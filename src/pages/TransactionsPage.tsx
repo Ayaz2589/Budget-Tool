@@ -1,7 +1,12 @@
 import { useState, useMemo, useCallback } from "react";
 import { useBudget } from "@/context/BudgetContext";
 import { useRules } from "@/context/RulesContext";
-import { applyRulesToExpenses } from "@/lib/categoryRules";
+import {
+  applyRulesToExpenses,
+  applyBaselineToExpenses,
+} from "@/lib/categoryRules";
+import { cleanDescription } from "@/lib/parsers";
+import { CategoryOption } from "@/lib/categoryColors";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -78,11 +83,19 @@ export function TransactionsPage() {
 
   const reapplyRules = () => {
     const expenseRules = rules.filter((r) => r.type === "expense");
-    const updated = applyRulesToExpenses(
-      expenses.filter((e) => !e.category),
-      expenseRules,
-    );
-    updated.forEach((e) => updateExpense(e.id, { category: e.category }));
+    const uncategorized = expenses.filter((e) => !e.category);
+    const withRules = applyRulesToExpenses(uncategorized, expenseRules);
+    const withBaseline = applyBaselineToExpenses(withRules);
+    withBaseline.forEach((e) => updateExpense(e.id, { category: e.category }));
+  };
+
+  const cleanAllDescriptions = () => {
+    expenses.forEach((e) => {
+      const cleaned = cleanDescription(e.description);
+      if (cleaned !== e.description) {
+        updateExpense(e.id, { description: cleaned });
+      }
+    });
   };
 
   const uncategorizedCount = expenses.filter((e) => !e.category).length;
@@ -165,14 +178,14 @@ export function TransactionsPage() {
                 value={categoryFilter || "_"}
                 onValueChange={(v) => setCategoryFilter(v === "_" ? "" : v)}
               >
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger className="w-[220px] min-w-[200px]">
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="_">All</SelectItem>
                   {expenseCategories.map((c) => (
                     <SelectItem key={c} value={c}>
-                      {c}
+                      <CategoryOption name={c} type="expense" />
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -183,6 +196,9 @@ export function TransactionsPage() {
                 Re-apply rules ({uncategorizedCount} uncategorized)
               </Button>
             )}
+            <Button variant="outline" onClick={cleanAllDescriptions}>
+              Clean descriptions
+            </Button>
             {someSelected && (
               <>
                 <Button
@@ -239,8 +255,11 @@ export function TransactionsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filtered.map((e) => (
-                    <TableRow key={e.id}>
+                  filtered.map((e, index) => (
+                    <TableRow
+                      key={e.id}
+                      className={index % 2 === 1 ? "bg-muted/50" : undefined}
+                    >
                       <TableCell className="w-[40px]">
                         <Checkbox
                           checked={selectedIds.has(e.id)}
@@ -270,14 +289,19 @@ export function TransactionsPage() {
                             })
                           }
                         >
-                          <SelectTrigger className="w-[160px]">
+                          <SelectTrigger className="w-[220px] min-w-[200px]">
                             <SelectValue placeholder="Category" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="_">Uncategorized</SelectItem>
+                            <SelectItem value="_">
+                              <CategoryOption
+                                name="Uncategorized"
+                                type="expense"
+                              />
+                            </SelectItem>
                             {expenseCategories.map((c) => (
                               <SelectItem key={c} value={c}>
-                                {c}
+                                <CategoryOption name={c} type="expense" />
                               </SelectItem>
                             ))}
                           </SelectContent>

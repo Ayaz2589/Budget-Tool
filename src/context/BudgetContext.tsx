@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -11,6 +12,8 @@ import {
   DEFAULT_EXPENSE_CATEGORIES,
   DEFAULT_INCOME_CATEGORIES,
 } from "@/lib/types";
+
+const BUDGET_STORAGE_KEY = "budget-tool-data";
 
 export interface BudgetState {
   expenses: Expense[];
@@ -39,16 +42,58 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+function loadStoredBudget(): {
+  expenses: Expense[];
+  income: Income[];
+  iOweNova: Record<string, number>;
+} {
+  try {
+    const raw = localStorage.getItem(BUDGET_STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw) as {
+        expenses?: Expense[];
+        income?: Income[];
+        iOweNova?: Record<string, number>;
+      };
+      return {
+        expenses: Array.isArray(data.expenses) ? data.expenses : [],
+        income: Array.isArray(data.income) ? data.income : [],
+        iOweNova:
+          data.iOweNova && typeof data.iOweNova === "object"
+            ? data.iOweNova
+            : {},
+      };
+    }
+  } catch {
+    // ignore
+  }
+  return { expenses: [], income: [], iOweNova: {} };
+}
+
 export function BudgetProvider({ children }: { children: ReactNode }) {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [income, setIncome] = useState<Income[]>([]);
+  const stored = loadStoredBudget();
+  const [expenses, setExpenses] = useState<Expense[]>(stored.expenses);
+  const [income, setIncome] = useState<Income[]>(stored.income);
   const [expenseCategories, setExpenseCategoriesState] = useState<string[]>([
     ...DEFAULT_EXPENSE_CATEGORIES,
   ]);
   const [incomeCategories, setIncomeCategoriesState] = useState<string[]>([
     ...DEFAULT_INCOME_CATEGORIES,
   ]);
-  const [iOweNova, setIOweNovaState] = useState<Record<string, number>>({});
+  const [iOweNova, setIOweNovaState] = useState<Record<string, number>>(
+    stored.iOweNova,
+  );
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        BUDGET_STORAGE_KEY,
+        JSON.stringify({ expenses, income, iOweNova }),
+      );
+    } catch {
+      // ignore
+    }
+  }, [expenses, income, iOweNova]);
 
   const addExpenses = useCallback((newExpenses: Expense[]) => {
     setExpenses((prev) => {

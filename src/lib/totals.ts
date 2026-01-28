@@ -61,15 +61,15 @@ export function computeMonthTotals(
     .filter((e) => e.category === "50/50")
     .reduce((s, e) => s + e.amount, 0);
   const split5050 = total5050Spent / 2;
-  const novasPurchase = monthExpenses
-    .filter((e) => e.category === "Nova's Purchases")
+  const tasnuvasPurchase = monthExpenses
+    .filter((e) => e.category === "Tasnuva's Purchases")
     .reduce((s, e) => s + e.amount, 0);
-  const novasTotalSpending = novasPurchase + split5050;
-  // My total spending = expenses that are mine (not Nova's, not 50/50, not Mortgage) + my half of 50/50
+  const tasnuvasTotalSpending = tasnuvasPurchase + split5050;
+  // My total spending = expenses that are mine (not Tasnuva's, not 50/50, not Mortgage) + my half of 50/50
   const myCategoriesSpent = monthExpenses
     .filter(
       (e) =>
-        e.category !== "Nova's Purchases" &&
+        e.category !== "Tasnuva's Purchases" &&
         e.category !== "50/50" &&
         e.category !== "Mortgage"
     )
@@ -89,8 +89,8 @@ export function computeMonthTotals(
     totalSpentWithoutMortgage,
     total5050Spent,
     split5050,
-    novasPurchase,
-    novasTotalSpending,
+    novasPurchase: tasnuvasPurchase,
+    novasTotalSpending: tasnuvasTotalSpending,
     iOweNova,
     myTotalSpendingWithoutMortgage,
     totalSaved,

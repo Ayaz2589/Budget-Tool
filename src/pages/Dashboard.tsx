@@ -82,7 +82,7 @@ export function Dashboard() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Nova&apos;s Total Spending
+              Tasnuva&apos;s Total Spending
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -28,6 +28,7 @@ export function SettingsPage() {
     setSpreadsheetId,
     syncToSheets,
     syncStatus,
+    syncErrorMessage,
   } = useGoogleAuth();
 
   const [expenseList, setExpenseList] = useState(expenseCategories.join(", "));
@@ -118,7 +119,7 @@ export function SettingsPage() {
               )}
               {syncStatus === "error" && (
                 <p className="text-sm text-destructive">
-                  Sync failed. Check console.
+                  {syncErrorMessage ?? "Sync failed."}
                 </p>
               )}
             </>
@@ -137,7 +138,7 @@ export function SettingsPage() {
           <Input
             value={expenseList}
             onChange={(e) => setExpenseList(e.target.value)}
-            placeholder="50/50, Nova's Purchases, Mortgage, ..."
+            placeholder="My Purchase, Tasnuva's Purchases, 50/50, Mortgage"
           />
           <Button variant="outline" size="sm" onClick={saveExpenseCategories}>
             Save

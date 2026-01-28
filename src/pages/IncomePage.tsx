@@ -33,6 +33,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
+import { CategoryOption } from "@/lib/categoryColors";
 
 function formatCurrency(n: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -124,13 +125,13 @@ export function IncomePage() {
                 <div className="space-y-2">
                   <Label>Category</Label>
                   <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-[220px] min-w-[200px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {incomeCategories.map((c) => (
                         <SelectItem key={c} value={c}>
-                          {c}
+                          <CategoryOption name={c} type="income" />
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -184,13 +185,13 @@ export function IncomePage() {
                             updateIncome(i.id, { category: v })
                           }
                         >
-                          <SelectTrigger className="w-[140px]">
+                          <SelectTrigger className="w-[220px] min-w-[200px]">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             {incomeCategories.map((c) => (
                               <SelectItem key={c} value={c}>
-                                {c}
+                                <CategoryOption name={c} type="income" />
                               </SelectItem>
                             ))}
                           </SelectContent>

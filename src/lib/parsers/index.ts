@@ -5,32 +5,42 @@ import { parseAppleCsv } from "./apple";
 
 export type CsvSource = "amex" | "chase" | "apple" | "unknown";
 
+const STRIP_BOM = /^\uFEFF/;
+
 export function detectCsvSource(csvText: string): CsvSource {
-  const firstLine = csvText.trim().split(/\r?\n/)[0] ?? "";
+  const trimmed = csvText.replace(STRIP_BOM, "").trim();
+  const firstLine = trimmed.split(/\r?\n/)[0] ?? "";
   const lower = firstLine.toLowerCase();
   if (lower.includes("card member") && lower.includes("amount") && lower.includes("description")) {
     return "amex";
   }
-  // Chase/Apple: add header checks when we have sample CSVs
   if (lower.includes("chase")) return "chase";
+  // Apple Card: Transaction Date, Clearing Date, Amount (USD), Purchased By
+  if (
+    lower.includes("transaction date") &&
+    lower.includes("clearing date") &&
+    lower.includes("amount (usd)")
+  )
+    return "apple";
   if (lower.includes("apple")) return "apple";
   return "unknown";
 }
 
 export function parseCsv(csvText: string, source?: CsvSource): ParseResult {
-  const detected = source ?? detectCsvSource(csvText);
+  const cleanText = csvText.replace(STRIP_BOM, "").trim();
+  const detected = source ?? detectCsvSource(cleanText);
   switch (detected) {
     case "amex":
-      return parseAmexCsv(csvText);
+      return parseAmexCsv(cleanText);
     case "chase":
-      return parseChaseCsv(csvText);
+      return parseChaseCsv(cleanText);
     case "apple":
-      return parseAppleCsv(csvText);
+      return parseAppleCsv(cleanText);
     default:
       return { expenses: [], source: "amex" };
   }
 }
 
-export { parseAmexCsv } from "./amex";
+export { parseAmexCsv, cleanDescription } from "./amex";
 export { parseChaseCsv } from "./chase";
 export { parseAppleCsv } from "./apple";

@@ -24,14 +24,10 @@ export interface ParseResult {
 }
 
 export const DEFAULT_EXPENSE_CATEGORIES = [
+  "My Purchase",
+  "Tasnuva's Purchases",
   "50/50",
-  "Nova's Purchases",
   "Mortgage",
-  "Entertainment",
-  "Transportation",
-  "Utilities",
-  "Food",
-  "Other",
 ] as const;
 
 export const DEFAULT_INCOME_CATEGORIES = [

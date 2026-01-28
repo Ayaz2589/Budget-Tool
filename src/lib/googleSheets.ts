@@ -81,8 +81,8 @@ export async function writeTotalsSheet(
     "Total Spent w/o Mortgage",
     "Total 50/50 Spent",
     "50/50 Split",
-    "Nova's Purchase",
-    "Nova's Total Spending",
+    "Tasnuva's Purchase",
+    "Tasnuva's Total Spending",
     "I Owe Nova",
     "My Total Spending w/o Mortgage",
     "Total Saved",
@@ -179,16 +179,47 @@ async function updateSheet(
   }
 }
 
+export interface SheetIds {
+  expenses: number;
+  income: number;
+  totals: number;
+}
+
+export async function getSheetIds(
+  accessToken: string,
+  spreadsheetId: string
+): Promise<SheetIds | null> {
+  const metaUrl = `${SHEETS_API}/${spreadsheetId}?fields=sheets.properties(sheetId,title)`;
+  const res = await fetch(metaUrl, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as {
+    sheets?: { properties: { sheetId: number; title: string } }[];
+  };
+  const byTitle: Record<string, number> = {};
+  for (const s of data.sheets ?? []) {
+    byTitle[s.properties.title] = s.properties.sheetId;
+  }
+  const expenses = byTitle["Expenses"];
+  const income = byTitle["Income"];
+  const totals = byTitle["Totals"];
+  if (expenses == null || income == null || totals == null) return null;
+  return { expenses, income, totals };
+}
+
 export async function ensureSheetsExist(
   accessToken: string,
   spreadsheetId: string
 ): Promise<void> {
-  const metaUrl = `${SHEETS_API}/${spreadsheetId}?fields=sheets.properties`;
+  const metaUrl = `${SHEETS_API}/${spreadsheetId}?fields=sheets.properties(sheetId,title)`;
   const res = await fetch(metaUrl, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   if (!res.ok) throw new Error("Failed to get spreadsheet metadata");
-  const data = (await res.json()) as { sheets?: { properties: { title: string } }[] };
+  const data = (await res.json()) as {
+    sheets?: { properties: { sheetId: number; title: string } }[];
+  };
   const titles = new Set((data.sheets ?? []).map((s) => s.properties.title));
   const needed = ["Expenses", "Income", "Totals"];
   const toAdd = needed.filter((t) => !titles.has(t));
@@ -208,5 +239,206 @@ export async function ensureSheetsExist(
   if (!addRes.ok) {
     const err = await addRes.text();
     throw new Error(`Failed to add sheets: ${addRes.status} ${err}`);
+  }
+}
+
+function repeatCellRequest(
+  sheetId: number,
+  startRow: number,
+  endRow: number,
+  startCol: number,
+  endCol: number,
+  format: {
+    bold?: boolean;
+    fontSize?: number;
+    horizontalAlignment?: string;
+    numberFormat?: { type: string; pattern?: string };
+  },
+  fields: string
+): { repeatCell: object } {
+  const userEnteredFormat: Record<string, unknown> = {};
+  if (format.bold != null || format.fontSize != null) {
+    userEnteredFormat.textFormat = {};
+    if (format.bold != null) (userEnteredFormat.textFormat as Record<string, unknown>).bold = format.bold;
+    if (format.fontSize != null) (userEnteredFormat.textFormat as Record<string, unknown>).fontSize = format.fontSize;
+  }
+  if (format.horizontalAlignment != null) {
+    userEnteredFormat.horizontalAlignment = format.horizontalAlignment;
+  }
+  if (format.numberFormat != null) {
+    userEnteredFormat.numberFormat = format.numberFormat;
+  }
+  return {
+    repeatCell: {
+      range: {
+        sheetId,
+        startRowIndex: startRow,
+        endRowIndex: endRow,
+        startColumnIndex: startCol,
+        endColumnIndex: endCol,
+      },
+      cell: { userEnteredFormat },
+      fields,
+    },
+  };
+}
+
+export async function applySheetsFormatting(
+  accessToken: string,
+  spreadsheetId: string,
+  sheetIds: SheetIds
+): Promise<void> {
+  const requests: object[] = [];
+
+  const leftAlignFields = "userEnteredFormat(horizontalAlignment)";
+  const headerFields = "userEnteredFormat(textFormat,horizontalAlignment)";
+  const currencyFields = "userEnteredFormat(numberFormat,horizontalAlignment)";
+  const percentFields = "userEnteredFormat(numberFormat,horizontalAlignment)";
+
+  // Expenses: header row bold + larger, all left align, column B (Amount) currency
+  requests.push(
+    repeatCellRequest(
+      sheetIds.expenses,
+      0,
+      1,
+      0,
+      4,
+      { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
+      headerFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.expenses,
+      0,
+      10000,
+      0,
+      4,
+      { horizontalAlignment: "LEFT" },
+      leftAlignFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.expenses,
+      1,
+      10000,
+      1,
+      2,
+      {
+        horizontalAlignment: "LEFT",
+        numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },
+      },
+      currencyFields
+    )
+  );
+
+  // Income: same as Expenses
+  requests.push(
+    repeatCellRequest(
+      sheetIds.income,
+      0,
+      1,
+      0,
+      4,
+      { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
+      headerFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.income,
+      0,
+      10000,
+      0,
+      4,
+      { horizontalAlignment: "LEFT" },
+      leftAlignFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.income,
+      1,
+      10000,
+      1,
+      2,
+      {
+        horizontalAlignment: "LEFT",
+        numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },
+      },
+      currencyFields
+    )
+  );
+
+  // Totals: header bold + larger, all left align; money columns $, Personal Savings Rate (col 11) %
+  requests.push(
+    repeatCellRequest(
+      sheetIds.totals,
+      0,
+      1,
+      0,
+      15,
+      { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
+      headerFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.totals,
+      0,
+      100,
+      0,
+      15,
+      { horizontalAlignment: "LEFT" },
+      leftAlignFields
+    )
+  );
+  // Columns 1-10, 12-14 = currency; column 11 = Personal Savings Rate = percent
+  for (let c = 1; c <= 14; c++) {
+    if (c === 11) {
+      requests.push(
+        repeatCellRequest(
+          sheetIds.totals,
+          1,
+          100,
+          11,
+          12,
+          {
+            horizontalAlignment: "LEFT",
+            numberFormat: { type: "PERCENT", pattern: "0.0%" },
+          },
+          percentFields
+        )
+      );
+    } else {
+      requests.push(
+        repeatCellRequest(
+          sheetIds.totals,
+          1,
+          100,
+          c,
+          c + 1,
+          {
+            horizontalAlignment: "LEFT",
+            numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },
+          },
+          currencyFields
+        )
+      );
+    }
+  }
+
+  const batchRes = await fetch(`${SHEETS_API}/${spreadsheetId}:batchUpdate`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ requests }),
+  });
+  if (!batchRes.ok) {
+    const err = await batchRes.text();
+    throw new Error(`Formatting failed: ${batchRes.status} ${err}`);
   }
 }

@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
 import type { CategoryRule } from "@/lib/categoryRules";
+import { CategoryOption } from "@/lib/categoryColors";
 
 export function CategoryRulesPage() {
   const { rules, addRule, removeRule } = useRules();
@@ -42,7 +43,7 @@ export function CategoryRulesPage() {
   const [open, setOpen] = useState(false);
   const [pattern, setPattern] = useState("");
   const [category, setCategory] = useState<string>(
-    expenseCategories[0] ?? "50/50",
+    expenseCategories[0] ?? "My Purchase",
   );
 
   const expenseRules = rules.filter((r) => r.type === "expense");
@@ -52,11 +53,11 @@ export function CategoryRulesPage() {
     if (!pattern.trim()) return;
     addRule({
       pattern: pattern.trim(),
-      category: category || (expenseCategories[0] ?? "50/50"),
+      category: category || (expenseCategories[0] ?? "My Purchase"),
       type: "expense",
     });
     setPattern("");
-    setCategory(expenseCategories[0] ?? "50/50");
+    setCategory(expenseCategories[0] ?? "My Purchase");
     setOpen(false);
   };
 
@@ -96,13 +97,13 @@ export function CategoryRulesPage() {
                 <div className="space-y-2">
                   <Label>Category</Label>
                   <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-[220px] min-w-[200px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {expenseCategories.map((c) => (
                         <SelectItem key={c} value={c}>
-                          {c}
+                          <CategoryOption name={c} type="expense" />
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -137,7 +138,9 @@ export function CategoryRulesPage() {
                       <TableCell className="font-mono text-sm">
                         {r.pattern}
                       </TableCell>
-                      <TableCell>{r.category}</TableCell>
+                      <TableCell>
+                        <CategoryOption name={r.category} type="expense" />
+                      </TableCell>
                       <TableCell>
                         <Button
                           variant="ghost"

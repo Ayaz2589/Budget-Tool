@@ -1,9 +1,13 @@
 import { useRef, useState } from "react";
 import { useBudget } from "@/context/BudgetContext";
 import { useRules } from "@/context/RulesContext";
-import { parseCsv, detectCsvSource } from "@/lib/parsers";
-import { applyRulesToExpenses } from "@/lib/categoryRules";
+import { parseCsv, type CsvSource } from "@/lib/parsers";
+import {
+  applyRulesToExpenses,
+  applyBaselineToExpenses,
+} from "@/lib/categoryRules";
 import type { Expense } from "@/lib/types";
+import { CategoryOption } from "@/lib/categoryColors";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -36,47 +40,61 @@ function formatCurrency(n: number): string {
   }).format(n);
 }
 
+type SourceChoice = "amex" | "apple";
+
+const SOURCE_OPTIONS: { value: SourceChoice; label: string }[] = [
+  { value: "amex", label: "American Express" },
+  { value: "apple", label: "Apple Card" },
+];
+
 export function ImportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedSource, setSelectedSource] = useState<SourceChoice>("amex");
   const [previewExpenses, setPreviewExpenses] = useState<Expense[]>([]);
   const [sourceLabel, setSourceLabel] = useState<string>("");
+  const [lastDetected, setLastDetected] = useState<string>("");
+  const [importError, setImportError] = useState<string>("");
   const { addExpenses, expenseCategories } = useBudget();
   const { rules } = useRules();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setImportError("");
     const reader = new FileReader();
     reader.onload = () => {
-      const text = String(reader.result);
-      const detected = detectCsvSource(text);
-      const result = parseCsv(text, detected);
-      const withRules = applyRulesToExpenses(
-        result.expenses,
-        rules.filter((r) => r.type === "expense"),
-      );
-      setPreviewExpenses(withRules);
-      setSourceLabel(
-        detected === "amex"
-          ? "American Express"
-          : detected === "chase"
-            ? "Chase"
-            : detected === "apple"
-              ? "Apple"
-              : "Unknown",
-      );
+      try {
+        const text = String(reader.result);
+        const result = parseCsv(text, selectedSource);
+        const withRules = applyRulesToExpenses(
+          result.expenses,
+          rules.filter((r) => r.type === "expense"),
+        );
+        const withBaseline = applyBaselineToExpenses(withRules);
+        setPreviewExpenses(withBaseline);
+        const label =
+          selectedSource === "amex" ? "American Express" : "Apple Card";
+        setSourceLabel(label);
+        setLastDetected(selectedSource);
+      } catch (err) {
+        setImportError(err instanceof Error ? err.message : "Import failed");
+        setPreviewExpenses([]);
+        setLastDetected("");
+        setSourceLabel("");
+      }
     };
-    reader.readAsText(file);
+    reader.readAsText(file, "UTF-8");
     e.target.value = "";
   };
 
   const applyRules = () => {
-    setPreviewExpenses((prev) =>
-      applyRulesToExpenses(
+    setPreviewExpenses((prev) => {
+      const withRules = applyRulesToExpenses(
         prev,
         rules.filter((r) => r.type === "expense"),
-      ),
-    );
+      );
+      return applyBaselineToExpenses(withRules);
+    });
   };
 
   const updatePreviewCategory = (id: string, category: string) => {
@@ -89,6 +107,8 @@ export function ImportPage() {
     addExpenses(previewExpenses);
     setPreviewExpenses([]);
     setSourceLabel("");
+    setLastDetected("");
+    setImportError("");
   };
 
   return (
@@ -98,11 +118,33 @@ export function ImportPage() {
         <CardHeader>
           <CardTitle>Upload statement</CardTitle>
           <CardDescription>
-            Select a CSV from American Express (Chase and Apple coming soon).
-            We&apos;ll detect the source and apply your category rules.
+            Select your bank from the dropdown, then choose a CSV file. After
+            reviewing the preview, click &quot;Add to transactions&quot; to save
+            them—they persist across refreshes and appear on the Transactions
+            page.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
+        <CardContent className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium whitespace-nowrap">
+              CSV source:
+            </span>
+            <Select
+              value={selectedSource}
+              onValueChange={(v) => setSelectedSource(v as SourceChoice)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SOURCE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <input
             ref={fileInputRef}
             type="file"
@@ -114,15 +156,22 @@ export function ImportPage() {
             <Upload className="size-4" />
             Choose CSV file
           </Button>
+          {importError && (
+            <span className="text-sm text-destructive self-center">
+              {importError}
+            </span>
+          )}
+          {lastDetected && !importError && (
+            <span className="text-sm text-muted-foreground self-center">
+              {sourceLabel} · {previewExpenses.length} rows
+            </span>
+          )}
           {previewExpenses.length > 0 && (
             <>
               <Button variant="outline" onClick={applyRules}>
                 Apply rules
               </Button>
               <Button onClick={addToTransactions}>Add to transactions</Button>
-              <span className="text-sm text-muted-foreground self-center">
-                {sourceLabel} · {previewExpenses.length} rows
-              </span>
             </>
           )}
         </CardContent>
@@ -168,14 +217,19 @@ export function ImportPage() {
                             updatePreviewCategory(e.id, v === "_" ? "" : v)
                           }
                         >
-                          <SelectTrigger className="w-[160px]">
+                          <SelectTrigger className="w-[220px] min-w-[200px]">
                             <SelectValue placeholder="Category" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="_">Uncategorized</SelectItem>
+                            <SelectItem value="_">
+                              <CategoryOption
+                                name="Uncategorized"
+                                type="expense"
+                              />
+                            </SelectItem>
                             {expenseCategories.map((c) => (
                               <SelectItem key={c} value={c}>
-                                {c}
+                                <CategoryOption name={c} type="expense" />
                               </SelectItem>
                             ))}
                           </SelectContent>

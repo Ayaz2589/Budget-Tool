@@ -36,6 +36,32 @@ export function applyRulesToExpenses(
   return expenses.map((e) => applyRulesToExpense(e, rules));
 }
 
+/** Baseline rules (only if still uncategorized). */
+export function applyBaselineToExpense(expense: Expense): Expense {
+  if (expense.category) return expense;
+  // Apple Card → My Purchase
+  if (expense.source === "apple") {
+    return { ...expense, category: "My Purchase" };
+  }
+  // Card Member TASNUVA AHMED → Tasnuva's Purchases
+  if (expense.cardMember?.toUpperCase() === "TASNUVA AHMED") {
+    return { ...expense, category: "Tasnuva's Purchases" };
+  }
+  // UBER EATS + not Tasnuva + amount < $25 → My Purchase
+  if (
+    expense.description.toUpperCase().includes("UBER EATS") &&
+    expense.cardMember?.toUpperCase() !== "TASNUVA AHMED" &&
+    expense.amount < 25
+  ) {
+    return { ...expense, category: "My Purchase" };
+  }
+  return expense;
+}
+
+export function applyBaselineToExpenses(expenses: Expense[]): Expense[] {
+  return expenses.map((e) => applyBaselineToExpense(e));
+}
+
 export function generateRuleId(): string {
   return `rule-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }

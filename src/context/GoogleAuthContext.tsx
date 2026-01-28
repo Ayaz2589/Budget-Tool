@@ -15,6 +15,8 @@ import {
   clearAndWriteExpenses,
   clearAndWriteIncome,
   writeTotalsSheet,
+  getSheetIds,
+  applySheetsFormatting,
   extractSpreadsheetId,
 } from "@/lib/googleSheets";
 
@@ -30,6 +32,7 @@ interface GoogleAuthContextValue {
   setSpreadsheetId: (id: string | null) => void;
   syncToSheets: () => Promise<void>;
   syncStatus: SyncStatus;
+  syncErrorMessage: string | null;
 }
 
 const GoogleAuthContext = createContext<GoogleAuthContextValue | null>(null);
@@ -51,6 +54,7 @@ export function GoogleAuthProviderFallback({
     }
   });
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
+  const [syncErrorMessage, setSyncErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (spreadsheetId) {
@@ -84,10 +88,14 @@ export function GoogleAuthProviderFallback({
       signOut: () => {},
       spreadsheetId,
       setSpreadsheetId,
-      syncToSheets: async () => setSyncStatus("error"),
+      syncToSheets: async () => {
+        setSyncStatus("error");
+        setSyncErrorMessage("Google sign-in is not configured.");
+      },
       syncStatus,
+      syncErrorMessage,
     }),
-    [spreadsheetId, setSpreadsheetId, syncStatus],
+    [spreadsheetId, setSpreadsheetId, syncStatus, syncErrorMessage],
   );
 
   return (
@@ -107,6 +115,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     }
   });
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
+  const [syncErrorMessage, setSyncErrorMessage] = useState<string | null>(null);
 
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
@@ -157,9 +166,11 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const syncToSheets = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
       setSyncStatus("error");
+      setSyncErrorMessage("Not signed in or no spreadsheet set.");
       return;
     }
     setSyncStatus("syncing");
+    setSyncErrorMessage(null);
     try {
       await ensureSheetsExist(accessToken, spreadsheetId);
       await clearAndWriteExpenses(accessToken, spreadsheetId, budget.expenses);
@@ -171,10 +182,17 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       });
       const grand = computeGrandTotals(months);
       await writeTotalsSheet(accessToken, spreadsheetId, months, grand);
+      const sheetIds = await getSheetIds(accessToken, spreadsheetId);
+      if (sheetIds) {
+        await applySheetsFormatting(accessToken, spreadsheetId, sheetIds);
+      }
       setSyncStatus("success");
+      setSyncErrorMessage(null);
     } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error("Sync failed:", err);
       setSyncStatus("error");
+      setSyncErrorMessage(message);
     }
   }, [
     accessToken,
@@ -193,6 +211,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       setSpreadsheetId,
       syncToSheets,
       syncStatus,
+      syncErrorMessage,
     }),
     [
       accessToken,
@@ -202,6 +221,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       setSpreadsheetId,
       syncToSheets,
       syncStatus,
+      syncErrorMessage,
     ],
   );
 

@@ -17,6 +17,11 @@ import {
   PAYCHECK_CATEGORY,
   hasPaycheckOnSheet,
   getCurrentMonthPaycheckDatesUTC,
+  RENT_AMOUNTS,
+  RENT_DESCRIPTION,
+  RENT_CATEGORY,
+  hasRentOnSheet,
+  getCurrentMonthRentDateUTC,
 } from "@/lib/paycheck";
 import {
   ensureSheetsExist,
@@ -314,19 +319,51 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
+    const ensureCurrentMonthRent = () => {
+      const rentDate = getCurrentMonthRentDateUTC();
+      const existingRentAmounts = new Set(
+        budget.income
+          .filter(
+            (i) =>
+              i.date === rentDate &&
+              ((i.description || "").toLowerCase() ===
+                RENT_DESCRIPTION.toLowerCase() ||
+                (i.category || "").toLowerCase() ===
+                  RENT_CATEGORY.toLowerCase()) &&
+              RENT_AMOUNTS.some((a) => Math.abs(i.amount - a) < 0.01),
+          )
+          .map((i) => i.amount),
+      );
+      for (const amount of RENT_AMOUNTS) {
+        if (!existingRentAmounts.has(amount)) {
+          budget.addIncome({
+            date: rentDate,
+            amount,
+            description: RENT_DESCRIPTION,
+            category: RENT_CATEGORY,
+          });
+        }
+      }
+    };
+
     if (accessToken && spreadsheetId) {
       if (hasCheckedSheetForPaychecks.current) return;
       hasCheckedSheetForPaychecks.current = true;
       readIncomeFromSheet(accessToken, spreadsheetId)
         .then((sheetIncome) => {
-          if (hasPaycheckOnSheet(sheetIncome)) {
-            void pullFromSheet();
+          if (hasPaycheckOnSheet(sheetIncome) || hasRentOnSheet(sheetIncome)) {
+            void pullFromSheet().then(() => {
+              ensureCurrentMonthPaychecks();
+              ensureCurrentMonthRent();
+            });
           } else {
             ensureCurrentMonthPaychecks();
+            ensureCurrentMonthRent();
           }
         })
         .catch(() => {
           ensureCurrentMonthPaychecks();
+          ensureCurrentMonthRent();
         });
       return;
     }
@@ -334,6 +371,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     if (!accessToken && !hasAddedPaychecksWhenUnsignedIn.current) {
       hasAddedPaychecksWhenUnsignedIn.current = true;
       ensureCurrentMonthPaychecks();
+      ensureCurrentMonthRent();
     }
   }, [
     accessToken,

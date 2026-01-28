@@ -4,6 +4,11 @@ export const PAYCHECK_AMOUNT = 4178.4;
 export const PAYCHECK_DESCRIPTION = "Paycheck";
 export const PAYCHECK_CATEGORY = "Paycheck";
 
+/** Rent: two entries on the 5th of each month. */
+export const RENT_AMOUNTS = [2200, 2800] as const;
+export const RENT_DESCRIPTION = "Rent";
+export const RENT_CATEGORY = "Rent";
+
 const AMOUNT_TOLERANCE = 0.01;
 
 /** Months that have 31 days (1-indexed). */
@@ -45,4 +50,28 @@ export function getPaycheckDatesForYear(year: number): string[] {
     }
   }
   return dates;
+}
+
+export function isRentEntry(i: Income): boolean {
+  const isRentDesc =
+    (i.description || "").toLowerCase() === RENT_DESCRIPTION.toLowerCase();
+  const isRentCat =
+    (i.category || "").toLowerCase() === RENT_CATEGORY.toLowerCase();
+  const amountMatch = RENT_AMOUNTS.some(
+    (a) => Math.abs(i.amount - a) < AMOUNT_TOLERANCE,
+  );
+  return (isRentDesc || isRentCat) && amountMatch;
+}
+
+export function hasRentOnSheet(income: Income[]): boolean {
+  return income.some(isRentEntry);
+}
+
+/** Current month (UTC) rent date: 5th. */
+export function getCurrentMonthRentDateUTC(): string {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth() + 1;
+  const monthStr = month.toString().padStart(2, "0");
+  return `${year}-${monthStr}-05`;
 }

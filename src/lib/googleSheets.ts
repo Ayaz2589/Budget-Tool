@@ -439,14 +439,14 @@ export async function applySheetsFormatting(
   const currencyFields = "userEnteredFormat(numberFormat,horizontalAlignment)";
   const percentFields = "userEnteredFormat(numberFormat,horizontalAlignment)";
 
-  // Expenses: header row bold + larger, all left align (A–F), column B (Amount) currency
+  // Expenses: header row bold + larger, all left align (A–G), column C (Amount) currency
   requests.push(
     repeatCellRequest(
       sheetIds.expenses,
       0,
       1,
       0,
-      6,
+      7,
       { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
       headerFields
     )
@@ -457,7 +457,7 @@ export async function applySheetsFormatting(
       0,
       10000,
       0,
-      6,
+      7,
       { horizontalAlignment: "LEFT" },
       leftAlignFields
     )
@@ -467,8 +467,8 @@ export async function applySheetsFormatting(
       sheetIds.expenses,
       1,
       10000,
-      1,
       2,
+      3,
       {
         horizontalAlignment: "LEFT",
         numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },
@@ -477,7 +477,7 @@ export async function applySheetsFormatting(
     )
   );
 
-  // Income: same as Expenses
+  // Income: same as Expenses, column B (Amount) currency
   requests.push(
     repeatCellRequest(
       sheetIds.income,

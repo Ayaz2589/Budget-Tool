@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, Fragment } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useBudget } from "@/context/BudgetContext";
 import { useRules } from "@/context/RulesContext";
 import {
@@ -45,6 +45,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Plus, FileDown } from "lucide-react";
 
 function formatCurrency(n: number): string {
@@ -128,6 +134,11 @@ export function TransactionsPage() {
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
   }, [filtered]);
+
+  const currentMonthKey = new Date().toISOString().slice(0, 7);
+  const defaultOpenMonth = byMonth.some(([k]) => k === currentMonthKey)
+    ? currentMonthKey
+    : (byMonth[0]?.[0] ?? "");
 
   const reapplyRules = () => {
     const expenseRules = rules.filter((r) => r.type === "expense");
@@ -409,6 +420,16 @@ export function TransactionsPage() {
               <FileDown className="size-4" />
               Download PDF
             </Button>
+            {filtered.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={selectAllFiltered}
+                className={someSelected ? undefined : ""}
+              >
+                {allFilteredSelected ? "Deselect all" : "Select all"}
+              </Button>
+            )}
             {someSelected && (
               <>
                 <Button
@@ -435,124 +456,157 @@ export function TransactionsPage() {
             )}
           </div>
           <div className="overflow-x-auto max-h-[60vh] overflow-y-auto border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[40px]">
-                    <Checkbox
-                      checked={allFilteredSelected}
-                      onCheckedChange={selectAllFiltered}
-                      aria-label="Select all"
-                    />
-                  </TableHead>
-                  <TableHead className="w-[100px]">ID</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead>Card Member</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="w-[80px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={9}
-                      className="text-center text-muted-foreground py-8"
-                    >
-                      No transactions. Import a CSV or add a manual transaction.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  byMonth.map(([monthKey, monthExpenses]) => (
-                    <Fragment key={monthKey}>
-                      <TableRow className="bg-muted/80 hover:bg-muted/80">
-                        <TableCell
-                          colSpan={9}
-                          className="font-semibold text-foreground py-2"
-                        >
-                          {getMonthLabel(monthKey)}
-                        </TableCell>
-                      </TableRow>
-                      {monthExpenses.map((e, index) => (
-                        <TableRow
-                          key={e.id}
-                          className={
-                            index % 2 === 1 ? "bg-muted/30" : undefined
-                          }
-                        >
-                          <TableCell className="w-[40px]">
-                            <Checkbox
-                              checked={selectedIds.has(e.id)}
-                              onCheckedChange={() => toggleSelect(e.id)}
-                              aria-label={`Select ${e.description}`}
-                            />
-                          </TableCell>
-                          <TableCell
-                            className="font-mono text-xs max-w-[100px] truncate"
-                            title={e.id}
-                          >
-                            {e.id}
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">
-                            {e.date}
-                          </TableCell>
-                          <TableCell className="max-w-[220px] truncate">
-                            {e.description}
-                          </TableCell>
-                          <TableCell>{formatCurrency(e.amount)}</TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {SOURCE_LABELS[e.source]}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {e.cardMember ?? "—"}
-                          </TableCell>
-                          <TableCell>
-                            <Select
-                              value={e.category || "_"}
-                              onValueChange={(v) =>
-                                updateExpense(e.id, {
-                                  category: v === "_" ? "" : v,
-                                })
+            {filtered.length === 0 ? (
+              <div className="text-center text-muted-foreground py-12 px-4">
+                No transactions. Import a CSV or add a manual transaction.
+              </div>
+            ) : (
+              <Accordion
+                type="single"
+                collapsible
+                defaultValue={defaultOpenMonth}
+                className="divide-y"
+              >
+                {byMonth.map(([monthKey, monthExpenses]) => (
+                  <AccordionItem
+                    key={monthKey}
+                    value={monthKey}
+                    className="border-0"
+                  >
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
+                      <span className="font-semibold">
+                        {getMonthLabel(monthKey)}
+                      </span>
+                      <span className="text-muted-foreground font-normal ml-2">
+                        ({monthExpenses.length} transaction
+                        {monthExpenses.length === 1 ? "" : "s"})
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-0 pb-0">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-[40px]">
+                              <Checkbox
+                                checked={
+                                  monthExpenses.length > 0 &&
+                                  monthExpenses.every((e) =>
+                                    selectedIds.has(e.id),
+                                  )
+                                }
+                                onCheckedChange={() => {
+                                  const ids = new Set(
+                                    monthExpenses.map((e) => e.id),
+                                  );
+                                  const allSelected =
+                                    ids.size > 0 &&
+                                    [...ids].every((id: string) =>
+                                      selectedIds.has(id),
+                                    );
+                                  setSelectedIds((prev) => {
+                                    const next = new Set(prev);
+                                    if (allSelected)
+                                      ids.forEach((id) => next.delete(id));
+                                    else ids.forEach((id) => next.add(id));
+                                    return next;
+                                  });
+                                }}
+                                aria-label="Select all in month"
+                              />
+                            </TableHead>
+                            <TableHead className="w-[100px]">ID</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Description</TableHead>
+                            <TableHead>Amount</TableHead>
+                            <TableHead>Source</TableHead>
+                            <TableHead>Card Member</TableHead>
+                            <TableHead>Category</TableHead>
+                            <TableHead className="w-[80px]">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {monthExpenses.map((e, index) => (
+                            <TableRow
+                              key={e.id}
+                              className={
+                                index % 2 === 1 ? "bg-muted/30" : undefined
                               }
                             >
-                              <SelectTrigger className="w-[220px] min-w-[200px]">
-                                <SelectValue placeholder="Category" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="_">
-                                  <CategoryOption
-                                    name="Uncategorized"
-                                    type="expense"
-                                  />
-                                </SelectItem>
-                                {expenseCategories.map((c) => (
-                                  <SelectItem key={c} value={c}>
-                                    <CategoryOption name={c} type="expense" />
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDeleteOneExpense(e)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              Delete
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </Fragment>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                              <TableCell className="w-[40px]">
+                                <Checkbox
+                                  checked={selectedIds.has(e.id)}
+                                  onCheckedChange={() => toggleSelect(e.id)}
+                                  aria-label={`Select ${e.description}`}
+                                />
+                              </TableCell>
+                              <TableCell
+                                className="font-mono text-xs max-w-[100px] truncate"
+                                title={e.id}
+                              >
+                                {e.id}
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                {e.date}
+                              </TableCell>
+                              <TableCell className="max-w-[220px] truncate">
+                                {e.description}
+                              </TableCell>
+                              <TableCell>{formatCurrency(e.amount)}</TableCell>
+                              <TableCell className="text-muted-foreground">
+                                {SOURCE_LABELS[e.source]}
+                              </TableCell>
+                              <TableCell className="text-muted-foreground">
+                                {e.cardMember ?? "—"}
+                              </TableCell>
+                              <TableCell>
+                                <Select
+                                  value={e.category || "_"}
+                                  onValueChange={(v) =>
+                                    updateExpense(e.id, {
+                                      category: v === "_" ? "" : v,
+                                    })
+                                  }
+                                >
+                                  <SelectTrigger className="w-[220px] min-w-[200px]">
+                                    <SelectValue placeholder="Category" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="_">
+                                      <CategoryOption
+                                        name="Uncategorized"
+                                        type="expense"
+                                      />
+                                    </SelectItem>
+                                    {expenseCategories.map((c) => (
+                                      <SelectItem key={c} value={c}>
+                                        <CategoryOption
+                                          name={c}
+                                          type="expense"
+                                        />
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeleteOneExpense(e)}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  Delete
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
           </div>
         </CardContent>
       </Card>

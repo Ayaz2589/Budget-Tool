@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, Fragment } from "react";
 import { useBudget } from "@/context/BudgetContext";
 import { useRules } from "@/context/RulesContext";
 import {
@@ -6,6 +6,7 @@ import {
   applyBaselineToExpenses,
 } from "@/lib/categoryRules";
 import type { ExpenseSource } from "@/lib/types";
+import { getMonthLabel } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
 import { CategoryOption } from "@/lib/categoryColors";
 import { Button } from "@/components/ui/button";
@@ -112,6 +113,16 @@ export function TransactionsPage() {
     }
     return list;
   }, [expenses, monthFilter, sourceFilter, categoryFilter]);
+
+  const byMonth = useMemo(() => {
+    const map = new Map<string, typeof filtered>();
+    for (const e of filtered) {
+      const key = e.date.slice(0, 7);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(e);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [filtered]);
 
   const reapplyRules = () => {
     const expenseRules = rules.filter((r) => r.type === "expense");
@@ -435,69 +446,83 @@ export function TransactionsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filtered.map((e, index) => (
-                    <TableRow
-                      key={e.id}
-                      className={index % 2 === 1 ? "bg-muted/50" : undefined}
-                    >
-                      <TableCell className="w-[40px]">
-                        <Checkbox
-                          checked={selectedIds.has(e.id)}
-                          onCheckedChange={() => toggleSelect(e.id)}
-                          aria-label={`Select ${e.description}`}
-                        />
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {e.date}
-                      </TableCell>
-                      <TableCell className="max-w-[220px] truncate">
-                        {e.description}
-                      </TableCell>
-                      <TableCell>{formatCurrency(e.amount)}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {SOURCE_LABELS[e.source]}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {e.cardMember ?? "—"}
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={e.category || "_"}
-                          onValueChange={(v) =>
-                            updateExpense(e.id, {
-                              category: v === "_" ? "" : v,
-                            })
+                  byMonth.map(([monthKey, monthExpenses]) => (
+                    <Fragment key={monthKey}>
+                      <TableRow className="bg-muted/80 hover:bg-muted/80">
+                        <TableCell
+                          colSpan={8}
+                          className="font-semibold text-foreground py-2"
+                        >
+                          {getMonthLabel(monthKey)}
+                        </TableCell>
+                      </TableRow>
+                      {monthExpenses.map((e, index) => (
+                        <TableRow
+                          key={e.id}
+                          className={
+                            index % 2 === 1 ? "bg-muted/30" : undefined
                           }
                         >
-                          <SelectTrigger className="w-[220px] min-w-[200px]">
-                            <SelectValue placeholder="Category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="_">
-                              <CategoryOption
-                                name="Uncategorized"
-                                type="expense"
-                              />
-                            </SelectItem>
-                            {expenseCategories.map((c) => (
-                              <SelectItem key={c} value={c}>
-                                <CategoryOption name={c} type="expense" />
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeExpense(e.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
+                          <TableCell className="w-[40px]">
+                            <Checkbox
+                              checked={selectedIds.has(e.id)}
+                              onCheckedChange={() => toggleSelect(e.id)}
+                              aria-label={`Select ${e.description}`}
+                            />
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {e.date}
+                          </TableCell>
+                          <TableCell className="max-w-[220px] truncate">
+                            {e.description}
+                          </TableCell>
+                          <TableCell>{formatCurrency(e.amount)}</TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {SOURCE_LABELS[e.source]}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {e.cardMember ?? "—"}
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={e.category || "_"}
+                              onValueChange={(v) =>
+                                updateExpense(e.id, {
+                                  category: v === "_" ? "" : v,
+                                })
+                              }
+                            >
+                              <SelectTrigger className="w-[220px] min-w-[200px]">
+                                <SelectValue placeholder="Category" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="_">
+                                  <CategoryOption
+                                    name="Uncategorized"
+                                    type="expense"
+                                  />
+                                </SelectItem>
+                                {expenseCategories.map((c) => (
+                                  <SelectItem key={c} value={c}>
+                                    <CategoryOption name={c} type="expense" />
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeExpense(e.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </Fragment>
                   ))
                 )}
               </TableBody>

@@ -31,7 +31,7 @@ function getMonthKey(date: string): string {
   return date.slice(0, 7);
 }
 
-function getMonthLabel(monthKey: string): string {
+export function getMonthLabel(monthKey: string): string {
   const [y, m] = monthKey.split("-");
   const months = [
     "January", "February", "March", "April", "May", "June",

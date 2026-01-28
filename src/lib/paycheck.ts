@@ -11,6 +11,10 @@ export const RENT_CATEGORY = "Rent";
 
 const AMOUNT_TOLERANCE = 0.01;
 
+function formatCurrency(n: number): string {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+}
+
 /** Months that have 31 days (1-indexed). */
 const MONTHS_WITH_31 = new Set([1, 3, 5, 7, 8, 10, 12]);
 
@@ -75,3 +79,37 @@ export function getCurrentMonthRentDateUTC(): string {
   const monthStr = month.toString().padStart(2, "0");
   return `${year}-${monthStr}-05`;
 }
+
+/** Mortgage: $5,400 on the 15th of each month (expense). */
+export const MORTGAGE_AMOUNT = 5400;
+export const MORTGAGE_DESCRIPTION = "Mortgage";
+export const MORTGAGE_CATEGORY = "Mortgage";
+
+export function isMortgageEntry(e: { date: string; amount: number; category: string }): boolean {
+  const dateMatch = e.date.endsWith("-15");
+  const amountMatch = Math.abs(e.amount - MORTGAGE_AMOUNT) < AMOUNT_TOLERANCE;
+  const catMatch = (e.category || "").toLowerCase() === MORTGAGE_CATEGORY.toLowerCase();
+  return dateMatch && amountMatch && catMatch;
+}
+
+/** Current month (UTC) mortgage date: 15th. */
+export function getCurrentMonthMortgageDateUTC(): string {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth() + 1;
+  const monthStr = month.toString().padStart(2, "0");
+  return `${year}-${monthStr}-15`;
+}
+
+/** Auto-added income rules (shown in rules section, read-only). */
+export const AUTO_INCOME_RULES_READONLY: { schedule: string; amount: string; category: string }[] = [
+  { schedule: "15th of each month", amount: formatCurrency(PAYCHECK_AMOUNT), category: PAYCHECK_CATEGORY },
+  { schedule: "31st of each month (if applicable)", amount: formatCurrency(PAYCHECK_AMOUNT), category: PAYCHECK_CATEGORY },
+  { schedule: "5th of each month", amount: formatCurrency(RENT_AMOUNTS[0]), category: RENT_CATEGORY },
+  { schedule: "5th of each month", amount: formatCurrency(RENT_AMOUNTS[1]), category: RENT_CATEGORY },
+];
+
+/** Auto-added expense rules (shown in rules section, read-only). */
+export const AUTO_EXPENSE_RULES_READONLY: { schedule: string; amount: string; category: string }[] = [
+  { schedule: "15th of each month", amount: formatCurrency(MORTGAGE_AMOUNT), category: MORTGAGE_CATEGORY },
+];

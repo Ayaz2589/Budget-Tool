@@ -206,7 +206,6 @@ export function downloadTransactionsAndIncomePdf(
 
 const DATA_START_MARKER = "BUDGET_TOOL_DATA_START";
 const DATA_END_MARKER = "BUDGET_TOOL_DATA_END";
-const RECORD_SEP = " || ";
 const VALID_EXPENSE_SOURCES = [
   "amex",
   "chase",

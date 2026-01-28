@@ -39,14 +39,53 @@ const SKIP_PATTERNS = [
   /^split\s+transaction/i,
 ];
 
-function parseChaseDate(value: string): string {
+function parseChaseDate(
+  value: string,
+  statementYear?: number,
+  statementMonth?: number,
+): string {
   const parts = value.trim().split("/");
-  if (parts.length !== 3) return value;
-  const [m, d, y] = parts;
-  const year = y!.length === 2 ? `20${y}` : y;
-  const month = m!.padStart(2, "0");
-  const day = d!.padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  if (parts.length === 3) {
+    const [m, d, y] = parts;
+    const year = y!.length === 2 ? `20${y}` : y;
+    const month = m!.padStart(2, "0");
+    const day = d!.padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+  if (parts.length === 2 && statementYear != null && statementMonth != null) {
+    const [m, d] = parts;
+    const txMonth = parseInt(m!, 10);
+    const month = m!.padStart(2, "0");
+    const day = d!.padStart(2, "0");
+    // e.g. statement 01/15/26, transaction 12/31 → Dec is before Jan, use prior year
+    const year =
+      txMonth > statementMonth ? statementYear - 1 : statementYear;
+    return `${year}-${month}-${day}`;
+  }
+  if (parts.length === 2 && statementYear != null) {
+    const [m, d] = parts;
+    const month = m!.padStart(2, "0");
+    const day = d!.padStart(2, "0");
+    return `${statementYear}-${month}-${day}`;
+  }
+  return value;
+}
+
+/** Extract statement closing date (YYYY-MM-DD) from PDF text. */
+function extractStatementClosing(pdfText: string): { year: number; month: number; day: number } | null {
+  const m = pdfText.match(STATEMENT_CLOSING_RE);
+  if (!m) return null;
+  // Group 1-3: Opening/Closing Date ... - MM/DD/YY
+  // Group 4-6: Statement Date: MM/DD/YY
+  const mm = m[1] ?? m[4];
+  const dd = m[2] ?? m[5];
+  const yy = m[3] ?? m[6];
+  if (!mm || !dd || !yy) return null;
+  const year = yy.length === 2 ? 2000 + parseInt(yy, 10) : parseInt(yy, 10);
+  const month = parseInt(mm, 10);
+  const day = parseInt(dd, 10);
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  return { year, month, day };
 }
 
 function parseAmount(raw: string): number {
@@ -75,7 +114,13 @@ function hashId(date: string, description: string, amount: number): string {
 // Chase PDF amounts: $37.92, -$224.46, -224.46, 37.92, .99, ($12.34)
 const AMOUNT_REGEX =
   /(-\$?[\d,]+\.\d{2}|\$[\d,]+\.\d{2}|\([\d,]+\.\d{2}\)|[\d,]+\.\d{2}(?!%|\d)|\.\d{2}(?!%|\d))/g;
-const DATE_REGEX = /\b(\d{1,2}\/\d{1,2}\/\d{2,4})\b/g;
+// Full date MM/DD/YY or MM/DD/YYYY
+const DATE_REGEX_FULL = /\b(\d{1,2}\/\d{1,2}\/\d{2,4})\b/g;
+// Transaction dates use MM/DD only (year from statement)
+const DATE_REGEX_MMDD = /\b(\d{1,2}\/\d{1,2})\b(?!\/\d)/g;
+// Statement period: "Opening/Closing Date MM/DD/YY - MM/DD/YY" or "Statement Date: MM/DD/YY"
+const STATEMENT_CLOSING_RE =
+  /(?:Opening\/Closing Date|Statement Date:?)\s*\d{1,2}\/\d{1,2}\/\d{2,4}\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{2,4})|Statement Date:\s*(\d{1,2})\/(\d{1,2})\/(\d{2,4})/i;
 
 /**
  * Parse Chase statement text (from PDF) into expenses.
@@ -88,6 +133,14 @@ export function parseChasePdfFromText(pdfText: string): ParseResult {
   const normalized = pdfText.replace(/\s+/g, " ").trim();
   const seen = new Set<string>();
 
+  const statementClosing = extractStatementClosing(normalized);
+  const statementYear = statementClosing?.year;
+  const statementMonth = statementClosing?.month;
+  // Reject dates more than 45 days after statement closing (e.g. Equal Pay Promo expiration)
+  const maxValidDate = statementClosing
+    ? new Date(statementClosing.year, statementClosing.month - 1, statementClosing.day + 45)
+    : null;
+
   let amountMatch: RegExpExecArray | null;
   AMOUNT_REGEX.lastIndex = 0;
   while ((amountMatch = AMOUNT_REGEX.exec(normalized)) !== null) {
@@ -97,20 +150,49 @@ export function parseChasePdfFromText(pdfText: string): ParseResult {
 
     const amountStart = amountMatch.index;
     const beforeAmount = normalized.slice(0, amountStart).trim();
-    // Find last date before this amount (transaction or post date)
-    const dateMatches = [...beforeAmount.matchAll(DATE_REGEX)];
-    if (dateMatches.length === 0) continue;
+    const nearAmount = beforeAmount.slice(-120); // Last 120 chars before amount (likely transaction line)
+
+    // Prefer MM/DD (transaction format) within the transaction line; infer year from statement
+    let transDate: string | null = null;
+    let isMmdd = false;
+    const mmddMatches = [...nearAmount.matchAll(DATE_REGEX_MMDD)];
+    if (mmddMatches.length > 0 && statementYear != null) {
+      const lastMmdd = mmddMatches[mmddMatches.length - 1];
+      transDate = lastMmdd[1];
+      isMmdd = true;
+    }
+
+    // Fallback: last full date (MM/DD/YY) before amount
+    if (!transDate) {
+      const fullMatches = [...beforeAmount.matchAll(DATE_REGEX_FULL)];
+      if (fullMatches.length === 0) continue;
+      const lastFull = fullMatches[fullMatches.length - 1];
+      const parsed = parseChaseDate(lastFull[1]!);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(parsed)) continue;
+      // Reject dates far in future (Equal Pay Promo expiration, etc.)
+      if (maxValidDate && new Date(parsed) > maxValidDate) continue;
+      transDate = lastFull[1];
+    }
+
+    if (!transDate) continue;
+
+    // Match transDate; for MM/DD avoid matching inside MM/DD/YY (e.g. 09/16 in 09/16/25)
+    const datePattern = isMmdd
+      ? transDate.replace(/\//g, "\\/") + "(?!/\\d)"
+      : transDate.replace(/\//g, "\\/");
+    const dateMatches = [...beforeAmount.matchAll(new RegExp(datePattern, "g"))];
     const lastDateMatch = dateMatches[dateMatches.length - 1];
-    const transDate = lastDateMatch[1];
-    const dateEnd = lastDateMatch.index! + lastDateMatch[0].length;
+    const dateEnd = lastDateMatch
+      ? lastDateMatch.index! + lastDateMatch[0].length
+      : beforeAmount.length;
     const descriptionRaw = beforeAmount.slice(dateEnd).trim();
     if (descriptionRaw.length < 2) continue;
     if (SKIP_PATTERNS.some((p) => p.test(descriptionRaw))) continue;
-    // Skip if description is only digits/dashes (e.g. order number fragment)
     if (/^[\d\s\-*]+$/.test(descriptionRaw)) continue;
 
-    const date = parseChaseDate(transDate);
+    const date = parseChaseDate(transDate, statementYear, statementMonth);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+    if (maxValidDate && new Date(date) > maxValidDate) continue;
 
     const description = cleanDescription(descriptionRaw);
     const id = hashId(date, description, amount);

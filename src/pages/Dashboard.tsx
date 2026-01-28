@@ -261,7 +261,9 @@ export function Dashboard() {
                     }
                   />
                   <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value: number | undefined) =>
+                      value != null ? formatCurrency(value) : ""
+                    }
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       border: "1px solid hsl(var(--border))",

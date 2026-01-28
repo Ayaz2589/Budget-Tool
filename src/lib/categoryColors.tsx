@@ -5,6 +5,7 @@ const EXPENSE_COLORS: Record<string, string> = {
   "Tasnuva's Purchases": "bg-rose-500",
   "50/50": "bg-amber-500",
   Mortgage: "bg-slate-500",
+  Amazon: "bg-orange-500",
 };
 
 const INCOME_COLORS: Record<string, string> = {

@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import { useBudget } from "@/context/BudgetContext";
 import { useRules } from "@/context/RulesContext";
-import { parseCsv, type CsvSource } from "@/lib/parsers";
+import { parseCsv, parseChasePdfFromText, type CsvSource } from "@/lib/parsers";
+import { extractTextFromPdf } from "@/lib/pdfText";
 import {
   applyRulesToExpenses,
   applyBaselineToExpenses,
@@ -40,11 +41,12 @@ function formatCurrency(n: number): string {
   }).format(n);
 }
 
-type SourceChoice = "amex" | "apple";
+type SourceChoice = "amex" | "apple" | "chase";
 
 const SOURCE_OPTIONS: { value: SourceChoice; label: string }[] = [
   { value: "amex", label: "American Express" },
   { value: "apple", label: "Apple Card" },
+  { value: "chase", label: "Chase (PDF statement)" },
 ];
 
 export function ImportPage() {
@@ -57,33 +59,60 @@ export function ImportPage() {
   const { addExpenses, expenseCategories } = useBudget();
   const { rules } = useRules();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setImportError("");
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const text = String(reader.result);
-        const result = parseCsv(text, selectedSource);
-        const withRules = applyRulesToExpenses(
-          result.expenses,
-          rules.filter((r) => r.type === "expense"),
-        );
-        const withBaseline = applyBaselineToExpenses(withRules);
-        setPreviewExpenses(withBaseline);
-        const label =
-          selectedSource === "amex" ? "American Express" : "Apple Card";
-        setSourceLabel(label);
-        setLastDetected(selectedSource);
-      } catch (err) {
-        setImportError(err instanceof Error ? err.message : "Import failed");
-        setPreviewExpenses([]);
-        setLastDetected("");
-        setSourceLabel("");
-      }
-    };
-    reader.readAsText(file, "UTF-8");
+    if (selectedSource === "chase") {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const buffer = reader.result as ArrayBuffer;
+          const text = await extractTextFromPdf(buffer);
+          const result = parseChasePdfFromText(text);
+          const withRules = applyRulesToExpenses(
+            result.expenses,
+            rules.filter((r) => r.type === "expense"),
+          );
+          const withBaseline = applyBaselineToExpenses(withRules);
+          setPreviewExpenses(withBaseline);
+          setSourceLabel("Chase");
+          setLastDetected("chase");
+        } catch (err) {
+          setImportError(
+            err instanceof Error ? err.message : "PDF import failed",
+          );
+          setPreviewExpenses([]);
+          setLastDetected("");
+          setSourceLabel("");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const text = String(reader.result);
+          const result = parseCsv(text, selectedSource as CsvSource);
+          const withRules = applyRulesToExpenses(
+            result.expenses,
+            rules.filter((r) => r.type === "expense"),
+          );
+          const withBaseline = applyBaselineToExpenses(withRules);
+          setPreviewExpenses(withBaseline);
+          const label =
+            selectedSource === "amex" ? "American Express" : "Apple Card";
+          setSourceLabel(label);
+          setLastDetected(selectedSource);
+        } catch (err) {
+          setImportError(err instanceof Error ? err.message : "Import failed");
+          setPreviewExpenses([]);
+          setLastDetected("");
+          setSourceLabel("");
+        }
+      };
+      reader.readAsText(file, "UTF-8");
+    }
     e.target.value = "";
   };
 
@@ -113,15 +142,15 @@ export function ImportPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Import CSV</h1>
+      <h1 className="text-2xl font-semibold">Import</h1>
       <Card>
         <CardHeader>
           <CardTitle>Upload statement</CardTitle>
           <CardDescription>
-            Select your bank from the dropdown, then choose a CSV file. After
-            reviewing the preview, click &quot;Add to transactions&quot; to save
-            them—they persist across refreshes and appear on the Transactions
-            page.
+            Select your bank from the dropdown, then choose a CSV file (Amex,
+            Apple) or PDF statement (Chase). After reviewing the preview, click
+            &quot;Add to transactions&quot; to save them—they persist across
+            refreshes and appear on the Transactions page.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-2">
@@ -148,13 +177,15 @@ export function ImportPage() {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".csv"
+            accept={selectedSource === "chase" ? ".pdf" : ".csv"}
             className="hidden"
             onChange={handleFileChange}
           />
           <Button onClick={() => fileInputRef.current?.click()}>
             <Upload className="size-4" />
-            Choose CSV file
+            {selectedSource === "chase"
+              ? "Choose PDF statement"
+              : "Choose CSV file"}
           </Button>
           {importError && (
             <span className="text-sm text-destructive self-center">

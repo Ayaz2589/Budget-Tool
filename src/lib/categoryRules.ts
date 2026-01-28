@@ -39,6 +39,10 @@ export function applyRulesToExpenses(
 /** Baseline rules (only if still uncategorized). */
 export function applyBaselineToExpense(expense: Expense): Expense {
   if (expense.category) return expense;
+  // Chase (Amazon card) → Amazon
+  if (expense.source === "chase") {
+    return { ...expense, category: "Amazon" };
+  }
   // Apple Card → My Purchase
   if (expense.source === "apple") {
     return { ...expense, category: "My Purchase" };

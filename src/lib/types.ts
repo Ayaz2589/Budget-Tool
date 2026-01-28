@@ -33,6 +33,7 @@ export const DEFAULT_EXPENSE_CATEGORIES = [
   "Tasnuva's Purchases",
   "50/50",
   "Mortgage",
+  "Amazon",
 ] as const;
 
 export const DEFAULT_INCOME_CATEGORIES = [

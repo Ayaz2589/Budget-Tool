@@ -33,8 +33,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2 } from "lucide-react";
+import { Lock, Plus, Trash2 } from "lucide-react";
 import type { CategoryRule } from "@/lib/categoryRules";
+import { BASELINE_RULES_READONLY } from "@/lib/categoryRules";
 import { CategoryOption } from "@/lib/categoryColors";
 
 export function CategoryRulesPage() {
@@ -68,7 +69,8 @@ export function CategoryRulesPage() {
         <CardHeader>
           <CardTitle>Expense rules</CardTitle>
           <CardDescription>
-            First matching rule (by order) sets the category. Pattern is matched
+            Built-in rules run first (cannot be removed). Your rules are matched
+            next; first match sets the category. Pattern is matched
             case-insensitively against the transaction description.
           </CardDescription>
         </CardHeader>
@@ -123,13 +125,29 @@ export function CategoryRulesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {BASELINE_RULES_READONLY.map((r) => (
+                  <TableRow key={r.id}>
+                    <TableCell className="font-mono text-sm text-muted-foreground">
+                      {r.pattern}
+                    </TableCell>
+                    <TableCell>
+                      <CategoryOption name={r.category} type="expense" />
+                    </TableCell>
+                    <TableCell className="w-[80px]">
+                      <Lock
+                        className="size-4 text-muted-foreground"
+                        title="Built-in rule (cannot be removed)"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
                 {expenseRules.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={3}
                       className="text-center text-muted-foreground py-8"
                     >
-                      No rules. Add one to auto-categorize imports.
+                      No custom rules. Add one to auto-categorize imports.
                     </TableCell>
                   </TableRow>
                 ) : (

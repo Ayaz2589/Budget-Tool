@@ -69,3 +69,11 @@ export function applyBaselineToExpenses(expenses: Expense[]): Expense[] {
 export function generateRuleId(): string {
   return `rule-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
+
+/** Built-in rules shown in the UI (read-only, not removable). */
+export const BASELINE_RULES_READONLY: { id: string; pattern: string; category: string }[] = [
+  { id: "baseline-chase", pattern: "Source: Chase", category: "Amazon" },
+  { id: "baseline-apple", pattern: "Source: Apple Card", category: "My Purchase" },
+  { id: "baseline-tasnuva", pattern: "Card member: TASNUVA AHMED", category: "Tasnuva's Purchases" },
+  { id: "baseline-uber", pattern: "UBER EATS (amount < $25, not Tasnuva)", category: "My Purchase" },
+];

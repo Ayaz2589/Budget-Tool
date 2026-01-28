@@ -1,11 +1,112 @@
-import type { Expense, Income } from "@/lib/types";
+import type { Expense, Income, ExpenseSource } from "@/lib/types";
 import type { MonthTotals } from "@/lib/totals";
 
+const VALID_EXPENSE_SOURCES: ExpenseSource[] = [
+  "amex",
+  "chase",
+  "apple",
+  "manual",
+  "td",
+];
+
 const SHEETS_API = "https://sheets.googleapis.com/v4/spreadsheets";
+
+function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function parseAmount(value: unknown): number | null {
+  if (typeof value === "number" && !Number.isNaN(value)) return value;
+  const s = String(value ?? "").replace(/[$,\s]/g, "");
+  const n = parseFloat(s);
+  return Number.isNaN(n) ? null : n;
+}
 
 export function extractSpreadsheetId(urlOrId: string): string | null {
   const match = urlOrId.match(/\/d\/([a-zA-Z0-9-_]+)/);
   return match ? match[1]! : urlOrId;
+}
+
+export async function getSheetValues(
+  accessToken: string,
+  spreadsheetId: string,
+  range: string
+): Promise<string[][]> {
+  const url = `${SHEETS_API}/${spreadsheetId}/values/${encodeURIComponent(range)}`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Sheets read failed: ${res.status} ${err}`);
+  }
+  const data = (await res.json()) as { values?: unknown[][] };
+  const values = data.values;
+  if (!Array.isArray(values) || values.length === 0) return [];
+  return values.map((row) =>
+    Array.isArray(row)
+      ? row.map((cell) => (cell != null ? String(cell) : ""))
+      : [],
+  );
+}
+
+export async function readExpensesFromSheet(
+  accessToken: string,
+  spreadsheetId: string
+): Promise<Expense[]> {
+  const rows = await getSheetValues(
+    accessToken,
+    spreadsheetId,
+    "Expenses!A2:F",
+  );
+  const expenses: Expense[] = [];
+  for (const row of rows) {
+    const date = (row[0] ?? "").trim();
+    const amount = parseAmount(row[1]);
+    const description = (row[2] ?? "").trim();
+    const category = (row[3] ?? "").trim();
+    const rawSource = (row[4] ?? "").trim().toLowerCase();
+    const source: ExpenseSource = VALID_EXPENSE_SOURCES.includes(
+      rawSource as ExpenseSource,
+    )
+      ? (rawSource as ExpenseSource)
+      : "manual";
+    const cardMember = (row[5] ?? "").trim() || undefined;
+    if (!date || amount == null || amount <= 0) continue;
+    expenses.push({
+      id: generateId(),
+      date,
+      amount,
+      description: description || "Expense",
+      category,
+      source,
+      cardMember,
+    });
+  }
+  return expenses;
+}
+
+export async function readIncomeFromSheet(
+  accessToken: string,
+  spreadsheetId: string
+): Promise<Income[]> {
+  const rows = await getSheetValues(accessToken, spreadsheetId, "Income!A2:D");
+  const income: Income[] = [];
+  for (const row of rows) {
+    const date = (row[0] ?? "").trim();
+    const amount = parseAmount(row[1]);
+    const description = (row[2] ?? "").trim();
+    const category = (row[3] ?? "").trim();
+    if (!date || amount == null || amount <= 0) continue;
+    income.push({
+      id: generateId(),
+      date,
+      amount,
+      description: description || "Income",
+      category: category || "Other",
+    });
+  }
+  return income;
 }
 
 export async function appendExpenses(
@@ -13,12 +114,14 @@ export async function appendExpenses(
   spreadsheetId: string,
   expenses: Expense[]
 ): Promise<void> {
-  const range = "Expenses!A:D";
+  const range = "Expenses!A:F";
   const values = expenses.map((e) => [
     e.date,
     e.amount,
     e.description,
     e.category || "",
+    e.source,
+    e.cardMember ?? "",
   ]);
   await updateSheet(accessToken, spreadsheetId, range, values, false);
 }
@@ -38,16 +141,20 @@ export async function clearAndWriteExpenses(
   spreadsheetId: string,
   expenses: Expense[]
 ): Promise<void> {
-  const headers = [["Date", "Amount", "Description", "Category"]];
+  const headers = [
+    ["Date", "Amount", "Description", "Category", "Source", "Card Member"],
+  ];
   const rows = expenses.map((e) => [
     e.date,
     e.amount,
     e.description,
     e.category || "",
+    e.source,
+    e.cardMember ?? "",
   ]);
   const values = [...headers, ...rows];
-  const range = "Expenses!A1:D";
-  await clearRange(accessToken, spreadsheetId, "Expenses!A1:D10000");
+  const range = "Expenses!A1:F";
+  await clearRange(accessToken, spreadsheetId, "Expenses!A1:F10000");
   if (values.length > 0) {
     await updateSheet(accessToken, spreadsheetId, range, values, false);
   }
@@ -295,14 +402,14 @@ export async function applySheetsFormatting(
   const currencyFields = "userEnteredFormat(numberFormat,horizontalAlignment)";
   const percentFields = "userEnteredFormat(numberFormat,horizontalAlignment)";
 
-  // Expenses: header row bold + larger, all left align, column B (Amount) currency
+  // Expenses: header row bold + larger, all left align (A–F), column B (Amount) currency
   requests.push(
     repeatCellRequest(
       sheetIds.expenses,
       0,
       1,
       0,
-      4,
+      6,
       { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
       headerFields
     )
@@ -313,7 +420,7 @@ export async function applySheetsFormatting(
       0,
       10000,
       0,
-      4,
+      6,
       { horizontalAlignment: "LEFT" },
       leftAlignFields
     )

@@ -18,6 +18,8 @@ import {
   getSheetIds,
   applySheetsFormatting,
   extractSpreadsheetId,
+  readExpensesFromSheet,
+  readIncomeFromSheet,
 } from "@/lib/googleSheets";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
@@ -31,6 +33,7 @@ interface GoogleAuthContextValue {
   spreadsheetId: string | null;
   setSpreadsheetId: (id: string | null) => void;
   syncToSheets: () => Promise<void>;
+  pullFromSheet: () => Promise<void>;
   syncStatus: SyncStatus;
   syncErrorMessage: string | null;
 }
@@ -89,6 +92,10 @@ export function GoogleAuthProviderFallback({
       spreadsheetId,
       setSpreadsheetId,
       syncToSheets: async () => {
+        setSyncStatus("error");
+        setSyncErrorMessage("Google sign-in is not configured.");
+      },
+      pullFromSheet: async () => {
         setSyncStatus("error");
         setSyncErrorMessage("Google sign-in is not configured.");
       },
@@ -202,6 +209,76 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.iOweNova,
   ]);
 
+  const pullFromSheet = useCallback(async () => {
+    if (!accessToken || !spreadsheetId) {
+      setSyncStatus("error");
+      setSyncErrorMessage("Not signed in or no spreadsheet set.");
+      return;
+    }
+    setSyncStatus("syncing");
+    setSyncErrorMessage(null);
+    try {
+      await ensureSheetsExist(accessToken, spreadsheetId);
+
+      const expenseKey = (e: {
+        date: string;
+        description: string;
+        amount: number;
+      }) => `${e.date}|${e.description}|${e.amount}`;
+      const incomeKey = (i: {
+        date: string;
+        description: string;
+        amount: number;
+      }) => `${i.date}|${i.description}|${i.amount}`;
+
+      const appExpenseKeys = new Set(budget.expenses.map((e) => expenseKey(e)));
+      const appIncomeKeys = new Set(budget.income.map((i) => incomeKey(i)));
+
+      const sheetExpenses = await readExpensesFromSheet(
+        accessToken,
+        spreadsheetId,
+      );
+      const sheetIncome = await readIncomeFromSheet(accessToken, spreadsheetId);
+
+      const newExpenses = sheetExpenses.filter(
+        (e) => !appExpenseKeys.has(expenseKey(e)),
+      );
+      const newIncome = sheetIncome.filter(
+        (i) => !appIncomeKeys.has(incomeKey(i)),
+      );
+
+      if (newExpenses.length > 0) {
+        budget.addExpenses(newExpenses);
+      }
+      for (const i of newIncome) {
+        if (!appIncomeKeys.has(incomeKey(i))) {
+          appIncomeKeys.add(incomeKey(i));
+          budget.addIncome({
+            date: i.date,
+            amount: i.amount,
+            description: i.description,
+            category: i.category,
+          });
+        }
+      }
+
+      setSyncStatus("success");
+      setSyncErrorMessage(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("Restore from sheet failed:", err);
+      setSyncStatus("error");
+      setSyncErrorMessage(message);
+    }
+  }, [
+    accessToken,
+    spreadsheetId,
+    budget.expenses,
+    budget.income,
+    budget.addExpenses,
+    budget.addIncome,
+  ]);
+
   const value = useMemo<GoogleAuthContextValue>(
     () => ({
       isSignedIn: !!accessToken,
@@ -210,6 +287,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       spreadsheetId,
       setSpreadsheetId,
       syncToSheets,
+      pullFromSheet,
       syncStatus,
       syncErrorMessage,
     }),
@@ -220,6 +298,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       spreadsheetId,
       setSpreadsheetId,
       syncToSheets,
+      pullFromSheet,
       syncStatus,
       syncErrorMessage,
     ],

@@ -27,6 +27,7 @@ export function SettingsPage() {
     spreadsheetId,
     setSpreadsheetId,
     syncToSheets,
+    pullFromSheet,
     syncStatus,
     syncErrorMessage,
   } = useGoogleAuth();
@@ -103,14 +104,32 @@ export function SettingsPage() {
                 )}
               </div>
               {spreadsheetId && (
-                <Button
-                  onClick={syncToSheets}
-                  disabled={syncStatus === "syncing"}
-                >
-                  {syncStatus === "syncing"
-                    ? "Syncing..."
-                    : "Sync to Google Sheets"}
-                </Button>
+                <>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      onClick={pullFromSheet}
+                      disabled={syncStatus === "syncing"}
+                      variant="outline"
+                    >
+                      {syncStatus === "syncing"
+                        ? "Syncing..."
+                        : "Restore from Sheet"}
+                    </Button>
+                    <Button
+                      onClick={syncToSheets}
+                      disabled={syncStatus === "syncing"}
+                    >
+                      {syncStatus === "syncing"
+                        ? "Syncing..."
+                        : "Sync to Google Sheets"}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Restore from Sheet: load data from the spreadsheet into the
+                    app (e.g. after clearing local storage). Sync to Google
+                    Sheets: pull then push so app and sheet stay in sync.
+                  </p>
+                </>
               )}
               {syncStatus === "success" && (
                 <p className="text-sm text-green-600 dark:text-green-400">

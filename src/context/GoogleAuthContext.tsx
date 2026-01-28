@@ -4,12 +4,20 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useBudget } from "@/context/BudgetContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
+import {
+  PAYCHECK_AMOUNT,
+  PAYCHECK_DESCRIPTION,
+  PAYCHECK_CATEGORY,
+  hasPaycheckOnSheet,
+  getCurrentMonthPaycheckDatesUTC,
+} from "@/lib/paycheck";
 import {
   ensureSheetsExist,
   clearAndWriteExpenses,
@@ -169,6 +177,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const budget = useBudget();
+  const hasCheckedSheetForPaychecks = useRef(false);
+  const hasAddedPaychecksWhenUnsignedIn = useRef(false);
 
   const syncToSheets = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
@@ -277,6 +287,60 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.income,
     budget.addExpenses,
     budget.addIncome,
+  ]);
+
+  useEffect(() => {
+    const ensureCurrentMonthPaychecks = () => {
+      const dates = getCurrentMonthPaycheckDatesUTC();
+      const existingPaycheckDates = new Set(
+        budget.income
+          .filter(
+            (i) =>
+              (i.description || "").toLowerCase() ===
+                PAYCHECK_DESCRIPTION.toLowerCase() &&
+              Math.abs(i.amount - PAYCHECK_AMOUNT) < 0.01,
+          )
+          .map((i) => i.date),
+      );
+      for (const date of dates) {
+        if (!existingPaycheckDates.has(date)) {
+          budget.addIncome({
+            date,
+            amount: PAYCHECK_AMOUNT,
+            description: PAYCHECK_DESCRIPTION,
+            category: PAYCHECK_CATEGORY,
+          });
+        }
+      }
+    };
+
+    if (accessToken && spreadsheetId) {
+      if (hasCheckedSheetForPaychecks.current) return;
+      hasCheckedSheetForPaychecks.current = true;
+      readIncomeFromSheet(accessToken, spreadsheetId)
+        .then((sheetIncome) => {
+          if (hasPaycheckOnSheet(sheetIncome)) {
+            void pullFromSheet();
+          } else {
+            ensureCurrentMonthPaychecks();
+          }
+        })
+        .catch(() => {
+          ensureCurrentMonthPaychecks();
+        });
+      return;
+    }
+
+    if (!accessToken && !hasAddedPaychecksWhenUnsignedIn.current) {
+      hasAddedPaychecksWhenUnsignedIn.current = true;
+      ensureCurrentMonthPaychecks();
+    }
+  }, [
+    accessToken,
+    spreadsheetId,
+    budget.income,
+    budget.addIncome,
+    pullFromSheet,
   ]);
 
   const value = useMemo<GoogleAuthContextValue>(

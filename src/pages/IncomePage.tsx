@@ -143,6 +143,7 @@ export function IncomePage() {
           </Dialog>
         </CardContent>
       </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Income entries</CardTitle>
@@ -197,11 +198,16 @@ export function IncomePage() {
                           </SelectContent>
                         </Select>
                       </TableCell>
-                      <TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <Button
+                          type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => removeIncome(i.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            removeIncome(i.id);
+                          }}
                           className="text-destructive hover:text-destructive"
                         >
                           Delete

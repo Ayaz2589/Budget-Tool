@@ -5,7 +5,7 @@ import {
   applyRulesToExpenses,
   applyBaselineToExpenses,
 } from "@/lib/categoryRules";
-import type { ExpenseSource } from "@/lib/types";
+import type { Expense, ExpenseSource } from "@/lib/types";
 import { getMonthLabel } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
 import { CategoryOption } from "@/lib/categoryColors";
@@ -80,6 +80,9 @@ export function TransactionsPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
   const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
+  const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
+    null,
+  );
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
   const [addDate, setAddDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
@@ -178,6 +181,13 @@ export function TransactionsPage() {
     clearSelection();
     setDeleteAllOpen(false);
   }, [expenses, removeExpenses, clearSelection]);
+
+  const handleDeleteOne = useCallback(() => {
+    if (deleteOneExpense) {
+      removeExpense(deleteOneExpense.id);
+      setDeleteOneExpense(null);
+    }
+  }, [deleteOneExpense, removeExpense]);
 
   const handleAddTransaction = (e: React.FormEvent) => {
     e.preventDefault();
@@ -514,7 +524,7 @@ export function TransactionsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => removeExpense(e.id)}
+                              onClick={() => setDeleteOneExpense(e)}
                               className="text-destructive hover:text-destructive"
                             >
                               Delete
@@ -530,6 +540,37 @@ export function TransactionsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog
+        open={deleteOneExpense !== null}
+        onOpenChange={(open) => !open && setDeleteOneExpense(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete this transaction?</DialogTitle>
+            <DialogDescription>
+              {deleteOneExpense ? (
+                <>
+                  <span className="font-medium">{deleteOneExpense.date}</span>{" "}
+                  {deleteOneExpense.description} (
+                  {formatCurrency(deleteOneExpense.amount)}) will be removed.
+                  This cannot be undone.
+                </>
+              ) : (
+                "This transaction will be removed. This cannot be undone."
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOneExpense(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteOne}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={deleteSelectedOpen} onOpenChange={setDeleteSelectedOpen}>
         <DialogContent>

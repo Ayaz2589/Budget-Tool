@@ -10,6 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -35,6 +43,8 @@ export function SettingsPage() {
   const [expenseList, setExpenseList] = useState(expenseCategories.join(", "));
   const [incomeList, setIncomeList] = useState(incomeCategories.join(", "));
   const [sheetIdInput, setSheetIdInput] = useState(spreadsheetId ?? "");
+  const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
+  const [restoreConfirmOpen, setRestoreConfirmOpen] = useState(false);
 
   const saveExpenseCategories = () => {
     const list = expenseList
@@ -107,7 +117,7 @@ export function SettingsPage() {
                 <>
                   <div className="flex flex-wrap gap-2">
                     <Button
-                      onClick={pullFromSheet}
+                      onClick={() => setRestoreConfirmOpen(true)}
                       disabled={syncStatus === "syncing"}
                       variant="outline"
                     >
@@ -116,7 +126,7 @@ export function SettingsPage() {
                         : "Restore from Sheet"}
                     </Button>
                     <Button
-                      onClick={syncToSheets}
+                      onClick={() => setSyncConfirmOpen(true)}
                       disabled={syncStatus === "syncing"}
                     >
                       {syncStatus === "syncing"
@@ -124,6 +134,71 @@ export function SettingsPage() {
                         : "Sync to Google Sheets"}
                     </Button>
                   </div>
+
+                  <Dialog
+                    open={syncConfirmOpen}
+                    onOpenChange={setSyncConfirmOpen}
+                  >
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Sync to Google Sheets?</DialogTitle>
+                        <DialogDescription>
+                          This will overwrite your spreadsheet with the
+                          app&apos;s current expenses, income, and totals. Your
+                          sheet data will be replaced. This cannot be undone.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button
+                          variant="outline"
+                          onClick={() => setSyncConfirmOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setSyncConfirmOpen(false);
+                            syncToSheets();
+                          }}
+                        >
+                          Sync to Google Sheets
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog
+                    open={restoreConfirmOpen}
+                    onOpenChange={setRestoreConfirmOpen}
+                  >
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Restore from Sheet?</DialogTitle>
+                        <DialogDescription>
+                          This will load data from the spreadsheet into the app
+                          and merge with existing transactions and income. Any
+                          matching rows will be skipped; new rows from the sheet
+                          will be added.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button
+                          variant="outline"
+                          onClick={() => setRestoreConfirmOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setRestoreConfirmOpen(false);
+                            pullFromSheet();
+                          }}
+                        >
+                          Restore from Sheet
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                   <p className="text-xs text-muted-foreground">
                     Restore from Sheet: load data from the spreadsheet into the
                     app (e.g. after clearing local storage). Sync to Google

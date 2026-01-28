@@ -8,6 +8,7 @@ import {
 import type { Expense, ExpenseSource } from "@/lib/types";
 import { getMonthLabel } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
+import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { CategoryOption } from "@/lib/categoryColors";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,7 +45,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { Plus, FileDown } from "lucide-react";
 
 function formatCurrency(n: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -67,6 +68,7 @@ const SOURCE_LABELS: Record<ExpenseSource | "all", string> = {
 export function TransactionsPage() {
   const {
     expenses,
+    income,
     addExpense,
     updateExpense,
     removeExpense,
@@ -399,6 +401,13 @@ export function TransactionsPage() {
             )}
             <Button variant="outline" onClick={cleanAllDescriptions}>
               Clean descriptions
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => downloadTransactionsAndIncomePdf(expenses, income)}
+            >
+              <FileDown className="size-4" />
+              Download PDF
             </Button>
             {someSelected && (
               <>

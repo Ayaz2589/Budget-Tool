@@ -32,8 +32,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { Plus, FileDown } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
+import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 
 function formatCurrency(n: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -43,8 +44,14 @@ function formatCurrency(n: number): string {
 }
 
 export function IncomePage() {
-  const { income, addIncome, updateIncome, removeIncome, incomeCategories } =
-    useBudget();
+  const {
+    expenses,
+    income,
+    addIncome,
+    updateIncome,
+    removeIncome,
+    incomeCategories,
+  } = useBudget();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -148,6 +155,16 @@ export function IncomePage() {
         <CardHeader>
           <CardTitle>Income entries</CardTitle>
           <CardDescription>Edit or delete entries below.</CardDescription>
+          <div className="pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => downloadTransactionsAndIncomePdf(expenses, income)}
+            >
+              <FileDown className="size-4" />
+              Download PDF (transactions & income)
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto max-h-[50vh] overflow-y-auto border rounded-md">

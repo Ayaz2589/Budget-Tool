@@ -29,6 +29,7 @@ interface BudgetContextValue extends BudgetState {
   removeExpense: (id: string) => void;
   removeExpenses: (ids: string[]) => void;
   addIncome: (entry: Omit<Income, "id">) => void;
+  addIncomes: (income: Income[]) => void;
   updateIncome: (id: string, updates: Partial<Income>) => void;
   removeIncome: (id: string) => void;
   setExpenseCategories: (categories: string[]) => void;
@@ -137,6 +138,18 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const addIncomes = useCallback((newIncome: Income[]) => {
+    setIncome((prev) => {
+      const byId = new Map(prev.map((i) => [i.id, i]));
+      for (const i of newIncome) {
+        if (!byId.has(i.id)) byId.set(i.id, i);
+      }
+      return Array.from(byId.values()).sort((a, b) =>
+        b.date.localeCompare(a.date),
+      );
+    });
+  }, []);
+
   const updateIncome = useCallback((id: string, updates: Partial<Income>) => {
     setIncome((prev) =>
       prev.map((i) => (i.id === id ? { ...i, ...updates } : i)),
@@ -171,6 +184,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       removeExpense,
       removeExpenses,
       addIncome,
+      addIncomes,
       updateIncome,
       removeIncome,
       setExpenseCategories,
@@ -190,6 +204,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       removeExpense,
       removeExpenses,
       addIncome,
+      addIncomes,
       updateIncome,
       removeIncome,
       setExpenseCategories,

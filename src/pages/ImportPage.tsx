@@ -3,11 +3,12 @@ import { useBudget } from "@/context/BudgetContext";
 import { useRules } from "@/context/RulesContext";
 import { parseCsv, parseChasePdfFromText, type CsvSource } from "@/lib/parsers";
 import { extractTextFromPdf } from "@/lib/pdfText";
+import { parseExportedPdfData } from "@/lib/pdfExport";
 import {
   applyRulesToExpenses,
   applyBaselineToExpenses,
 } from "@/lib/categoryRules";
-import type { Expense } from "@/lib/types";
+import type { Expense, Income } from "@/lib/types";
 import { CategoryOption } from "@/lib/categoryColors";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,29 +42,90 @@ function formatCurrency(n: number): string {
   }).format(n);
 }
 
-type SourceChoice = "amex" | "apple" | "chase";
+type SourceChoice = "amex" | "apple" | "chase" | "pdf-export";
 
 const SOURCE_OPTIONS: { value: SourceChoice; label: string }[] = [
   { value: "amex", label: "American Express" },
   { value: "apple", label: "Apple Card" },
   { value: "chase", label: "Chase (PDF statement)" },
+  { value: "pdf-export", label: "Exported PDF (re-import)" },
 ];
 
 export function ImportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedSource, setSelectedSource] = useState<SourceChoice>("amex");
   const [previewExpenses, setPreviewExpenses] = useState<Expense[]>([]);
+  const [previewIncome, setPreviewIncome] = useState<Income[]>([]);
   const [sourceLabel, setSourceLabel] = useState<string>("");
   const [lastDetected, setLastDetected] = useState<string>("");
   const [importError, setImportError] = useState<string>("");
-  const { addExpenses, expenseCategories } = useBudget();
+  const { expenses, income, addExpenses, addIncomes, expenseCategories } =
+    useBudget();
   const { rules } = useRules();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setImportError("");
-    if (selectedSource === "chase") {
+    if (selectedSource === "pdf-export") {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const buffer = reader.result as ArrayBuffer;
+          const text = await extractTextFromPdf(buffer);
+          const parsed = parseExportedPdfData(text);
+          const existingExpenseIds = new Set(expenses.map((ex) => ex.id));
+          const toAddExpenses = parsed.expenses.filter(
+            (ex) => !existingExpenseIds.has(ex.id),
+          );
+          // Omit income that already exists by id OR by (date, amount, category)
+          // so auto-generated paychecks/rent (random ids) are not duplicated
+          const toAddIncome = parsed.income.filter((i) => {
+            if (income.some((existing) => existing.id === i.id)) return false;
+            const sameEntry = income.some(
+              (existing) =>
+                existing.date === i.date &&
+                Math.abs(existing.amount - i.amount) < 0.01 &&
+                (existing.category || "").toLowerCase() ===
+                  (i.category || "").toLowerCase(),
+            );
+            return !sameEntry;
+          });
+          if (
+            parsed.expenses.length === 0 &&
+            parsed.income.length === 0 &&
+            text.trim().length > 0
+          ) {
+            setImportError(
+              "This doesn't look like an exported transactions PDF.",
+            );
+            setPreviewExpenses([]);
+            setPreviewIncome([]);
+            setLastDetected("");
+            setSourceLabel("");
+            return;
+          }
+          const withRules = applyRulesToExpenses(
+            toAddExpenses,
+            rules.filter((r) => r.type === "expense"),
+          );
+          const withBaseline = applyBaselineToExpenses(withRules);
+          setPreviewExpenses(withBaseline);
+          setPreviewIncome(toAddIncome);
+          setSourceLabel("Exported PDF");
+          setLastDetected("pdf-export");
+        } catch (err) {
+          setImportError(
+            err instanceof Error ? err.message : "PDF import failed",
+          );
+          setPreviewExpenses([]);
+          setPreviewIncome([]);
+          setLastDetected("");
+          setSourceLabel("");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else if (selectedSource === "chase") {
       const reader = new FileReader();
       reader.onload = async () => {
         try {
@@ -76,6 +138,7 @@ export function ImportPage() {
           );
           const withBaseline = applyBaselineToExpenses(withRules);
           setPreviewExpenses(withBaseline);
+          setPreviewIncome([]);
           setSourceLabel("Chase");
           setLastDetected("chase");
         } catch (err) {
@@ -83,6 +146,7 @@ export function ImportPage() {
             err instanceof Error ? err.message : "PDF import failed",
           );
           setPreviewExpenses([]);
+          setPreviewIncome([]);
           setLastDetected("");
           setSourceLabel("");
         }
@@ -100,6 +164,7 @@ export function ImportPage() {
           );
           const withBaseline = applyBaselineToExpenses(withRules);
           setPreviewExpenses(withBaseline);
+          setPreviewIncome([]);
           const label =
             selectedSource === "amex" ? "American Express" : "Apple Card";
           setSourceLabel(label);
@@ -107,6 +172,7 @@ export function ImportPage() {
         } catch (err) {
           setImportError(err instanceof Error ? err.message : "Import failed");
           setPreviewExpenses([]);
+          setPreviewIncome([]);
           setLastDetected("");
           setSourceLabel("");
         }
@@ -134,7 +200,11 @@ export function ImportPage() {
 
   const addToTransactions = () => {
     addExpenses(previewExpenses);
+    if (previewIncome.length > 0) {
+      addIncomes(previewIncome);
+    }
     setPreviewExpenses([]);
+    setPreviewIncome([]);
     setSourceLabel("");
     setLastDetected("");
     setImportError("");
@@ -147,10 +217,13 @@ export function ImportPage() {
         <CardHeader>
           <CardTitle>Upload statement</CardTitle>
           <CardDescription>
-            Select your bank from the dropdown, then choose a CSV file (Amex,
-            Apple) or PDF statement (Chase). After reviewing the preview, click
-            &quot;Add to transactions&quot; to save them—they persist across
-            refreshes and appear on the Transactions page.
+            Select your bank or &quot;Exported PDF (re-import)&quot; from the
+            dropdown, then choose a CSV file (Amex, Apple), PDF statement
+            (Chase), or a previously downloaded transactions PDF. Re-imported
+            PDFs skip rows that already exist by ID. After reviewing the
+            preview, click &quot;Add to transactions&quot; or &quot;Add
+            all&quot; to save—they persist across refreshes and appear on the
+            Transactions and Income pages.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-2">
@@ -177,15 +250,21 @@ export function ImportPage() {
           <input
             ref={fileInputRef}
             type="file"
-            accept={selectedSource === "chase" ? ".pdf" : ".csv"}
+            accept={
+              selectedSource === "chase" || selectedSource === "pdf-export"
+                ? ".pdf"
+                : ".csv"
+            }
             className="hidden"
             onChange={handleFileChange}
           />
           <Button onClick={() => fileInputRef.current?.click()}>
             <Upload className="size-4" />
-            {selectedSource === "chase"
-              ? "Choose PDF statement"
-              : "Choose CSV file"}
+            {selectedSource === "pdf-export"
+              ? "Choose exported PDF"
+              : selectedSource === "chase"
+                ? "Choose PDF statement"
+                : "Choose CSV file"}
           </Button>
           {importError && (
             <span className="text-sm text-destructive self-center">
@@ -194,83 +273,144 @@ export function ImportPage() {
           )}
           {lastDetected && !importError && (
             <span className="text-sm text-muted-foreground self-center">
-              {sourceLabel} · {previewExpenses.length} rows
+              {sourceLabel}
+              {lastDetected === "pdf-export"
+                ? ` · ${previewExpenses.length} expenses, ${previewIncome.length} income to add (existing IDs omitted)`
+                : ` · ${previewExpenses.length} rows`}
             </span>
           )}
-          {previewExpenses.length > 0 && (
+          {(previewExpenses.length > 0 || previewIncome.length > 0) && (
             <>
-              <Button variant="outline" onClick={applyRules}>
-                Apply rules
+              {lastDetected !== "pdf-export" && (
+                <Button variant="outline" onClick={applyRules}>
+                  Apply rules
+                </Button>
+              )}
+              <Button onClick={addToTransactions}>
+                {lastDetected === "pdf-export"
+                  ? "Add all"
+                  : "Add to transactions"}
               </Button>
-              <Button onClick={addToTransactions}>Add to transactions</Button>
             </>
           )}
         </CardContent>
       </Card>
-      {previewExpenses.length > 0 && (
+      {(previewExpenses.length > 0 || previewIncome.length > 0) && (
         <Card>
           <CardHeader>
             <CardTitle>Preview</CardTitle>
             <CardDescription>
-              Edit category per row if needed, then click &quot;Add to
-              transactions&quot;.
+              {lastDetected === "pdf-export"
+                ? 'Transactions and income with existing IDs are omitted. Click "Add all" to add the rest.'
+                : 'Edit category per row if needed, then click "Add to transactions".'}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto max-h-[60vh] overflow-y-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Card Member</TableHead>
-                    <TableHead>Category</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {previewExpenses.map((e) => (
-                    <TableRow key={e.id}>
-                      <TableCell className="whitespace-nowrap">
-                        {e.date}
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate">
-                        {e.description}
-                      </TableCell>
-                      <TableCell>{formatCurrency(e.amount)}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {e.cardMember ?? "—"}
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={e.category || "_"}
-                          onValueChange={(v) =>
-                            updatePreviewCategory(e.id, v === "_" ? "" : v)
-                          }
-                        >
-                          <SelectTrigger className="w-[220px] min-w-[200px]">
-                            <SelectValue placeholder="Category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="_">
-                              <CategoryOption
-                                name="Uncategorized"
-                                type="expense"
-                              />
-                            </SelectItem>
-                            {expenseCategories.map((c) => (
-                              <SelectItem key={c} value={c}>
-                                <CategoryOption name={c} type="expense" />
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+          <CardContent className="space-y-6">
+            {previewExpenses.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium mb-2">Expenses to add</h3>
+                <div className="overflow-x-auto max-h-[40vh] overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Card Member</TableHead>
+                        <TableHead>Category</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {previewExpenses.map((e) => (
+                        <TableRow key={e.id}>
+                          <TableCell className="font-mono text-xs">
+                            {e.id}
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {e.date}
+                          </TableCell>
+                          <TableCell className="max-w-[200px] truncate">
+                            {e.description}
+                          </TableCell>
+                          <TableCell>{formatCurrency(e.amount)}</TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {e.cardMember ?? "—"}
+                          </TableCell>
+                          <TableCell>
+                            {lastDetected === "pdf-export" ? (
+                              e.category || "—"
+                            ) : (
+                              <Select
+                                value={e.category || "_"}
+                                onValueChange={(v) =>
+                                  updatePreviewCategory(
+                                    e.id,
+                                    v === "_" ? "" : v,
+                                  )
+                                }
+                              >
+                                <SelectTrigger className="w-[220px] min-w-[200px]">
+                                  <SelectValue placeholder="Category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="_">
+                                    <CategoryOption
+                                      name="Uncategorized"
+                                      type="expense"
+                                    />
+                                  </SelectItem>
+                                  {expenseCategories.map((c) => (
+                                    <SelectItem key={c} value={c}>
+                                      <CategoryOption name={c} type="expense" />
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+            {previewIncome.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium mb-2">Income to add</h3>
+                <div className="overflow-x-auto max-h-[40vh] overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Category</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {previewIncome.map((i) => (
+                        <TableRow key={i.id}>
+                          <TableCell className="font-mono text-xs">
+                            {i.id}
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {i.date}
+                          </TableCell>
+                          <TableCell className="max-w-[200px] truncate">
+                            {i.description}
+                          </TableCell>
+                          <TableCell>{formatCurrency(i.amount)}</TableCell>
+                          <TableCell>{i.category || "—"}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

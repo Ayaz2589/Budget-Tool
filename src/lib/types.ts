@@ -1,4 +1,9 @@
-export type ExpenseSource = "amex" | "chase" | "apple" | "manual";
+export type ExpenseSource =
+  | "amex"
+  | "chase"
+  | "apple"
+  | "manual"
+  | "td";
 
 export interface Expense {
   id: string;

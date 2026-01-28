@@ -5,6 +5,7 @@ import {
   applyRulesToExpenses,
   applyBaselineToExpenses,
 } from "@/lib/categoryRules";
+import type { ExpenseSource } from "@/lib/types";
 import { cleanDescription } from "@/lib/parsers";
 import { CategoryOption } from "@/lib/categoryColors";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
 
 function formatCurrency(n: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -49,11 +52,21 @@ function formatCurrency(n: number): string {
   }).format(n);
 }
 
-const SOURCES = ["all", "amex", "chase", "apple", "manual"] as const;
+const SOURCES = ["all", "amex", "chase", "apple", "manual", "td"] as const;
+
+const SOURCE_LABELS: Record<ExpenseSource | "all", string> = {
+  all: "All",
+  amex: "American Express",
+  chase: "Chase",
+  apple: "Apple Card",
+  manual: "Manual",
+  td: "Debit (TD Bank)",
+};
 
 export function TransactionsPage() {
   const {
     expenses,
+    addExpense,
     updateExpense,
     removeExpense,
     removeExpenses,
@@ -66,6 +79,25 @@ export function TransactionsPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
   const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
+  const [addTransactionOpen, setAddTransactionOpen] = useState(false);
+  const [addDate, setAddDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
+  const [addAmount, setAddAmount] = useState("");
+  const [addDescription, setAddDescription] = useState("");
+  const [addCategory, setAddCategory] = useState<string>("");
+  const [addSource, setAddSource] = useState<ExpenseSource>("manual");
+  const [addCardMember, setAddCardMember] = useState("");
+
+  const cardMemberOptions = useMemo(() => {
+    const fromExpenses = [
+      ...new Set(
+        expenses.map((e) => e.cardMember).filter((m): m is string => !!m),
+      ),
+    ].sort();
+    if (fromExpenses.length > 0) return fromExpenses;
+    return ["AYAZ UDDIN", "TASNUVA AHMED"];
+  }, [expenses]);
 
   const filtered = useMemo(() => {
     let list = [...expenses].sort((a, b) => b.date.localeCompare(a.date));
@@ -136,6 +168,27 @@ export function TransactionsPage() {
     setDeleteAllOpen(false);
   }, [expenses, removeExpenses, clearSelection]);
 
+  const handleAddTransaction = (e: React.FormEvent) => {
+    e.preventDefault();
+    const num = parseFloat(addAmount.replace(/[$,]/g, ""));
+    if (Number.isNaN(num) || num <= 0) return;
+    addExpense({
+      date: addDate,
+      amount: num,
+      description: addDescription.trim() || "Manual transaction",
+      category: addCategory || "",
+      source: addSource,
+      cardMember: addCardMember.trim() || undefined,
+    });
+    setAddAmount("");
+    setAddDescription("");
+    setAddCategory("");
+    setAddSource("manual");
+    setAddCardMember("");
+    setAddDate(new Date().toISOString().slice(0, 10));
+    setAddTransactionOpen(false);
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Transactions</h1>
@@ -148,6 +201,133 @@ export function TransactionsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-4 items-end">
+            <Dialog
+              open={addTransactionOpen}
+              onOpenChange={setAddTransactionOpen}
+            >
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="size-4" />
+                  Add transaction
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>New transaction</DialogTitle>
+                  <DialogDescription>
+                    Add an expense manually. Choose the source (e.g. Manual or
+                    Debit (TD Bank)).
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddTransaction} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Source</Label>
+                    <Select
+                      value={addSource}
+                      onValueChange={(v) => setAddSource(v as ExpenseSource)}
+                    >
+                      <SelectTrigger className="w-full min-w-[200px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="manual">
+                          {SOURCE_LABELS.manual}
+                        </SelectItem>
+                        <SelectItem value="td">{SOURCE_LABELS.td}</SelectItem>
+                        <SelectItem value="amex">
+                          {SOURCE_LABELS.amex}
+                        </SelectItem>
+                        <SelectItem value="apple">
+                          {SOURCE_LABELS.apple}
+                        </SelectItem>
+                        <SelectItem value="chase">
+                          {SOURCE_LABELS.chase}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Date</Label>
+                    <Input
+                      type="date"
+                      value={addDate}
+                      onChange={(e) => setAddDate(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Amount</Label>
+                    <Input
+                      type="text"
+                      placeholder="0.00"
+                      value={addAmount}
+                      onChange={(e) => setAddAmount(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <Input
+                      placeholder="e.g. Groceries, Gas"
+                      value={addDescription}
+                      onChange={(e) => setAddDescription(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Category</Label>
+                    <Select
+                      value={addCategory || "_"}
+                      onValueChange={(v) => setAddCategory(v === "_" ? "" : v)}
+                    >
+                      <SelectTrigger className="w-full min-w-[200px]">
+                        <SelectValue placeholder="Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_">
+                          <CategoryOption name="Uncategorized" type="expense" />
+                        </SelectItem>
+                        {expenseCategories.map((c) => (
+                          <SelectItem key={c} value={c}>
+                            <CategoryOption name={c} type="expense" />
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Card member (optional)</Label>
+                    <Select
+                      value={addCardMember || "_none"}
+                      onValueChange={(v) =>
+                        setAddCardMember(v === "_none" ? "" : v)
+                      }
+                    >
+                      <SelectTrigger className="w-full min-w-[200px]">
+                        <SelectValue placeholder="—" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_none">—</SelectItem>
+                        {cardMemberOptions.map((name) => (
+                          <SelectItem key={name} value={name}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setAddTransactionOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit">Add</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
             <div className="space-y-2">
               <Label>Month</Label>
               <Input
@@ -166,7 +346,7 @@ export function TransactionsPage() {
                 <SelectContent>
                   {SOURCES.map((s) => (
                     <SelectItem key={s} value={s}>
-                      {s === "all" ? "All" : s}
+                      {SOURCE_LABELS[s]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -251,7 +431,7 @@ export function TransactionsPage() {
                       colSpan={8}
                       className="text-center text-muted-foreground py-8"
                     >
-                      No transactions. Import a CSV or add income.
+                      No transactions. Import a CSV or add a manual transaction.
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -275,7 +455,7 @@ export function TransactionsPage() {
                       </TableCell>
                       <TableCell>{formatCurrency(e.amount)}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        {e.source}
+                        {SOURCE_LABELS[e.source]}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {e.cardMember ?? "—"}

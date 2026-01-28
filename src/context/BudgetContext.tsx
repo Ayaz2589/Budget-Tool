@@ -24,6 +24,7 @@ export interface BudgetState {
 
 interface BudgetContextValue extends BudgetState {
   addExpenses: (expenses: Expense[]) => void;
+  addExpense: (entry: Omit<Expense, "id">) => void;
   updateExpense: (id: string, updates: Partial<Expense>) => void;
   removeExpense: (id: string) => void;
   removeExpenses: (ids: string[]) => void;
@@ -107,6 +108,13 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const addExpense = useCallback((entry: Omit<Expense, "id">) => {
+    const newExpense: Expense = { ...entry, id: generateId() };
+    setExpenses((prev) =>
+      [...prev, newExpense].sort((a, b) => b.date.localeCompare(a.date)),
+    );
+  }, []);
+
   const updateExpense = useCallback((id: string, updates: Partial<Expense>) => {
     setExpenses((prev) =>
       prev.map((e) => (e.id === id ? { ...e, ...updates } : e)),
@@ -158,6 +166,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       expenseCategories,
       incomeCategories,
       addExpenses,
+      addExpense,
       updateExpense,
       removeExpense,
       removeExpenses,
@@ -176,6 +185,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       incomeCategories,
       iOweNova,
       addExpenses,
+      addExpense,
       updateExpense,
       removeExpense,
       removeExpenses,

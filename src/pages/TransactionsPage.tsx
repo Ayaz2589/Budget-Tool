@@ -445,6 +445,7 @@ export function TransactionsPage() {
                       aria-label="Select all"
                     />
                   </TableHead>
+                  <TableHead className="w-[100px]">ID</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Amount</TableHead>
@@ -458,7 +459,7 @@ export function TransactionsPage() {
                 {filtered.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={9}
                       className="text-center text-muted-foreground py-8"
                     >
                       No transactions. Import a CSV or add a manual transaction.
@@ -469,7 +470,7 @@ export function TransactionsPage() {
                     <Fragment key={monthKey}>
                       <TableRow className="bg-muted/80 hover:bg-muted/80">
                         <TableCell
-                          colSpan={8}
+                          colSpan={9}
                           className="font-semibold text-foreground py-2"
                         >
                           {getMonthLabel(monthKey)}
@@ -488,6 +489,12 @@ export function TransactionsPage() {
                               onCheckedChange={() => toggleSelect(e.id)}
                               aria-label={`Select ${e.description}`}
                             />
+                          </TableCell>
+                          <TableCell
+                            className="font-mono text-xs max-w-[100px] truncate"
+                            title={e.id}
+                          >
+                            {e.id}
                           </TableCell>
                           <TableCell className="whitespace-nowrap">
                             {e.date}

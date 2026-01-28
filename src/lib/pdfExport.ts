@@ -73,6 +73,7 @@ export function downloadTransactionsAndIncomePdf(
     // Expenses table
     if (monthExpenses.length > 0) {
       const expenseHead = [
+        "ID",
         "Date",
         "Description",
         "Amount",
@@ -81,6 +82,7 @@ export function downloadTransactionsAndIncomePdf(
         "Card Member",
       ];
       const expenseBody = monthExpenses.map((e) => [
+        e.id,
         e.date,
         e.description.slice(0, 40) + (e.description.length > 40 ? "…" : ""),
         formatCurrency(e.amount),

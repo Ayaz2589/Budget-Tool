@@ -50,6 +50,12 @@ export async function getSheetValues(
   );
 }
 
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+function looksLikeIsoDate(value: string): boolean {
+  return ISO_DATE_PATTERN.test(value.trim());
+}
+
 export async function readExpensesFromSheet(
   accessToken: string,
   spreadsheetId: string
@@ -57,24 +63,45 @@ export async function readExpensesFromSheet(
   const rows = await getSheetValues(
     accessToken,
     spreadsheetId,
-    "Expenses!A2:F",
+    "Expenses!A2:G",
   );
   const expenses: Expense[] = [];
   for (const row of rows) {
-    const date = (row[0] ?? "").trim();
-    const amount = parseAmount(row[1]);
-    const description = (row[2] ?? "").trim();
-    const category = (row[3] ?? "").trim();
-    const rawSource = (row[4] ?? "").trim().toLowerCase();
+    const first = (row[0] ?? "").trim();
+    const hasIdColumn =
+      row.length >= 7 && first.length > 0 && !looksLikeIsoDate(first);
+    let id: string;
+    let date: string;
+    let amount: number | null;
+    let description: string;
+    let category: string;
+    let rawSource: string;
+    let cardMember: string | undefined;
+    if (hasIdColumn) {
+      id = first;
+      date = (row[1] ?? "").trim();
+      amount = parseAmount(row[2]);
+      description = (row[3] ?? "").trim();
+      category = (row[4] ?? "").trim();
+      rawSource = (row[5] ?? "").trim().toLowerCase();
+      cardMember = (row[6] ?? "").trim() || undefined;
+    } else {
+      id = generateId();
+      date = first;
+      amount = parseAmount(row[1]);
+      description = (row[2] ?? "").trim();
+      category = (row[3] ?? "").trim();
+      rawSource = (row[4] ?? "").trim().toLowerCase();
+      cardMember = (row[5] ?? "").trim() || undefined;
+    }
     const source: ExpenseSource = VALID_EXPENSE_SOURCES.includes(
       rawSource as ExpenseSource,
     )
       ? (rawSource as ExpenseSource)
       : "manual";
-    const cardMember = (row[5] ?? "").trim() || undefined;
     if (!date || amount == null || amount <= 0) continue;
     expenses.push({
-      id: generateId(),
+      id,
       date,
       amount,
       description: description || "Expense",
@@ -114,8 +141,9 @@ export async function appendExpenses(
   spreadsheetId: string,
   expenses: Expense[]
 ): Promise<void> {
-  const range = "Expenses!A:F";
+  const range = "Expenses!A:G";
   const values = expenses.map((e) => [
+    e.id,
     e.date,
     e.amount,
     e.description,
@@ -142,9 +170,18 @@ export async function clearAndWriteExpenses(
   expenses: Expense[]
 ): Promise<void> {
   const headers = [
-    ["Date", "Amount", "Description", "Category", "Source", "Card Member"],
+    [
+      "ID",
+      "Date",
+      "Amount",
+      "Description",
+      "Category",
+      "Source",
+      "Card Member",
+    ],
   ];
   const rows = expenses.map((e) => [
+    e.id,
     e.date,
     e.amount,
     e.description,
@@ -153,8 +190,8 @@ export async function clearAndWriteExpenses(
     e.cardMember ?? "",
   ]);
   const values = [...headers, ...rows];
-  const range = "Expenses!A1:F";
-  await clearRange(accessToken, spreadsheetId, "Expenses!A1:F10000");
+  const range = "Expenses!A1:G";
+  await clearRange(accessToken, spreadsheetId, "Expenses!A1:G10000");
   if (values.length > 0) {
     await updateSheet(accessToken, spreadsheetId, range, values, false);
   }

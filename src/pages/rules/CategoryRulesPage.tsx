@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRules } from "@/context/RulesContext";
 import { useBudget } from "@/context/BudgetContext";
+import type { CategoryRule } from "@/lib/categoryRules";
 import {
   Card,
   CardContent,
@@ -12,6 +13,8 @@ import {
 import { BASELINE_RULES_READONLY } from "@/lib/categoryRules";
 import { AddRuleDialog } from "./AddRuleDialog";
 import { RulesTable } from "./RulesTable";
+import { RulesList } from "./RulesList";
+import { RuleActionsDialog } from "./RuleActionsDialog";
 
 export function CategoryRulesPage() {
   const { rules, addRule, removeRule } = useRules();
@@ -20,6 +23,9 @@ export function CategoryRulesPage() {
   const [pattern, setPattern] = useState("");
   const [category, setCategory] = useState<string>(
     expenseCategories[0] ?? "My Purchase",
+  );
+  const [ruleForActions, setRuleForActions] = useState<CategoryRule | null>(
+    null,
   );
 
   const { t } = useTranslation();
@@ -58,10 +64,29 @@ export function CategoryRulesPage() {
             expenseCategories={expenseCategories}
             onSubmit={handleAdd}
           />
-          <RulesTable
-            baselineRules={BASELINE_RULES_READONLY}
-            customRules={expenseRules}
-            onRemoveRule={removeRule}
+          <div className="hidden md:block">
+            <RulesTable
+              baselineRules={BASELINE_RULES_READONLY}
+              customRules={expenseRules}
+              onRemoveRule={removeRule}
+            />
+          </div>
+          <div className="md:hidden max-h-[50vh] overflow-y-auto">
+            <RulesList
+              baselineRules={BASELINE_RULES_READONLY}
+              customRules={expenseRules}
+              onRuleTap={setRuleForActions}
+            />
+          </div>
+
+          <RuleActionsDialog
+            rule={ruleForActions}
+            onClose={() => setRuleForActions(null)}
+            onRemove={(id) => {
+              removeRule(id);
+              setRuleForActions(null);
+            }}
+            t={t}
           />
         </CardContent>
       </Card>

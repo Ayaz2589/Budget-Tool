@@ -27,7 +27,12 @@ export interface TotalsInput {
   investingByMonth?: Record<string, number>;
 }
 
+import { isValidDate } from "@/lib/dateRepair";
+
+export { isValidDate };
+
 function getMonthKey(date: string): string {
+  if (!isValidDate(date)) return "";
   return date.slice(0, 7);
 }
 
@@ -49,8 +54,12 @@ export function computeMonthTotals(
   hysa = 0,
   investing = 0
 ): MonthTotals {
-  const monthExpenses = expenses.filter((e) => getMonthKey(e.date) === monthKey);
-  const monthIncome = income.filter((i) => getMonthKey(i.date) === monthKey);
+  const monthExpenses = expenses.filter(
+    (e) => isValidDate(e.date) && getMonthKey(e.date) === monthKey
+  );
+  const monthIncome = income.filter(
+    (i) => isValidDate(i.date) && getMonthKey(i.date) === monthKey
+  );
 
   const totalEarned = monthIncome.reduce((s, i) => s + i.amount, 0);
   const totalSpent = monthExpenses.reduce((s, e) => s + e.amount, 0);
@@ -104,8 +113,14 @@ export function computeMonthTotals(
 export function computeAllTotals(input: TotalsInput): MonthTotals[] {
   const { expenses, income, iOweNovaByMonth, hysaByMonth = {}, investingByMonth = {} } = input;
   const monthKeys = new Set<string>();
-  for (const e of expenses) monthKeys.add(getMonthKey(e.date));
-  for (const i of income) monthKeys.add(getMonthKey(i.date));
+  for (const e of expenses) {
+    const key = getMonthKey(e.date);
+    if (key) monthKeys.add(key);
+  }
+  for (const i of income) {
+    const key = getMonthKey(i.date);
+    if (key) monthKeys.add(key);
+  }
   const sorted = Array.from(monthKeys).sort().reverse();
 
   return sorted.map((monthKey) =>

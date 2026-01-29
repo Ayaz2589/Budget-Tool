@@ -6,7 +6,7 @@ import {
   applyBaselineToExpenses,
 } from "@/lib/categoryRules";
 import type { Expense, ExpenseSource } from "@/lib/types";
-import { getMonthLabel } from "@/lib/totals";
+import { getMonthLabel, isValidDate } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { CategoryOption } from "@/lib/categoryColors";
@@ -112,7 +112,9 @@ export function TransactionsPage() {
   }, [expenses]);
 
   const filtered = useMemo(() => {
-    let list = [...expenses].sort((a, b) => b.date.localeCompare(a.date));
+    let list = [...expenses]
+      .filter((e) => isValidDate(e.date))
+      .sort((a, b) => b.date.localeCompare(a.date));
     if (monthFilter) {
       list = list.filter((e) => e.date.startsWith(monthFilter));
     }

@@ -27,6 +27,7 @@ export function SettingsPage() {
     incomeCategories,
     setExpenseCategories,
     setIncomeCategories,
+    repairCorruptedDates,
   } = useBudget();
   const {
     isSignedIn,
@@ -45,6 +46,17 @@ export function SettingsPage() {
   const [sheetIdInput, setSheetIdInput] = useState(spreadsheetId ?? "");
   const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
   const [restoreConfirmOpen, setRestoreConfirmOpen] = useState(false);
+  const [repairResult, setRepairResult] = useState<string | null>(null);
+
+  const handleRepairDates = () => {
+    const { fixedExpenses, fixedIncome } = repairCorruptedDates();
+    setRepairResult(
+      fixedExpenses > 0 || fixedIncome > 0
+        ? `Repaired ${fixedExpenses} expense(s) and ${fixedIncome} income entry(ies).`
+        : "No corrupted dates found.",
+    );
+    setTimeout(() => setRepairResult(null), 5000);
+  };
 
   const saveExpenseCategories = () => {
     const list = expenseList
@@ -115,7 +127,7 @@ export function SettingsPage() {
               </div>
               {spreadsheetId && (
                 <>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 items-center">
                     <Button
                       onClick={() => setRestoreConfirmOpen(true)}
                       disabled={syncStatus === "syncing"}
@@ -133,6 +145,18 @@ export function SettingsPage() {
                         ? "Syncing..."
                         : "Sync to Google Sheets"}
                     </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleRepairDates}
+                      title="Fix dates that were corrupted (e.g. from Google Sheets formatting)"
+                    >
+                      Repair corrupted dates
+                    </Button>
+                    {repairResult && (
+                      <span className="text-sm text-muted-foreground">
+                        {repairResult}
+                      </span>
+                    )}
                   </div>
 
                   <Dialog

@@ -30,9 +30,11 @@ export function extractSpreadsheetId(urlOrId: string): string | null {
 export async function getSheetValues(
   accessToken: string,
   spreadsheetId: string,
-  range: string
-): Promise<string[][]> {
-  const url = `${SHEETS_API}/${spreadsheetId}/values/${encodeURIComponent(range)}`;
+  range: string,
+  valueRenderOption: "FORMATTED_VALUE" | "UNFORMATTED_VALUE" = "FORMATTED_VALUE"
+): Promise<unknown[][]> {
+  const params = new URLSearchParams({ valueRenderOption });
+  const url = `${SHEETS_API}/${spreadsheetId}/values/${encodeURIComponent(range)}?${params}`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
@@ -43,11 +45,17 @@ export async function getSheetValues(
   const data = (await res.json()) as { values?: unknown[][] };
   const values = data.values;
   if (!Array.isArray(values) || values.length === 0) return [];
-  return values.map((row) =>
-    Array.isArray(row)
-      ? row.map((cell) => (cell != null ? String(cell) : ""))
-      : [],
-  );
+  return values.map((row) => (Array.isArray(row) ? [...row] : []));
+}
+
+import { tryRepairDate } from "@/lib/dateRepair";
+
+/** Normalize a date value from Sheets: may be ISO string, serial number, or corrupted (currency-formatted). */
+function normalizeDate(value: unknown): string | null {
+  if (value == null) return null;
+  const s = String(value).trim();
+  if (ISO_DATE_PATTERN.test(s)) return s;
+  return tryRepairDate(s);
 }
 
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -64,14 +72,15 @@ export async function readExpensesFromSheet(
     accessToken,
     spreadsheetId,
     "Expenses!A2:G",
+    "UNFORMATTED_VALUE",
   );
   const expenses: Expense[] = [];
   for (const row of rows) {
-    const first = (row[0] ?? "").trim();
+    const first = String(row[0] ?? "").trim();
     const hasIdColumn =
       row.length >= 7 && first.length > 0 && !looksLikeIsoDate(first);
     let id: string;
-    let date: string;
+    let dateRaw: unknown;
     let amount: number | null;
     let description: string;
     let category: string;
@@ -79,21 +88,22 @@ export async function readExpensesFromSheet(
     let cardMember: string | undefined;
     if (hasIdColumn) {
       id = first;
-      date = (row[1] ?? "").trim();
+      dateRaw = row[1];
       amount = parseAmount(row[2]);
-      description = (row[3] ?? "").trim();
-      category = (row[4] ?? "").trim();
-      rawSource = (row[5] ?? "").trim().toLowerCase();
-      cardMember = (row[6] ?? "").trim() || undefined;
+      description = String(row[3] ?? "").trim();
+      category = String(row[4] ?? "").trim();
+      rawSource = String(row[5] ?? "").trim().toLowerCase();
+      cardMember = String(row[6] ?? "").trim() || undefined;
     } else {
       id = generateId();
-      date = first;
+      dateRaw = row[0];
       amount = parseAmount(row[1]);
-      description = (row[2] ?? "").trim();
-      category = (row[3] ?? "").trim();
-      rawSource = (row[4] ?? "").trim().toLowerCase();
-      cardMember = (row[5] ?? "").trim() || undefined;
+      description = String(row[2] ?? "").trim();
+      category = String(row[3] ?? "").trim();
+      rawSource = String(row[4] ?? "").trim().toLowerCase();
+      cardMember = String(row[5] ?? "").trim() || undefined;
     }
+    const date = normalizeDate(dateRaw);
     const source: ExpenseSource = VALID_EXPENSE_SOURCES.includes(
       rawSource as ExpenseSource,
     )
@@ -117,13 +127,18 @@ export async function readIncomeFromSheet(
   accessToken: string,
   spreadsheetId: string
 ): Promise<Income[]> {
-  const rows = await getSheetValues(accessToken, spreadsheetId, "Income!A2:D");
+  const rows = await getSheetValues(
+    accessToken,
+    spreadsheetId,
+    "Income!A2:D",
+    "UNFORMATTED_VALUE",
+  );
   const income: Income[] = [];
   for (const row of rows) {
-    const date = (row[0] ?? "").trim();
+    const date = normalizeDate(row[0]);
     const amount = parseAmount(row[1]);
-    const description = (row[2] ?? "").trim();
-    const category = (row[3] ?? "").trim();
+    const description = String(row[2] ?? "").trim();
+    const category = String(row[3] ?? "").trim();
     if (!date || amount == null || amount <= 0) continue;
     income.push({
       id: generateId(),

@@ -12,6 +12,7 @@ import {
   DEFAULT_EXPENSE_CATEGORIES,
   DEFAULT_INCOME_CATEGORIES,
 } from "@/lib/types";
+import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
 
@@ -36,6 +37,7 @@ interface BudgetContextValue extends BudgetState {
   setIncomeCategories: (categories: string[]) => void;
   setIOweNova: (monthKey: string, amount: number) => void;
   iOweNova: Record<string, number>;
+  repairCorruptedDates: () => { fixedExpenses: number; fixedIncome: number };
 }
 
 const BudgetContext = createContext<BudgetContextValue | null>(null);
@@ -172,6 +174,34 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     setIOweNovaState((prev) => ({ ...prev, [monthKey]: amount }));
   }, []);
 
+  const repairCorruptedDates = useCallback(() => {
+    let fixedExpenses = 0;
+    let fixedIncome = 0;
+    const repairedExpenses = expenses.map((e) => {
+      if (isValidDate(e.date)) return e;
+      const repaired = tryRepairDate(e.date);
+      if (repaired) {
+        fixedExpenses++;
+        return { ...e, date: repaired };
+      }
+      return e;
+    });
+    const repairedIncome = income.map((i) => {
+      if (isValidDate(i.date)) return i;
+      const repaired = tryRepairDate(i.date);
+      if (repaired) {
+        fixedIncome++;
+        return { ...i, date: repaired };
+      }
+      return i;
+    });
+    setExpenses(
+      [...repairedExpenses].sort((a, b) => b.date.localeCompare(a.date)),
+    );
+    setIncome([...repairedIncome].sort((a, b) => b.date.localeCompare(a.date)));
+    return { fixedExpenses, fixedIncome };
+  }, [expenses, income]);
+
   const value = useMemo<BudgetContextValue>(
     () => ({
       expenses,
@@ -191,6 +221,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       setIncomeCategories,
       setIOweNova,
       iOweNova,
+      repairCorruptedDates,
     }),
     [
       expenses,
@@ -210,6 +241,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       setExpenseCategories,
       setIncomeCategories,
       setIOweNova,
+      repairCorruptedDates,
     ],
   );
 

@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useBudget } from "@/context/BudgetContext";
+import { getDebtBalance } from "@/lib/debtUtils";
 import {
   computeAllTotals,
   computeGrandTotals,
@@ -56,7 +58,7 @@ function formatPercent(n: number): string {
 }
 
 export function Dashboard() {
-  const { expenses, income, iOweNova } = useBudget();
+  const { expenses, income, iOweNova, debts, debtPayments } = useBudget();
   const months = computeAllTotals({
     expenses,
     income,
@@ -313,6 +315,56 @@ export function Dashboard() {
     );
     return buildSpendingByType(monthExpenses);
   }, [expenses, selectedMonthKey]);
+
+  // Debt summary: total remaining, total paid off, and chart (remaining vs paid off)
+  const debtSummary = useMemo(() => {
+    const withBalance = debts.map((debt) => ({
+      debt,
+      balance: getDebtBalance(debt, debtPayments),
+    }));
+    const totalRemaining = withBalance.reduce(
+      (sum, { balance }) => sum + balance,
+      0,
+    );
+    const totalPaidOff = debtPayments.reduce((sum, p) => sum + p.amount, 0);
+    const chartData = [
+      {
+        metric: "Remaining balance",
+        value: totalRemaining,
+        fill: "var(--color-remaining)",
+      },
+      {
+        metric: "Paid off",
+        value: totalPaidOff,
+        fill: "var(--color-paidOff)",
+      },
+    ];
+    const hasDebtData = totalRemaining > 0 || totalPaidOff > 0;
+    return {
+      totalRemaining,
+      totalPaidOff,
+      totalDebt: totalRemaining + totalPaidOff,
+      chartData,
+      hasDebtData,
+    };
+  }, [debts, debtPayments]);
+
+  const debtChartConfig = {
+    remaining: {
+      label: "Remaining balance",
+      theme: {
+        light: "oklch(0.55 0.18 35)",
+        dark: "oklch(0.65 0.16 35)",
+      },
+    },
+    paidOff: {
+      label: "Paid off",
+      theme: {
+        light: "oklch(0.55 0.2 145)",
+        dark: "oklch(0.65 0.18 145)",
+      },
+    },
+  } satisfies ChartConfig;
 
   return (
     <div className="space-y-6">
@@ -634,6 +686,100 @@ export function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <h2 className="text-lg font-semibold text-foreground pt-4">Debt</h2>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Total debt: remaining vs paid off
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Remaining balance (what you still owe) and total paid off across all
+            debts.{" "}
+            <Link
+              to="/debt"
+              className="font-medium text-primary hover:underline"
+            >
+              View & manage debt →
+            </Link>
+          </p>
+        </CardHeader>
+        <CardContent>
+          {debtSummary.hasDebtData ? (
+            <>
+              <div className="flex flex-wrap items-baseline gap-4 mb-4">
+                <span className="text-muted-foreground text-sm">
+                  Total: {formatCurrency(debtSummary.totalDebt)}
+                </span>
+                <span className="text-sm">
+                  Remaining:{" "}
+                  <span className="font-semibold">
+                    {formatCurrency(debtSummary.totalRemaining)}
+                  </span>
+                </span>
+                <span className="text-sm">
+                  Paid off:{" "}
+                  <span className="font-semibold text-green-600 dark:text-green-500">
+                    {formatCurrency(debtSummary.totalPaidOff)}
+                  </span>
+                </span>
+              </div>
+              <ChartContainer
+                config={debtChartConfig}
+                className="h-[180px] w-full"
+              >
+                <BarChart
+                  data={debtSummary.chartData}
+                  layout="vertical"
+                  margin={{ top: 5, right: 10, left: 100, bottom: 5 }}
+                  accessibilityLayer
+                >
+                  <XAxis
+                    type="number"
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => formatCurrency(v)}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="metric"
+                    tickLine={false}
+                    axisLine={false}
+                    width={95}
+                    tick={{ fontSize: 11 }}
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) =>
+                          typeof value === "number"
+                            ? formatCurrency(value)
+                            : String(value ?? "")
+                        }
+                      />
+                    }
+                  />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={32}>
+                    {debtSummary.chartData.map((_, i) => (
+                      <Cell key={i} fill={debtSummary.chartData[i]!.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground py-6 text-center">
+              No debt yet.{" "}
+              <Link
+                to="/debt"
+                className="font-medium text-primary hover:underline"
+              >
+                Add a debt
+              </Link>
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       <h2 className="text-lg font-semibold text-foreground pt-4">
         Spending by type

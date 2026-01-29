@@ -8,6 +8,7 @@ import {
   applyRulesToExpenses,
   applyBaselineToExpenses,
 } from "@/lib/categoryRules";
+import { filterOutExistingExpenses } from "@/lib/importDedup";
 import type { Expense, Income } from "@/lib/types";
 import { CategoryOption } from "@/lib/categoryColors";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ export function ImportPage() {
   const [previewIncome, setPreviewIncome] = useState<Income[]>([]);
   const [sourceLabel, setSourceLabel] = useState<string>("");
   const [lastDetected, setLastDetected] = useState<string>("");
+  const [skippedDuplicates, setSkippedDuplicates] = useState<number>(0);
   const [importError, setImportError] = useState<string>("");
   const { expenses, income, addExpenses, addIncomes, expenseCategories } =
     useBudget();
@@ -114,6 +116,7 @@ export function ImportPage() {
           setPreviewIncome(toAddIncome);
           setSourceLabel("Exported PDF");
           setLastDetected("pdf-export");
+          setSkippedDuplicates(0);
         } catch (err) {
           setImportError(
             err instanceof Error ? err.message : "PDF import failed",
@@ -122,6 +125,7 @@ export function ImportPage() {
           setPreviewIncome([]);
           setLastDetected("");
           setSourceLabel("");
+          setSkippedDuplicates(0);
         }
       };
       reader.readAsArrayBuffer(file);
@@ -132,8 +136,10 @@ export function ImportPage() {
           const buffer = reader.result as ArrayBuffer;
           const text = await extractTextFromPdf(buffer);
           const result = parseChasePdfFromText(text);
+          const toAdd = filterOutExistingExpenses(result.expenses, expenses);
+          setSkippedDuplicates(result.expenses.length - toAdd.length);
           const withRules = applyRulesToExpenses(
-            result.expenses,
+            toAdd,
             rules.filter((r) => r.type === "expense"),
           );
           const withBaseline = applyBaselineToExpenses(withRules);
@@ -149,6 +155,7 @@ export function ImportPage() {
           setPreviewIncome([]);
           setLastDetected("");
           setSourceLabel("");
+          setSkippedDuplicates(0);
         }
       };
       reader.readAsArrayBuffer(file);
@@ -158,8 +165,10 @@ export function ImportPage() {
         try {
           const text = String(reader.result);
           const result = parseCsv(text, selectedSource as CsvSource);
+          const toAdd = filterOutExistingExpenses(result.expenses, expenses);
+          setSkippedDuplicates(result.expenses.length - toAdd.length);
           const withRules = applyRulesToExpenses(
-            result.expenses,
+            toAdd,
             rules.filter((r) => r.type === "expense"),
           );
           const withBaseline = applyBaselineToExpenses(withRules);
@@ -175,6 +184,7 @@ export function ImportPage() {
           setPreviewIncome([]);
           setLastDetected("");
           setSourceLabel("");
+          setSkippedDuplicates(0);
         }
       };
       reader.readAsText(file, "UTF-8");
@@ -207,6 +217,7 @@ export function ImportPage() {
     setPreviewIncome([]);
     setSourceLabel("");
     setLastDetected("");
+    setSkippedDuplicates(0);
     setImportError("");
   };
 
@@ -219,8 +230,9 @@ export function ImportPage() {
           <CardDescription>
             Select your bank or &quot;Exported PDF (re-import)&quot; from the
             dropdown, then choose a CSV file (Amex, Apple), PDF statement
-            (Chase), or a previously downloaded transactions PDF. Re-imported
-            PDFs skip rows that already exist by ID. After reviewing the
+            (Chase), or a previously downloaded transactions PDF. CSV and Chase
+            imports skip transactions that already exist (same date, amount,
+            description). Re-imported PDFs skip by ID. After reviewing the
             preview, click &quot;Add to transactions&quot; or &quot;Add
             all&quot; to save—they persist across refreshes and appear on the
             Transactions and Income pages.
@@ -276,7 +288,7 @@ export function ImportPage() {
               {sourceLabel}
               {lastDetected === "pdf-export"
                 ? ` · ${previewExpenses.length} expenses, ${previewIncome.length} income to add (existing IDs omitted)`
-                : ` · ${previewExpenses.length} rows`}
+                : ` · ${previewExpenses.length} rows${skippedDuplicates > 0 ? ` (${skippedDuplicates} duplicates skipped)` : ""}`}
             </span>
           )}
           {(previewExpenses.length > 0 || previewIncome.length > 0) && (
@@ -302,7 +314,7 @@ export function ImportPage() {
             <CardDescription>
               {lastDetected === "pdf-export"
                 ? 'Transactions and income with existing IDs are omitted. Click "Add all" to add the rest.'
-                : 'Edit category per row if needed, then click "Add to transactions".'}
+                : 'Transactions matching existing entries (same date, amount, description) are skipped. Edit category per row if needed, then click "Add to transactions".'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

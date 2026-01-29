@@ -262,7 +262,9 @@ export function Layout() {
               : "overflow-auto",
           )}
         >
-          <Outlet />
+          <div className="mx-auto w-full max-w-7xl flex-1 min-h-0 flex flex-col min-w-0">
+            <Outlet />
+          </div>
         </div>
       </main>
 

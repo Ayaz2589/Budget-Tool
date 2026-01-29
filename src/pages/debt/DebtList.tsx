@@ -11,14 +11,6 @@ import { DollarSign, Calendar, Trash2 } from "lucide-react";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency } from "@/lib/format";
 import type { Debt, DebtPayment } from "@/lib/types";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 export type DebtListProps = {
   debts: Debt[];
@@ -27,9 +19,6 @@ export type DebtListProps = {
   onEditRecurring: (debt: Debt) => void;
   onDelete: (debtId: string) => void;
   onRemovePayment: (paymentId: string) => void;
-  deleteConfirmDebtId: string | null;
-  onConfirmDelete: (id: string) => void;
-  onDismissDelete: () => void;
 };
 
 export function DebtList({
@@ -39,9 +28,6 @@ export function DebtList({
   onEditRecurring,
   onDelete,
   onRemovePayment,
-  deleteConfirmDebtId,
-  onConfirmDelete,
-  onDismissDelete,
 }: DebtListProps) {
   if (debts.length === 0) {
     return (
@@ -195,35 +181,6 @@ export function DebtList({
           );
         })}
       </div>
-
-      <Dialog
-        open={deleteConfirmDebtId !== null}
-        onOpenChange={(open) => !open && onDismissDelete()}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete debt?</DialogTitle>
-            <DialogDescription>
-              This will permanently remove the debt and all its payment history.
-              This cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onDismissDelete}>
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() =>
-                deleteConfirmDebtId && onConfirmDelete(deleteConfirmDebtId)
-              }
-            >
-              Delete debt
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

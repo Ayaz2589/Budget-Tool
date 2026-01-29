@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
-import type { DebtPayment } from "@/lib/types";
+import type { Debt, DebtPayment } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -9,10 +9,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
 import { EditRecurringDialog } from "./EditRecurringDialog";
 import { DebtList } from "./DebtList";
+import { DebtListMobile } from "./DebtListMobile";
+import { DebtActionsDialog } from "./DebtActionsDialog";
 
 export function DebtPage() {
   const {
@@ -30,6 +41,7 @@ export function DebtPage() {
   const [deleteConfirmDebtId, setDeleteConfirmDebtId] = useState<string | null>(
     null,
   );
+  const [debtForActions, setDebtForActions] = useState<Debt | null>(null);
 
   const paymentsByDebt = useMemo(() => {
     const map = new Map<string, DebtPayment[]>();
@@ -79,22 +91,91 @@ export function DebtPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <DebtList
-            debts={debts}
-            paymentsByDebt={paymentsByDebt}
-            onAddPayment={setPaymentDebtId}
-            onEditRecurring={(debt) => setRecurringDebtId(debt.id)}
-            onDelete={setDeleteConfirmDebtId}
-            onRemovePayment={removeDebtPayment}
-            deleteConfirmDebtId={deleteConfirmDebtId}
-            onConfirmDelete={(id) => {
-              removeDebt(id);
-              setDeleteConfirmDebtId(null);
-            }}
-            onDismissDelete={() => setDeleteConfirmDebtId(null)}
-          />
+          {debts.length === 0 ? (
+            <p className="text-muted-foreground text-sm py-6 text-center">
+              No debts yet. Add one above.
+            </p>
+          ) : (
+            <>
+              <div className="hidden md:block">
+                <DebtList
+                  debts={debts}
+                  paymentsByDebt={paymentsByDebt}
+                  onAddPayment={setPaymentDebtId}
+                  onEditRecurring={(debt) => setRecurringDebtId(debt.id)}
+                  onDelete={setDeleteConfirmDebtId}
+                  onRemovePayment={removeDebtPayment}
+                />
+              </div>
+              <div className="md:hidden max-h-[50vh] overflow-y-auto border rounded-md">
+                <DebtListMobile
+                  debts={debts}
+                  paymentsByDebt={paymentsByDebt}
+                  onDebtTap={setDebtForActions}
+                />
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
+
+      <DebtActionsDialog
+        debt={debtForActions}
+        payments={
+          debtForActions ? (paymentsByDebt.get(debtForActions.id) ?? []) : []
+        }
+        onClose={() => setDebtForActions(null)}
+        onAddPayment={(id) => {
+          setDebtForActions(null);
+          setPaymentDebtId(id);
+        }}
+        onEditRecurring={(debt) => {
+          setDebtForActions(null);
+          setRecurringDebtId(debt.id);
+        }}
+        onDelete={(id) => {
+          setDebtForActions(null);
+          setDeleteConfirmDebtId(id);
+        }}
+        onRemovePayment={removeDebtPayment}
+        t={t}
+      />
+
+      <Dialog
+        open={deleteConfirmDebtId !== null}
+        onOpenChange={(open) => !open && setDeleteConfirmDebtId(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete debt?</DialogTitle>
+            <DialogDescription>
+              This will permanently remove the debt and all its payment history.
+              This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteConfirmDebtId(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                if (deleteConfirmDebtId) {
+                  removeDebt(deleteConfirmDebtId);
+                  setDeleteConfirmDebtId(null);
+                }
+              }}
+            >
+              Delete debt
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AddPaymentDialog
         open={paymentDebtId !== null}

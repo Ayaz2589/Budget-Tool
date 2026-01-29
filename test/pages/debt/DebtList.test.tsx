@@ -11,9 +11,6 @@ test("DebtList shows empty state when no debts", () => {
       onEditRecurring={() => {}}
       onDelete={() => {}}
       onRemovePayment={() => {}}
-      deleteConfirmDebtId={null}
-      onConfirmDelete={() => {}}
-      onDismissDelete={() => {}}
     />,
   );
   expect(screen.getByText("No debts yet. Add one above.")).toBeInTheDocument();

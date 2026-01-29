@@ -321,17 +321,17 @@ export function TransactionsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Transactions</h1>
-      <Card>
-        <CardHeader>
+    <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
+      <h1 className="text-2xl font-semibold shrink-0 mb-4">Transactions</h1>
+      <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
+        <CardHeader className="shrink-0">
           <CardTitle>Expenses</CardTitle>
           <CardDescription>
             Filter and edit categories. Re-apply rules to uncategorized rows.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-2">
+        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-4">
+          <div className="flex items-center gap-2 shrink-0">
             <Button
               variant="outline"
               onClick={() => setFiltersPopupOpen(true)}
@@ -526,7 +526,7 @@ export function TransactionsPage() {
               </div>
             </DialogContent>
           </Dialog>
-          <div className="overflow-x-auto min-h-[calc(100vh-14rem)] max-h-[calc(100vh-10rem)] overflow-y-auto border rounded-md">
+          <div className="flex-1 min-h-0 overflow-auto border rounded-md">
             {filtered.length === 0 ? (
               <div className="text-center text-muted-foreground py-12 px-4">
                 No transactions. Import a CSV or add a manual transaction.

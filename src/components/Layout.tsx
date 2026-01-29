@@ -21,8 +21,8 @@ const nav = [
 export function Layout() {
   const location = useLocation();
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      <nav className="border-b md:border-b-0 md:border-r bg-muted/30 p-2 flex flex-row md:flex-col gap-1 shrink-0">
+    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
+      <nav className="border-b md:border-b-0 md:border-r bg-muted/30 p-2 flex flex-row md:flex-col gap-1 shrink-0 overflow-hidden">
         {nav.map(({ to, label, icon: Icon }) => (
           <Link
             key={to}
@@ -39,8 +39,17 @@ export function Layout() {
           </Link>
         ))}
       </nav>
-      <main className="flex-1 p-4 md:p-6 overflow-auto">
-        <Outlet />
+      <main className="flex-1 min-h-0 flex flex-col overflow-hidden p-4 md:p-6">
+        <div
+          className={cn(
+            "flex-1 min-h-0 flex flex-col",
+            location.pathname === "/transactions"
+              ? "overflow-hidden"
+              : "overflow-auto",
+          )}
+        >
+          <Outlet />
+        </div>
       </main>
     </div>
   );

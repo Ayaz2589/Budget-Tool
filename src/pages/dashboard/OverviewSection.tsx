@@ -76,48 +76,104 @@ export function OverviewSection({
             </CardHeader>
             <CardContent>
               {summaryBarData.some((d) => d.value > 0) ? (
-                <ChartContainer
-                  config={summaryBarConfig}
-                  className="h-[220px] w-full"
-                >
-                  <BarChart
-                    data={summaryBarData}
-                    layout="vertical"
-                    margin={{ top: 5, right: 10, left: 60, bottom: 5 }}
-                    accessibilityLayer
-                  >
-                    <XAxis
-                      type="number"
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(v) => formatCurrency(v)}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="metric"
-                      tickLine={false}
-                      axisLine={false}
-                      width={55}
-                      tick={{ fontSize: 11 }}
-                    />
-                    <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          formatter={(value) =>
-                            typeof value === "number"
-                              ? formatCurrency(value)
-                              : String(value ?? "")
+                <>
+                  <div className="md:hidden min-w-0">
+                    <ChartContainer
+                      config={summaryBarConfig}
+                      className="h-[160px] w-full"
+                    >
+                      <BarChart
+                        data={summaryBarData}
+                        layout="vertical"
+                        margin={{ top: 5, right: 8, left: 48, bottom: 5 }}
+                        accessibilityLayer
+                      >
+                        <XAxis
+                          type="number"
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(v) => formatCurrency(v)}
+                        />
+                        <YAxis
+                          type="category"
+                          dataKey="metric"
+                          tickLine={false}
+                          axisLine={false}
+                          width={42}
+                          tick={{ fontSize: 10 }}
+                        />
+                        <ChartTooltip
+                          content={
+                            <ChartTooltipContent
+                              formatter={(value) =>
+                                typeof value === "number"
+                                  ? formatCurrency(value)
+                                  : String(value ?? "")
+                              }
+                            />
                           }
                         />
-                      }
-                    />
-                    <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={28}>
-                      {summaryBarData.map((_, i) => (
-                        <Cell key={i} fill={summaryBarData[i]!.fill} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ChartContainer>
+                        <Bar
+                          dataKey="value"
+                          radius={[0, 4, 4, 0]}
+                          maxBarSize={20}
+                        >
+                          {summaryBarData.map((_, i) => (
+                            <Cell key={i} fill={summaryBarData[i]!.fill} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ChartContainer>
+                  </div>
+                  <div className="hidden md:block">
+                    <ChartContainer
+                      config={summaryBarConfig}
+                      className="h-[220px] w-full"
+                    >
+                      <BarChart
+                        data={summaryBarData}
+                        layout="vertical"
+                        margin={{ top: 5, right: 10, left: 60, bottom: 5 }}
+                        accessibilityLayer
+                      >
+                        <XAxis
+                          type="number"
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(v) => formatCurrency(v)}
+                        />
+                        <YAxis
+                          type="category"
+                          dataKey="metric"
+                          tickLine={false}
+                          axisLine={false}
+                          width={55}
+                          tick={{ fontSize: 11 }}
+                        />
+                        <ChartTooltip
+                          content={
+                            <ChartTooltipContent
+                              formatter={(value) =>
+                                typeof value === "number"
+                                  ? formatCurrency(value)
+                                  : String(value ?? "")
+                              }
+                            />
+                          }
+                        />
+                        <Bar
+                          dataKey="value"
+                          radius={[0, 4, 4, 0]}
+                          maxBarSize={28}
+                        >
+                          {summaryBarData.map((_, i) => (
+                            <Cell key={i} fill={summaryBarData[i]!.fill} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ChartContainer>
+                  </div>
+                </>
               ) : (
                 <p className="text-sm text-muted-foreground py-8 text-center">
                   {t("dashboard.noDataForMonth")}
@@ -134,55 +190,110 @@ export function OverviewSection({
             </CardHeader>
             <CardContent>
               {spendingPieData.length > 0 ? (
-                <ChartContainer
-                  config={{
-                    "50/50": {
-                      label: "50/50",
-                      theme: { light: PIE_COLORS[0], dark: PIE_COLORS[0] },
-                    },
-                    "Tasnuva's": {
-                      label: "Tasnuva's",
-                      theme: { light: PIE_COLORS[1], dark: PIE_COLORS[1] },
-                    },
-                    My: {
-                      label: "My",
-                      theme: { light: PIE_COLORS[2], dark: PIE_COLORS[2] },
-                    },
-                  }}
-                  className="h-[220px] w-full"
-                >
-                  <PieChart>
-                    <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          formatter={(value) =>
-                            typeof value === "number"
-                              ? formatCurrency(value)
-                              : String(value ?? "")
+                <>
+                  <div className="md:hidden min-w-0">
+                    <ChartContainer
+                      config={{
+                        "50/50": {
+                          label: "50/50",
+                          theme: { light: PIE_COLORS[0], dark: PIE_COLORS[0] },
+                        },
+                        "Tasnuva's": {
+                          label: "Tasnuva's",
+                          theme: { light: PIE_COLORS[1], dark: PIE_COLORS[1] },
+                        },
+                        My: {
+                          label: "My",
+                          theme: { light: PIE_COLORS[2], dark: PIE_COLORS[2] },
+                        },
+                      }}
+                      className="h-[160px] w-full"
+                    >
+                      <PieChart>
+                        <ChartTooltip
+                          content={
+                            <ChartTooltipContent
+                              formatter={(value) =>
+                                typeof value === "number"
+                                  ? formatCurrency(value)
+                                  : String(value ?? "")
+                              }
+                            />
                           }
                         />
-                      }
-                    />
-                    <Pie
-                      data={spendingPieData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={2}
+                        <Pie
+                          data={spendingPieData}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={36}
+                          outerRadius={58}
+                          paddingAngle={2}
+                        >
+                          {spendingPieData.map((_, i) => (
+                            <Cell
+                              key={i}
+                              fill={PIE_COLORS[i % PIE_COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Legend />
+                      </PieChart>
+                    </ChartContainer>
+                  </div>
+                  <div className="hidden md:block">
+                    <ChartContainer
+                      config={{
+                        "50/50": {
+                          label: "50/50",
+                          theme: { light: PIE_COLORS[0], dark: PIE_COLORS[0] },
+                        },
+                        "Tasnuva's": {
+                          label: "Tasnuva's",
+                          theme: { light: PIE_COLORS[1], dark: PIE_COLORS[1] },
+                        },
+                        My: {
+                          label: "My",
+                          theme: { light: PIE_COLORS[2], dark: PIE_COLORS[2] },
+                        },
+                      }}
+                      className="h-[220px] w-full"
                     >
-                      {spendingPieData.map((_, i) => (
-                        <Cell
-                          key={i}
-                          fill={PIE_COLORS[i % PIE_COLORS.length]}
+                      <PieChart>
+                        <ChartTooltip
+                          content={
+                            <ChartTooltipContent
+                              formatter={(value) =>
+                                typeof value === "number"
+                                  ? formatCurrency(value)
+                                  : String(value ?? "")
+                              }
+                            />
+                          }
                         />
-                      ))}
-                    </Pie>
-                    <Legend />
-                  </PieChart>
-                </ChartContainer>
+                        <Pie
+                          data={spendingPieData}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={50}
+                          outerRadius={80}
+                          paddingAngle={2}
+                        >
+                          {spendingPieData.map((_, i) => (
+                            <Cell
+                              key={i}
+                              fill={PIE_COLORS[i % PIE_COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Legend />
+                      </PieChart>
+                    </ChartContainer>
+                  </div>
+                </>
               ) : (
                 <p className="text-sm text-muted-foreground py-8 text-center">
                   {t("dashboard.noSpendingForMonth")}
@@ -199,70 +310,142 @@ export function OverviewSection({
             </CardHeader>
             <CardContent>
               {incomeStackedBarData.length > 0 ? (
-                <ChartContainer
-                  config={incomeStackedBarConfig}
-                  className="h-[220px] w-full"
-                >
-                  <BarChart
-                    data={incomeStackedBarData}
-                    layout="vertical"
-                    margin={{ top: 5, right: 10, left: 80, bottom: 5 }}
-                    accessibilityLayer
-                  >
-                    <XAxis
-                      type="number"
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(v) => formatCurrency(v)}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="name"
-                      tickLine={false}
-                      axisLine={false}
-                      width={76}
-                      tick={{ fontSize: 11 }}
-                    />
-                    <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          labelFormatter={(_, payload) =>
-                            payload?.[0]?.payload?.name ?? ""
-                          }
-                          formatter={(value, name) => (
-                            <div className="flex w-full items-center justify-between gap-4">
-                              <span className="text-muted-foreground">
-                                {String(name)}
-                              </span>
-                              <span>
-                                {typeof value === "number"
-                                  ? formatCurrency(value)
-                                  : String(value ?? "")}
-                              </span>
-                            </div>
-                          )}
+                <>
+                  <div className="md:hidden min-w-0">
+                    <ChartContainer
+                      config={incomeStackedBarConfig}
+                      className="h-[160px] w-full"
+                    >
+                      <BarChart
+                        data={incomeStackedBarData}
+                        layout="vertical"
+                        margin={{ top: 5, right: 8, left: 56, bottom: 5 }}
+                        accessibilityLayer
+                      >
+                        <XAxis
+                          type="number"
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(v) => formatCurrency(v)}
                         />
-                      }
-                    />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    {incomeCategoryKeys.map((cat, idx) => (
-                      <Bar
-                        key={cat}
-                        dataKey={cat}
-                        stackId="income"
-                        radius={
-                          idx === incomeCategoryKeys.length - 1
-                            ? [0, 4, 4, 0]
-                            : 0
-                        }
-                        maxBarSize={36}
-                        fill={
-                          INCOME_CATEGORY_COLORS[cat] ?? "oklch(0.6 0.15 200)"
-                        }
-                      />
-                    ))}
-                  </BarChart>
-                </ChartContainer>
+                        <YAxis
+                          type="category"
+                          dataKey="name"
+                          tickLine={false}
+                          axisLine={false}
+                          width={50}
+                          tick={{ fontSize: 10 }}
+                        />
+                        <ChartTooltip
+                          content={
+                            <ChartTooltipContent
+                              labelFormatter={(_, payload) =>
+                                payload?.[0]?.payload?.name ?? ""
+                              }
+                              formatter={(value, name) => (
+                                <div className="flex w-full items-center justify-between gap-4">
+                                  <span className="text-muted-foreground">
+                                    {String(name)}
+                                  </span>
+                                  <span>
+                                    {typeof value === "number"
+                                      ? formatCurrency(value)
+                                      : String(value ?? "")}
+                                  </span>
+                                </div>
+                              )}
+                            />
+                          }
+                        />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        {incomeCategoryKeys.map((cat, idx) => (
+                          <Bar
+                            key={cat}
+                            dataKey={cat}
+                            stackId="income"
+                            radius={
+                              idx === incomeCategoryKeys.length - 1
+                                ? [0, 4, 4, 0]
+                                : 0
+                            }
+                            maxBarSize={24}
+                            fill={
+                              INCOME_CATEGORY_COLORS[cat] ??
+                              "oklch(0.6 0.15 200)"
+                            }
+                          />
+                        ))}
+                      </BarChart>
+                    </ChartContainer>
+                  </div>
+                  <div className="hidden md:block">
+                    <ChartContainer
+                      config={incomeStackedBarConfig}
+                      className="h-[220px] w-full"
+                    >
+                      <BarChart
+                        data={incomeStackedBarData}
+                        layout="vertical"
+                        margin={{ top: 5, right: 10, left: 80, bottom: 5 }}
+                        accessibilityLayer
+                      >
+                        <XAxis
+                          type="number"
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(v) => formatCurrency(v)}
+                        />
+                        <YAxis
+                          type="category"
+                          dataKey="name"
+                          tickLine={false}
+                          axisLine={false}
+                          width={76}
+                          tick={{ fontSize: 11 }}
+                        />
+                        <ChartTooltip
+                          content={
+                            <ChartTooltipContent
+                              labelFormatter={(_, payload) =>
+                                payload?.[0]?.payload?.name ?? ""
+                              }
+                              formatter={(value, name) => (
+                                <div className="flex w-full items-center justify-between gap-4">
+                                  <span className="text-muted-foreground">
+                                    {String(name)}
+                                  </span>
+                                  <span>
+                                    {typeof value === "number"
+                                      ? formatCurrency(value)
+                                      : String(value ?? "")}
+                                  </span>
+                                </div>
+                              )}
+                            />
+                          }
+                        />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        {incomeCategoryKeys.map((cat, idx) => (
+                          <Bar
+                            key={cat}
+                            dataKey={cat}
+                            stackId="income"
+                            radius={
+                              idx === incomeCategoryKeys.length - 1
+                                ? [0, 4, 4, 0]
+                                : 0
+                            }
+                            maxBarSize={36}
+                            fill={
+                              INCOME_CATEGORY_COLORS[cat] ??
+                              "oklch(0.6 0.15 200)"
+                            }
+                          />
+                        ))}
+                      </BarChart>
+                    </ChartContainer>
+                  </div>
+                </>
               ) : (
                 <p className="text-sm text-muted-foreground py-8 text-center">
                   {t("dashboard.noIncomeForMonth")}

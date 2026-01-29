@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ByMonthList } from "./ByMonthList";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import {
   ChartContainer,
@@ -63,62 +64,138 @@ export function ByMonthSection({
         </CardHeader>
         <CardContent>
           {chartData.length > 0 ? (
-            <ChartContainer config={CHART_CONFIG} className="h-[300px] w-full">
-              <BarChart
-                data={chartData}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                accessibilityLayer
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(v) => (v >= 1000 ? `$${v / 1000}k` : `$${v}`)}
-                />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value, name, item: { fill?: string }) => (
-                        <div className="flex w-full flex-wrap items-center gap-2">
-                          <div
-                            className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                            style={{ backgroundColor: item?.fill }}
-                          />
-                          <div className="flex flex-1 justify-between leading-none items-center gap-2">
-                            <span className="text-muted-foreground">
-                              {CHART_CONFIG[name as keyof typeof CHART_CONFIG]
-                                ?.label ?? name}
-                            </span>
-                            <span className="text-foreground font-mono font-medium tabular-nums">
-                              {typeof value === "number"
-                                ? formatCurrency(value)
-                                : String(value ?? "")}
-                            </span>
-                          </div>
-                        </div>
-                      )}
+            <>
+              <div className="md:hidden min-w-0">
+                <ChartContainer
+                  config={CHART_CONFIG}
+                  className="h-[220px] w-full"
+                >
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                    accessibilityLayer
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      tickMargin={8}
+                      axisLine={false}
+                      tick={{ fontSize: 10 }}
                     />
-                  }
-                />
-                <ChartLegend content={<ChartLegendContent />} />
-                <Bar
-                  dataKey="earned"
-                  fill="var(--color-earned)"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="spent"
-                  fill="var(--color-spent)"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ChartContainer>
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(v) =>
+                        v >= 1000 ? `$${v / 1000}k` : `$${v}`
+                      }
+                      tick={{ fontSize: 10 }}
+                    />
+                    <ChartTooltip
+                      content={
+                        <ChartTooltipContent
+                          formatter={(value, name, item: { fill?: string }) => (
+                            <div className="flex w-full flex-wrap items-center gap-2">
+                              <div
+                                className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                                style={{ backgroundColor: item?.fill }}
+                              />
+                              <div className="flex flex-1 justify-between leading-none items-center gap-2">
+                                <span className="text-muted-foreground">
+                                  {CHART_CONFIG[
+                                    name as keyof typeof CHART_CONFIG
+                                  ]?.label ?? name}
+                                </span>
+                                <span className="text-foreground font-mono font-medium tabular-nums">
+                                  {typeof value === "number"
+                                    ? formatCurrency(value)
+                                    : String(value ?? "")}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        />
+                      }
+                    />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Bar
+                      dataKey="earned"
+                      fill="var(--color-earned)"
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="spent"
+                      fill="var(--color-spent)"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ChartContainer>
+              </div>
+              <div className="hidden md:block">
+                <ChartContainer
+                  config={CHART_CONFIG}
+                  className="h-[300px] w-full"
+                >
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                    accessibilityLayer
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(v) =>
+                        v >= 1000 ? `$${v / 1000}k` : `$${v}`
+                      }
+                    />
+                    <ChartTooltip
+                      content={
+                        <ChartTooltipContent
+                          formatter={(value, name, item: { fill?: string }) => (
+                            <div className="flex w-full flex-wrap items-center gap-2">
+                              <div
+                                className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                                style={{ backgroundColor: item?.fill }}
+                              />
+                              <div className="flex flex-1 justify-between leading-none items-center gap-2">
+                                <span className="text-muted-foreground">
+                                  {CHART_CONFIG[
+                                    name as keyof typeof CHART_CONFIG
+                                  ]?.label ?? name}
+                                </span>
+                                <span className="text-foreground font-mono font-medium tabular-nums">
+                                  {typeof value === "number"
+                                    ? formatCurrency(value)
+                                    : String(value ?? "")}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        />
+                      }
+                    />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Bar
+                      dataKey="earned"
+                      fill="var(--color-earned)"
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="spent"
+                      fill="var(--color-spent)"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ChartContainer>
+              </div>
+            </>
           ) : (
             <p className="text-sm text-muted-foreground py-8 text-center">
               {t("dashboard.noDataYet")}
@@ -135,7 +212,7 @@ export function ByMonthSection({
           </p>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -189,6 +266,13 @@ export function ByMonthSection({
                 ))}
               </TableBody>
             </Table>
+          </div>
+          <div className="md:hidden max-h-[50vh] overflow-y-auto">
+            <ByMonthList
+              months={months}
+              currentMonthKey={currentMonthKey}
+              t={t}
+            />
           </div>
         </CardContent>
       </Card>

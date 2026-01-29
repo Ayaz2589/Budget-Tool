@@ -73,48 +73,94 @@ export function DebtSection({ debtSummary }: DebtSectionProps) {
                 </span>
               </span>
             </div>
-            <ChartContainer
-              config={DEBT_CHART_CONFIG}
-              className="h-[180px] w-full"
-            >
-              <BarChart
-                data={debtSummary.chartData}
-                layout="vertical"
-                margin={{ top: 5, right: 10, left: 100, bottom: 5 }}
-                accessibilityLayer
+            <div className="md:hidden min-w-0">
+              <ChartContainer
+                config={DEBT_CHART_CONFIG}
+                className="h-[140px] w-full"
               >
-                <XAxis
-                  type="number"
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(v) => formatCurrency(v)}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="metric"
-                  tickLine={false}
-                  axisLine={false}
-                  width={95}
-                  tick={{ fontSize: 11 }}
-                />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value) =>
-                        typeof value === "number"
-                          ? formatCurrency(value)
-                          : String(value ?? "")
-                      }
-                    />
-                  }
-                />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={32}>
-                  {debtSummary.chartData.map((_, i) => (
-                    <Cell key={i} fill={debtSummary.chartData[i]!.fill} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ChartContainer>
+                <BarChart
+                  data={debtSummary.chartData}
+                  layout="vertical"
+                  margin={{ top: 5, right: 8, left: 72, bottom: 5 }}
+                  accessibilityLayer
+                >
+                  <XAxis
+                    type="number"
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => formatCurrency(v)}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="metric"
+                    tickLine={false}
+                    axisLine={false}
+                    width={66}
+                    tick={{ fontSize: 10 }}
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) =>
+                          typeof value === "number"
+                            ? formatCurrency(value)
+                            : String(value ?? "")
+                        }
+                      />
+                    }
+                  />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={24}>
+                    {debtSummary.chartData.map((_, i) => (
+                      <Cell key={i} fill={debtSummary.chartData[i]!.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            </div>
+            <div className="hidden md:block">
+              <ChartContainer
+                config={DEBT_CHART_CONFIG}
+                className="h-[180px] w-full"
+              >
+                <BarChart
+                  data={debtSummary.chartData}
+                  layout="vertical"
+                  margin={{ top: 5, right: 10, left: 100, bottom: 5 }}
+                  accessibilityLayer
+                >
+                  <XAxis
+                    type="number"
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => formatCurrency(v)}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="metric"
+                    tickLine={false}
+                    axisLine={false}
+                    width={95}
+                    tick={{ fontSize: 11 }}
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) =>
+                          typeof value === "number"
+                            ? formatCurrency(value)
+                            : String(value ?? "")
+                        }
+                      />
+                    }
+                  />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={32}>
+                    {debtSummary.chartData.map((_, i) => (
+                      <Cell key={i} fill={debtSummary.chartData[i]!.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            </div>
           </>
         ) : (
           <p className="text-sm text-muted-foreground py-6 text-center">

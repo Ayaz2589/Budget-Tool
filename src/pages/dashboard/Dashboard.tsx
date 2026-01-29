@@ -327,7 +327,7 @@ export function Dashboard() {
   }, [debts, debtPayments, t]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0 overflow-x-hidden">
       <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
       <MonthSelector
         value={selectedMonthKey}
@@ -341,7 +341,7 @@ export function Dashboard() {
       <Accordion
         type="multiple"
         defaultValue={["summary", "overview", "debt", "spending", "bymonth"]}
-        className="rounded-lg border pt-4"
+        className="rounded-lg border pt-4 min-w-0"
       >
         <AccordionItem value="summary">
           <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">

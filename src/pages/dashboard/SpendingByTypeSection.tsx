@@ -42,7 +42,7 @@ export function SpendingByTypeSection({
   };
   const barChartPropsMobile = {
     layout: "vertical" as const,
-    margin: { top: 5, right: 12, left: 0, bottom: 5 },
+    margin: { top: 5, right: 28, left: 0, bottom: 5 },
     barCategoryGap: "20%" as const,
     accessibilityLayer: true,
   };
@@ -53,8 +53,8 @@ export function SpendingByTypeSection({
   };
   const axisPropsMobile = {
     tickFormatter: (v: number) => formatCurrency(v),
-    YWidth: 120,
-    tickFormatterY: (v: string) => (v.length > 24 ? `${v.slice(0, 22)}…` : v),
+    YWidth: 62,
+    tickFormatterY: (v: string) => (v.length > 14 ? `${v.slice(0, 12)}…` : v),
   };
   const MOBILE_TOP = 8;
   const fiftyFiftyMobile = fiftyFiftyByType.slice(0, MOBILE_TOP);
@@ -66,23 +66,23 @@ export function SpendingByTypeSection({
       <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
         {t("dashboard.spendingByType")}
       </AccordionTrigger>
-      <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
-        <Card>
-          <CardHeader className="pb-2">
+      <AccordionContent className="px-1 pt-4 pb-4 space-y-6 md:px-4 min-w-0">
+        <Card className="min-w-0">
+          <CardHeader className="pb-2 px-2 md:px-6">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               {t("dashboard.fiftyFiftySpendByType")}
             </CardTitle>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground wrap-break-word">
               {t("dashboard.fiftyFiftyExpensesInCategory")}
             </p>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-2 md:px-6 min-w-0 overflow-hidden">
             {fiftyFiftyByType.length > 0 ? (
               <>
-                <div className="md:hidden min-w-0">
+                <div className="md:hidden min-w-0 overflow-hidden max-w-full">
                   <ChartContainer
                     config={fiftyFiftyChartConfig}
-                    className="h-[260px] w-full"
+                    className="h-[260px] w-full max-w-full aspect-auto"
                   >
                     <BarChart data={fiftyFiftyMobile} {...barChartPropsMobile}>
                       <CartesianGrid
@@ -191,23 +191,23 @@ export function SpendingByTypeSection({
           </CardContent>
         </Card>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <Card>
-            <CardHeader className="pb-2">
+        <div className="grid gap-4 lg:grid-cols-2 min-w-0">
+          <Card className="min-w-0">
+            <CardHeader className="pb-2 px-2 md:px-6">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {t("dashboard.mySpendingByType")}
               </CardTitle>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground wrap-break-word">
                 {t("dashboard.myExpensesExcluding")}
               </p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-2 md:px-6 min-w-0 overflow-hidden">
               {mySpendingByType.length > 0 ? (
                 <>
-                  <div className="md:hidden min-w-0">
+                  <div className="md:hidden min-w-0 overflow-hidden max-w-full">
                     <ChartContainer
                       config={mySpendingChartConfig}
-                      className="h-[260px] w-full"
+                      className="h-[260px] w-full max-w-full aspect-auto"
                     >
                       <BarChart
                         data={mySpendingMobile}
@@ -319,22 +319,22 @@ export function SpendingByTypeSection({
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
+          <Card className="min-w-0">
+            <CardHeader className="pb-2 px-2 md:px-6">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {t("dashboard.tasnuvasSpendingByType")}
               </CardTitle>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground wrap-break-word">
                 {t("dashboard.tasnuvasOnly")}
               </p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-2 md:px-6 min-w-0 overflow-hidden">
               {tasnuvasSpendingByType.length > 0 ? (
                 <>
-                  <div className="md:hidden min-w-0">
+                  <div className="md:hidden min-w-0 overflow-hidden max-w-full">
                     <ChartContainer
                       config={tasnuvasSpendingChartConfig}
-                      className="h-[260px] w-full"
+                      className="h-[260px] w-full max-w-full aspect-auto"
                     >
                       <BarChart
                         data={tasnuvasSpendingMobile}

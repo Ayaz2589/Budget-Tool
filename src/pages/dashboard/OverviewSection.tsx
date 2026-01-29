@@ -66,15 +66,15 @@ export function OverviewSection({
       <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
         {t("dashboard.overview")}
       </AccordionTrigger>
-      <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
+      <AccordionContent className="px-1 pt-4 pb-4 space-y-6 md:px-4">
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-2 px-2 md:px-6">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {t("dashboard.earnedVsSpentVsSaved")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-2 md:px-6">
               {summaryBarData.some((d) => d.value > 0) ? (
                 <>
                   <div className="md:hidden min-w-0">
@@ -85,7 +85,7 @@ export function OverviewSection({
                       <BarChart
                         data={summaryBarData}
                         layout="vertical"
-                        margin={{ top: 5, right: 8, left: 48, bottom: 5 }}
+                        margin={{ top: 5, right: 4, left: 18, bottom: 5 }}
                         accessibilityLayer
                       >
                         <XAxis
@@ -99,7 +99,7 @@ export function OverviewSection({
                           dataKey="metric"
                           tickLine={false}
                           axisLine={false}
-                          width={42}
+                          width={20}
                           tick={{ fontSize: 10 }}
                         />
                         <ChartTooltip
@@ -183,12 +183,12 @@ export function OverviewSection({
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-2 px-2 md:px-6">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {t("dashboard.spendingBreakdown")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-2 md:px-6">
               {spendingPieData.length > 0 ? (
                 <>
                   <div className="md:hidden min-w-0">
@@ -303,12 +303,12 @@ export function OverviewSection({
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-2 px-2 md:px-6">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {t("dashboard.incomeBreakdown")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-2 md:px-6">
               {incomeStackedBarData.length > 0 ? (
                 <>
                   <div className="md:hidden min-w-0">
@@ -319,7 +319,7 @@ export function OverviewSection({
                       <BarChart
                         data={incomeStackedBarData}
                         layout="vertical"
-                        margin={{ top: 5, right: 8, left: 56, bottom: 5 }}
+                        margin={{ top: 5, right: 4, left: 22, bottom: 5 }}
                         accessibilityLayer
                       >
                         <XAxis
@@ -333,7 +333,7 @@ export function OverviewSection({
                           dataKey="name"
                           tickLine={false}
                           axisLine={false}
-                          width={50}
+                          width={22}
                           tick={{ fontSize: 10 }}
                         />
                         <ChartTooltip

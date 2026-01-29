@@ -56,13 +56,13 @@ export function ByMonthSection({
   return (
     <>
       <Card>
-        <CardHeader>
+        <CardHeader className="px-2 md:px-6">
           <CardTitle>{t("dashboard.monthlyBreakdown")}</CardTitle>
           <p className="text-sm text-muted-foreground">
             {t("dashboard.totalEarnedVsSpentByMonth")}
           </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 md:px-6">
           {chartData.length > 0 ? (
             <>
               <div className="md:hidden min-w-0">

@@ -364,7 +364,7 @@ export function Dashboard() {
           <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
             {t("dashboard.debt")}
           </AccordionTrigger>
-          <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
+          <AccordionContent className="px-1 pt-4 pb-4 space-y-6 md:px-4">
             <DebtSection debtSummary={debtSummary} />
           </AccordionContent>
         </AccordionItem>
@@ -381,7 +381,7 @@ export function Dashboard() {
           <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
             {t("dashboard.byMonth")}
           </AccordionTrigger>
-          <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
+          <AccordionContent className="px-1 pt-4 pb-4 space-y-6 md:px-4">
             <ByMonthSection
               chartData={chartData}
               months={months}

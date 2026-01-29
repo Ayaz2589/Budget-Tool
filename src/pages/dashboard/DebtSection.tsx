@@ -45,7 +45,7 @@ export function DebtSection({ debtSummary }: DebtSectionProps) {
   const DEBT_CHART_CONFIG = getDebtChartConfig(t);
   return (
     <Card>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 px-3 md:px-6">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {t("dashboardDebt.totalDebtRemainingVsPaid")}
         </CardTitle>
@@ -56,7 +56,7 @@ export function DebtSection({ debtSummary }: DebtSectionProps) {
           </Link>
         </p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-3 md:px-6">
         {debtSummary.hasDebtData ? (
           <>
             <div className="flex flex-wrap items-baseline gap-4 mb-4">
@@ -81,7 +81,7 @@ export function DebtSection({ debtSummary }: DebtSectionProps) {
                 <BarChart
                   data={debtSummary.chartData}
                   layout="vertical"
-                  margin={{ top: 5, right: 8, left: 72, bottom: 5 }}
+                  margin={{ top: 5, right: 4, left: 34, bottom: 5 }}
                   accessibilityLayer
                 >
                   <XAxis
@@ -95,7 +95,7 @@ export function DebtSection({ debtSummary }: DebtSectionProps) {
                     dataKey="metric"
                     tickLine={false}
                     axisLine={false}
-                    width={66}
+                    width={34}
                     tick={{ fontSize: 10 }}
                   />
                   <ChartTooltip

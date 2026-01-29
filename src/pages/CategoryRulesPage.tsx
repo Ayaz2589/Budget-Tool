@@ -36,10 +36,6 @@ import {
 import { Lock, Plus, Trash2 } from "lucide-react";
 import type { CategoryRule } from "@/lib/categoryRules";
 import { BASELINE_RULES_READONLY } from "@/lib/categoryRules";
-import {
-  AUTO_INCOME_RULES_READONLY,
-  AUTO_EXPENSE_RULES_READONLY,
-} from "@/lib/paycheck";
 import { CategoryOption } from "@/lib/categoryColors";
 
 export function CategoryRulesPage() {
@@ -69,89 +65,6 @@ export function CategoryRulesPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Category rules</h1>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Auto income</CardTitle>
-          <CardDescription>
-            Recurring income added automatically each month (cannot be removed).
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="border rounded-md overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Schedule</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="w-[80px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {AUTO_INCOME_RULES_READONLY.map((r, i) => (
-                  <TableRow key={`auto-income-${i}`}>
-                    <TableCell className="font-mono text-sm text-muted-foreground">
-                      {r.schedule}
-                    </TableCell>
-                    <TableCell>{r.amount}</TableCell>
-                    <TableCell>
-                      <CategoryOption name={r.category} type="income" />
-                    </TableCell>
-                    <TableCell className="w-[80px]">
-                      <span title="Auto-added (cannot be removed)">
-                        <Lock className="size-4 text-muted-foreground" />
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Auto expense</CardTitle>
-          <CardDescription>
-            Recurring expenses added automatically each month (cannot be
-            removed).
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="border rounded-md overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Schedule</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="w-[80px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {AUTO_EXPENSE_RULES_READONLY.map((r, i) => (
-                  <TableRow key={`auto-expense-${i}`}>
-                    <TableCell className="font-mono text-sm text-muted-foreground">
-                      {r.schedule}
-                    </TableCell>
-                    <TableCell>{r.amount}</TableCell>
-                    <TableCell>
-                      <CategoryOption name={r.category} type="expense" />
-                    </TableCell>
-                    <TableCell className="w-[80px]">
-                      <span title="Auto-added (cannot be removed)">
-                        <Lock className="size-4 text-muted-foreground" />
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
 
       <Card>
         <CardHeader>

@@ -9,7 +9,7 @@ import {
   applyBaselineToExpenses,
 } from "@/lib/categoryRules";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
-import type { Expense, Income } from "@/lib/types";
+import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
 import { CategoryOption } from "@/lib/categoryColors";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,12 +57,25 @@ export function ImportPage() {
   const [selectedSource, setSelectedSource] = useState<SourceChoice>("amex");
   const [previewExpenses, setPreviewExpenses] = useState<Expense[]>([]);
   const [previewIncome, setPreviewIncome] = useState<Income[]>([]);
+  const [previewDebts, setPreviewDebts] = useState<Debt[]>([]);
+  const [previewDebtPayments, setPreviewDebtPayments] = useState<DebtPayment[]>(
+    [],
+  );
   const [sourceLabel, setSourceLabel] = useState<string>("");
   const [lastDetected, setLastDetected] = useState<string>("");
   const [skippedDuplicates, setSkippedDuplicates] = useState<number>(0);
   const [importError, setImportError] = useState<string>("");
-  const { expenses, income, addExpenses, addIncomes, expenseCategories } =
-    useBudget();
+  const {
+    expenses,
+    income,
+    debts,
+    debtPayments,
+    addExpenses,
+    addIncomes,
+    addDebts,
+    addDebtPayments,
+    expenseCategories,
+  } = useBudget();
   const { rules } = useRules();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,9 +106,19 @@ export function ImportPage() {
             );
             return !sameEntry;
           });
+          const existingDebtIds = new Set(debts.map((d) => d.id));
+          const existingPaymentIds = new Set(debtPayments.map((p) => p.id));
+          const toAddDebts = parsed.debts.filter(
+            (d) => !existingDebtIds.has(d.id),
+          );
+          const toAddDebtPayments = parsed.debtPayments.filter(
+            (p) => !existingPaymentIds.has(p.id),
+          );
           if (
             parsed.expenses.length === 0 &&
             parsed.income.length === 0 &&
+            parsed.debts.length === 0 &&
+            parsed.debtPayments.length === 0 &&
             text.trim().length > 0
           ) {
             setImportError(
@@ -114,6 +137,8 @@ export function ImportPage() {
           const withBaseline = applyBaselineToExpenses(withRules);
           setPreviewExpenses(withBaseline);
           setPreviewIncome(toAddIncome);
+          setPreviewDebts(toAddDebts);
+          setPreviewDebtPayments(toAddDebtPayments);
           setSourceLabel("Exported PDF");
           setLastDetected("pdf-export");
           setSkippedDuplicates(0);
@@ -123,6 +148,8 @@ export function ImportPage() {
           );
           setPreviewExpenses([]);
           setPreviewIncome([]);
+          setPreviewDebts([]);
+          setPreviewDebtPayments([]);
           setLastDetected("");
           setSourceLabel("");
           setSkippedDuplicates(0);
@@ -213,8 +240,16 @@ export function ImportPage() {
     if (previewIncome.length > 0) {
       addIncomes(previewIncome);
     }
+    if (previewDebts.length > 0) {
+      addDebts(previewDebts);
+    }
+    if (previewDebtPayments.length > 0) {
+      addDebtPayments(previewDebtPayments);
+    }
     setPreviewExpenses([]);
     setPreviewIncome([]);
+    setPreviewDebts([]);
+    setPreviewDebtPayments([]);
     setSourceLabel("");
     setLastDetected("");
     setSkippedDuplicates(0);
@@ -287,11 +322,14 @@ export function ImportPage() {
             <span className="text-sm text-muted-foreground self-center">
               {sourceLabel}
               {lastDetected === "pdf-export"
-                ? ` · ${previewExpenses.length} expenses, ${previewIncome.length} income to add (existing IDs omitted)`
+                ? ` · ${previewExpenses.length} expenses, ${previewIncome.length} income${previewDebts.length > 0 ? `, ${previewDebts.length} debts` : ""}${previewDebtPayments.length > 0 ? `, ${previewDebtPayments.length} debt payments` : ""} to add (existing IDs omitted)`
                 : ` · ${previewExpenses.length} rows${skippedDuplicates > 0 ? ` (${skippedDuplicates} duplicates skipped)` : ""}`}
             </span>
           )}
-          {(previewExpenses.length > 0 || previewIncome.length > 0) && (
+          {(previewExpenses.length > 0 ||
+            previewIncome.length > 0 ||
+            previewDebts.length > 0 ||
+            previewDebtPayments.length > 0) && (
             <>
               {lastDetected !== "pdf-export" && (
                 <Button variant="outline" onClick={applyRules}>
@@ -307,7 +345,10 @@ export function ImportPage() {
           )}
         </CardContent>
       </Card>
-      {(previewExpenses.length > 0 || previewIncome.length > 0) && (
+      {(previewExpenses.length > 0 ||
+        previewIncome.length > 0 ||
+        previewDebts.length > 0 ||
+        previewDebtPayments.length > 0) && (
         <Card>
           <CardHeader>
             <CardTitle>Preview</CardTitle>
@@ -400,6 +441,8 @@ export function ImportPage() {
                         <TableHead>Description</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Category</TableHead>
+                        <TableHead>Owner</TableHead>
+                        <TableHead>Recurring</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -416,6 +459,18 @@ export function ImportPage() {
                           </TableCell>
                           <TableCell>{formatCurrency(i.amount)}</TableCell>
                           <TableCell>{i.category || "—"}</TableCell>
+                          <TableCell>{i.owner ?? "Ayaz"}</TableCell>
+                          <TableCell className="text-muted-foreground text-sm">
+                            {i.recurringAmount != null && i.recurringAmount > 0
+                              ? i.recurringFrequency === "biweekly" &&
+                                i.recurringStartDate
+                                ? `Biweekly from ${i.recurringStartDate}`
+                                : i.recurringFrequency === "monthly" &&
+                                    i.recurringDayOfMonth != null
+                                  ? `Monthly on ${i.recurringDayOfMonth}`
+                                  : "—"
+                              : "—"}
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -423,6 +478,69 @@ export function ImportPage() {
                 </div>
               </div>
             )}
+            {lastDetected === "pdf-export" && previewDebts.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium mb-2">Debts to add</h3>
+                <div className="overflow-x-auto max-h-[30vh] overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Initial Amount</TableHead>
+                        <TableHead>Start Date</TableHead>
+                        <TableHead>Owner</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {previewDebts.map((d) => (
+                        <TableRow key={d.id}>
+                          <TableCell>{d.name}</TableCell>
+                          <TableCell>
+                            {formatCurrency(d.initialAmount)}
+                          </TableCell>
+                          <TableCell>{d.startDate ?? "—"}</TableCell>
+                          <TableCell>{d.owner ?? "Ayaz"}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+            {lastDetected === "pdf-export" &&
+              previewDebtPayments.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium mb-2">
+                    Debt payments to add
+                  </h3>
+                  <div className="overflow-x-auto max-h-[30vh] overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Debt Id</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Amount</TableHead>
+                          <TableHead>Note</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {previewDebtPayments.map((p) => (
+                          <TableRow key={p.id}>
+                            <TableCell className="font-mono text-xs">
+                              {p.debtId}
+                            </TableCell>
+                            <TableCell>{p.date}</TableCell>
+                            <TableCell>{formatCurrency(p.amount)}</TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {p.note ?? "—"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              )}
           </CardContent>
         </Card>
       )}

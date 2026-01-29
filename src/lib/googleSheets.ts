@@ -192,7 +192,7 @@ export async function readIncomeFromSheet(
   const rows = await getSheetValues(
     accessToken,
     spreadsheetId,
-    "Income!A2:D",
+    "Income!A2:I",
     "UNFORMATTED_VALUE",
   );
   const income: Income[] = [];
@@ -201,6 +201,18 @@ export async function readIncomeFromSheet(
     const amount = parseAmount(row[1]);
     const description = String(row[2] ?? "").trim();
     const category = String(row[3] ?? "").trim();
+    const owner =
+      row.length >= 5 && (row[4] ?? "").toString().trim()
+        ? parseDebtOwner(row[4])
+        : undefined;
+    const recurringAmount =
+      row.length >= 6 ? parseAmount(row[5]) : undefined;
+    const recurringFreq =
+      row.length >= 7 ? parseRecurringFrequency(row[6]) : undefined;
+    const recurringDay =
+      row.length >= 8 ? parseRecurringDay(row[7]) : undefined;
+    const recurringStart =
+      row.length >= 9 ? normalizeDate(row[8]) : undefined;
     if (!date || amount == null || amount <= 0) continue;
     income.push({
       id: generateId(),
@@ -208,6 +220,14 @@ export async function readIncomeFromSheet(
       amount,
       description: description || "Income",
       category: category || "Other",
+      owner,
+      recurringAmount:
+        recurringAmount != null && recurringAmount > 0
+          ? recurringAmount
+          : undefined,
+      recurringFrequency: recurringFreq,
+      recurringDayOfMonth: recurringDay,
+      recurringStartDate: recurringStart ?? undefined,
     });
   }
   return income;
@@ -325,8 +345,18 @@ export async function appendIncome(
   spreadsheetId: string,
   income: Income[]
 ): Promise<void> {
-  const range = "Income!A:D";
-  const values = income.map((i) => [i.date, i.amount, i.description, i.category]);
+  const range = "Income!A:I";
+  const values = income.map((i) => [
+    i.date,
+    i.amount,
+    i.description,
+    i.category,
+    i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+    i.recurringAmount ?? "",
+    i.recurringFrequency ?? "",
+    i.recurringDayOfMonth ?? "",
+    i.recurringStartDate ?? "",
+  ]);
   await updateSheet(accessToken, spreadsheetId, range, values, false);
 }
 
@@ -401,11 +431,33 @@ export async function clearAndWriteIncome(
   spreadsheetId: string,
   income: Income[]
 ): Promise<void> {
-  const headers = [["Date", "Amount", "Description", "Category"]];
-  const rows = income.map((i) => [i.date, i.amount, i.description, i.category]);
+  const headers = [
+    [
+      "Date",
+      "Amount",
+      "Description",
+      "Category",
+      "Owner",
+      "Recurring Amount",
+      "Recurring Frequency",
+      "Recurring Day",
+      "Recurring Start Date",
+    ],
+  ];
+  const rows = income.map((i) => [
+    i.date,
+    i.amount,
+    i.description,
+    i.category,
+    i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+    i.recurringAmount ?? "",
+    i.recurringFrequency ?? "",
+    i.recurringDayOfMonth ?? "",
+    i.recurringStartDate ?? "",
+  ]);
   const values = [...headers, ...rows];
-  const range = "Income!A1:D";
-  await clearRange(accessToken, spreadsheetId, "Income!A1:D10000");
+  const range = "Income!A1:I";
+  await clearRange(accessToken, spreadsheetId, "Income!A1:I10000");
   if (values.length > 0) {
     await updateSheet(accessToken, spreadsheetId, range, values, false);
   }
@@ -786,14 +838,14 @@ export async function applySheetsFormatting(
     )
   );
 
-  // Income: same as Expenses, column B (Amount) currency
+  // Income: column B (Amount) currency, columns A–I (Date, Amount, Description, Category, Owner, Recurring*)
   requests.push(
     repeatCellRequest(
       sheetIds.income,
       0,
       1,
       0,
-      4,
+      9,
       { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
       headerFields
     )
@@ -804,7 +856,7 @@ export async function applySheetsFormatting(
       0,
       10000,
       0,
-      4,
+      9,
       { horizontalAlignment: "LEFT" },
       leftAlignFields
     )

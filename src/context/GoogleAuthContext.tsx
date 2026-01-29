@@ -4,25 +4,12 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useBudget } from "@/context/BudgetContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
-import {
-  PAYCHECK_AMOUNT,
-  PAYCHECK_DESCRIPTION,
-  PAYCHECK_CATEGORY,
-  hasPaycheckOnSheet,
-  getCurrentMonthPaycheckDatesUTC,
-  RENT_AMOUNTS,
-  RENT_DESCRIPTION,
-  RENT_CATEGORY,
-  hasRentOnSheet,
-  getCurrentMonthRentDateUTC,
-} from "@/lib/paycheck";
 import {
   ensureSheetsExist,
   clearAndWriteExpenses,
@@ -240,7 +227,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const budget = useBudget();
-  const hasCheckedSheetForPaychecks = useRef(false);
 
   const syncToSheets = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
@@ -395,99 +381,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.addIncome,
     budget.addDebts,
     budget.addDebtPayments,
-  ]);
-
-  useEffect(() => {
-    const ensureCurrentMonthPaychecks = () => {
-      const dates = getCurrentMonthPaycheckDatesUTC();
-      const existingPaycheckDates = new Set(
-        budget.income
-          .filter(
-            (i) =>
-              (i.description || "").toLowerCase() ===
-                PAYCHECK_DESCRIPTION.toLowerCase() &&
-              Math.abs(i.amount - PAYCHECK_AMOUNT) < 0.01,
-          )
-          .map((i) => i.date),
-      );
-      for (const date of dates) {
-        if (!existingPaycheckDates.has(date)) {
-          budget.addIncome({
-            date,
-            amount: PAYCHECK_AMOUNT,
-            description: PAYCHECK_DESCRIPTION,
-            category: PAYCHECK_CATEGORY,
-          });
-        }
-      }
-    };
-
-    const ensureCurrentMonthRent = () => {
-      const rentDate = getCurrentMonthRentDateUTC();
-      const existingRentAmounts = new Set(
-        budget.income
-          .filter(
-            (i) =>
-              i.date === rentDate &&
-              ((i.description || "").toLowerCase() ===
-                RENT_DESCRIPTION.toLowerCase() ||
-                (i.category || "").toLowerCase() ===
-                  RENT_CATEGORY.toLowerCase()) &&
-              RENT_AMOUNTS.some((a) => Math.abs(i.amount - a) < 0.01),
-          )
-          .map((i) => i.amount),
-      );
-      for (const amount of RENT_AMOUNTS) {
-        if (!existingRentAmounts.has(amount)) {
-          budget.addIncome({
-            date: rentDate,
-            amount,
-            description: RENT_DESCRIPTION,
-            category: RENT_CATEGORY,
-          });
-        }
-      }
-    };
-
-    if (accessToken && spreadsheetId) {
-      if (!hasCheckedSheetForPaychecks.current) {
-        hasCheckedSheetForPaychecks.current = true;
-        readIncomeFromSheet(accessToken, spreadsheetId)
-          .then((sheetIncome) => {
-            if (
-              hasPaycheckOnSheet(sheetIncome) ||
-              hasRentOnSheet(sheetIncome)
-            ) {
-              void pullFromSheet().then(() => {
-                ensureCurrentMonthPaychecks();
-                ensureCurrentMonthRent();
-              });
-            } else {
-              ensureCurrentMonthPaychecks();
-              ensureCurrentMonthRent();
-            }
-          })
-          .catch(() => {
-            ensureCurrentMonthPaychecks();
-            ensureCurrentMonthRent();
-          });
-      } else {
-        ensureCurrentMonthPaychecks();
-        ensureCurrentMonthRent();
-      }
-      return;
-    }
-
-    ensureCurrentMonthPaychecks();
-    ensureCurrentMonthRent();
-  }, [
-    accessToken,
-    spreadsheetId,
-    budget.income,
-    budget.expenses,
-    budget.addIncome,
-    budget.addExpense,
-    pullFromSheet,
   ]);
 
   const value = useMemo<GoogleAuthContextValue>(

@@ -126,9 +126,11 @@ export function DebtPage() {
       initialAmount: num,
       startDate: addDebtStartDate.trim() || undefined,
       owner: addDebtOwner,
-      recurringAmount: recurringAmount ?? undefined,
+      recurringAmount:
+        typeof recurringAmount === "number" ? recurringAmount : undefined,
       recurringFrequency: recurringAmount != null ? freq : undefined,
-      recurringDayOfMonth: recurringDay ?? undefined,
+      recurringDayOfMonth:
+        typeof recurringDay === "number" ? recurringDay : undefined,
       recurringStartDate: recurringStart,
     });
     setAddDebtName("");

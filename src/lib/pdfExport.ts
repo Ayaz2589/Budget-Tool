@@ -1,6 +1,12 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { Expense, Income, ExpenseSource } from "@/lib/types";
+import type {
+  Debt,
+  DebtPayment,
+  Expense,
+  Income,
+  ExpenseSource,
+} from "@/lib/types";
 
 const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
 const INCOME_ROW_RE = /(\d{4}-\d{2}-\d{2})\s+(Paycheck|Rent)\s+\$([\d,]+\.\d{2})\s+(Paycheck|Rent)/g;
@@ -41,7 +47,9 @@ function getMonthKeys(expenses: Expense[], income: Income[]): string[] {
 
 export function downloadTransactionsAndIncomePdf(
   expenses: Expense[],
-  income: Income[]
+  income: Income[],
+  debts: Debt[] = [],
+  debtPayments: DebtPayment[] = []
 ): void {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const margin = 14;
@@ -57,8 +65,14 @@ export function downloadTransactionsAndIncomePdf(
 
   for (const monthKey of monthKeys) {
     const label = getMonthLabel(monthKey);
-    const monthExpenses = (expenseByMonth.get(monthKey) ?? []).sort((a, b) =>
+    const monthAll = (expenseByMonth.get(monthKey) ?? []).sort((a, b) =>
       b.date.localeCompare(a.date)
+    );
+    const monthExpenses = monthAll.filter(
+      (e) => (e.category || "").toLowerCase() !== "mortgage"
+    );
+    const monthMortgage = monthAll.filter(
+      (e) => (e.category || "").toLowerCase() === "mortgage"
     );
     const monthIncome = (incomeByMonth.get(monthKey) ?? []).sort((a, b) =>
       b.date.localeCompare(a.date)
@@ -73,7 +87,7 @@ export function downloadTransactionsAndIncomePdf(
     doc.text(label, margin, y);
     y += 8;
 
-    // Expenses table
+    // Expenses table (non-mortgage)
     if (monthExpenses.length > 0) {
       const expenseHead = [
         "ID",
@@ -106,19 +120,77 @@ export function downloadTransactionsAndIncomePdf(
       y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
     }
 
+    // Mortgage table (per month)
+    if (monthMortgage.length > 0) {
+      if (y > 260) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(12);
+      doc.text("Mortgage", margin, y);
+      y += 6;
+      const mortgageHead = [
+        "ID",
+        "Date",
+        "Description",
+        "Amount",
+        "Source",
+      ];
+      const mortgageBody = monthMortgage.map((e) => [
+        e.id,
+        e.date,
+        e.description.slice(0, 40) + (e.description.length > 40 ? "…" : ""),
+        formatCurrency(e.amount),
+        SOURCE_LABELS[e.source] ?? e.source,
+      ]);
+      autoTable(doc, {
+        startY: y,
+        head: [mortgageHead],
+        body: mortgageBody,
+        theme: "grid",
+        margin: { left: margin, right: margin },
+        tableWidth: "auto",
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [66, 66, 66], textColor: 255 },
+      });
+      y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
+    }
+
     // Income table
     if (monthIncome.length > 0) {
       if (y > 260) {
         doc.addPage();
         y = 20;
       }
-      const incomeHead = ["Date", "Description", "Amount", "Category"];
+      const incomeRecurringLabel = (i: Income): string => {
+        if (i.recurringAmount == null || i.recurringAmount <= 0) return "—";
+        if (i.recurringFrequency === "biweekly" && i.recurringStartDate)
+          return `Biweekly from ${i.recurringStartDate}`;
+        if (
+          i.recurringFrequency === "monthly" &&
+          i.recurringDayOfMonth != null &&
+          i.recurringDayOfMonth >= 1 &&
+          i.recurringDayOfMonth <= 31
+        )
+          return `Monthly on ${i.recurringDayOfMonth}`;
+        return "—";
+      };
+      const incomeHead = [
+        "Date",
+        "Description",
+        "Amount",
+        "Category",
+        "Owner",
+        "Recurring",
+      ];
       const incomeBody = monthIncome.map((i) => [
         i.date,
         (i.description || "Income").slice(0, 50) +
           ((i.description || "").length > 50 ? "…" : ""),
         formatCurrency(i.amount),
         i.category || "—",
+        i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+        incomeRecurringLabel(i),
       ]);
       autoTable(doc, {
         startY: y,
@@ -134,6 +206,80 @@ export function downloadTransactionsAndIncomePdf(
     }
 
     y += 6;
+  }
+
+  // Debts section
+  if (debts.length > 0) {
+    if (y > 250) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(14);
+    doc.text("Debts", margin, y);
+    y += 8;
+    const debtHead = [
+      "Id",
+      "Name",
+      "Initial Amount",
+      "Start Date",
+      "Owner",
+      "Recurring Amount",
+      "Recurring Day",
+      "Recurring Frequency",
+      "Recurring Start Date",
+    ];
+    const debtBody = debts.map((d) => [
+      d.id,
+      d.name.slice(0, 25) + (d.name.length > 25 ? "…" : ""),
+      formatCurrency(d.initialAmount),
+      d.startDate ?? "—",
+      d.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+      d.recurringAmount != null ? formatCurrency(d.recurringAmount) : "—",
+      d.recurringDayOfMonth ?? "—",
+      d.recurringFrequency ?? "—",
+      d.recurringStartDate ?? "—",
+    ]);
+    autoTable(doc, {
+      startY: y,
+      head: [debtHead],
+      body: debtBody,
+      theme: "grid",
+      margin: { left: margin, right: margin },
+      tableWidth: "auto",
+      styles: { fontSize: 7 },
+      headStyles: { fillColor: [66, 66, 66], textColor: 255 },
+    });
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
+  }
+
+  // Debt Payments section
+  if (debtPayments.length > 0) {
+    if (y > 260) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(14);
+    doc.text("Debt Payments", margin, y);
+    y += 8;
+    const dpHead = ["Id", "Debt Id", "Date", "Amount", "Note"];
+    const dpBody = debtPayments.map((p) => [
+      p.id,
+      p.debtId,
+      p.date,
+      formatCurrency(p.amount),
+      (p.note ?? "").slice(0, 30) + ((p.note?.length ?? 0) > 30 ? "…" : ""),
+    ]);
+    autoTable(doc, {
+      startY: y,
+      head: [dpHead],
+      body: dpBody,
+      theme: "grid",
+      margin: { left: margin, right: margin },
+      tableWidth: "auto",
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [66, 66, 66], textColor: 255 },
+    });
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
   }
 
   // Machine-readable block for re-import. Record separator " || " survives PDF text extraction (space-joined).
@@ -171,6 +317,39 @@ export function downloadTransactionsAndIncomePdf(
         String(i.amount),
         sanitize(i.description ?? "Income"),
         sanitize(i.category ?? "Other"),
+        i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+        i.recurringAmount != null ? String(i.recurringAmount) : "",
+        i.recurringFrequency ?? "",
+        i.recurringDayOfMonth != null ? String(i.recurringDayOfMonth) : "",
+        i.recurringStartDate ?? "",
+      ].join(FIELD_SEP)
+    );
+  }
+  for (const d of debts) {
+    lines.push(
+      [
+        "DEBT",
+        d.id,
+        sanitize(d.name),
+        String(d.initialAmount),
+        d.startDate ?? "",
+        d.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+        d.recurringAmount != null ? String(d.recurringAmount) : "",
+        d.recurringFrequency ?? "",
+        d.recurringDayOfMonth != null ? String(d.recurringDayOfMonth) : "",
+        d.recurringStartDate ?? "",
+      ].join(FIELD_SEP)
+    );
+  }
+  for (const p of debtPayments) {
+    lines.push(
+      [
+        "DEBT_PAYMENT",
+        p.id,
+        p.debtId,
+        p.date,
+        String(p.amount),
+        sanitize(p.note ?? ""),
       ].join(FIELD_SEP)
     );
   }
@@ -217,15 +396,31 @@ const VALID_EXPENSE_SOURCES = [
 export interface ParsedExportedPdf {
   expenses: Expense[];
   income: Income[];
+  debts: Debt[];
+  debtPayments: DebtPayment[];
 }
 
 /**
  * Parse text extracted from an exported transactions PDF (with DATA block).
  * Returns { expenses, income }. If no data block found, returns empty arrays.
  */
+function parseDebtOwner(value: string): "Ayaz" | "Tasnuva" {
+  const s = value.trim();
+  if (s === "Tasnuva") return "Tasnuva";
+  return "Ayaz";
+}
+
+function parseRecurringFrequency(value: string): "monthly" | "biweekly" {
+  const s = value.trim().toLowerCase();
+  if (s === "biweekly" || s === "bi-weekly") return "biweekly";
+  return "monthly";
+}
+
 export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
   const expenses: Expense[] = [];
   const income: Income[] = [];
+  const debts: Debt[] = [];
+  const debtPayments: DebtPayment[] = [];
   // Normalize: PDF wrapping can split markers across lines (e.g. "BUDGET_TOOL_DATA_" + " START")
   const normalized = pdfText
     .replace(/\s+/g, " ")
@@ -236,42 +431,121 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
   if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
     // Normalize whitespace (PDF extraction can insert spaces/newlines when text wraps)
     const block = normalized
-    .slice(startIdx + DATA_START_MARKER.length, endIdx)
-    .replace(/\s+/g, " ")
-    .trim();
-  const lines = block
-    .split(/\s*\|\|\s*/)
-    .map((l) => l.trim())
-    .filter(Boolean);
-  for (const line of lines) {
-    const parts = line.split(/\s*@@\s*/);
-    if (parts[0] === "EXPENSE" && parts.length >= 8) {
-      const source = VALID_EXPENSE_SOURCES.includes(parts[6] as ExpenseSource)
-        ? (parts[6] as ExpenseSource)
-        : "manual";
-      expenses.push({
-        id: parts[1]!.trim(),
-        date: parts[2]!.trim(),
-        amount: parseFloat(parts[3]!) || 0,
-        description: parts[4]!.trim() || "Expense",
-        category: parts[5]!.trim() || "",
-        source,
-        cardMember: parts[7]?.trim() || undefined,
-      });
-    } else if (parts[0] === "INCOME" && parts.length >= 6) {
-      income.push({
-        id: parts[1]!.trim(),
-        date: parts[2]!.trim(),
-        amount: parseFloat(parts[3]!) || 0,
-        description: parts[4]!.trim() || "Income",
-        category: parts[5]!.trim() || "Other",
-      });
+      .slice(startIdx + DATA_START_MARKER.length, endIdx)
+      .replace(/\s+/g, " ")
+      .trim();
+    const lines = block
+      .split(/\s*\|\|\s*/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+    for (const line of lines) {
+      const parts = line.split(/\s*@@\s*/);
+      if (parts[0] === "EXPENSE" && parts.length >= 8) {
+        const source = VALID_EXPENSE_SOURCES.includes(parts[6] as ExpenseSource)
+          ? (parts[6] as ExpenseSource)
+          : "manual";
+        expenses.push({
+          id: parts[1]!.trim(),
+          date: parts[2]!.trim(),
+          amount: parseFloat(parts[3]!) || 0,
+          description: parts[4]!.trim() || "Expense",
+          category: parts[5]!.trim() || "",
+          source,
+          cardMember: parts[7]?.trim() || undefined,
+        });
+      } else if (parts[0] === "INCOME" && parts.length >= 6) {
+        const owner =
+          parts.length >= 7 && (parts[6] ?? "").trim() === "Tasnuva"
+            ? "Tasnuva"
+            : "Ayaz";
+        const recurringAmount =
+          parts.length >= 8 && (parts[7] ?? "").toString().trim()
+            ? parseFloat(parts[7]!)
+            : undefined;
+        const recurringFreq =
+          parts.length >= 9 && (parts[8] ?? "").toString().trim()
+            ? (parts[8]!.trim().toLowerCase() === "biweekly"
+                ? "biweekly"
+                : "monthly")
+            : undefined;
+        const recurringDay =
+          parts.length >= 10 && (parts[9] ?? "").toString().trim()
+            ? parseInt(parts[9]!, 10)
+            : undefined;
+        const recurringStart =
+          parts.length >= 11 && (parts[10] ?? "").toString().trim()
+            ? parts[10]!.trim()
+            : undefined;
+        income.push({
+          id: parts[1]!.trim(),
+          date: parts[2]!.trim(),
+          amount: parseFloat(parts[3]!) || 0,
+          description: parts[4]!.trim() || "Income",
+          category: parts[5]!.trim() || "Other",
+          owner,
+          recurringAmount:
+            recurringAmount != null &&
+            !Number.isNaN(recurringAmount) &&
+            recurringAmount > 0
+              ? recurringAmount
+              : undefined,
+          recurringFrequency: recurringFreq,
+          recurringDayOfMonth:
+            recurringDay != null &&
+            recurringDay >= 1 &&
+            recurringDay <= 31
+              ? recurringDay
+              : undefined,
+          recurringStartDate: recurringStart,
+        });
+      } else if (parts[0] === "DEBT" && parts.length >= 10) {
+        const initialAmount = parseFloat(parts[3]!) ?? 0;
+        const recurringAmount = parts[6]?.trim()
+          ? parseFloat(parts[6]) ?? undefined
+          : undefined;
+        const recurringFreq = parts[7]?.trim()
+          ? parseRecurringFrequency(parts[7])
+          : undefined;
+        const recurringDay = parts[8]?.trim()
+          ? parseInt(parts[8], 10)
+          : undefined;
+        debts.push({
+          id: parts[1]!.trim(),
+          name: parts[2]!.trim() || "Debt",
+          initialAmount: Number.isNaN(initialAmount) ? 0 : initialAmount,
+          startDate: parts[4]?.trim() || undefined,
+          owner: parseDebtOwner(parts[5] ?? "Ayaz"),
+          recurringAmount:
+            recurringAmount != null && recurringAmount > 0
+              ? recurringAmount
+              : undefined,
+          recurringFrequency: recurringFreq,
+          recurringDayOfMonth:
+            recurringDay != null && recurringDay >= 1 && recurringDay <= 31
+              ? recurringDay
+              : undefined,
+          recurringStartDate: parts[9]?.trim() || undefined,
+        });
+      } else if (parts[0] === "DEBT_PAYMENT" && parts.length >= 6) {
+        const amount = parseFloat(parts[4]!) ?? 0;
+        debtPayments.push({
+          id: parts[1]!.trim(),
+          debtId: parts[2]!.trim(),
+          date: parts[3]!.trim(),
+          amount: Number.isNaN(amount) ? 0 : amount,
+          note: parts[5]?.trim() || undefined,
+        });
+      }
     }
+    return { expenses, income, debts, debtPayments };
   }
-  return { expenses, income };
-  }
-  // No data block: fallback to parsing the human-readable table
-  return parseExportedPdfTableFallback(normalized);
+  // No data block: fallback to parsing the human-readable table (no debts/debtPayments)
+  const fallback = parseExportedPdfTableFallback(normalized);
+  return {
+    ...fallback,
+    debts: [],
+    debtPayments: [],
+  };
 }
 
 /**
@@ -357,5 +631,5 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
     });
   }
 
-  return { expenses, income };
+  return { expenses, income, debts: [], debtPayments: [] };
 }

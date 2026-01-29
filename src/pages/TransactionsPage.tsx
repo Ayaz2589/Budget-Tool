@@ -84,6 +84,8 @@ export function TransactionsPage() {
   const {
     expenses,
     income,
+    debts,
+    debtPayments,
     updateExpense,
     removeExpense,
     removeExpenses,
@@ -502,7 +504,12 @@ export function TransactionsPage() {
                     <Button
                       variant="outline"
                       onClick={() =>
-                        downloadTransactionsAndIncomePdf(expenses, income)
+                        downloadTransactionsAndIncomePdf(
+                          expenses,
+                          income,
+                          debts,
+                          debtPayments,
+                        )
                       }
                     >
                       <FileDown className="size-4" />

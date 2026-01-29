@@ -9,6 +9,7 @@ import {
   getMonthLabel,
   type MonthTotals,
 } from "@/lib/totals";
+import { DEFAULT_INCOME_CATEGORIES } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -162,39 +163,74 @@ export function Dashboard() {
     [selectedMonth],
   );
 
-  // Income category colors (Rent, Paycheck, Bonus, Other + fallback)
+  // Income by person, stacked by type (Rent, Paycheck, Bonus, Other, etc.) for selected month
   const INCOME_CATEGORY_COLORS: Record<string, string> = {
     Rent: "oklch(0.6 0.18 145)",
     Paycheck: "oklch(0.65 0.2 160)",
     Bonus: "oklch(0.55 0.22 85)",
     Other: "oklch(0.6 0.15 280)",
   };
-  const incomeBarConfig = {
-    amount: {
-      label: "Amount",
-      theme: { light: "oklch(0.55 0.2 145)", dark: "oklch(0.65 0.18 145)" },
-    },
-  } satisfies ChartConfig;
+  const defaultCategoryOrder: string[] = [...DEFAULT_INCOME_CATEGORIES];
 
-  // Income by category for selected month (Rent, Paycheck, Bonus, Other)
-  const incomeByCategory = useMemo(() => {
-    const monthIncome = income.filter((i) =>
-      i.date.startsWith(selectedMonthKey),
-    );
-    const byCategory = new Map<string, number>();
-    for (const i of monthIncome) {
-      const cat = (i.category || "Other").trim() || "Other";
-      byCategory.set(cat, (byCategory.get(cat) ?? 0) + i.amount);
-    }
-    return Array.from(byCategory.entries())
-      .map(([name, amount]) => ({
-        name,
-        amount,
-        fill: INCOME_CATEGORY_COLORS[name] ?? "oklch(0.6 0.15 200)",
-      }))
-      .filter((d) => d.amount > 0)
-      .sort((a, b) => b.amount - a.amount);
-  }, [income, selectedMonthKey]);
+  const { incomeStackedBarData, incomeCategoryKeys, incomeStackedBarConfig } =
+    useMemo(() => {
+      const monthIncome = income.filter((i) =>
+        i.date.startsWith(selectedMonthKey),
+      );
+      const byPersonByCat = new Map<string, Map<string, number>>();
+      const categorySet = new Set<string>(defaultCategoryOrder);
+      for (const i of monthIncome) {
+        const person = i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz";
+        const cat = (i.category || "Other").trim() || "Other";
+        categorySet.add(cat);
+        if (!byPersonByCat.has(person)) {
+          byPersonByCat.set(person, new Map());
+        }
+        const catMap = byPersonByCat.get(person)!;
+        catMap.set(cat, (catMap.get(cat) ?? 0) + i.amount);
+      }
+      const categoryKeys = Array.from(categorySet);
+      categoryKeys.sort((a: string, b: string) => {
+        const ai = defaultCategoryOrder.indexOf(a);
+        const bi = defaultCategoryOrder.indexOf(b);
+        if (ai >= 0 && bi >= 0) return ai - bi;
+        if (ai >= 0) return -1;
+        if (bi >= 0) return 1;
+        return a.localeCompare(b);
+      });
+
+      const rows: { name: string; [cat: string]: string | number }[] = [];
+      for (const person of ["Ayaz", "Tasnuva"]) {
+        const catMap = byPersonByCat.get(person) ?? new Map();
+        const row: { name: string; [cat: string]: string | number } = {
+          name: person,
+        };
+        let hasAny = false;
+        for (const cat of categoryKeys) {
+          const amt = catMap.get(cat) ?? 0;
+          row[cat] = amt;
+          if (amt > 0) hasAny = true;
+        }
+        if (hasAny) rows.push(row);
+      }
+
+      const config: ChartConfig = {};
+      for (const cat of categoryKeys) {
+        config[cat] = {
+          label: cat,
+          theme: {
+            light: INCOME_CATEGORY_COLORS[cat] ?? "oklch(0.6 0.15 200)",
+            dark: INCOME_CATEGORY_COLORS[cat] ?? "oklch(0.65 0.14 200)",
+          },
+        };
+      }
+
+      return {
+        incomeStackedBarData: rows,
+        incomeCategoryKeys: categoryKeys,
+        incomeStackedBarConfig: config,
+      };
+    }, [income, selectedMonthKey]);
 
   // Spending breakdown pie (50/50, Tasnuva's, My) — excludes Mortgage
   const spendingPieData = useMemo(() => {
@@ -664,13 +700,13 @@ export function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {incomeByCategory.length > 0 ? (
+                  {incomeStackedBarData.length > 0 ? (
                     <ChartContainer
-                      config={incomeBarConfig}
+                      config={incomeStackedBarConfig}
                       className="h-[220px] w-full"
                     >
                       <BarChart
-                        data={incomeByCategory}
+                        data={incomeStackedBarData}
                         layout="vertical"
                         margin={{ top: 5, right: 10, left: 80, bottom: 5 }}
                         accessibilityLayer
@@ -692,23 +728,42 @@ export function Dashboard() {
                         <ChartTooltip
                           content={
                             <ChartTooltipContent
-                              formatter={(value) =>
-                                typeof value === "number"
-                                  ? formatCurrency(value)
-                                  : String(value ?? "")
+                              labelFormatter={(_, payload) =>
+                                payload?.[0]?.payload?.name ?? ""
                               }
+                              formatter={(value, name) => (
+                                <div className="flex w-full items-center justify-between gap-4">
+                                  <span className="text-muted-foreground">
+                                    {String(name)}
+                                  </span>
+                                  <span>
+                                    {typeof value === "number"
+                                      ? formatCurrency(value)
+                                      : String(value ?? "")}
+                                  </span>
+                                </div>
+                              )}
                             />
                           }
                         />
-                        <Bar
-                          dataKey="amount"
-                          radius={[0, 4, 4, 0]}
-                          maxBarSize={28}
-                        >
-                          {incomeByCategory.map((_, i) => (
-                            <Cell key={i} fill={incomeByCategory[i]!.fill} />
-                          ))}
-                        </Bar>
+                        <ChartLegend content={<ChartLegendContent />} />
+                        {incomeCategoryKeys.map((cat, idx) => (
+                          <Bar
+                            key={cat}
+                            dataKey={cat}
+                            stackId="income"
+                            radius={
+                              idx === incomeCategoryKeys.length - 1
+                                ? [0, 4, 4, 0]
+                                : 0
+                            }
+                            maxBarSize={36}
+                            fill={
+                              INCOME_CATEGORY_COLORS[cat] ??
+                              "oklch(0.6 0.15 200)"
+                            }
+                          />
+                        ))}
                       </BarChart>
                     </ChartContainer>
                   ) : (

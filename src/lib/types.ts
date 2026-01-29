@@ -21,6 +21,16 @@ export interface Income {
   amount: number;
   description: string;
   category: string;
+  /** Ayaz or Tasnuva; default "Ayaz" when missing (backward compat) */
+  owner?: DebtOwner;
+  /** Recurring amount (e.g. same as amount for paycheck) */
+  recurringAmount?: number;
+  /** "monthly" = each month on recurringDayOfMonth; "biweekly" = every 14 days from recurringStartDate */
+  recurringFrequency?: "monthly" | "biweekly";
+  /** Day of month (1–31) when recurring (monthly only) */
+  recurringDayOfMonth?: number;
+  /** First payment date for bi-weekly schedule (YYYY-MM-DD) */
+  recurringStartDate?: string;
 }
 
 export type DebtOwner = "Ayaz" | "Tasnuva";

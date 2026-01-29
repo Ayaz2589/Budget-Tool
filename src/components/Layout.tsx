@@ -12,6 +12,7 @@ import {
   Settings,
   LogIn,
   LogOut,
+  Landmark,
 } from "lucide-react";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { Button } from "@/components/ui/button";
@@ -67,6 +68,15 @@ export function Layout() {
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       <nav className="border-b md:border-b-0 md:border-r bg-muted/30 p-2 flex flex-row md:flex-col gap-1 shrink-0 overflow-hidden md:min-w-[180px]">
+        <Link
+          to="/"
+          className="flex items-center gap-2 px-3 py-2.5 shrink-0 border-b border-border/50 mb-1 md:mb-2"
+        >
+          <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <Landmark className="size-5 text-primary" />
+          </div>
+          <span className="font-semibold text-base tracking-tight">Ortho</span>
+        </Link>
         <div className="flex flex-1 md:flex-col gap-1 overflow-x-auto md:overflow-x-visible md:overflow-y-auto">
           {nav.map(({ to, label, icon: Icon }) => (
             <Link

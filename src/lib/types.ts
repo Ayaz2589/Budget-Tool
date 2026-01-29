@@ -58,7 +58,6 @@ export const DEFAULT_EXPENSE_CATEGORIES = [
   "My Purchase",
   "Tasnuva's Purchases",
   "50/50",
-  "Mortgage",
   "Amazon",
 ] as const;
 

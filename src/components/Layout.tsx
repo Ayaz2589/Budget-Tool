@@ -7,6 +7,7 @@ import {
   List,
   Wallet,
   CreditCard,
+  Home,
   ListOrdered,
   Settings,
   LogIn,
@@ -50,10 +51,11 @@ function Avatar({
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/import", label: "Import CSV", icon: Upload },
   { to: "/transactions", label: "Transactions", icon: List },
   { to: "/income", label: "Income", icon: Wallet },
   { to: "/debt", label: "Debt", icon: CreditCard },
+  { to: "/mortgage", label: "Mortgage", icon: Home },
+  { to: "/import", label: "Import", icon: Upload },
   { to: "/rules", label: "Category Rules", icon: ListOrdered },
   { to: "/settings", label: "Settings", icon: Settings },
 ];

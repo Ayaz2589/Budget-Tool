@@ -80,27 +80,6 @@ export function getCurrentMonthRentDateUTC(): string {
   return `${year}-${monthStr}-05`;
 }
 
-/** Mortgage: $5,400 on the 15th of each month (expense). */
-export const MORTGAGE_AMOUNT = 5400;
-export const MORTGAGE_DESCRIPTION = "Mortgage";
-export const MORTGAGE_CATEGORY = "Mortgage";
-
-export function isMortgageEntry(e: { date: string; amount: number; category: string }): boolean {
-  const dateMatch = e.date.endsWith("-15");
-  const amountMatch = Math.abs(e.amount - MORTGAGE_AMOUNT) < AMOUNT_TOLERANCE;
-  const catMatch = (e.category || "").toLowerCase() === MORTGAGE_CATEGORY.toLowerCase();
-  return dateMatch && amountMatch && catMatch;
-}
-
-/** Current month (UTC) mortgage date: 15th. */
-export function getCurrentMonthMortgageDateUTC(): string {
-  const now = new Date();
-  const year = now.getUTCFullYear();
-  const month = now.getUTCMonth() + 1;
-  const monthStr = month.toString().padStart(2, "0");
-  return `${year}-${monthStr}-15`;
-}
-
 /** Auto-added income rules (shown in rules section, read-only). */
 export const AUTO_INCOME_RULES_READONLY: { schedule: string; amount: string; category: string }[] = [
   { schedule: "15th of each month", amount: formatCurrency(PAYCHECK_AMOUNT), category: PAYCHECK_CATEGORY },
@@ -110,6 +89,4 @@ export const AUTO_INCOME_RULES_READONLY: { schedule: string; amount: string; cat
 ];
 
 /** Auto-added expense rules (shown in rules section, read-only). */
-export const AUTO_EXPENSE_RULES_READONLY: { schedule: string; amount: string; category: string }[] = [
-  { schedule: "15th of each month", amount: formatCurrency(MORTGAGE_AMOUNT), category: MORTGAGE_CATEGORY },
-];
+export const AUTO_EXPENSE_RULES_READONLY: { schedule: string; amount: string; category: string }[] = [];

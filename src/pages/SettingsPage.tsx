@@ -256,7 +256,7 @@ export function SettingsPage() {
           <Input
             value={expenseList}
             onChange={(e) => setExpenseList(e.target.value)}
-            placeholder="My Purchase, Tasnuva's Purchases, 50/50, Mortgage"
+            placeholder="My Purchase, Tasnuva's Purchases, 50/50, Amazon"
           />
           <Button variant="outline" size="sm" onClick={saveExpenseCategories}>
             Save

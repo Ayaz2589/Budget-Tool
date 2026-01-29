@@ -9,6 +9,7 @@ import {
 import { Layout } from "@/components/Layout";
 import { Dashboard } from "@/pages/Dashboard";
 import { DebtPage } from "@/pages/DebtPage";
+import { MortgagePage } from "@/pages/MortgagePage";
 import { ImportPage } from "@/pages/ImportPage";
 import { TransactionsPage } from "@/pages/TransactionsPage";
 import { IncomePage } from "@/pages/IncomePage";
@@ -27,6 +28,7 @@ function AppContent() {
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="income" element={<IncomePage />} />
           <Route path="debt" element={<DebtPage />} />
+          <Route path="mortgage" element={<MortgagePage />} />
           <Route path="rules" element={<CategoryRulesPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>

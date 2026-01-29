@@ -122,7 +122,9 @@ export function TransactionsPage() {
   }, [expenses]);
 
   const filtered = useMemo(() => {
-    let list = [...expenses].filter((e) => isValidDate(e.date));
+    let list = [...expenses]
+      .filter((e) => isValidDate(e.date))
+      .filter((e) => e.category !== "Mortgage");
     if (monthFilter) {
       list = list.filter((e) => e.date.startsWith(monthFilter));
     }

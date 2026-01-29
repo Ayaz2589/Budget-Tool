@@ -129,6 +129,62 @@ export async function readExpensesFromSheet(
   return expenses;
 }
 
+export async function readMortgageFromSheet(
+  accessToken: string,
+  spreadsheetId: string
+): Promise<Expense[]> {
+  const rows = await getSheetValues(
+    accessToken,
+    spreadsheetId,
+    "Mortgage!A2:G",
+    "UNFORMATTED_VALUE",
+  );
+  const expenses: Expense[] = [];
+  for (const row of rows) {
+    const first = String(row[0] ?? "").trim();
+    const hasIdColumn =
+      row.length >= 7 && first.length > 0 && !looksLikeIsoDate(first);
+    let id: string;
+    let dateRaw: unknown;
+    let amount: number | null;
+    let description: string;
+    let rawSource: string;
+    let cardMember: string | undefined;
+    if (hasIdColumn) {
+      id = first;
+      dateRaw = row[1];
+      amount = parseAmount(row[2]);
+      description = String(row[3] ?? "").trim();
+      rawSource = String(row[5] ?? "").trim().toLowerCase();
+      cardMember = String(row[6] ?? "").trim() || undefined;
+    } else {
+      id = generateId();
+      dateRaw = row[0];
+      amount = parseAmount(row[1]);
+      description = String(row[2] ?? "").trim();
+      rawSource = String(row[4] ?? "").trim().toLowerCase();
+      cardMember = String(row[5] ?? "").trim() || undefined;
+    }
+    const date = normalizeDate(dateRaw);
+    const source: ExpenseSource = VALID_EXPENSE_SOURCES.includes(
+      rawSource as ExpenseSource,
+    )
+      ? (rawSource as ExpenseSource)
+      : "manual";
+    if (!date || amount == null || amount <= 0) continue;
+    expenses.push({
+      id,
+      date,
+      amount,
+      description: description || "Mortgage",
+      category: "Mortgage",
+      source,
+      cardMember,
+    });
+  }
+  return expenses;
+}
+
 export async function readIncomeFromSheet(
   accessToken: string,
   spreadsheetId: string
@@ -302,6 +358,39 @@ export async function clearAndWriteExpenses(
   const values = [...headers, ...rows];
   const range = "Expenses!A1:G";
   await clearRange(accessToken, spreadsheetId, "Expenses!A1:G10000");
+  if (values.length > 0) {
+    await updateSheet(accessToken, spreadsheetId, range, values, false);
+  }
+}
+
+export async function clearAndWriteMortgage(
+  accessToken: string,
+  spreadsheetId: string,
+  expenses: Expense[]
+): Promise<void> {
+  const headers = [
+    [
+      "ID",
+      "Date",
+      "Amount",
+      "Description",
+      "Category",
+      "Source",
+      "Card Member",
+    ],
+  ];
+  const rows = expenses.map((e) => [
+    e.id,
+    e.date,
+    e.amount,
+    e.description,
+    e.category || "",
+    e.source,
+    e.cardMember ?? "",
+  ]);
+  const values = [...headers, ...rows];
+  const range = "Mortgage!A1:G";
+  await clearRange(accessToken, spreadsheetId, "Mortgage!A1:G10000");
   if (values.length > 0) {
     await updateSheet(accessToken, spreadsheetId, range, values, false);
   }
@@ -497,6 +586,7 @@ export interface SheetIds {
   totals: number;
   debts: number;
   debtPayments: number;
+  mortgage: number;
 }
 
 export async function getSheetIds(
@@ -520,15 +610,17 @@ export async function getSheetIds(
   const totals = byTitle["Totals"];
   const debts = byTitle["Debts"];
   const debtPayments = byTitle["DebtPayments"];
+  const mortgage = byTitle["Mortgage"];
   if (
     expenses == null ||
     income == null ||
     totals == null ||
     debts == null ||
-    debtPayments == null
+    debtPayments == null ||
+    mortgage == null
   )
     return null;
-  return { expenses, income, totals, debts, debtPayments };
+  return { expenses, income, totals, debts, debtPayments, mortgage };
 }
 
 export async function ensureSheetsExist(
@@ -544,7 +636,7 @@ export async function ensureSheetsExist(
     sheets?: { properties: { sheetId: number; title: string } }[];
   };
   const titles = new Set((data.sheets ?? []).map((s) => s.properties.title));
-  const needed = ["Expenses", "Income", "Totals", "Debts", "DebtPayments"];
+  const needed = ["Expenses", "Income", "Totals", "Debts", "DebtPayments", "Mortgage"];
   const toAdd = needed.filter((t) => !titles.has(t));
   if (toAdd.length === 0) return;
   const addRes = await fetch(`${SHEETS_API}/${spreadsheetId}:batchUpdate`, {
@@ -644,6 +736,44 @@ export async function applySheetsFormatting(
   requests.push(
     repeatCellRequest(
       sheetIds.expenses,
+      1,
+      10000,
+      2,
+      3,
+      {
+        horizontalAlignment: "LEFT",
+        numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },
+      },
+      currencyFields
+    )
+  );
+
+  // Mortgage: same layout as Expenses (ID, Date, Amount, Description, Category, Source, Card Member), column C currency
+  requests.push(
+    repeatCellRequest(
+      sheetIds.mortgage,
+      0,
+      1,
+      0,
+      7,
+      { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
+      headerFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.mortgage,
+      0,
+      10000,
+      0,
+      7,
+      { horizontalAlignment: "LEFT" },
+      leftAlignFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.mortgage,
       1,
       10000,
       2,

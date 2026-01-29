@@ -22,14 +22,11 @@ import {
   RENT_CATEGORY,
   hasRentOnSheet,
   getCurrentMonthRentDateUTC,
-  MORTGAGE_AMOUNT,
-  MORTGAGE_DESCRIPTION,
-  MORTGAGE_CATEGORY,
-  getCurrentMonthMortgageDateUTC,
 } from "@/lib/paycheck";
 import {
   ensureSheetsExist,
   clearAndWriteExpenses,
+  clearAndWriteMortgage,
   clearAndWriteIncome,
   clearAndWriteDebts,
   clearAndWriteDebtPayments,
@@ -38,6 +35,7 @@ import {
   applySheetsFormatting,
   extractSpreadsheetId,
   readExpensesFromSheet,
+  readMortgageFromSheet,
   readIncomeFromSheet,
   readDebtsFromSheet,
   readDebtPaymentsFromSheet,
@@ -254,7 +252,18 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     setSyncErrorMessage(null);
     try {
       await ensureSheetsExist(accessToken, spreadsheetId);
-      await clearAndWriteExpenses(accessToken, spreadsheetId, budget.expenses);
+      const nonMortgageExpenses = budget.expenses.filter(
+        (e) => (e.category || "").toLowerCase() !== "mortgage",
+      );
+      const mortgageExpenses = budget.expenses.filter(
+        (e) => (e.category || "").toLowerCase() === "mortgage",
+      );
+      await clearAndWriteExpenses(
+        accessToken,
+        spreadsheetId,
+        nonMortgageExpenses,
+      );
+      await clearAndWriteMortgage(accessToken, spreadsheetId, mortgageExpenses);
       await clearAndWriteIncome(accessToken, spreadsheetId, budget.income);
       await clearAndWriteDebts(accessToken, spreadsheetId, budget.debts);
       await clearAndWriteDebtPayments(
@@ -320,17 +329,24 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         accessToken,
         spreadsheetId,
       );
+      const sheetMortgage = await readMortgageFromSheet(
+        accessToken,
+        spreadsheetId,
+      );
       const sheetIncome = await readIncomeFromSheet(accessToken, spreadsheetId);
 
       const newExpenses = sheetExpenses.filter(
+        (e) => !appExpenseKeys.has(expenseKey(e)),
+      );
+      const newMortgage = sheetMortgage.filter(
         (e) => !appExpenseKeys.has(expenseKey(e)),
       );
       const newIncome = sheetIncome.filter(
         (i) => !appIncomeKeys.has(incomeKey(i)),
       );
 
-      if (newExpenses.length > 0) {
-        budget.addExpenses(newExpenses);
+      if (newExpenses.length > 0 || newMortgage.length > 0) {
+        budget.addExpenses([...newExpenses, ...newMortgage]);
       }
       for (const i of newIncome) {
         if (!appIncomeKeys.has(incomeKey(i))) {
@@ -433,25 +449,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    const ensureCurrentMonthMortgage = () => {
-      const mortgageDate = getCurrentMonthMortgageDateUTC();
-      const hasMortgage = budget.expenses.some(
-        (e) =>
-          e.date === mortgageDate &&
-          Math.abs(e.amount - MORTGAGE_AMOUNT) < 0.01 &&
-          (e.category || "").toLowerCase() === MORTGAGE_CATEGORY.toLowerCase(),
-      );
-      if (!hasMortgage) {
-        budget.addExpense({
-          date: mortgageDate,
-          amount: MORTGAGE_AMOUNT,
-          description: MORTGAGE_DESCRIPTION,
-          category: MORTGAGE_CATEGORY,
-          source: "manual",
-        });
-      }
-    };
-
     if (accessToken && spreadsheetId) {
       if (!hasCheckedSheetForPaychecks.current) {
         hasCheckedSheetForPaychecks.current = true;
@@ -464,30 +461,25 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
               void pullFromSheet().then(() => {
                 ensureCurrentMonthPaychecks();
                 ensureCurrentMonthRent();
-                ensureCurrentMonthMortgage();
               });
             } else {
               ensureCurrentMonthPaychecks();
               ensureCurrentMonthRent();
-              ensureCurrentMonthMortgage();
             }
           })
           .catch(() => {
             ensureCurrentMonthPaychecks();
             ensureCurrentMonthRent();
-            ensureCurrentMonthMortgage();
           });
       } else {
         ensureCurrentMonthPaychecks();
         ensureCurrentMonthRent();
-        ensureCurrentMonthMortgage();
       }
       return;
     }
 
     ensureCurrentMonthPaychecks();
     ensureCurrentMonthRent();
-    ensureCurrentMonthMortgage();
   }, [
     accessToken,
     spreadsheetId,

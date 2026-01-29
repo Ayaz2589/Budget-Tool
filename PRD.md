@@ -6,6 +6,12 @@
 
 ---
 
+## Summary
+
+Budget Tool is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage category rules, and sign in with Google in the nav. Data lives in the app and localStorage; Sheets sync is manual push/restore.
+
+---
+
 ## 1. Overview
 
 Budget Tool is a personal budgeting application for a couple (you and your wife, Tasnuva) to:

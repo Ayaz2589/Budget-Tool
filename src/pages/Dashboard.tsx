@@ -33,8 +33,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  RadialBarChart,
-  RadialBar,
   Legend,
 } from "recharts";
 import {
@@ -119,7 +117,7 @@ export function Dashboard() {
     },
   } satisfies ChartConfig;
 
-  // Selected month summary bar chart data (Earned, Spent, Spent w/o Mortgage, Saved)
+  // Selected month summary bar chart data (Earned, Spent, Saved)
   const summaryBarConfig = {
     earned: {
       label: "Earned",
@@ -128,10 +126,6 @@ export function Dashboard() {
     spent: {
       label: "Spent",
       theme: { light: "oklch(0.72 0.18 55)", dark: "oklch(0.78 0.15 55)" },
-    },
-    spentWoMtg: {
-      label: "Spent w/o Mtg",
-      theme: { light: "oklch(0.75 0.15 45)", dark: "oklch(0.8 0.12 45)" },
     },
     saved: {
       label: "Saved",
@@ -152,11 +146,6 @@ export function Dashboard() {
         fill: "var(--color-spent)",
       },
       {
-        metric: "Spent w/o Mtg",
-        value: selectedMonth.totalSpentWithoutMortgage,
-        fill: "var(--color-spentWoMtg)",
-      },
-      {
         metric: "Saved",
         value: selectedMonth.totalSaved,
         fill: "var(--color-saved)",
@@ -165,16 +154,47 @@ export function Dashboard() {
     [selectedMonth],
   );
 
-  // Spending breakdown pie (Mortgage, 50/50, Tasnuva's, My)
+  // Income category colors (Rent, Paycheck, Bonus, Other + fallback)
+  const INCOME_CATEGORY_COLORS: Record<string, string> = {
+    Rent: "oklch(0.6 0.18 145)",
+    Paycheck: "oklch(0.65 0.2 160)",
+    Bonus: "oklch(0.55 0.22 85)",
+    Other: "oklch(0.6 0.15 280)",
+  };
+  const incomeBarConfig = {
+    amount: {
+      label: "Amount",
+      theme: { light: "oklch(0.55 0.2 145)", dark: "oklch(0.65 0.18 145)" },
+    },
+  } satisfies ChartConfig;
+
+  // Income by category for selected month (Rent, Paycheck, Bonus, Other)
+  const incomeByCategory = useMemo(() => {
+    const monthIncome = income.filter((i) =>
+      i.date.startsWith(selectedMonthKey),
+    );
+    const byCategory = new Map<string, number>();
+    for (const i of monthIncome) {
+      const cat = (i.category || "Other").trim() || "Other";
+      byCategory.set(cat, (byCategory.get(cat) ?? 0) + i.amount);
+    }
+    return Array.from(byCategory.entries())
+      .map(([name, amount]) => ({
+        name,
+        amount,
+        fill: INCOME_CATEGORY_COLORS[name] ?? "oklch(0.6 0.15 200)",
+      }))
+      .filter((d) => d.amount > 0)
+      .sort((a, b) => b.amount - a.amount);
+  }, [income, selectedMonthKey]);
+
+  // Spending breakdown pie (50/50, Tasnuva's, My) — excludes Mortgage
   const spendingPieData = useMemo(() => {
-    const mortgage =
-      selectedMonth.totalSpent - selectedMonth.totalSpentWithoutMortgage;
     const fiftyFifty = selectedMonth.total5050Spent;
     const tasnuvas = selectedMonth.novasPurchase;
     const mySpending =
       selectedMonth.myTotalSpendingWithoutMortgage - selectedMonth.split5050;
     return [
-      ...(mortgage > 0 ? [{ name: "Mortgage", value: mortgage }] : []),
       ...(fiftyFifty > 0 ? [{ name: "50/50", value: fiftyFifty }] : []),
       ...(tasnuvas > 0 ? [{ name: "Tasnuva's", value: tasnuvas }] : []),
       ...(mySpending > 0 ? [{ name: "My", value: mySpending }] : []),
@@ -188,23 +208,111 @@ export function Dashboard() {
     "oklch(0.6 0.2 160)",
   ];
 
-  const savingsRatePercent = selectedMonth.personalSavingsRate * 100;
-  const savingsRadialData = useMemo(
-    () => [
-      {
-        name: "Savings rate",
-        value: savingsRatePercent,
-        fill: "var(--color-savings)",
-      },
-    ],
-    [savingsRatePercent],
-  );
-  const savingsConfig = {
-    savings: {
-      label: "Savings rate",
-      theme: { light: "oklch(0.6 0.2 160)", dark: "oklch(0.7 0.18 165)" },
+  // Normalize description for grouping (merge "UBER EATS" / "Uber Eats")
+  const normalizeDescKey = (s: string) =>
+    (s || "").trim().toLowerCase().replace(/\s+/g, " ") || "other";
+
+  // Strip leading digits and period for display (e.g. "460010. Bahamä" -> "Bahamä")
+  const cleanDisplayName = (s: string) =>
+    (s || "")
+      .trim()
+      .replace(/^\d+\.\s*/, "")
+      .replace(/\s+/g, " ") || "Other";
+
+  // 50/50 spend by type (description) for selected month — normalized and cleaned
+  const fiftyFiftyByType = useMemo(() => {
+    const monthExpenses = expenses.filter(
+      (e) => e.date.startsWith(selectedMonthKey) && e.category === "50/50",
+    );
+    const byKey = new Map<string, { amount: number; display: string }>();
+    for (const e of monthExpenses) {
+      const raw = (e.description || "").trim() || "Other";
+      const key = normalizeDescKey(raw);
+      const existing = byKey.get(key);
+      const display = cleanDisplayName(raw);
+      if (!existing) {
+        byKey.set(key, { amount: e.amount, display });
+      } else {
+        existing.amount += e.amount;
+        if (display.length > existing.display.length) {
+          existing.display = display;
+        }
+      }
+    }
+    return Array.from(byKey.values())
+      .map(({ display, amount }) => ({ name: display, amount }))
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 15);
+  }, [expenses, selectedMonthKey]);
+
+  // Distinct colors per spend-by-type chart
+  const fiftyFiftyChartConfig = {
+    amount: {
+      label: "Amount",
+      theme: { light: "oklch(0.65 0.18 85)", dark: "oklch(0.72 0.16 85)" }, // amber
     },
   } satisfies ChartConfig;
+
+  const mySpendingChartConfig = {
+    amount: {
+      label: "Amount",
+      theme: { light: "oklch(0.55 0.2 220)", dark: "oklch(0.65 0.18 220)" }, // blue
+    },
+  } satisfies ChartConfig;
+
+  const tasnuvasSpendingChartConfig = {
+    amount: {
+      label: "Amount",
+      theme: { light: "oklch(0.65 0.2 350)", dark: "oklch(0.72 0.18 350)" }, // rose/pink
+    },
+  } satisfies ChartConfig;
+
+  // Build "by type" bar data from filtered expenses (normalize + clean + top 15)
+  const buildSpendingByType = (
+    monthExpenses: { description?: string; amount: number }[],
+  ) => {
+    const byKey = new Map<string, { amount: number; display: string }>();
+    for (const e of monthExpenses) {
+      const raw = (e.description || "").trim() || "Other";
+      const key = normalizeDescKey(raw);
+      const existing = byKey.get(key);
+      const display = cleanDisplayName(raw);
+      if (!existing) {
+        byKey.set(key, { amount: e.amount, display });
+      } else {
+        existing.amount += e.amount;
+        if (display.length > existing.display.length) {
+          existing.display = display;
+        }
+      }
+    }
+    return Array.from(byKey.values())
+      .map(({ display, amount }) => ({ name: display, amount }))
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 15);
+  };
+
+  // My (Ayaz) spending by type — selected month, exclude Tasnuva's Purchases, 50/50 & Mortgage
+  const mySpendingByType = useMemo(() => {
+    const monthExpenses = expenses.filter(
+      (e) =>
+        e.date.startsWith(selectedMonthKey) &&
+        e.category !== "Tasnuva's Purchases" &&
+        e.category !== "50/50" &&
+        e.category !== "Mortgage",
+    );
+    return buildSpendingByType(monthExpenses);
+  }, [expenses, selectedMonthKey]);
+
+  // Tasnuva's spending by type — selected month, Tasnuva's Purchases only (no 50/50)
+  const tasnuvasSpendingByType = useMemo(() => {
+    const monthExpenses = expenses.filter(
+      (e) =>
+        e.date.startsWith(selectedMonthKey) &&
+        e.category === "Tasnuva's Purchases",
+    );
+    return buildSpendingByType(monthExpenses);
+  }, [expenses, selectedMonthKey]);
 
   return (
     <div className="space-y-6">
@@ -234,167 +342,7 @@ export function Dashboard() {
         </p>
       </div>
 
-      {/* Chart visualizations for selected month */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Earned vs Spent vs Saved
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {summaryBarData.some((d) => d.value > 0) ? (
-              <ChartContainer
-                config={summaryBarConfig}
-                className="h-[220px] w-full"
-              >
-                <BarChart
-                  data={summaryBarData}
-                  layout="vertical"
-                  margin={{ top: 5, right: 10, left: 60, bottom: 5 }}
-                  accessibilityLayer
-                >
-                  <XAxis type="number" hide />
-                  <YAxis
-                    type="category"
-                    dataKey="metric"
-                    tickLine={false}
-                    axisLine={false}
-                    width={55}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        formatter={(value) =>
-                          typeof value === "number"
-                            ? formatCurrency(value)
-                            : String(value ?? "")
-                        }
-                      />
-                    }
-                  />
-                  <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={28}>
-                    {summaryBarData.map((_, i) => (
-                      <Cell key={i} fill={summaryBarData[i]!.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ChartContainer>
-            ) : (
-              <p className="text-sm text-muted-foreground py-8 text-center">
-                No data for this month.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Spending breakdown
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {spendingPieData.length > 0 ? (
-              <ChartContainer
-                config={{
-                  mortgage: {
-                    label: "Mortgage",
-                    theme: { light: PIE_COLORS[0], dark: PIE_COLORS[0] },
-                  },
-                  "50/50": {
-                    label: "50/50",
-                    theme: { light: PIE_COLORS[1], dark: PIE_COLORS[1] },
-                  },
-                  "Tasnuva's": {
-                    label: "Tasnuva's",
-                    theme: { light: PIE_COLORS[2], dark: PIE_COLORS[2] },
-                  },
-                  My: {
-                    label: "My",
-                    theme: { light: PIE_COLORS[3], dark: PIE_COLORS[3] },
-                  },
-                }}
-                className="h-[220px] w-full"
-              >
-                <PieChart>
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        formatter={(value) =>
-                          typeof value === "number"
-                            ? formatCurrency(value)
-                            : String(value ?? "")
-                        }
-                      />
-                    }
-                  />
-                  <Pie
-                    data={spendingPieData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={2}
-                  >
-                    {spendingPieData.map((_, i) => (
-                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Legend />
-                </PieChart>
-              </ChartContainer>
-            ) : (
-              <p className="text-sm text-muted-foreground py-8 text-center">
-                No spending for this month.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Personal savings rate
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={savingsConfig} className="h-[220px] w-full">
-              <RadialBarChart
-                data={savingsRadialData}
-                innerRadius="60%"
-                outerRadius="90%"
-                startAngle={90}
-                endAngle={-270}
-              >
-                <RadialBar
-                  dataKey="value"
-                  fill="var(--color-savings)"
-                  cornerRadius={4}
-                />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value) =>
-                        typeof value === "number"
-                          ? `${value.toFixed(1)}%`
-                          : String(value ?? "")
-                      }
-                    />
-                  }
-                />
-              </RadialBarChart>
-            </ChartContainer>
-            <p className="text-center text-2xl font-semibold mt-[-40px]">
-              {formatPercent(selectedMonth.personalSavingsRate)}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
+      <h2 className="text-lg font-semibold text-foreground pt-2">Summary</h2>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
@@ -506,6 +454,406 @@ export function Dashboard() {
         </CardContent>
       </Card>
 
+      <h2 className="text-lg font-semibold text-foreground pt-4">Overview</h2>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Earned vs Spent vs Saved
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {summaryBarData.some((d) => d.value > 0) ? (
+              <ChartContainer
+                config={summaryBarConfig}
+                className="h-[220px] w-full"
+              >
+                <BarChart
+                  data={summaryBarData}
+                  layout="vertical"
+                  margin={{ top: 5, right: 10, left: 60, bottom: 5 }}
+                  accessibilityLayer
+                >
+                  <XAxis
+                    type="number"
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => formatCurrency(v)}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="metric"
+                    tickLine={false}
+                    axisLine={false}
+                    width={55}
+                    tick={{ fontSize: 11 }}
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) =>
+                          typeof value === "number"
+                            ? formatCurrency(value)
+                            : String(value ?? "")
+                        }
+                      />
+                    }
+                  />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={28}>
+                    {summaryBarData.map((_, i) => (
+                      <Cell key={i} fill={summaryBarData[i]!.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No data for this month.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Spending breakdown
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {spendingPieData.length > 0 ? (
+              <ChartContainer
+                config={{
+                  "50/50": {
+                    label: "50/50",
+                    theme: { light: PIE_COLORS[0], dark: PIE_COLORS[0] },
+                  },
+                  "Tasnuva's": {
+                    label: "Tasnuva's",
+                    theme: { light: PIE_COLORS[1], dark: PIE_COLORS[1] },
+                  },
+                  My: {
+                    label: "My",
+                    theme: { light: PIE_COLORS[2], dark: PIE_COLORS[2] },
+                  },
+                }}
+                className="h-[220px] w-full"
+              >
+                <PieChart>
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) =>
+                          typeof value === "number"
+                            ? formatCurrency(value)
+                            : String(value ?? "")
+                        }
+                      />
+                    }
+                  />
+                  <Pie
+                    data={spendingPieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    paddingAngle={2}
+                  >
+                    {spendingPieData.map((_, i) => (
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Legend />
+                </PieChart>
+              </ChartContainer>
+            ) : (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No spending for this month.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Income breakdown
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {incomeByCategory.length > 0 ? (
+              <ChartContainer
+                config={incomeBarConfig}
+                className="h-[220px] w-full"
+              >
+                <BarChart
+                  data={incomeByCategory}
+                  layout="vertical"
+                  margin={{ top: 5, right: 10, left: 80, bottom: 5 }}
+                  accessibilityLayer
+                >
+                  <XAxis
+                    type="number"
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => formatCurrency(v)}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    width={76}
+                    tick={{ fontSize: 11 }}
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) =>
+                          typeof value === "number"
+                            ? formatCurrency(value)
+                            : String(value ?? "")
+                        }
+                      />
+                    }
+                  />
+                  <Bar dataKey="amount" radius={[0, 4, 4, 0]} maxBarSize={28}>
+                    {incomeByCategory.map((_, i) => (
+                      <Cell key={i} fill={incomeByCategory[i]!.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No income for this month.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <h2 className="text-lg font-semibold text-foreground pt-4">
+        Spending by type
+      </h2>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            50/50 spend by type
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Expenses in 50/50 category for the selected month, grouped by
+            description. Top 15 shown.
+          </p>
+        </CardHeader>
+        <CardContent>
+          {fiftyFiftyByType.length > 0 ? (
+            <ChartContainer
+              config={fiftyFiftyChartConfig}
+              className="h-[480px] w-full"
+            >
+              <BarChart
+                data={fiftyFiftyByType}
+                layout="vertical"
+                margin={{ top: 5, right: 24, left: 0, bottom: 5 }}
+                barCategoryGap="20%"
+                accessibilityLayer
+              >
+                <CartesianGrid strokeDasharray="3 3" horizontal vertical />
+                <XAxis
+                  type="number"
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(v) => formatCurrency(v)}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  tickLine={false}
+                  axisLine={false}
+                  width={240}
+                  tick={{ fontSize: 11 }}
+                  tickFormatter={(v) =>
+                    v.length > 52 ? `${v.slice(0, 50)}…` : v
+                  }
+                />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(_, payload) =>
+                        payload?.[0]?.payload?.name ?? ""
+                      }
+                      formatter={(value) =>
+                        typeof value === "number"
+                          ? formatCurrency(value)
+                          : String(value ?? "")
+                      }
+                    />
+                  }
+                />
+                <Bar
+                  dataKey="amount"
+                  fill="var(--color-amount)"
+                  radius={[0, 4, 4, 0]}
+                  maxBarSize={16}
+                />
+              </BarChart>
+            </ChartContainer>
+          ) : (
+            <p className="text-sm text-muted-foreground py-8 text-center">
+              No 50/50 expenses for this month.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              My spending by type
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Your expenses (excluding Tasnuva&apos;s Purchases, 50/50 &
+              Mortgage) for the selected month. Top 15 shown.
+            </p>
+          </CardHeader>
+          <CardContent>
+            {mySpendingByType.length > 0 ? (
+              <ChartContainer
+                config={mySpendingChartConfig}
+                className="h-[480px] w-full"
+              >
+                <BarChart
+                  data={mySpendingByType}
+                  layout="vertical"
+                  margin={{ top: 5, right: 24, left: 0, bottom: 5 }}
+                  barCategoryGap="20%"
+                  accessibilityLayer
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal vertical />
+                  <XAxis
+                    type="number"
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => formatCurrency(v)}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    width={240}
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(v) =>
+                      v.length > 52 ? `${v.slice(0, 50)}…` : v
+                    }
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        labelFormatter={(_, payload) =>
+                          payload?.[0]?.payload?.name ?? ""
+                        }
+                        formatter={(value) =>
+                          typeof value === "number"
+                            ? formatCurrency(value)
+                            : String(value ?? "")
+                        }
+                      />
+                    }
+                  />
+                  <Bar
+                    dataKey="amount"
+                    fill="var(--color-amount)"
+                    radius={[0, 4, 4, 0]}
+                    maxBarSize={16}
+                  />
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No expenses for this month.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Tasnuva&apos;s spending by type
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Tasnuva&apos;s Purchases only for the selected month. Top 15
+              shown.
+            </p>
+          </CardHeader>
+          <CardContent>
+            {tasnuvasSpendingByType.length > 0 ? (
+              <ChartContainer
+                config={tasnuvasSpendingChartConfig}
+                className="h-[480px] w-full"
+              >
+                <BarChart
+                  data={tasnuvasSpendingByType}
+                  layout="vertical"
+                  margin={{ top: 5, right: 24, left: 0, bottom: 5 }}
+                  barCategoryGap="20%"
+                  accessibilityLayer
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal vertical />
+                  <XAxis
+                    type="number"
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => formatCurrency(v)}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    width={240}
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(v) =>
+                      v.length > 52 ? `${v.slice(0, 50)}…` : v
+                    }
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        labelFormatter={(_, payload) =>
+                          payload?.[0]?.payload?.name ?? ""
+                        }
+                        formatter={(value) =>
+                          typeof value === "number"
+                            ? formatCurrency(value)
+                            : String(value ?? "")
+                        }
+                      />
+                    }
+                  />
+                  <Bar
+                    dataKey="amount"
+                    fill="var(--color-amount)"
+                    radius={[0, 4, 4, 0]}
+                    maxBarSize={16}
+                  />
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No expenses for this month.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <h2 className="text-lg font-semibold text-foreground pt-4">By month</h2>
       <Card>
         <CardHeader>
           <CardTitle>Monthly breakdown</CardTitle>

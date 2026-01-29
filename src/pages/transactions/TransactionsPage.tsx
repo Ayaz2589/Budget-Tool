@@ -14,6 +14,7 @@ import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -272,18 +273,19 @@ export function TransactionsPage() {
         <CardHeader className="shrink-0">
           <CardTitle>{t("transactions.expenses")}</CardTitle>
           <CardDescription>{t("transactions.filterAndEdit")}</CardDescription>
+          <CardAction>
+            <TransactionsToolbar
+              onOpenFilters={() => setFiltersPopupOpen(true)}
+              onAddTransaction={() => setAddTransactionOpen(true)}
+              hasActiveFilters={hasActiveFilters}
+              showSync={!!(isSignedIn && spreadsheetId)}
+              syncStatus={syncStatus}
+              onSync={() => setSyncConfirmOpen(true)}
+              t={t}
+            />
+          </CardAction>
         </CardHeader>
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-4">
-          <TransactionsToolbar
-            onOpenFilters={() => setFiltersPopupOpen(true)}
-            onAddTransaction={() => setAddTransactionOpen(true)}
-            hasActiveFilters={hasActiveFilters}
-            showSync={!!(isSignedIn && spreadsheetId)}
-            syncStatus={syncStatus}
-            onSync={() => setSyncConfirmOpen(true)}
-            t={t}
-          />
-
           <SyncConfirmDialog
             open={syncConfirmOpen}
             onOpenChange={setSyncConfirmOpen}

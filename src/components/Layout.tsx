@@ -308,7 +308,7 @@ export function Layout() {
       <Dialog open={moreOpen} onOpenChange={setMoreOpen}>
         <DialogContent
           showCloseButton={true}
-          className="fixed bottom-0 left-0 right-0 top-auto z-50 max-h-[85vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
+          className="fixed bottom-0 left-0 right-0 top-auto z-50 w-full max-w-full max-h-[85vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
         >
           <DialogTitle className="sr-only">{t("layout.more")}</DialogTitle>
           <div className="overflow-y-auto overscroll-contain p-4 pb-8 flex flex-col gap-1">

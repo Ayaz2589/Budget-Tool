@@ -45,7 +45,7 @@ export function ExpenseActionsDialog({
     <Dialog open={expense !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         showCloseButton={true}
-        className="fixed bottom-0 left-0 right-0 top-auto z-50 max-h-[85vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
+        className="fixed bottom-0 left-0 right-0 top-auto z-50 w-full max-w-full max-h-[85vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
       >
         <DialogHeader className="p-4 pb-2">
           <DialogTitle className="text-left truncate pr-8">

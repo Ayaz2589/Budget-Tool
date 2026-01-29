@@ -29,7 +29,7 @@ export function TransactionsToolbar({
       : t("transactions.syncToSheets");
 
   return (
-    <div className="flex items-center justify-between gap-2 shrink-0">
+    <div className="flex items-center justify-between md:justify-end gap-2 shrink-0">
       <div className="flex items-center gap-2">
         <Button
           variant="outline"

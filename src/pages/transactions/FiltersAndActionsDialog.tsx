@@ -106,7 +106,7 @@ export function FiltersAndActionsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={true}
-        className="fixed bottom-0 left-0 right-0 top-auto z-50 max-h-[85vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom md:top-1/2 md:left-1/2 md:right-auto md:bottom-auto md:max-h-[90vh] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border md:max-w-2xl md:overflow-y-auto md:p-6"
+        className="fixed bottom-0 left-0 right-0 top-auto z-50 w-full max-w-full max-h-[85vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom md:top-1/2 md:left-1/2 md:right-auto md:bottom-auto md:max-h-[90vh] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border md:max-w-2xl md:overflow-y-auto md:p-6"
       >
         <DialogHeader className="px-4 pt-4 pb-2 md:px-0 md:pt-0 md:pb-0">
           <DialogTitle>{t("transactions.filtersActionsTitle")}</DialogTitle>

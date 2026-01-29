@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { useRules } from "@/context/RulesContext";
@@ -65,16 +66,17 @@ import { formatCurrency } from "@/lib/format";
 
 const SOURCES = ["all", "amex", "chase", "apple", "manual", "td"] as const;
 
-const SOURCE_LABELS: Record<ExpenseSource | "all", string> = {
-  all: "All",
-  amex: "American Express",
-  chase: "Chase",
-  apple: "Apple Card",
-  manual: "Manual",
-  td: "Debit (TD Bank)",
+const SOURCE_LABEL_KEYS: Record<ExpenseSource | "all", string> = {
+  all: "common.all",
+  amex: "transactions.sourceAmex",
+  chase: "transactions.sourceChase",
+  apple: "transactions.sourceApple",
+  manual: "transactions.sourceManual",
+  td: "transactions.sourceTd",
 };
 
 export function TransactionsPage() {
+  const { t } = useTranslation();
   const {
     expenses,
     income,
@@ -296,13 +298,13 @@ export function TransactionsPage() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <h1 className="text-2xl font-semibold shrink-0 mb-4">Transactions</h1>
+      <h1 className="text-2xl font-semibold shrink-0 mb-4">
+        {t("transactions.title")}
+      </h1>
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
         <CardHeader className="shrink-0">
-          <CardTitle>Expenses</CardTitle>
-          <CardDescription>
-            Filter and edit categories. Re-apply rules to uncategorized rows.
-          </CardDescription>
+          <CardTitle>{t("transactions.expenses")}</CardTitle>
+          <CardDescription>{t("transactions.filterAndEdit")}</CardDescription>
         </CardHeader>
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-4">
           <div className="flex items-center justify-between gap-2 shrink-0">
@@ -313,10 +315,10 @@ export function TransactionsPage() {
                 className="gap-2"
               >
                 <SlidersHorizontal className="size-4" />
-                Filters & actions
+                {t("common.filtersAndActions")}
                 {hasActiveFilters && (
                   <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium">
-                    active
+                    {t("common.active")}
                   </span>
                 )}
               </Button>
@@ -326,7 +328,7 @@ export function TransactionsPage() {
                 className="gap-1.5"
               >
                 <Plus className="size-4" />
-                Add
+                {t("common.add")}
               </Button>
             </div>
             {isSignedIn && spreadsheetId && (
@@ -340,7 +342,9 @@ export function TransactionsPage() {
                 <RefreshCw
                   className={`size-4 ${syncStatus === "syncing" ? "animate-spin" : ""}`}
                 />
-                {syncStatus === "syncing" ? "Syncing..." : "Sync to Sheets"}
+                {syncStatus === "syncing"
+                  ? t("transactions.syncing")
+                  : t("transactions.syncToSheets")}
               </Button>
             )}
           </div>
@@ -348,11 +352,9 @@ export function TransactionsPage() {
           <Dialog open={syncConfirmOpen} onOpenChange={setSyncConfirmOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Sync to Google Sheets?</DialogTitle>
+                <DialogTitle>{t("transactions.syncConfirmTitle")}</DialogTitle>
                 <DialogDescription>
-                  This will overwrite your spreadsheet with the app&apos;s
-                  current expenses, income, and totals. Your sheet data will be
-                  replaced. This cannot be undone.
+                  {t("transactions.syncConfirmDesc")}
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
@@ -360,7 +362,7 @@ export function TransactionsPage() {
                   variant="outline"
                   onClick={() => setSyncConfirmOpen(false)}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
                 <Button
                   onClick={() => {
@@ -368,7 +370,7 @@ export function TransactionsPage() {
                     syncToSheets();
                   }}
                 >
-                  Sync to Google Sheets
+                  {t("transactions.syncToGoogleSheets")}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -377,17 +379,21 @@ export function TransactionsPage() {
           <Dialog open={filtersPopupOpen} onOpenChange={setFiltersPopupOpen}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Filters & actions</DialogTitle>
+                <DialogTitle>
+                  {t("transactions.filtersActionsTitle")}
+                </DialogTitle>
                 <DialogDescription>
-                  Filter transactions, add new ones, or perform bulk actions.
+                  {t("transactions.filtersActionsDesc")}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-6 py-4">
                 <div>
-                  <h3 className="text-sm font-medium mb-3">Filters</h3>
+                  <h3 className="text-sm font-medium mb-3">
+                    {t("common.filters")}
+                  </h3>
                   <div className="flex flex-wrap gap-4 items-end">
                     <div className="space-y-2">
-                      <Label>Month</Label>
+                      <Label>{t("transactions.month")}</Label>
                       <Input
                         type="month"
                         value={monthFilter}
@@ -407,14 +413,14 @@ export function TransactionsPage() {
                         <SelectContent>
                           {SOURCES.map((s) => (
                             <SelectItem key={s} value={s}>
-                              {SOURCE_LABELS[s]}
+                              {t(SOURCE_LABEL_KEYS[s])}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Category</Label>
+                      <Label>{t("common.category")}</Label>
                       <Select
                         value={categoryFilter || "_"}
                         onValueChange={(v) =>
@@ -422,13 +428,13 @@ export function TransactionsPage() {
                         }
                       >
                         <SelectTrigger className="w-[200px]">
-                          <SelectValue placeholder="All" />
+                          <SelectValue placeholder={t("common.all")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="_">All</SelectItem>
+                          <SelectItem value="_">{t("common.all")}</SelectItem>
                           <SelectItem value="__uncategorized">
                             <CategoryOption
-                              name="Uncategorized"
+                              name={t("common.uncategorized")}
                               type="expense"
                             />
                           </SelectItem>
@@ -441,13 +447,13 @@ export function TransactionsPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Card member</Label>
+                      <Label>{t("common.cardMember")}</Label>
                       <Select
                         value={cardMemberFilter}
                         onValueChange={setCardMemberFilter}
                       >
                         <SelectTrigger className="w-[160px]">
-                          <SelectValue placeholder="All" />
+                          <SelectValue placeholder={t("common.all")} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All</SelectItem>
@@ -460,9 +466,9 @@ export function TransactionsPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Search description</Label>
+                      <Label>{t("transactions.searchDescription")}</Label>
                       <Input
-                        placeholder="Filter by description..."
+                        placeholder={t("transactions.filterByDescription")}
                         value={searchFilter}
                         onChange={(e) => setSearchFilter(e.target.value)}
                         className="w-[200px]"
@@ -470,13 +476,15 @@ export function TransactionsPage() {
                     </div>
                     {hasActiveFilters && (
                       <Button variant="ghost" size="sm" onClick={clearFilters}>
-                        Clear filters
+                        {t("common.clearFilters")}
                       </Button>
                     )}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium mb-3">Actions</h3>
+                  <h3 className="text-sm font-medium mb-3">
+                    {t("common.actions")}
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     <Button
                       onClick={() => {
@@ -485,15 +493,17 @@ export function TransactionsPage() {
                       }}
                     >
                       <Plus className="size-4" />
-                      Add transaction
+                      {t("transactions.addTransaction")}
                     </Button>
                     {uncategorizedCount > 0 && (
                       <Button variant="outline" onClick={reapplyRules}>
-                        Re-apply rules ({uncategorizedCount} uncategorized)
+                        {t("transactions.reapplyRules", {
+                          count: uncategorizedCount,
+                        })}
                       </Button>
                     )}
                     <Button variant="outline" onClick={cleanAllDescriptions}>
-                      Clean descriptions
+                      {t("transactions.cleanDescriptions")}
                     </Button>
                     <Button
                       variant="outline"
@@ -507,7 +517,7 @@ export function TransactionsPage() {
                       }
                     >
                       <FileDown className="size-4" />
-                      Download PDF
+                      {t("transactions.downloadPdf")}
                     </Button>
                     {filtered.length > 0 && (
                       <Button
@@ -515,7 +525,9 @@ export function TransactionsPage() {
                         size="sm"
                         onClick={selectAllFiltered}
                       >
-                        {allFilteredSelected ? "Deselect all" : "Select all"}
+                        {allFilteredSelected
+                          ? t("common.deselectAll")
+                          : t("common.selectAll")}
                       </Button>
                     )}
                     {someSelected && (
@@ -525,14 +537,16 @@ export function TransactionsPage() {
                           size="sm"
                           onClick={() => setDeleteSelectedOpen(true)}
                         >
-                          Delete selected ({selectedIds.size})
+                          {t("transactions.deleteSelected", {
+                            count: selectedIds.size,
+                          })}
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={clearSelection}
                         >
-                          Clear selection
+                          {t("common.clearSelection")}
                         </Button>
                       </>
                     )}
@@ -542,7 +556,7 @@ export function TransactionsPage() {
                         size="sm"
                         onClick={() => setDeleteAllOpen(true)}
                       >
-                        Delete all
+                        {t("transactions.deleteAll")}
                       </Button>
                     )}
                   </div>
@@ -553,7 +567,7 @@ export function TransactionsPage() {
           <div className="flex-1 min-h-0 overflow-auto border rounded-md">
             {filtered.length === 0 ? (
               <div className="text-center text-muted-foreground py-12 px-4">
-                No transactions. Import a CSV or add a manual transaction.
+                {t("transactions.noTransactions")}
               </div>
             ) : (
               <Accordion
@@ -573,8 +587,13 @@ export function TransactionsPage() {
                         {getMonthLabel(monthKey)}
                       </span>
                       <span className="text-muted-foreground font-normal ml-2">
-                        ({monthExpenses.length} transaction
-                        {monthExpenses.length === 1 ? "" : "s"})
+                        (
+                        {monthExpenses.length === 1
+                          ? t("transactions.transaction_one", { count: 1 })
+                          : t("transactions.transaction_other", {
+                              count: monthExpenses.length,
+                            })}
+                        )
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="px-0 pb-0">
@@ -606,17 +625,19 @@ export function TransactionsPage() {
                                     return next;
                                   });
                                 }}
-                                aria-label="Select all in month"
+                                aria-label={t("common.selectAllInMonth")}
                               />
                             </TableHead>
-                            <TableHead className="w-[100px]">ID</TableHead>
+                            <TableHead className="w-[100px]">
+                              {t("common.id")}
+                            </TableHead>
                             <TableHead>
                               <button
                                 type="button"
                                 onClick={() => toggleSort("date")}
                                 className="flex items-center gap-1 hover:text-foreground"
                               >
-                                Date
+                                {t("common.date")}
                                 <SortIcon column="date" />
                               </button>
                             </TableHead>
@@ -626,7 +647,7 @@ export function TransactionsPage() {
                                 onClick={() => toggleSort("description")}
                                 className="flex items-center gap-1 hover:text-foreground"
                               >
-                                Description
+                                {t("common.description")}
                                 <SortIcon column="description" />
                               </button>
                             </TableHead>
@@ -636,7 +657,7 @@ export function TransactionsPage() {
                                 onClick={() => toggleSort("amount")}
                                 className="flex items-center gap-1 hover:text-foreground"
                               >
-                                Amount
+                                {t("common.amount")}
                                 <SortIcon column="amount" />
                               </button>
                             </TableHead>
@@ -646,7 +667,7 @@ export function TransactionsPage() {
                                 onClick={() => toggleSort("source")}
                                 className="flex items-center gap-1 hover:text-foreground"
                               >
-                                Source
+                                {t("common.source")}
                                 <SortIcon column="source" />
                               </button>
                             </TableHead>
@@ -656,7 +677,7 @@ export function TransactionsPage() {
                                 onClick={() => toggleSort("cardMember")}
                                 className="flex items-center gap-1 hover:text-foreground"
                               >
-                                Card Member
+                                {t("common.cardMember")}
                                 <SortIcon column="cardMember" />
                               </button>
                             </TableHead>
@@ -666,11 +687,13 @@ export function TransactionsPage() {
                                 onClick={() => toggleSort("category")}
                                 className="flex items-center gap-1 hover:text-foreground"
                               >
-                                Category
+                                {t("common.category")}
                                 <SortIcon column="category" />
                               </button>
                             </TableHead>
-                            <TableHead className="w-[80px]">Actions</TableHead>
+                            <TableHead className="w-[80px]">
+                              {t("common.actions")}
+                            </TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -702,7 +725,7 @@ export function TransactionsPage() {
                               </TableCell>
                               <TableCell>{formatCurrency(e.amount)}</TableCell>
                               <TableCell className="text-muted-foreground">
-                                {SOURCE_LABELS[e.source]}
+                                {t(SOURCE_LABEL_KEYS[e.source])}
                               </TableCell>
                               <TableCell className="text-muted-foreground">
                                 {e.cardMember ?? "—"}
@@ -744,7 +767,7 @@ export function TransactionsPage() {
                                   onClick={() => setDeleteOneExpense(e)}
                                   className="text-destructive hover:text-destructive"
                                 >
-                                  Delete
+                                  {t("common.delete")}
                                 </Button>
                               </TableCell>
                             </TableRow>
@@ -771,26 +794,27 @@ export function TransactionsPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete this transaction?</DialogTitle>
+            <DialogTitle>{t("transactions.deleteThisTitle")}</DialogTitle>
             <DialogDescription>
-              {deleteOneExpense ? (
-                <>
-                  <span className="font-medium">{deleteOneExpense.date}</span>{" "}
-                  {deleteOneExpense.description} (
-                  {formatCurrency(deleteOneExpense.amount)}) will be removed.
-                  This cannot be undone.
-                </>
-              ) : (
-                "This transaction will be removed. This cannot be undone."
-              )}
+              {deleteOneExpense
+                ? t("transactions.deleteThisDesc", {
+                    date: deleteOneExpense.date,
+                    description: deleteOneExpense.description,
+                    amount: formatCurrency(deleteOneExpense.amount),
+                  })
+                : t("transactions.deleteThisDesc", {
+                    date: "",
+                    description: "",
+                    amount: "",
+                  })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteOneExpense(null)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button variant="destructive" onClick={handleDeleteOne}>
-              Delete
+              {t("common.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -799,10 +823,11 @@ export function TransactionsPage() {
       <Dialog open={deleteSelectedOpen} onOpenChange={setDeleteSelectedOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete selected transactions?</DialogTitle>
+            <DialogTitle>{t("transactions.deleteSelectedTitle")}</DialogTitle>
             <DialogDescription>
-              {selectedIds.size} transaction{selectedIds.size === 1 ? "" : "s"}{" "}
-              will be removed. This cannot be undone.
+              {t("transactions.deleteSelectedDesc", {
+                count: selectedIds.size,
+              })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -810,10 +835,12 @@ export function TransactionsPage() {
               variant="outline"
               onClick={() => setDeleteSelectedOpen(false)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button variant="destructive" onClick={handleDeleteSelected}>
-              Delete selected
+              {t("transactions.deleteSelected", {
+                count: selectedIds.size,
+              })}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -822,18 +849,17 @@ export function TransactionsPage() {
       <Dialog open={deleteAllOpen} onOpenChange={setDeleteAllOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete all transactions?</DialogTitle>
+            <DialogTitle>{t("transactions.deleteAllTitle")}</DialogTitle>
             <DialogDescription>
-              All {expenses.length} expense{expenses.length === 1 ? "" : "s"}{" "}
-              will be removed. This cannot be undone.
+              {t("transactions.deleteAllDesc", { count: expenses.length })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteAllOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button variant="destructive" onClick={handleDeleteAll}>
-              Delete all
+              {t("transactions.deleteAll")}
             </Button>
           </DialogFooter>
         </DialogContent>

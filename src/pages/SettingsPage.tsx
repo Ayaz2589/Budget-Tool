@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { extractSpreadsheetId } from "@/lib/googleSheets";
@@ -74,6 +75,7 @@ export function SettingsPage() {
     if (list.length > 0) setIncomeCategories(list);
   };
 
+  const { t } = useTranslation();
   const handleSetSpreadsheetId = () => {
     const trimmed = sheetIdInput.trim();
     if (trimmed) {
@@ -86,15 +88,12 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Settings</h1>
+      <h1 className="text-2xl font-semibold">{t("settings.title")}</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Google Sheets</CardTitle>
-          <CardDescription>
-            Connect your Google account and sync expenses, income, and totals to
-            a spreadsheet.
-          </CardDescription>
+          <CardTitle>{t("settings.googleSheets")}</CardTitle>
+          <CardDescription>{t("settings.googleSheetsDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {!isSignedIn ? (

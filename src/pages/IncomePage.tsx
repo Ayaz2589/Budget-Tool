@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import type { Income, DebtOwner } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -99,6 +100,7 @@ export function IncomePage() {
   const [editRecurringDay, setEditRecurringDay] = useState("15");
   const [editRecurringStartDate, setEditRecurringStartDate] = useState("");
 
+  const { t } = useTranslation();
   const sortedIncome = [...income].sort((a, b) => b.date.localeCompare(a.date));
 
   const handleAdd = (e: React.FormEvent) => {
@@ -218,13 +220,11 @@ export function IncomePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Income</h1>
+      <h1 className="text-2xl font-semibold">{t("income.title")}</h1>
       <Card>
         <CardHeader>
-          <CardTitle>Add income</CardTitle>
-          <CardDescription>
-            Paycheck, rent from tenants, bonus, etc.
-          </CardDescription>
+          <CardTitle>{t("income.addIncome")}</CardTitle>
+          <CardDescription>{t("income.addIncomeDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Dialog open={addOpen} onOpenChange={setAddOpen}>

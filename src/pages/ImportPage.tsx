@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { useRules } from "@/context/RulesContext";
 import { parseCsv, parseChasePdfFromText, type CsvSource } from "@/lib/parsers";
@@ -229,6 +230,7 @@ export function ImportPage() {
     );
   };
 
+  const { t } = useTranslation();
   const addToTransactions = () => {
     addExpenses(previewExpenses);
     if (previewIncome.length > 0) {
@@ -252,20 +254,11 @@ export function ImportPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Import</h1>
+      <h1 className="text-2xl font-semibold">{t("import.title")}</h1>
       <Card>
         <CardHeader>
-          <CardTitle>Upload statement</CardTitle>
-          <CardDescription>
-            Select your bank or &quot;Exported PDF (re-import)&quot; from the
-            dropdown, then choose a CSV file (Amex, Apple), PDF statement
-            (Chase), or a previously downloaded transactions PDF. CSV and Chase
-            imports skip transactions that already exist (same date and amount).
-            Re-imported PDFs skip by ID. After reviewing the preview, click
-            &quot;Add to transactions&quot; or &quot;Add all&quot; to save—they
-            persist across refreshes and appear on the Transactions and Income
-            pages.
-          </CardDescription>
+          <CardTitle>{t("import.uploadStatement")}</CardTitle>
+          <CardDescription>{t("import.uploadStatementDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2">

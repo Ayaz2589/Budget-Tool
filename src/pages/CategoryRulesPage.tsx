@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useRules } from "@/context/RulesContext";
 import { useBudget } from "@/context/BudgetContext";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ export function CategoryRulesPage() {
     expenseCategories[0] ?? "My Purchase",
   );
 
+  const { t } = useTranslation();
   const expenseRules = rules.filter((r) => r.type === "expense");
 
   const handleAdd = (e: React.FormEvent) => {
@@ -64,16 +66,12 @@ export function CategoryRulesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Category rules</h1>
+      <h1 className="text-2xl font-semibold">{t("rules.title")}</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Expense rules</CardTitle>
-          <CardDescription>
-            Built-in rules run first (cannot be removed). Your rules are matched
-            next; first match sets the category. Pattern is matched
-            case-insensitively against the transaction description.
-          </CardDescription>
+          <CardTitle>{t("rules.expenseRules")}</CardTitle>
+          <CardDescription>{t("rules.expenseRulesDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Dialog open={open} onOpenChange={setOpen}>

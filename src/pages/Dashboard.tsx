@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { getDebtBalance } from "@/lib/debtUtils";
 import {
@@ -49,6 +50,7 @@ import { DebtSection } from "@/pages/dashboard/DebtSection";
 import { ByMonthSection } from "@/pages/dashboard/ByMonthSection";
 
 export function Dashboard() {
+  const { t } = useTranslation();
   const { expenses, income, iOweNova, debts, debtPayments } = useBudget();
   const months = computeAllTotals({
     expenses,
@@ -96,15 +98,15 @@ export function Dashboard() {
   // Selected month summary bar chart data (Earned, Spent, Saved)
   const summaryBarConfig = {
     earned: {
-      label: "Earned",
+      label: t("dashboard.earned"),
       theme: { light: "oklch(0.55 0.2 160)", dark: "oklch(0.7 0.18 165)" },
     },
     spent: {
-      label: "Spent",
+      label: t("dashboard.spent"),
       theme: { light: "oklch(0.72 0.18 55)", dark: "oklch(0.78 0.15 55)" },
     },
     saved: {
-      label: "Saved",
+      label: t("dashboard.saved"),
       theme: { light: "oklch(0.6 0.2 160)", dark: "oklch(0.65 0.18 165)" },
     },
   } satisfies ChartConfig;
@@ -112,22 +114,22 @@ export function Dashboard() {
   const summaryBarData = useMemo(
     () => [
       {
-        metric: "Earned",
+        metric: t("dashboard.earned"),
         value: selectedMonth.totalEarned,
         fill: "var(--color-earned)",
       },
       {
-        metric: "Spent",
+        metric: t("dashboard.spent"),
         value: selectedMonth.totalSpent,
         fill: "var(--color-spent)",
       },
       {
-        metric: "Saved",
+        metric: t("dashboard.saved"),
         value: selectedMonth.totalSaved,
         fill: "var(--color-saved)",
       },
     ],
-    [selectedMonth],
+    [selectedMonth, t],
   );
 
   // Income by person, stacked by type (Rent, Paycheck, Bonus, Other, etc.) for selected month
@@ -338,12 +340,12 @@ export function Dashboard() {
     const totalPaidOff = debtPayments.reduce((sum, p) => sum + p.amount, 0);
     const chartData = [
       {
-        metric: "Remaining balance",
+        metric: t("dashboardDebt.remaining"),
         value: totalRemaining,
         fill: "var(--color-remaining)",
       },
       {
-        metric: "Paid off",
+        metric: t("dashboardDebt.paidOff"),
         value: totalPaidOff,
         fill: "var(--color-paidOff)",
       },
@@ -355,14 +357,14 @@ export function Dashboard() {
       chartData,
       hasDebtData,
     };
-  }, [debts, debtPayments]);
+  }, [debts, debtPayments, t]);
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
       <div className="flex flex-wrap items-end gap-4">
         <div className="space-y-2">
-          <Label>View month</Label>
+          <Label>{t("dashboard.viewMonth")}</Label>
           <Select value={selectedMonthKey} onValueChange={setSelectedMonthKey}>
             <SelectTrigger className="w-[200px]">
               <SelectValue />
@@ -371,7 +373,7 @@ export function Dashboard() {
               {monthOptions.map((key) => (
                 <SelectItem key={key} value={key}>
                   {getMonthLabel(key)}
-                  {key === currentMonthKey ? " (current)" : ""}
+                  {key === currentMonthKey ? ` (${t("common.current")})` : ""}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -379,9 +381,11 @@ export function Dashboard() {
         </div>
         <p className="text-muted-foreground text-sm pb-2">
           {isCurrentMonth
-            ? "Current month summary."
-            : `Showing ${getMonthLabel(selectedMonthKey)}.`}{" "}
-          Sync to Google Sheets from Settings.
+            ? t("dashboard.currentMonthSummary")
+            : t("dashboard.showingMonth", {
+                month: getMonthLabel(selectedMonthKey),
+              })}{" "}
+          {t("dashboard.syncFromSettings")}
         </p>
       </div>
 
@@ -392,7 +396,7 @@ export function Dashboard() {
       >
         <AccordionItem value="summary">
           <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
-            Summary
+            {t("dashboard.summary")}
           </AccordionTrigger>
           <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
             <SummaryCards selectedMonth={selectedMonth} grand={grand} />
@@ -400,14 +404,14 @@ export function Dashboard() {
         </AccordionItem>
         <AccordionItem value="overview">
           <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
-            Overview
+            {t("dashboard.overview")}
           </AccordionTrigger>
           <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
             <div className="grid gap-4 lg:grid-cols-2">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Earned vs Spent vs Saved
+                    {t("dashboard.earnedVsSpentVsSaved")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -460,7 +464,7 @@ export function Dashboard() {
                     </ChartContainer>
                   ) : (
                     <p className="text-sm text-muted-foreground py-8 text-center">
-                      No data for this month.
+                      {t("dashboard.noDataForMonth")}
                     </p>
                   )}
                 </CardContent>
@@ -469,7 +473,7 @@ export function Dashboard() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Spending breakdown
+                    {t("dashboard.spendingBreakdown")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -525,7 +529,7 @@ export function Dashboard() {
                     </ChartContainer>
                   ) : (
                     <p className="text-sm text-muted-foreground py-8 text-center">
-                      No spending for this month.
+                      {t("dashboard.noSpendingForMonth")}
                     </p>
                   )}
                 </CardContent>
@@ -534,7 +538,7 @@ export function Dashboard() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Income breakdown
+                    {t("dashboard.incomeBreakdown")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -606,7 +610,7 @@ export function Dashboard() {
                     </ChartContainer>
                   ) : (
                     <p className="text-sm text-muted-foreground py-8 text-center">
-                      No income for this month.
+                      {t("dashboard.noIncomeForMonth")}
                     </p>
                   )}
                 </CardContent>
@@ -616,7 +620,7 @@ export function Dashboard() {
         </AccordionItem>
         <AccordionItem value="debt">
           <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
-            Debt
+            {t("dashboard.debt")}
           </AccordionTrigger>
           <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
             <DebtSection debtSummary={debtSummary} />
@@ -624,17 +628,16 @@ export function Dashboard() {
         </AccordionItem>
         <AccordionItem value="spending">
           <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
-            Spending by type
+            {t("dashboard.spendingByType")}
           </AccordionTrigger>
           <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  50/50 spend by type
+                  {t("dashboard.fiftyFiftySpendByType")}
                 </CardTitle>
                 <p className="text-xs text-muted-foreground">
-                  Expenses in 50/50 category for the selected month, grouped by
-                  description. Top 15 shown.
+                  {t("dashboard.fiftyFiftyExpensesInCategory")}
                 </p>
               </CardHeader>
               <CardContent>
@@ -696,7 +699,7 @@ export function Dashboard() {
                   </ChartContainer>
                 ) : (
                   <p className="text-sm text-muted-foreground py-8 text-center">
-                    No 50/50 expenses for this month.
+                    {t("dashboard.no5050Expenses")}
                   </p>
                 )}
               </CardContent>
@@ -706,11 +709,10 @@ export function Dashboard() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    My spending by type
+                    {t("dashboard.mySpendingByType")}
                   </CardTitle>
                   <p className="text-xs text-muted-foreground">
-                    Your expenses (excluding Tasnuva&apos;s Purchases, 50/50 &
-                    Mortgage) for the selected month. Top 15 shown.
+                    {t("dashboard.myExpensesExcluding")}
                   </p>
                 </CardHeader>
                 <CardContent>
@@ -772,7 +774,7 @@ export function Dashboard() {
                     </ChartContainer>
                   ) : (
                     <p className="text-sm text-muted-foreground py-8 text-center">
-                      No expenses for this month.
+                      {t("dashboard.noExpensesForMonth")}
                     </p>
                   )}
                 </CardContent>
@@ -781,11 +783,10 @@ export function Dashboard() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Tasnuva&apos;s spending by type
+                    {t("dashboard.tasnuvasSpendingByType")}
                   </CardTitle>
                   <p className="text-xs text-muted-foreground">
-                    Tasnuva&apos;s Purchases only for the selected month. Top 15
-                    shown.
+                    {t("dashboard.tasnuvasOnly")}
                   </p>
                 </CardHeader>
                 <CardContent>
@@ -847,7 +848,7 @@ export function Dashboard() {
                     </ChartContainer>
                   ) : (
                     <p className="text-sm text-muted-foreground py-8 text-center">
-                      No expenses for this month.
+                      {t("dashboard.noExpensesForMonth")}
                     </p>
                   )}
                 </CardContent>
@@ -857,7 +858,7 @@ export function Dashboard() {
         </AccordionItem>
         <AccordionItem value="bymonth">
           <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
-            By month
+            {t("dashboard.byMonth")}
           </AccordionTrigger>
           <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
             <ByMonthSection

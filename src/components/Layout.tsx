@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
@@ -13,9 +14,19 @@ import {
   LogIn,
   LogOut,
   Landmark,
+  Globe,
 } from "lucide-react";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { persistLocale } from "@/i18n";
+import i18n from "@/i18n";
 
 function Avatar({
   userProfile,
@@ -51,19 +62,26 @@ function Avatar({
 }
 
 const nav = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/transactions", label: "Transactions", icon: List },
-  { to: "/income", label: "Income", icon: Wallet },
-  { to: "/debt", label: "Debt", icon: CreditCard },
-  { to: "/mortgage", label: "Mortgage", icon: Home },
-  { to: "/import", label: "Import", icon: Upload },
-  { to: "/rules", label: "Category Rules", icon: ListOrdered },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/", labelKey: "nav.dashboard", icon: LayoutDashboard },
+  { to: "/transactions", labelKey: "nav.transactions", icon: List },
+  { to: "/income", labelKey: "nav.income", icon: Wallet },
+  { to: "/debt", labelKey: "nav.debt", icon: CreditCard },
+  { to: "/mortgage", labelKey: "nav.mortgage", icon: Home },
+  { to: "/import", labelKey: "nav.import", icon: Upload },
+  { to: "/rules", labelKey: "nav.categoryRules", icon: ListOrdered },
+  { to: "/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
 export function Layout() {
+  const { t } = useTranslation();
   const location = useLocation();
   const { isSignedIn, userProfile, signIn, signOut } = useGoogleAuth();
+  const currentLng = i18n.language;
+
+  const handleLanguageChange = (locale: string) => {
+    i18n.changeLanguage(locale);
+    persistLocale(locale);
+  };
 
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
@@ -75,10 +93,12 @@ export function Layout() {
           <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
             <Landmark className="size-5 text-primary" />
           </div>
-          <span className="font-semibold text-base tracking-tight">Ortho</span>
+          <span className="font-semibold text-base tracking-tight">
+            {t("layout.appName")}
+          </span>
         </Link>
         <div className="flex flex-1 md:flex-col gap-1 overflow-x-auto md:overflow-x-visible md:overflow-y-auto">
-          {nav.map(({ to, label, icon: Icon }) => (
+          {nav.map(({ to, labelKey, icon: Icon }) => (
             <Link
               key={to}
               to={to}
@@ -90,9 +110,26 @@ export function Layout() {
               )}
             >
               <Icon className="size-4" />
-              {label}
+              {t(labelKey)}
             </Link>
           ))}
+        </div>
+        <div className="shrink-0 border-t md:border-t pt-2 mt-2 flex flex-col gap-1">
+          <Select value={currentLng} onValueChange={handleLanguageChange}>
+            <SelectTrigger className="h-8 gap-1.5 px-2 text-xs font-medium text-muted-foreground border-0 bg-transparent shadow-none hover:bg-muted focus:ring-2 w-full justify-start">
+              <Globe className="size-3.5" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="max-h-[280px]!">
+              <SelectItem value="en">{t("common.english")}</SelectItem>
+              <SelectItem value="es">{t("common.spanish")}</SelectItem>
+              <SelectItem value="bn">{t("common.bangla")}</SelectItem>
+              <SelectItem value="zh">{t("common.chinese")}</SelectItem>
+              <SelectItem value="ko">{t("common.korean")}</SelectItem>
+              <SelectItem value="hi">{t("common.hindi")}</SelectItem>
+              <SelectItem value="ja">{t("common.japanese")}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="shrink-0 border-t md:border-t pt-2 mt-2 md:mt-auto flex flex-col gap-1">
           {isSignedIn ? (
@@ -112,7 +149,7 @@ export function Layout() {
                   <>
                     <div className="size-8 rounded-full shrink-0 bg-muted" />
                     <span className="text-sm text-muted-foreground truncate">
-                      Loading…
+                      {t("layout.loading")}
                     </span>
                   </>
                 )}
@@ -124,7 +161,7 @@ export function Layout() {
                 onClick={signOut}
               >
                 <LogOut className="size-4" />
-                Sign out
+                {t("layout.signOut")}
               </Button>
             </>
           ) : (
@@ -135,7 +172,7 @@ export function Layout() {
               onClick={signIn}
             >
               <LogIn className="size-4" />
-              Sign in with Google
+              {t("layout.signIn")}
             </Button>
           )}
         </div>

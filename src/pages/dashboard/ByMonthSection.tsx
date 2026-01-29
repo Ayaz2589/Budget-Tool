@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -19,22 +20,24 @@ import {
 import { formatCurrency, formatPercent } from "@/lib/format";
 import type { MonthTotals } from "@/lib/totals";
 
-const CHART_CONFIG = {
-  earned: {
-    label: "Total Earned",
-    theme: {
-      light: "oklch(0.55 0.2 160)",
-      dark: "oklch(0.7 0.18 165)",
+function getChartConfig(t: (key: string) => string) {
+  return {
+    earned: {
+      label: t("common.totalEarned"),
+      theme: {
+        light: "oklch(0.55 0.2 160)",
+        dark: "oklch(0.7 0.18 165)",
+      },
     },
-  },
-  spent: {
-    label: "Total Spent",
-    theme: {
-      light: "oklch(0.72 0.18 55)",
-      dark: "oklch(0.78 0.15 55)",
+    spent: {
+      label: t("common.totalSpent"),
+      theme: {
+        light: "oklch(0.72 0.18 55)",
+        dark: "oklch(0.78 0.15 55)",
+      },
     },
-  },
-} satisfies ChartConfig;
+  } satisfies ChartConfig;
+}
 
 interface ByMonthSectionProps {
   chartData: { month: string; earned: number; spent: number }[];
@@ -47,13 +50,15 @@ export function ByMonthSection({
   months,
   currentMonthKey,
 }: ByMonthSectionProps) {
+  const { t } = useTranslation();
+  const CHART_CONFIG = getChartConfig(t);
   return (
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Monthly breakdown</CardTitle>
+          <CardTitle>{t("dashboard.monthlyBreakdown")}</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Total earned vs total spent by month.
+            {t("dashboard.totalEarnedVsSpentByMonth")}
           </p>
         </CardHeader>
         <CardContent>
@@ -116,7 +121,7 @@ export function ByMonthSection({
             </ChartContainer>
           ) : (
             <p className="text-sm text-muted-foreground py-8 text-center">
-              No data yet. Add income or expenses to see the chart.
+              {t("dashboard.noDataYet")}
             </p>
           )}
         </CardContent>
@@ -124,9 +129,9 @@ export function ByMonthSection({
 
       <Card>
         <CardHeader>
-          <CardTitle>Spending by month</CardTitle>
+          <CardTitle>{t("dashboard.spendingByMonth")}</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Totals for each month. Current month is highlighted.
+            {t("dashboard.totalsPerMonth")}
           </p>
         </CardHeader>
         <CardContent>
@@ -134,14 +139,22 @@ export function ByMonthSection({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Month</TableHead>
-                  <TableHead className="text-right">Total Earned</TableHead>
-                  <TableHead className="text-right">Total Spent</TableHead>
+                  <TableHead>{t("common.month")}</TableHead>
                   <TableHead className="text-right">
-                    Spent w/o Mortgage
+                    {t("common.totalEarned")}
                   </TableHead>
-                  <TableHead className="text-right">Total Saved</TableHead>
-                  <TableHead className="text-right">Savings Rate</TableHead>
+                  <TableHead className="text-right">
+                    {t("common.totalSpent")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("common.spentWoMortgage")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("common.totalSaved")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("common.savingsRate")}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

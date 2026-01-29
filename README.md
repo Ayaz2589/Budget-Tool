@@ -55,6 +55,13 @@ bun run test:run  # run tests once
 
 Tests live in the **`test/`** directory, mirroring `src/`: `test/lib/` for lib unit tests, `test/components/` for component tests, and `test/pages/` for page tests. Setup runs from `test/setup.ts` (happy-dom + jest-dom matchers).
 
+## Translations
+
+The app supports **English (en)**, **Spanish (es)**, **Bangla (bn)**, **Chinese (zh)**, **Korean (ko)**, **Hindi (hi)**, and **Japanese (ja)**. Use the globe dropdown in the sidebar to switch language. The selected language is stored in `localStorage` under the key `ortho-locale` and is used on the next load.
+
+- **Strings**: Translation keys live in `src/locales/en.json` and `src/locales/es.json`, grouped by feature (e.g. `nav`, `layout`, `dashboard`, `transactions`).
+- **Adding a locale**: Add a new JSON file under `src/locales/` (e.g. `fr.json`) with the same key structure, register it in `src/i18n.ts` in the `resources` object and in the initial-language check, then add an option to the language Select in `Layout.tsx`.
+
 ## Architecture
 
 - **`src/lib/`**: Pure helpers where possible (formatting, totals, category rules, parsers, date repair, import dedup). I/O (Google Sheets, PDF export) is isolated in dedicated modules.

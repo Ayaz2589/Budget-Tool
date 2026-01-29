@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import type { Debt, DebtPayment } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -220,16 +221,14 @@ export function DebtPage() {
     setRecurringDebtId(null);
   };
 
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Debt</h1>
+      <h1 className="text-2xl font-semibold">{t("debt.title")}</h1>
       <Card>
         <CardHeader>
-          <CardTitle>Add debt</CardTitle>
-          <CardDescription>
-            Track a loan or debt (e.g. car loan, credit card). Then record
-            payments to see the balance go down.
-          </CardDescription>
+          <CardTitle>{t("debt.addDebt")}</CardTitle>
+          <CardDescription>{t("debt.addDebtDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Dialog open={addDebtOpen} onOpenChange={setAddDebtOpen}>

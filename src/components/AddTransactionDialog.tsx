@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import type { ExpenseSource } from "@/lib/types";
 import { CategoryOption } from "@/lib/categoryColors";
@@ -29,12 +30,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const SOURCE_LABELS: Record<ExpenseSource, string> = {
-  amex: "Amex",
-  chase: "Chase",
-  apple: "Apple",
-  manual: "Manual",
-  td: "TD",
+const SOURCE_KEYS: Record<ExpenseSource, string> = {
+  amex: "addTransaction.sourceAmex",
+  chase: "addTransaction.sourceChase",
+  apple: "addTransaction.sourceApple",
+  manual: "addTransaction.sourceManual",
+  td: "addTransaction.sourceTd",
 };
 
 interface TransactionRow {
@@ -68,6 +69,7 @@ export function AddTransactionDialog({
   open,
   onOpenChange,
 }: AddTransactionDialogProps) {
+  const { t } = useTranslation();
   const { expenses, addExpense, expenseCategories } = useBudget();
   const [rows, setRows] = useState<TransactionRow[]>(() => [defaultRow()]);
 
@@ -121,7 +123,7 @@ export function AddTransactionDialog({
       addExpense({
         date: row.date,
         amount: num,
-        description: row.description.trim() || "Manual transaction",
+        description: row.description.trim() || t("addTransaction.sourceManual"),
         category: row.category || "",
         source: row.source,
         cardMember: row.cardMember.trim() || undefined,
@@ -147,11 +149,12 @@ export function AddTransactionDialog({
       <DialogContent className="flex flex-col w-[94vw] max-w-[94vw]! h-[92vh] max-h-[92vh] p-4 gap-3 overflow-hidden">
         <DialogHeader className="shrink-0 gap-1">
           <DialogTitle className="text-lg">
-            New transaction{rows.length > 1 ? "s" : ""}
+            {rows.length > 1
+              ? t("addTransaction.newTransactions")
+              : t("addTransaction.newTransaction")}
           </DialogTitle>
           <DialogDescription className="text-xs">
-            One row per transaction. Copy a row to duplicate, then edit. Rows
-            with a valid amount are added on submit.
+            {t("addTransaction.dialogDesc")}
           </DialogDescription>
         </DialogHeader>
         <form
@@ -163,25 +166,25 @@ export function AddTransactionDialog({
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="w-20 py-1.5 text-xs font-medium">
-                    Source
+                    {t("addTransaction.source")}
                   </TableHead>
                   <TableHead className="w-28 py-1.5 text-xs font-medium">
-                    Date
+                    {t("addTransaction.date")}
                   </TableHead>
                   <TableHead className="w-24 py-1.5 text-xs font-medium">
-                    Amount
+                    {t("addTransaction.amount")}
                   </TableHead>
                   <TableHead className="min-w-[140px] py-1.5 text-xs font-medium">
-                    Description
+                    {t("addTransaction.description")}
                   </TableHead>
                   <TableHead className="w-36 py-1.5 text-xs font-medium">
-                    Category
+                    {t("addTransaction.category")}
                   </TableHead>
                   <TableHead className="w-28 py-1.5 text-xs font-medium">
-                    Member
+                    {t("addTransaction.member")}
                   </TableHead>
                   <TableHead className="w-20 py-1.5 text-right text-xs font-medium">
-                    Actions
+                    {t("addTransaction.actions")}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -202,17 +205,19 @@ export function AddTransactionDialog({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="manual">
-                            {SOURCE_LABELS.manual}
+                            {t(SOURCE_KEYS.manual)}
                           </SelectItem>
-                          <SelectItem value="td">{SOURCE_LABELS.td}</SelectItem>
+                          <SelectItem value="td">
+                            {t(SOURCE_KEYS.td)}
+                          </SelectItem>
                           <SelectItem value="amex">
-                            {SOURCE_LABELS.amex}
+                            {t(SOURCE_KEYS.amex)}
                           </SelectItem>
                           <SelectItem value="apple">
-                            {SOURCE_LABELS.apple}
+                            {t(SOURCE_KEYS.apple)}
                           </SelectItem>
                           <SelectItem value="chase">
-                            {SOURCE_LABELS.chase}
+                            {t(SOURCE_KEYS.chase)}
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -230,7 +235,7 @@ export function AddTransactionDialog({
                     <TableCell className="p-1 align-middle">
                       <Input
                         type="text"
-                        placeholder="0.00"
+                        placeholder={t("addTransaction.placeholderAmount")}
                         className={compactInput}
                         value={row.amount}
                         onChange={(e) =>
@@ -240,7 +245,7 @@ export function AddTransactionDialog({
                     </TableCell>
                     <TableCell className="p-1 align-middle min-w-[140px]">
                       <Input
-                        placeholder="e.g. Groceries"
+                        placeholder={t("addTransaction.placeholderDescription")}
                         className={compactInput}
                         value={row.description}
                         onChange={(e) =>
@@ -263,7 +268,7 @@ export function AddTransactionDialog({
                         <SelectContent>
                           <SelectItem value="_">
                             <CategoryOption
-                              name="Uncategorized"
+                              name={t("addTransaction.uncategorized")}
                               type="expense"
                             />
                           </SelectItem>
@@ -307,7 +312,7 @@ export function AddTransactionDialog({
                           size="icon"
                           className="size-7"
                           onClick={() => copyRow(index)}
-                          title="Copy row"
+                          title={t("addTransaction.copyRow")}
                         >
                           <Copy className="size-3.5" />
                         </Button>
@@ -318,7 +323,7 @@ export function AddTransactionDialog({
                             size="icon"
                             className="size-7 text-muted-foreground hover:text-destructive"
                             onClick={() => removeRow(index)}
-                            title="Remove row"
+                            title={t("addTransaction.removeRow")}
                           >
                             <Trash2 className="size-3.5" />
                           </Button>
@@ -339,10 +344,10 @@ export function AddTransactionDialog({
                 onClick={addRow}
               >
                 <Plus className="size-4" />
-                Add row
+                {t("addTransaction.addRow")}
               </Button>
               <span className="text-xs text-muted-foreground">
-                {validCount} with valid amount
+                {t("addTransaction.withValidAmount", { count: validCount })}
               </span>
             </div>
             <DialogFooter className="flex-row gap-2 p-0">
@@ -352,15 +357,16 @@ export function AddTransactionDialog({
                 size="sm"
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button type="submit" size="sm" disabled={validCount === 0}>
-                Add{" "}
                 {validCount === 0
-                  ? ""
+                  ? t("addTransaction.addTransaction")
                   : validCount === 1
-                    ? "transaction"
-                    : `${validCount} transactions`}
+                    ? t("addTransaction.addTransaction")
+                    : t("addTransaction.addTransactions", {
+                        count: validCount,
+                      })}
               </Button>
             </DialogFooter>
           </div>

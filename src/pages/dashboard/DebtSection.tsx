@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Cell } from "recharts";
@@ -16,39 +17,42 @@ export interface DebtSummaryData {
   hasDebtData: boolean;
 }
 
-const DEBT_CHART_CONFIG = {
-  remaining: {
-    label: "Remaining balance",
-    theme: {
-      light: "oklch(0.55 0.18 35)",
-      dark: "oklch(0.65 0.16 35)",
+function getDebtChartConfig(t: (key: string) => string) {
+  return {
+    remaining: {
+      label: t("dashboardDebt.remaining"),
+      theme: {
+        light: "oklch(0.55 0.18 35)",
+        dark: "oklch(0.65 0.16 35)",
+      },
     },
-  },
-  paidOff: {
-    label: "Paid off",
-    theme: {
-      light: "oklch(0.55 0.2 145)",
-      dark: "oklch(0.65 0.18 145)",
+    paidOff: {
+      label: t("dashboardDebt.paidOff"),
+      theme: {
+        light: "oklch(0.55 0.2 145)",
+        dark: "oklch(0.65 0.18 145)",
+      },
     },
-  },
-} satisfies ChartConfig;
+  } satisfies ChartConfig;
+}
 
 interface DebtSectionProps {
   debtSummary: DebtSummaryData;
 }
 
 export function DebtSection({ debtSummary }: DebtSectionProps) {
+  const { t } = useTranslation();
+  const DEBT_CHART_CONFIG = getDebtChartConfig(t);
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
-          Total debt: remaining vs paid off
+          {t("dashboardDebt.totalDebtRemainingVsPaid")}
         </CardTitle>
         <p className="text-xs text-muted-foreground">
-          Remaining balance (what you still owe) and total paid off across all
-          debts.{" "}
+          {t("dashboardDebt.remainingAndPaidOff")}{" "}
           <Link to="/debt" className="font-medium text-primary hover:underline">
-            View & manage debt →
+            {t("dashboardDebt.viewManageDebt")}
           </Link>
         </p>
       </CardHeader>
@@ -57,13 +61,13 @@ export function DebtSection({ debtSummary }: DebtSectionProps) {
           <>
             <div className="flex flex-wrap items-baseline gap-4 mb-4">
               <span className="text-sm">
-                Remaining:{" "}
+                {t("dashboardDebt.remaining")}:{" "}
                 <span className="font-semibold">
                   {formatCurrency(debtSummary.totalRemaining)}
                 </span>
               </span>
               <span className="text-sm">
-                Paid off:{" "}
+                {t("dashboardDebt.paidOff")}:{" "}
                 <span className="font-semibold text-green-600 dark:text-green-500">
                   {formatCurrency(debtSummary.totalPaidOff)}
                 </span>
@@ -114,12 +118,12 @@ export function DebtSection({ debtSummary }: DebtSectionProps) {
           </>
         ) : (
           <p className="text-sm text-muted-foreground py-6 text-center">
-            No debt yet.{" "}
+            {t("dashboardDebt.noDebtYet")}{" "}
             <Link
               to="/debt"
               className="font-medium text-primary hover:underline"
             >
-              Add a debt
+              {t("dashboardDebt.addDebt")}
             </Link>
           </p>
         )}

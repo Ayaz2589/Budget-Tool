@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
+import i18n from "@/i18n";
 import { useBudget } from "@/context/BudgetContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
 import {
@@ -107,11 +108,11 @@ export function GoogleAuthProviderFallback({
       setSpreadsheetId,
       syncToSheets: async () => {
         setSyncStatus("error");
-        setSyncErrorMessage("Google sign-in is not configured.");
+        setSyncErrorMessage(i18n.t("auth.googleNotConfigured"));
       },
       pullFromSheet: async () => {
         setSyncStatus("error");
-        setSyncErrorMessage("Google sign-in is not configured.");
+        setSyncErrorMessage(i18n.t("auth.googleNotConfigured"));
       },
       syncStatus,
       syncErrorMessage,
@@ -231,7 +232,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const syncToSheets = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
       setSyncStatus("error");
-      setSyncErrorMessage("Not signed in or no spreadsheet set.");
+      setSyncErrorMessage(i18n.t("auth.notSignedInOrNoSpreadsheet"));
       return;
     }
     setSyncStatus("syncing");
@@ -289,7 +290,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const pullFromSheet = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
       setSyncStatus("error");
-      setSyncErrorMessage("Not signed in or no spreadsheet set.");
+      setSyncErrorMessage(i18n.t("auth.notSignedInOrNoSpreadsheet"));
       return;
     }
     setSyncStatus("syncing");

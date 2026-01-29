@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import type { Expense } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -83,19 +84,18 @@ export function MortgagePage() {
     setDeleteConfirm(null);
   };
 
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold flex items-center gap-2">
         <Home className="size-6" />
-        Mortgage
+        {t("mortgage.title")}
       </h1>
       <Card>
         <CardHeader>
-          <CardTitle>Mortgage payments</CardTitle>
+          <CardTitle>{t("mortgage.mortgagePayments")}</CardTitle>
           <CardDescription>
-            Record mortgage payments here. They are excluded from the
-            Transactions list and included in spending totals (e.g. Dashboard
-            &quot;Spent w/o Mortgage&quot; excludes them).
+            {t("mortgage.mortgagePaymentsDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

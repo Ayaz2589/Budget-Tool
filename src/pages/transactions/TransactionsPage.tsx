@@ -198,19 +198,8 @@ export function TransactionsPage() {
     });
   }, []);
 
-  const selectAllFiltered = useCallback(() => {
-    setSelectedIds((prev) => {
-      const filteredIds = new Set(filtered.map((e) => e.id));
-      const allSelected =
-        filtered.length > 0 && filtered.every((e) => prev.has(e.id));
-      return allSelected ? new Set() : filteredIds;
-    });
-  }, [filtered]);
-
   const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
 
-  const allFilteredSelected =
-    filtered.length > 0 && filtered.every((e) => selectedIds.has(e.id));
   const someSelected = selectedIds.size > 0;
 
   const hasActiveFilters = Boolean(
@@ -310,14 +299,10 @@ export function TransactionsPage() {
             cardMemberOptions={cardMemberOptions}
             hasActiveFilters={hasActiveFilters}
             onClearFilters={clearFilters}
-            onAddTransaction={() => setAddTransactionOpen(true)}
             onReapplyRules={reapplyRules}
             uncategorizedCount={uncategorizedCount}
             onCleanDescriptions={cleanAllDescriptions}
             onDownloadPdf={handleDownloadPdf}
-            filteredCount={filtered.length}
-            allFilteredSelected={allFilteredSelected}
-            onSelectAllFiltered={selectAllFiltered}
             someSelected={someSelected}
             selectedCount={selectedIds.size}
             onDeleteSelected={() => setDeleteSelectedOpen(true)}

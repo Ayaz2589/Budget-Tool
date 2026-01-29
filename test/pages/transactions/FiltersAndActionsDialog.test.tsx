@@ -24,14 +24,10 @@ test("FiltersAndActionsDialog shows title and Filters section when open", () => 
       cardMemberOptions={["AYAZ UDDIN", "TASNUVA AHMED"]}
       hasActiveFilters={false}
       onClearFilters={() => {}}
-      onAddTransaction={() => {}}
       onReapplyRules={() => {}}
       uncategorizedCount={0}
       onCleanDescriptions={() => {}}
       onDownloadPdf={() => {}}
-      filteredCount={0}
-      allFilteredSelected={false}
-      onSelectAllFiltered={() => {}}
       someSelected={false}
       selectedCount={0}
       onDeleteSelected={() => {}}

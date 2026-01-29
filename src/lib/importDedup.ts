@@ -4,16 +4,11 @@ const AMOUNT_TOLERANCE = 0.01;
 
 /**
  * Returns true if two expenses represent the same transaction.
- * Matches on date, amount (with tolerance), description (case-insensitive),
- * and cardMember when both have it (for Amex/Apple).
+ * Matches on date, amount (with tolerance), and cardMember when both have it (for Amex/Apple).
  */
 export function isSameExpense(a: Expense, b: Expense): boolean {
   if (a.date !== b.date) return false;
   if (Math.abs(a.amount - b.amount) >= AMOUNT_TOLERANCE) return false;
-
-  const descA = (a.description || "").trim().toLowerCase();
-  const descB = (b.description || "").trim().toLowerCase();
-  if (descA !== descB) return false;
 
   const cardA = (a.cardMember || "").trim().toLowerCase();
   const cardB = (b.cardMember || "").trim().toLowerCase();

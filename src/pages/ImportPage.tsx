@@ -231,11 +231,11 @@ export function ImportPage() {
             Select your bank or &quot;Exported PDF (re-import)&quot; from the
             dropdown, then choose a CSV file (Amex, Apple), PDF statement
             (Chase), or a previously downloaded transactions PDF. CSV and Chase
-            imports skip transactions that already exist (same date, amount,
-            description). Re-imported PDFs skip by ID. After reviewing the
-            preview, click &quot;Add to transactions&quot; or &quot;Add
-            all&quot; to save—they persist across refreshes and appear on the
-            Transactions and Income pages.
+            imports skip transactions that already exist (same date and amount).
+            Re-imported PDFs skip by ID. After reviewing the preview, click
+            &quot;Add to transactions&quot; or &quot;Add all&quot; to save—they
+            persist across refreshes and appear on the Transactions and Income
+            pages.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-2">
@@ -314,7 +314,7 @@ export function ImportPage() {
             <CardDescription>
               {lastDetected === "pdf-export"
                 ? 'Transactions and income with existing IDs are omitted. Click "Add all" to add the rest.'
-                : 'Transactions matching existing entries (same date, amount, description) are skipped. Edit category per row if needed, then click "Add to transactions".'}
+                : 'Transactions matching existing entries (same date and amount) are skipped. Edit category per row if needed, then click "Add to transactions".'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

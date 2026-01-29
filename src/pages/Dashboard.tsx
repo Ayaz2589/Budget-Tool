@@ -24,16 +24,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
 
 function formatCurrency(n: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -90,6 +89,23 @@ export function Dashboard() {
       })),
     [months],
   );
+
+  const chartConfig = {
+    earned: {
+      label: "Total Earned",
+      theme: {
+        light: "oklch(0.55 0.2 160)",
+        dark: "oklch(0.7 0.18 165)",
+      },
+    },
+    spent: {
+      label: "Total Spent",
+      theme: {
+        light: "oklch(0.72 0.18 55)",
+        dark: "oklch(0.78 0.15 55)",
+      },
+    },
+  } satisfies ChartConfig;
 
   return (
     <div className="space-y-6">
@@ -238,55 +254,62 @@ export function Dashboard() {
         </CardHeader>
         <CardContent>
           {chartData.length > 0 ? (
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    className="stroke-muted"
-                  />
-                  <XAxis
-                    dataKey="month"
-                    className="text-xs"
-                    tick={{ fill: "hsl(var(--muted-foreground))" }}
-                  />
-                  <YAxis
-                    className="text-xs"
-                    tick={{ fill: "hsl(var(--muted-foreground))" }}
-                    tickFormatter={(v) =>
-                      v >= 1000 ? `$${v / 1000}k` : `$${v}`
-                    }
-                  />
-                  <Tooltip
-                    formatter={(value: number | undefined) =>
-                      value != null ? formatCurrency(value) : ""
-                    }
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "var(--radius)",
-                    }}
-                    labelStyle={{ color: "hsl(var(--foreground))" }}
-                  />
-                  <Legend />
-                  <Bar
-                    dataKey="earned"
-                    name="Total Earned"
-                    fill="hsl(var(--chart-1, 142 76% 36%))"
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <Bar
-                    dataKey="spent"
-                    name="Total Spent"
-                    fill="hsl(var(--chart-2, 221 83% 53%))"
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <ChartContainer config={chartConfig} className="h-[300px] w-full">
+              <BarChart
+                data={chartData}
+                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                accessibilityLayer
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(v) => (v >= 1000 ? `$${v / 1000}k` : `$${v}`)}
+                />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value, name, item: { fill?: string }) => (
+                        <div className="flex w-full flex-wrap items-center gap-2">
+                          <div
+                            className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                            style={{ backgroundColor: item?.fill }}
+                          />
+                          <div className="flex flex-1 justify-between leading-none items-center gap-2">
+                            <span className="text-muted-foreground">
+                              {chartConfig[name as keyof typeof chartConfig]
+                                ?.label ?? name}
+                            </span>
+                            <span className="text-foreground font-mono font-medium tabular-nums">
+                              {typeof value === "number"
+                                ? formatCurrency(value)
+                                : String(value ?? "")}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    />
+                  }
+                />
+                <ChartLegend content={<ChartLegendContent />} />
+                <Bar
+                  dataKey="earned"
+                  fill="var(--color-earned)"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="spent"
+                  fill="var(--color-spent)"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ChartContainer>
           ) : (
             <p className="text-sm text-muted-foreground py-8 text-center">
               No data yet. Add income or expenses to see the chart.

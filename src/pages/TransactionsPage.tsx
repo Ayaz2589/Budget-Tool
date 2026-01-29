@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { useBudget } from "@/context/BudgetContext";
+import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { useRules } from "@/context/RulesContext";
 import {
   applyRulesToExpenses,
@@ -57,7 +58,9 @@ import {
   ArrowUp,
   ArrowDown,
   SlidersHorizontal,
+  RefreshCw,
 } from "lucide-react";
+import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 
 function formatCurrency(n: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -81,12 +84,13 @@ export function TransactionsPage() {
   const {
     expenses,
     income,
-    addExpense,
     updateExpense,
     removeExpense,
     removeExpenses,
     expenseCategories,
   } = useBudget();
+  const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
+    useGoogleAuth();
   const { rules } = useRules();
   const [monthFilter, setMonthFilter] = useState<string>("");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
@@ -105,14 +109,7 @@ export function TransactionsPage() {
   );
   const [filtersPopupOpen, setFiltersPopupOpen] = useState(false);
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
-  const [addDate, setAddDate] = useState(() =>
-    new Date().toISOString().slice(0, 10),
-  );
-  const [addAmount, setAddAmount] = useState("");
-  const [addDescription, setAddDescription] = useState("");
-  const [addCategory, setAddCategory] = useState<string>("");
-  const [addSource, setAddSource] = useState<ExpenseSource>("manual");
-  const [addCardMember, setAddCardMember] = useState("");
+  const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
 
   const cardMemberOptions = useMemo(() => {
     const fromExpenses = [
@@ -299,27 +296,6 @@ export function TransactionsPage() {
     }
   }, [deleteOneExpense, removeExpense]);
 
-  const handleAddTransaction = (e: React.FormEvent) => {
-    e.preventDefault();
-    const num = parseFloat(addAmount.replace(/[$,]/g, ""));
-    if (Number.isNaN(num) || num <= 0) return;
-    addExpense({
-      date: addDate,
-      amount: num,
-      description: addDescription.trim() || "Manual transaction",
-      category: addCategory || "",
-      source: addSource,
-      cardMember: addCardMember.trim() || undefined,
-    });
-    setAddAmount("");
-    setAddDescription("");
-    setAddCategory("");
-    setAddSource("manual");
-    setAddCardMember("");
-    setAddDate(new Date().toISOString().slice(0, 10));
-    setAddTransactionOpen(false);
-  };
-
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
       <h1 className="text-2xl font-semibold shrink-0 mb-4">Transactions</h1>
@@ -331,29 +307,74 @@ export function TransactionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-4">
-          <div className="flex items-center gap-2 shrink-0">
-            <Button
-              variant="outline"
-              onClick={() => setFiltersPopupOpen(true)}
-              className="gap-2"
-            >
-              <SlidersHorizontal className="size-4" />
-              Filters & actions
-              {hasActiveFilters && (
-                <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium">
-                  active
-                </span>
-              )}
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => setAddTransactionOpen(true)}
-              className="gap-1.5"
-            >
-              <Plus className="size-4" />
-              Add
-            </Button>
+          <div className="flex items-center justify-between gap-2 shrink-0">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setFiltersPopupOpen(true)}
+                className="gap-2"
+              >
+                <SlidersHorizontal className="size-4" />
+                Filters & actions
+                {hasActiveFilters && (
+                  <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium">
+                    active
+                  </span>
+                )}
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setAddTransactionOpen(true)}
+                className="gap-1.5"
+              >
+                <Plus className="size-4" />
+                Add
+              </Button>
+            </div>
+            {isSignedIn && spreadsheetId && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setSyncConfirmOpen(true)}
+                disabled={syncStatus === "syncing"}
+                className="gap-1.5"
+              >
+                <RefreshCw
+                  className={`size-4 ${syncStatus === "syncing" ? "animate-spin" : ""}`}
+                />
+                {syncStatus === "syncing" ? "Syncing..." : "Sync to Sheets"}
+              </Button>
+            )}
           </div>
+
+          <Dialog open={syncConfirmOpen} onOpenChange={setSyncConfirmOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Sync to Google Sheets?</DialogTitle>
+                <DialogDescription>
+                  This will overwrite your spreadsheet with the app&apos;s
+                  current expenses, income, and totals. Your sheet data will be
+                  replaced. This cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setSyncConfirmOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    setSyncConfirmOpen(false);
+                    syncToSheets();
+                  }}
+                >
+                  Sync to Google Sheets
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           <Dialog open={filtersPopupOpen} onOpenChange={setFiltersPopupOpen}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -736,114 +757,10 @@ export function TransactionsPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={addTransactionOpen} onOpenChange={setAddTransactionOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>New transaction</DialogTitle>
-            <DialogDescription>
-              Add an expense manually. Choose the source (e.g. Manual or Debit
-              (TD Bank)).
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleAddTransaction} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Source</Label>
-              <Select
-                value={addSource}
-                onValueChange={(v) => setAddSource(v as ExpenseSource)}
-              >
-                <SelectTrigger className="w-full min-w-[200px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="manual">{SOURCE_LABELS.manual}</SelectItem>
-                  <SelectItem value="td">{SOURCE_LABELS.td}</SelectItem>
-                  <SelectItem value="amex">{SOURCE_LABELS.amex}</SelectItem>
-                  <SelectItem value="apple">{SOURCE_LABELS.apple}</SelectItem>
-                  <SelectItem value="chase">{SOURCE_LABELS.chase}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Date</Label>
-              <Input
-                type="date"
-                value={addDate}
-                onChange={(e) => setAddDate(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Amount</Label>
-              <Input
-                type="text"
-                placeholder="0.00"
-                value={addAmount}
-                onChange={(e) => setAddAmount(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Description</Label>
-              <Input
-                placeholder="e.g. Groceries, Gas"
-                value={addDescription}
-                onChange={(e) => setAddDescription(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Category</Label>
-              <Select
-                value={addCategory || "_"}
-                onValueChange={(v) => setAddCategory(v === "_" ? "" : v)}
-              >
-                <SelectTrigger className="w-full min-w-[200px]">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_">
-                    <CategoryOption name="Uncategorized" type="expense" />
-                  </SelectItem>
-                  {expenseCategories.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      <CategoryOption name={c} type="expense" />
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Card member (optional)</Label>
-              <Select
-                value={addCardMember || "_none"}
-                onValueChange={(v) => setAddCardMember(v === "_none" ? "" : v)}
-              >
-                <SelectTrigger className="w-full min-w-[200px]">
-                  <SelectValue placeholder="—" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_none">—</SelectItem>
-                  {cardMemberOptions.map((name) => (
-                    <SelectItem key={name} value={name}>
-                      {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setAddTransactionOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit">Add</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <AddTransactionDialog
+        open={addTransactionOpen}
+        onOpenChange={setAddTransactionOpen}
+      />
 
       <Dialog
         open={deleteOneExpense !== null}

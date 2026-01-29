@@ -43,7 +43,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Accordion,
@@ -51,7 +50,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Plus, FileDown, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  Plus,
+  FileDown,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  SlidersHorizontal,
+} from "lucide-react";
 
 function formatCurrency(n: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -97,6 +103,7 @@ export function TransactionsPage() {
   const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
     null,
   );
+  const [filtersPopupOpen, setFiltersPopupOpen] = useState(false);
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
   const [addDate, setAddDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
@@ -324,264 +331,202 @@ export function TransactionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-4 items-end">
-            <Dialog
-              open={addTransactionOpen}
-              onOpenChange={setAddTransactionOpen}
-            >
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="size-4" />
-                  Add transaction
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>New transaction</DialogTitle>
-                  <DialogDescription>
-                    Add an expense manually. Choose the source (e.g. Manual or
-                    Debit (TD Bank)).
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleAddTransaction} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Source</Label>
-                    <Select
-                      value={addSource}
-                      onValueChange={(v) => setAddSource(v as ExpenseSource)}
-                    >
-                      <SelectTrigger className="w-full min-w-[200px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="manual">
-                          {SOURCE_LABELS.manual}
-                        </SelectItem>
-                        <SelectItem value="td">{SOURCE_LABELS.td}</SelectItem>
-                        <SelectItem value="amex">
-                          {SOURCE_LABELS.amex}
-                        </SelectItem>
-                        <SelectItem value="apple">
-                          {SOURCE_LABELS.apple}
-                        </SelectItem>
-                        <SelectItem value="chase">
-                          {SOURCE_LABELS.chase}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Date</Label>
-                    <Input
-                      type="date"
-                      value={addDate}
-                      onChange={(e) => setAddDate(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Amount</Label>
-                    <Input
-                      type="text"
-                      placeholder="0.00"
-                      value={addAmount}
-                      onChange={(e) => setAddAmount(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Description</Label>
-                    <Input
-                      placeholder="e.g. Groceries, Gas"
-                      value={addDescription}
-                      onChange={(e) => setAddDescription(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Category</Label>
-                    <Select
-                      value={addCategory || "_"}
-                      onValueChange={(v) => setAddCategory(v === "_" ? "" : v)}
-                    >
-                      <SelectTrigger className="w-full min-w-[200px]">
-                        <SelectValue placeholder="Category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="_">
-                          <CategoryOption name="Uncategorized" type="expense" />
-                        </SelectItem>
-                        {expenseCategories.map((c) => (
-                          <SelectItem key={c} value={c}>
-                            <CategoryOption name={c} type="expense" />
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Card member (optional)</Label>
-                    <Select
-                      value={addCardMember || "_none"}
-                      onValueChange={(v) =>
-                        setAddCardMember(v === "_none" ? "" : v)
-                      }
-                    >
-                      <SelectTrigger className="w-full min-w-[200px]">
-                        <SelectValue placeholder="—" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="_none">—</SelectItem>
-                        {cardMemberOptions.map((name) => (
-                          <SelectItem key={name} value={name}>
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setAddTransactionOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">Add</Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
-            <div className="space-y-2">
-              <Label>Month</Label>
-              <Input
-                type="month"
-                value={monthFilter}
-                onChange={(e) => setMonthFilter(e.target.value)}
-                className="w-[160px]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Source</Label>
-              <Select value={sourceFilter} onValueChange={setSourceFilter}>
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {SOURCES.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {SOURCE_LABELS[s]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Category</Label>
-              <Select
-                value={categoryFilter || "_"}
-                onValueChange={(v) => setCategoryFilter(v === "_" ? "" : v)}
-              >
-                <SelectTrigger className="w-[220px] min-w-[200px]">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_">All</SelectItem>
-                  <SelectItem value="__uncategorized">
-                    <CategoryOption name="Uncategorized" type="expense" />
-                  </SelectItem>
-                  {expenseCategories.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      <CategoryOption name={c} type="expense" />
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Card member</Label>
-              <Select
-                value={cardMemberFilter}
-                onValueChange={setCardMemberFilter}
-              >
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  {cardMemberOptions.map((name) => (
-                    <SelectItem key={name} value={name}>
-                      {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Search description</Label>
-              <Input
-                placeholder="Filter by description..."
-                value={searchFilter}
-                onChange={(e) => setSearchFilter(e.target.value)}
-                className="w-[200px]"
-              />
-            </div>
-            {hasActiveFilters && (
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
-                Clear filters
-              </Button>
-            )}
-            {uncategorizedCount > 0 && (
-              <Button variant="outline" onClick={reapplyRules}>
-                Re-apply rules ({uncategorizedCount} uncategorized)
-              </Button>
-            )}
-            <Button variant="outline" onClick={cleanAllDescriptions}>
-              Clean descriptions
-            </Button>
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={() => downloadTransactionsAndIncomePdf(expenses, income)}
+              onClick={() => setFiltersPopupOpen(true)}
+              className="gap-2"
             >
-              <FileDown className="size-4" />
-              Download PDF
+              <SlidersHorizontal className="size-4" />
+              Filters & actions
+              {hasActiveFilters && (
+                <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium">
+                  active
+                </span>
+              )}
             </Button>
-            {filtered.length > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={selectAllFiltered}
-                className={someSelected ? undefined : ""}
-              >
-                {allFilteredSelected ? "Deselect all" : "Select all"}
-              </Button>
-            )}
-            {someSelected && (
-              <>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setDeleteSelectedOpen(true)}
-                >
-                  Delete selected ({selectedIds.size})
-                </Button>
-                <Button variant="ghost" size="sm" onClick={clearSelection}>
-                  Clear selection
-                </Button>
-              </>
-            )}
-            {expenses.length > 0 && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setDeleteAllOpen(true)}
-                className="ml-auto"
-              >
-                Delete all
-              </Button>
-            )}
+            <Button
+              size="sm"
+              onClick={() => setAddTransactionOpen(true)}
+              className="gap-1.5"
+            >
+              <Plus className="size-4" />
+              Add
+            </Button>
           </div>
-          <div className="overflow-x-auto max-h-[60vh] overflow-y-auto border rounded-md">
+
+          <Dialog open={filtersPopupOpen} onOpenChange={setFiltersPopupOpen}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Filters & actions</DialogTitle>
+                <DialogDescription>
+                  Filter transactions, add new ones, or perform bulk actions.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-6 py-4">
+                <div>
+                  <h3 className="text-sm font-medium mb-3">Filters</h3>
+                  <div className="flex flex-wrap gap-4 items-end">
+                    <div className="space-y-2">
+                      <Label>Month</Label>
+                      <Input
+                        type="month"
+                        value={monthFilter}
+                        onChange={(e) => setMonthFilter(e.target.value)}
+                        className="w-[160px]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Source</Label>
+                      <Select
+                        value={sourceFilter}
+                        onValueChange={setSourceFilter}
+                      >
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SOURCES.map((s) => (
+                            <SelectItem key={s} value={s}>
+                              {SOURCE_LABELS[s]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Category</Label>
+                      <Select
+                        value={categoryFilter || "_"}
+                        onValueChange={(v) =>
+                          setCategoryFilter(v === "_" ? "" : v)
+                        }
+                      >
+                        <SelectTrigger className="w-[200px]">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="_">All</SelectItem>
+                          <SelectItem value="__uncategorized">
+                            <CategoryOption
+                              name="Uncategorized"
+                              type="expense"
+                            />
+                          </SelectItem>
+                          {expenseCategories.map((c) => (
+                            <SelectItem key={c} value={c}>
+                              <CategoryOption name={c} type="expense" />
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Card member</Label>
+                      <Select
+                        value={cardMemberFilter}
+                        onValueChange={setCardMemberFilter}
+                      >
+                        <SelectTrigger className="w-[160px]">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All</SelectItem>
+                          {cardMemberOptions.map((name) => (
+                            <SelectItem key={name} value={name}>
+                              {name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Search description</Label>
+                      <Input
+                        placeholder="Filter by description..."
+                        value={searchFilter}
+                        onChange={(e) => setSearchFilter(e.target.value)}
+                        className="w-[200px]"
+                      />
+                    </div>
+                    {hasActiveFilters && (
+                      <Button variant="ghost" size="sm" onClick={clearFilters}>
+                        Clear filters
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium mb-3">Actions</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      onClick={() => {
+                        setFiltersPopupOpen(false);
+                        setAddTransactionOpen(true);
+                      }}
+                    >
+                      <Plus className="size-4" />
+                      Add transaction
+                    </Button>
+                    {uncategorizedCount > 0 && (
+                      <Button variant="outline" onClick={reapplyRules}>
+                        Re-apply rules ({uncategorizedCount} uncategorized)
+                      </Button>
+                    )}
+                    <Button variant="outline" onClick={cleanAllDescriptions}>
+                      Clean descriptions
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        downloadTransactionsAndIncomePdf(expenses, income)
+                      }
+                    >
+                      <FileDown className="size-4" />
+                      Download PDF
+                    </Button>
+                    {filtered.length > 0 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={selectAllFiltered}
+                      >
+                        {allFilteredSelected ? "Deselect all" : "Select all"}
+                      </Button>
+                    )}
+                    {someSelected && (
+                      <>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => setDeleteSelectedOpen(true)}
+                        >
+                          Delete selected ({selectedIds.size})
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearSelection}
+                        >
+                          Clear selection
+                        </Button>
+                      </>
+                    )}
+                    {expenses.length > 0 && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setDeleteAllOpen(true)}
+                      >
+                        Delete all
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <div className="overflow-x-auto min-h-[calc(100vh-14rem)] max-h-[calc(100vh-10rem)] overflow-y-auto border rounded-md">
             {filtered.length === 0 ? (
               <div className="text-center text-muted-foreground py-12 px-4">
                 No transactions. Import a CSV or add a manual transaction.
@@ -790,6 +735,115 @@ export function TransactionsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={addTransactionOpen} onOpenChange={setAddTransactionOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New transaction</DialogTitle>
+            <DialogDescription>
+              Add an expense manually. Choose the source (e.g. Manual or Debit
+              (TD Bank)).
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddTransaction} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Source</Label>
+              <Select
+                value={addSource}
+                onValueChange={(v) => setAddSource(v as ExpenseSource)}
+              >
+                <SelectTrigger className="w-full min-w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">{SOURCE_LABELS.manual}</SelectItem>
+                  <SelectItem value="td">{SOURCE_LABELS.td}</SelectItem>
+                  <SelectItem value="amex">{SOURCE_LABELS.amex}</SelectItem>
+                  <SelectItem value="apple">{SOURCE_LABELS.apple}</SelectItem>
+                  <SelectItem value="chase">{SOURCE_LABELS.chase}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Date</Label>
+              <Input
+                type="date"
+                value={addDate}
+                onChange={(e) => setAddDate(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Amount</Label>
+              <Input
+                type="text"
+                placeholder="0.00"
+                value={addAmount}
+                onChange={(e) => setAddAmount(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Input
+                placeholder="e.g. Groceries, Gas"
+                value={addDescription}
+                onChange={(e) => setAddDescription(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Category</Label>
+              <Select
+                value={addCategory || "_"}
+                onValueChange={(v) => setAddCategory(v === "_" ? "" : v)}
+              >
+                <SelectTrigger className="w-full min-w-[200px]">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_">
+                    <CategoryOption name="Uncategorized" type="expense" />
+                  </SelectItem>
+                  {expenseCategories.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      <CategoryOption name={c} type="expense" />
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Card member (optional)</Label>
+              <Select
+                value={addCardMember || "_none"}
+                onValueChange={(v) => setAddCardMember(v === "_none" ? "" : v)}
+              >
+                <SelectTrigger className="w-full min-w-[200px]">
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">—</SelectItem>
+                  {cardMemberOptions.map((name) => (
+                    <SelectItem key={name} value={name}>
+                      {name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setAddTransactionOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">Add</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={deleteOneExpense !== null}

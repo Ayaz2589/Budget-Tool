@@ -38,16 +38,10 @@ import {
 import { Plus, Trash2, DollarSign, Calendar } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getDebtBalance } from "@/lib/debtUtils";
+import { formatCurrency } from "@/lib/format";
 import type { DebtOwner } from "@/lib/types";
 
 type RecurringFrequency = "monthly" | "biweekly";
-
-function formatCurrency(n: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(n);
-}
 
 export function DebtPage() {
   const {

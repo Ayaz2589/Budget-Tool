@@ -38,6 +38,7 @@ import {
 import { Plus, FileDown, Trash2, Pencil } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CategoryOption } from "@/lib/categoryColors";
+import { formatCurrency } from "@/lib/format";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 
 type RecurringFrequency = "monthly" | "biweekly";
@@ -56,13 +57,6 @@ function formatRecurring(i: Income): string {
     return `Monthly on ${i.recurringDayOfMonth}`;
   }
   return "—";
-}
-
-function formatCurrency(n: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(n);
 }
 
 export function IncomePage() {

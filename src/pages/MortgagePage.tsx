@@ -30,16 +30,10 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Trash2, Home } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
+import { formatCurrency } from "@/lib/format";
 
 const MORTGAGE_CATEGORY = "Mortgage";
 const DEFAULT_MORTGAGE_AMOUNT = 5400;
-
-function formatCurrency(n: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(n);
-}
 
 export function MortgagePage() {
   const { expenses, addExpense, removeExpense } = useBudget();

@@ -3,8 +3,12 @@ import type { Debt, DebtPayment } from "@/lib/types";
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const BIWEEKLY_DAYS = 14;
 
-/** Number of recurring deductions that have "occurred" up to today. */
-export function countRecurringDeductions(debt: Debt): number {
+/** Number of recurring deductions that have "occurred" up to asOfDate (default: now). */
+export function countRecurringDeductions(
+  debt: Debt,
+  asOfDate?: Date,
+): number {
+  const now = asOfDate ?? new Date();
   const amount = debt.recurringAmount ?? 0;
   if (amount <= 0) return 0;
 
@@ -14,7 +18,6 @@ export function countRecurringDeductions(debt: Debt): number {
     const startDateStr = debt.recurringStartDate ?? debt.startDate;
     if (!startDateStr) return 0;
     const start = new Date(startDateStr);
-    const now = new Date();
     if (start.getTime() > now.getTime()) return 0;
     const elapsedDays = Math.floor(
       (now.getTime() - start.getTime()) / MS_PER_DAY,
@@ -27,12 +30,11 @@ export function countRecurringDeductions(debt: Debt): number {
   if (day < 1 || day > 31) return 0;
   const startMonth = debt.startDate?.slice(0, 7) ?? null;
   if (!startMonth) return 0;
-  const now = new Date();
   const [startY, startM] = startMonth.split("-").map(Number);
   let y = startY;
   let m = startM;
   const endY = now.getFullYear();
-  const endM = now.getMonth() + 1;
+  const endM = now.getMonth() + 1; // 1-based month
   let count = 0;
   while (y < endY || (y === endY && m < endM)) {
     count += 1;

@@ -2,7 +2,7 @@
 
 ## Budget Tool — What Was Done So Far
 
-**Last updated:** January 2026
+**Last updated:** January 2026 (multi-transaction add, nav Google sign-in, dashboard charts)
 
 ---
 
@@ -15,8 +15,9 @@ Budget Tool is a personal budgeting application for a couple (you and your wife,
 - Track **income** (e.g. Rent, Paycheck, Bonus) and **expenses** in one place.
 - Compute **totals** by month: Total Earned, Total Spent, Total Spent w/o Mortgage, 50/50 Split, Nova’s/your spending, I Owe Nova, savings, etc.
 - **Sync** expenses, income, and totals to a **Google Sheet** (manual “Sync to Google Sheets” from Settings). **Restore from Sheet** loads data from the Sheet into the app (e.g. after clearing local storage).
-- **Add transactions manually** (date, amount, description, category, source, card member). Source options: Manual, Debit (TD Bank), American Express, Apple Card, Chase. Card member is a dropdown (from existing data or default AYAZ UDDIN / TASNUVA AHMED).
-- **View** dashboard and transactions **by month** (month selector, spending-by-month table, bar chart, transactions grouped by month).
+- **Add transactions manually** (date, amount, description, category, source, card member). **Multiple at once:** add several rows in one dialog; **copy** a row to duplicate and edit; remove rows. Source options: Manual, Debit (TD Bank), American Express, Apple Card, Chase. Card member is a dropdown (from existing data or default AYAZ UDDIN / TASNUVA AHMED).
+- **View** dashboard and transactions **by month** (month selector, spending-by-month table, **chart visualizations** for earned/spent/saved, spending breakdown, savings rate, plus monthly bar chart, transactions grouped by month).
+- **Google sign-in in the nav:** Sign in with Google at the bottom of the sidebar; when signed in, show the user’s name and avatar (with fallback to initials if the image fails). Same account is used for Google Sheets sync.
 
 The app replaces a manual Google Sheet workflow while keeping a similar structure (Expenses table, Income table, Totals sheet).
 
@@ -90,7 +91,7 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 
 ### 4.4 Transactions UI
 
-- **Add transaction (manual):** "Add transaction" button opens a dialog. User enters date, amount, description, category, **source** (Manual, Debit (TD Bank), American Express, Apple Card, Chase), and optional **card member** (dropdown: unique values from existing expenses or default AYAZ UDDIN / TASNUVA AHMED). New rows get a generated id and persist like imported transactions.
+- **Add transaction (manual):** "Add transaction" button opens a **nearly full-screen dialog** (94vw × 92vh) with a **compact table layout**: one row per transaction (Source, Date, Amount, Description, Category, Card member, Copy / Remove). User can **add multiple transactions at once**: "Add row" for a blank row; **Copy** on any row duplicates it (inserted below) for editing; remove row when more than one. Submit adds all rows that have a valid amount; empty/invalid rows are skipped. New rows get a generated id and persist like imported transactions. Source options: Manual, Debit (TD Bank), American Express, Apple Card, Chase. Card member dropdown: unique values from existing expenses or default AYAZ UDDIN / TASNUVA AHMED.
 - **List:** All expenses with filters (month, source, category). List is **grouped by month** with a month header row (e.g. "January 2025") above each group. Inline category dropdown per row; delete single row.
 - **Bulk actions:** Checkboxes, “Select all” (filtered), **Delete selected**, **Delete all** (with confirmation).
 - **Display:** Source filter and table use friendly labels (e.g. American Express, Apple Card, Debit (TD Bank)). Category dropdowns are **wider** and **color-coded** (e.g. My Purchase = blue, Tasnuva’s = rose, 50/50 = amber, Mortgage = slate). **Staggered row colors** (alternating subtle background) for readability.
@@ -103,6 +104,10 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 ### 4.6 Dashboard
 
 - **View month:** A "View month" dropdown lets the user select which month's totals to show. Default is current month. Options include the current month plus every month that has expense/income data (newest first).
+- **Chart visualizations (selected month):** Three shadcn/Recharts cards above the summary cards, all driven by the selected month:
+  1. **Earned vs Spent vs Saved** — Horizontal bar chart: Earned, Spent, Spent w/o Mortgage, Saved (tooltip in currency).
+  2. **Spending breakdown** — Donut (pie with inner radius): Mortgage, 50/50, Tasnuva's (her purchases only), My (your spending excluding 50/50). Only segments with value &gt; 0 shown; legend and currency tooltip.
+  3. **Personal savings rate** — Radial (circular) bar showing 0–100% with large percentage label below; tooltip shows rate.
 - **Summary cards:** Total Earned, Total Spent, Total Spent w/o Mortgage, 50/50 Split, Tasnuva's Total Spending, My Total Spending w/o Mortgage, Total Saved, Personal Savings Rate — all for the **selected month**.
 - **All-time totals:** Single card with Total Earned, Total Spent, Total Saved across all months.
 - **Spending by month (table):** Table with one row per month: Month, Total Earned, Total Spent, Spent w/o Mortgage, Total Saved, Savings Rate. Current month row is highlighted.
@@ -115,8 +120,9 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 - **My total spending:** Expenses in categories other than Tasnuva’s, 50/50, and Mortgage, plus your half of 50/50.
 - **I Owe Nova, HYSA, Investing:** Stored per month in app state and included in Totals; editable in UI where implemented.
 
-### 4.8 Google Sheets Sync
+### 4.8 Google Sign-In & Sheets Sync
 
+- **Nav sign-in:** At the bottom of the sidebar, the app shows either **"Sign in with Google"** or, when signed in, the **user's name and avatar** (profile picture from Google userinfo; fallback to initials if the image fails to load) and a **Sign out** button. Same OAuth scope and account as Google Sheets; user profile (name, picture, email) is fetched after sign-in for display only.
 - **Auth:** Google OAuth (e.g. `@react-oauth/google`). Requires `VITE_GOOGLE_CLIENT_ID` in `.env`. If not set, app shows a fallback and does not initialize the Google client (avoids “Missing required parameter client_id”).
 - **Spreadsheet:** User pastes spreadsheet ID or URL in Settings. App can use an **empty** sheet; it creates/ensures required sheets and structure.
 - **Sync to Google Sheets (push only):** "Sync to Google Sheets" in Settings **overwrites** the Sheet with the app's current state. Clears and writes **Expenses** (6 columns: Date, Amount, Description, Category, **Source**, **Card Member**), **Income** table, and **Totals** sheet (monthly rows + TOTALS row). If the user deletes all transactions in the app and syncs, the Sheet is updated to match (empty expenses/income).
@@ -138,9 +144,9 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 
 ## 5. Technical Stack
 
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS, shadcn/ui, recharts (Dashboard bar chart).
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS, shadcn/ui, recharts (BarChart, PieChart, RadialBarChart; shadcn ChartContainer, ChartTooltipContent, ChartLegend for Dashboard).
 - **State:** React context (BudgetContext, RulesContext, GoogleAuthContext); localStorage for persistence.
-- **No backend:** All logic and storage in the browser; Google Sheets API called from the client with the user’s OAuth token.
+- **No backend:** All logic and storage in the browser; Google Sheets API and Google userinfo API called from the client with the user’s OAuth token.
 
 ---
 

@@ -13,6 +13,8 @@ import { Home } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { AddMortgagePaymentDialog } from "./AddMortgagePaymentDialog";
 import { MortgagePaymentsTable } from "./MortgagePaymentsTable";
+import { MortgagePaymentsList } from "./MortgagePaymentsList";
+import { MortgagePaymentActionsDialog } from "./MortgagePaymentActionsDialog";
 import { DeleteMortgagePaymentDialog } from "./DeleteMortgagePaymentDialog";
 
 const MORTGAGE_CATEGORY = "Mortgage";
@@ -26,6 +28,9 @@ export function MortgagePage() {
   );
   const [addAmount, setAddAmount] = useState(String(DEFAULT_MORTGAGE_AMOUNT));
   const [deleteConfirm, setDeleteConfirm] = useState<Expense | null>(null);
+  const [paymentForActions, setPaymentForActions] = useState<Expense | null>(
+    null,
+  );
 
   const mortgagePayments = useMemo(() => {
     return [...expenses]
@@ -96,12 +101,38 @@ export function MortgagePage() {
             </span>
           </div>
 
-          <MortgagePaymentsTable
-            payments={mortgagePayments}
-            onRemove={setDeleteConfirm}
-          />
+          {mortgagePayments.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              No mortgage payments recorded yet. Add one above.
+            </p>
+          ) : (
+            <>
+              <div className="hidden md:block overflow-x-auto border rounded-md">
+                <MortgagePaymentsTable
+                  payments={mortgagePayments}
+                  onRemove={setDeleteConfirm}
+                />
+              </div>
+              <div className="md:hidden max-h-[50vh] overflow-y-auto">
+                <MortgagePaymentsList
+                  payments={mortgagePayments}
+                  onPaymentTap={setPaymentForActions}
+                />
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
+
+      <MortgagePaymentActionsDialog
+        payment={paymentForActions}
+        onClose={() => setPaymentForActions(null)}
+        onRemove={(exp) => {
+          setPaymentForActions(null);
+          setDeleteConfirm(exp);
+        }}
+        t={t}
+      />
 
       <DeleteMortgagePaymentDialog
         expense={deleteConfirm}

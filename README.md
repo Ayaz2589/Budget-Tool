@@ -44,6 +44,23 @@ bun run build
 bun run preview
 ```
 
+## Testing
+
+Tests use **Bun’s built-in test runner** with **React Testing Library** and **@testing-library/jest-dom** matchers. DOM tests run in **happy-dom** (via `@happy-dom/global-registrator`).
+
+```bash
+bun test          # run tests (watch mode)
+bun run test:run  # run tests once
+```
+
+Tests live in the **`test/`** directory, mirroring `src/`: `test/lib/` for lib unit tests, `test/components/` for component tests, and `test/pages/` for page tests. Setup runs from `test/setup.ts` (happy-dom + jest-dom matchers).
+
+## Architecture
+
+- **`src/lib/`**: Pure helpers where possible (formatting, totals, category rules, parsers, date repair, import dedup). I/O (Google Sheets, PDF export) is isolated in dedicated modules.
+- **Components**: Kept small; shared UI in `src/components/ui/` (shadcn), page-specific sections in `src/pages/dashboard/` etc.
+- **Refactors**: Done incrementally with tests added or updated first; run `bun test` after each change.
+
 ## Adding shadcn components
 
 ```bash

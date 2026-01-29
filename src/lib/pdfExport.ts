@@ -7,10 +7,11 @@ import type {
   Income,
   ExpenseSource,
 } from "@/lib/types";
+import { getMonthLabel } from "@/lib/totals";
+import { formatCurrency } from "@/lib/format";
 
 const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
 const INCOME_ROW_RE = /(\d{4}-\d{2}-\d{2})\s+(Paycheck|Rent)\s+\$([\d,]+\.\d{2})\s+(Paycheck|Rent)/g;
-import { getMonthLabel } from "@/lib/totals";
 
 const SOURCE_LABELS: Record<ExpenseSource, string> = {
   amex: "American Express",
@@ -19,13 +20,6 @@ const SOURCE_LABELS: Record<ExpenseSource, string> = {
   manual: "Manual",
   td: "Debit (TD Bank)",
 };
-
-function formatCurrency(n: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(n);
-}
 
 function groupByMonth<T extends { date: string }>(items: T[]): Map<string, T[]> {
   const map = new Map<string, T[]>();

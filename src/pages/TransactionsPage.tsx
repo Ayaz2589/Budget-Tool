@@ -61,13 +61,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
-
-function formatCurrency(n: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(n);
-}
+import { formatCurrency } from "@/lib/format";
 
 const SOURCES = ["all", "amex", "chase", "apple", "manual", "td"] as const;
 

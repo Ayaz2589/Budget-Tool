@@ -358,7 +358,7 @@ export function Dashboard() {
     return buildSpendingByType(monthExpenses);
   }, [expenses, selectedMonthKey]);
 
-  // Debt summary: total remaining, total paid off, and chart (remaining vs paid off)
+  // Debt summary: remaining vs paid off (chart only; no "total" displayed)
   const debtSummary = useMemo(() => {
     const withBalance = debts.map((debt) => ({
       debt,
@@ -385,7 +385,6 @@ export function Dashboard() {
     return {
       totalRemaining,
       totalPaidOff,
-      totalDebt: totalRemaining + totalPaidOff,
       chartData,
       hasDebtData,
     };
@@ -801,9 +800,6 @@ export function Dashboard() {
                 {debtSummary.hasDebtData ? (
                   <>
                     <div className="flex flex-wrap items-baseline gap-4 mb-4">
-                      <span className="text-muted-foreground text-sm">
-                        Total: {formatCurrency(debtSummary.totalDebt)}
-                      </span>
                       <span className="text-sm">
                         Remaining:{" "}
                         <span className="font-semibold">

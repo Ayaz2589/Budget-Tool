@@ -449,111 +449,146 @@ export function DebtPage() {
                 return (
                   <div
                     key={debt.id}
-                    className="rounded-lg border p-4 space-y-3"
+                    className="rounded-lg border bg-card p-5 space-y-4"
                   >
-                    <div className="flex flex-wrap items-center justify-between gap-2">
+                    {/* Header: name + meta */}
+                    <div>
+                      <h3 className="font-semibold text-lg">{debt.name}</h3>
+                      <p className="text-muted-foreground text-sm mt-0.5">
+                        {debt.owner === "Tasnuva" ? "Tasnuva" : "Ayaz"}
+                        {debt.startDate ? ` · Started ${debt.startDate}` : ""}
+                      </p>
+                    </div>
+
+                    {/* Stats: Initial, Balance, Recurring */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <span className="font-medium">{debt.name}</span>
-                        <span className="text-muted-foreground text-sm ml-2">
-                          ({debt.owner === "Tasnuva" ? "Tasnuva" : "Ayaz"})
-                        </span>
-                        {debt.startDate && (
-                          <span className="text-muted-foreground text-sm ml-2">
-                            (from {debt.startDate})
-                          </span>
-                        )}
+                        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                          Initial
+                        </p>
+                        <p className="text-sm font-medium mt-0.5">
+                          {formatCurrency(debt.initialAmount)}
+                        </p>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-muted-foreground text-sm">
-                          Initial: {formatCurrency(debt.initialAmount)}
-                        </span>
-                        <span className="font-semibold">
-                          Balance: {formatCurrency(balance)}
-                        </span>
-                        {debt.recurringAmount != null &&
-                        debt.recurringAmount > 0 ? (
-                          <span className="text-muted-foreground text-sm">
-                            Recurring: {formatCurrency(debt.recurringAmount)}{" "}
-                            {debt.recurringFrequency === "biweekly"
-                              ? `bi-weekly from ${debt.recurringStartDate ?? debt.startDate ?? "—"}`
-                              : `monthly on day ${debt.recurringDayOfMonth ?? "—"}`}
-                          </span>
-                        ) : null}
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openRecurringDialog(debt)}
-                        >
-                          <Calendar className="size-4" />
+                      <div>
+                        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                          Balance
+                        </p>
+                        <p className="text-lg font-semibold mt-0.5">
+                          {formatCurrency(balance)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                          Recurring
+                        </p>
+                        <p className="text-sm font-medium mt-0.5">
                           {debt.recurringAmount != null &&
-                          debt.recurringAmount > 0
-                            ? "Edit recurring"
-                            : "Set recurring"}
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={() => openPaymentDialog(debt.id)}
-                          disabled={balance <= 0}
-                        >
-                          <DollarSign className="size-4" />
-                          Make payment
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => setDeleteConfirmDebtId(debt.id)}
-                        >
-                          <Trash2 className="size-4" />
-                          Delete
-                        </Button>
+                          debt.recurringAmount > 0 ? (
+                            <>
+                              {formatCurrency(debt.recurringAmount)}{" "}
+                              <span className="text-muted-foreground font-normal">
+                                {debt.recurringFrequency === "biweekly"
+                                  ? `bi-weekly from ${debt.recurringStartDate ?? debt.startDate ?? "—"}`
+                                  : `monthly on day ${debt.recurringDayOfMonth ?? "—"}`}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </p>
                       </div>
                     </div>
-                    {payments.length > 0 && (
-                      <div className="overflow-x-auto">
-                        <Table>
-                          <TableHeader>
-                            <TableRow className="hover:bg-transparent">
-                              <TableHead className="text-xs">Date</TableHead>
-                              <TableHead className="text-xs">Amount</TableHead>
-                              <TableHead className="text-xs">Note</TableHead>
-                              <TableHead className="w-[80px] text-right text-xs">
-                                Actions
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {payments.map((p) => (
-                              <TableRow key={p.id}>
-                                <TableCell className="text-sm">
-                                  {p.date}
-                                </TableCell>
-                                <TableCell className="text-sm">
-                                  {formatCurrency(p.amount)}
-                                </TableCell>
-                                <TableCell className="text-sm text-muted-foreground">
-                                  {p.note ?? "—"}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-destructive hover:text-destructive"
-                                    onClick={() => removeDebtPayment(p.id)}
-                                  >
-                                    Delete
-                                  </Button>
-                                </TableCell>
+
+                    {/* Debt actions */}
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openRecurringDialog(debt)}
+                      >
+                        <Calendar className="size-4" />
+                        {debt.recurringAmount != null &&
+                        debt.recurringAmount > 0
+                          ? "Edit recurring"
+                          : "Set recurring"}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => openPaymentDialog(debt.id)}
+                        disabled={balance <= 0}
+                      >
+                        <DollarSign className="size-4" />
+                        Make payment
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive ml-auto"
+                        onClick={() => setDeleteConfirmDebtId(debt.id)}
+                      >
+                        <Trash2 className="size-4" />
+                        Delete debt
+                      </Button>
+                    </div>
+
+                    {/* Payment history */}
+                    <div className="pt-2 border-t">
+                      <h4 className="text-sm font-medium text-muted-foreground mb-2">
+                        Payment history
+                      </h4>
+                      {payments.length === 0 ? (
+                        <p className="text-muted-foreground text-sm py-3">
+                          No payments yet.
+                        </p>
+                      ) : (
+                        <div className="overflow-x-auto rounded-md border">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="hover:bg-transparent">
+                                <TableHead className="text-xs">Date</TableHead>
+                                <TableHead className="text-xs">
+                                  Amount
+                                </TableHead>
+                                <TableHead className="text-xs">Note</TableHead>
+                                <TableHead className="w-[72px] text-right text-xs">
+                                  Actions
+                                </TableHead>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    )}
+                            </TableHeader>
+                            <TableBody>
+                              {payments.map((p) => (
+                                <TableRow key={p.id}>
+                                  <TableCell className="text-sm">
+                                    {p.date}
+                                  </TableCell>
+                                  <TableCell className="text-sm font-medium">
+                                    {formatCurrency(p.amount)}
+                                  </TableCell>
+                                  <TableCell className="text-sm text-muted-foreground">
+                                    {p.note ?? "—"}
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 text-muted-foreground hover:text-destructive"
+                                      onClick={() => removeDebtPayment(p.id)}
+                                    >
+                                      Remove
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}

@@ -187,7 +187,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
 
   const budget = useBudget();
   const hasCheckedSheetForPaychecks = useRef(false);
-  const hasAddedPaychecksWhenUnsignedIn = useRef(false);
 
   const syncToSheets = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
@@ -370,36 +369,41 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     };
 
     if (accessToken && spreadsheetId) {
-      if (hasCheckedSheetForPaychecks.current) return;
-      hasCheckedSheetForPaychecks.current = true;
-      readIncomeFromSheet(accessToken, spreadsheetId)
-        .then((sheetIncome) => {
-          if (hasPaycheckOnSheet(sheetIncome) || hasRentOnSheet(sheetIncome)) {
-            void pullFromSheet().then(() => {
+      if (!hasCheckedSheetForPaychecks.current) {
+        hasCheckedSheetForPaychecks.current = true;
+        readIncomeFromSheet(accessToken, spreadsheetId)
+          .then((sheetIncome) => {
+            if (
+              hasPaycheckOnSheet(sheetIncome) ||
+              hasRentOnSheet(sheetIncome)
+            ) {
+              void pullFromSheet().then(() => {
+                ensureCurrentMonthPaychecks();
+                ensureCurrentMonthRent();
+                ensureCurrentMonthMortgage();
+              });
+            } else {
               ensureCurrentMonthPaychecks();
               ensureCurrentMonthRent();
               ensureCurrentMonthMortgage();
-            });
-          } else {
+            }
+          })
+          .catch(() => {
             ensureCurrentMonthPaychecks();
             ensureCurrentMonthRent();
             ensureCurrentMonthMortgage();
-          }
-        })
-        .catch(() => {
-          ensureCurrentMonthPaychecks();
-          ensureCurrentMonthRent();
-          ensureCurrentMonthMortgage();
-        });
+          });
+      } else {
+        ensureCurrentMonthPaychecks();
+        ensureCurrentMonthRent();
+        ensureCurrentMonthMortgage();
+      }
       return;
     }
 
-    if (!accessToken && !hasAddedPaychecksWhenUnsignedIn.current) {
-      hasAddedPaychecksWhenUnsignedIn.current = true;
-      ensureCurrentMonthPaychecks();
-      ensureCurrentMonthRent();
-      ensureCurrentMonthMortgage();
-    }
+    ensureCurrentMonthPaychecks();
+    ensureCurrentMonthRent();
+    ensureCurrentMonthMortgage();
   }, [
     accessToken,
     spreadsheetId,

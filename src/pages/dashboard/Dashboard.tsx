@@ -16,12 +16,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import type { ChartConfig } from "@/components/ui/chart";
-import { SummaryCards } from "@/pages/dashboard/SummaryCards";
-import { DebtSection } from "@/pages/dashboard/DebtSection";
-import { ByMonthSection } from "@/pages/dashboard/ByMonthSection";
-import { MonthSelector } from "@/pages/dashboard/MonthSelector";
-import { OverviewSection } from "@/pages/dashboard/OverviewSection";
-import { SpendingByTypeSection } from "@/pages/dashboard/SpendingByTypeSection";
+import { SummaryCards } from "./SummaryCards";
+import { DebtSection } from "./DebtSection";
+import { ByMonthSection } from "./ByMonthSection";
+import { MonthSelector } from "./MonthSelector";
+import { OverviewSection } from "./OverviewSection";
+import { SpendingByTypeSection } from "./SpendingByTypeSection";
 
 export function Dashboard() {
   const { t } = useTranslation();

@@ -10,8 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BASELINE_RULES_READONLY } from "@/lib/categoryRules";
-import { AddRuleDialog } from "@/pages/rules/AddRuleDialog";
-import { RulesTable } from "@/pages/rules/RulesTable";
+import { AddRuleDialog } from "./AddRuleDialog";
+import { RulesTable } from "./RulesTable";
 
 export function CategoryRulesPage() {
   const { rules, addRule, removeRule } = useRules();

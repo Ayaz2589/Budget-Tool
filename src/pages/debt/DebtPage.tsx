@@ -9,10 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AddDebtDialog } from "@/pages/debt/AddDebtDialog";
-import { AddPaymentDialog } from "@/pages/debt/AddPaymentDialog";
-import { EditRecurringDialog } from "@/pages/debt/EditRecurringDialog";
-import { DebtList } from "@/pages/debt/DebtList";
+import { AddDebtDialog } from "./AddDebtDialog";
+import { AddPaymentDialog } from "./AddPaymentDialog";
+import { EditRecurringDialog } from "./EditRecurringDialog";
+import { DebtList } from "./DebtList";
 
 export function DebtPage() {
   const {

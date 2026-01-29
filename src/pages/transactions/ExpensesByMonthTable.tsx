@@ -1,0 +1,291 @@
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CategoryOption } from "@/lib/categoryColors";
+import { formatCurrency } from "@/lib/format";
+import { getMonthLabel } from "@/lib/totals";
+import type { Expense } from "@/lib/types";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+
+export type SortColumn =
+  | "date"
+  | "amount"
+  | "description"
+  | "source"
+  | "category"
+  | "cardMember";
+
+export type ExpensesByMonthTableProps = {
+  byMonth: [string, Expense[]][];
+  defaultOpenMonth: string;
+  selectedIds: Set<string>;
+  onToggleSelect: (id: string) => void;
+  onToggleMonthSelection: (monthExpenses: Expense[]) => void;
+  sortBy: SortColumn;
+  sortDir: "asc" | "desc";
+  onSort: (col: SortColumn) => void;
+  onUpdateCategory: (id: string, category: string) => void;
+  expenseCategories: string[];
+  onDeleteOne: (expense: Expense) => void;
+  sourceLabelKeys: Record<string, string>;
+  t: (key: string, opts?: { count?: number }) => string;
+};
+
+function SortIcon({
+  column,
+  sortBy,
+  sortDir,
+}: {
+  column: SortColumn;
+  sortBy: SortColumn;
+  sortDir: "asc" | "desc";
+}) {
+  if (sortBy !== column) return <ArrowUpDown className="size-3.5 opacity-50" />;
+  return sortDir === "asc" ? (
+    <ArrowUp className="size-3.5" />
+  ) : (
+    <ArrowDown className="size-3.5" />
+  );
+}
+
+export function ExpensesByMonthTable({
+  byMonth,
+  defaultOpenMonth,
+  selectedIds,
+  onToggleSelect,
+  onToggleMonthSelection,
+  sortBy,
+  sortDir,
+  onSort,
+  onUpdateCategory,
+  expenseCategories,
+  onDeleteOne,
+  sourceLabelKeys,
+  t,
+}: ExpensesByMonthTableProps) {
+  return (
+    <Accordion
+      type="single"
+      collapsible
+      defaultValue={defaultOpenMonth}
+      className="divide-y"
+    >
+      {byMonth.map(([monthKey, monthExpenses]) => (
+        <AccordionItem key={monthKey} value={monthKey} className="border-0">
+          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
+            <span className="font-semibold">{getMonthLabel(monthKey)}</span>
+            <span className="text-muted-foreground font-normal ml-2">
+              (
+              {monthExpenses.length === 1
+                ? t("transactions.transaction_one", { count: 1 })
+                : t("transactions.transaction_other", {
+                    count: monthExpenses.length,
+                  })}
+              )
+            </span>
+          </AccordionTrigger>
+          <AccordionContent className="px-0 pb-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40px] px-2">
+                    <Checkbox
+                      checked={
+                        monthExpenses.length > 0 &&
+                        monthExpenses.every((e) => selectedIds.has(e.id))
+                      }
+                      onCheckedChange={() =>
+                        onToggleMonthSelection(monthExpenses)
+                      }
+                      aria-label={t("common.selectAllInMonth")}
+                    />
+                  </TableHead>
+                  <TableHead className="w-[100px]">{t("common.id")}</TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => onSort("date")}
+                      className="flex items-center gap-1 hover:text-foreground"
+                    >
+                      {t("common.date")}
+                      <SortIcon
+                        column="date"
+                        sortBy={sortBy}
+                        sortDir={sortDir}
+                      />
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => onSort("description")}
+                      className="flex items-center gap-1 hover:text-foreground"
+                    >
+                      {t("common.description")}
+                      <SortIcon
+                        column="description"
+                        sortBy={sortBy}
+                        sortDir={sortDir}
+                      />
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => onSort("amount")}
+                      className="flex items-center gap-1 hover:text-foreground"
+                    >
+                      {t("common.amount")}
+                      <SortIcon
+                        column="amount"
+                        sortBy={sortBy}
+                        sortDir={sortDir}
+                      />
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => onSort("source")}
+                      className="flex items-center gap-1 hover:text-foreground"
+                    >
+                      {t("common.source")}
+                      <SortIcon
+                        column="source"
+                        sortBy={sortBy}
+                        sortDir={sortDir}
+                      />
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => onSort("cardMember")}
+                      className="flex items-center gap-1 hover:text-foreground"
+                    >
+                      {t("common.cardMember")}
+                      <SortIcon
+                        column="cardMember"
+                        sortBy={sortBy}
+                        sortDir={sortDir}
+                      />
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      type="button"
+                      onClick={() => onSort("category")}
+                      className="flex items-center gap-1 hover:text-foreground"
+                    >
+                      {t("common.category")}
+                      <SortIcon
+                        column="category"
+                        sortBy={sortBy}
+                        sortDir={sortDir}
+                      />
+                    </button>
+                  </TableHead>
+                  <TableHead className="w-[80px]">
+                    {t("common.actions")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {monthExpenses.map((e, index) => (
+                  <TableRow
+                    key={e.id}
+                    className={index % 2 === 1 ? "bg-muted/30" : undefined}
+                  >
+                    <TableCell className="w-[40px]">
+                      <Checkbox
+                        checked={selectedIds.has(e.id)}
+                        onCheckedChange={() => onToggleSelect(e.id)}
+                        aria-label={`Select ${e.description}`}
+                      />
+                    </TableCell>
+                    <TableCell
+                      className="font-mono text-xs max-w-[100px] truncate"
+                      title={e.id}
+                    >
+                      {e.id}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {e.date}
+                    </TableCell>
+                    <TableCell className="max-w-[220px] truncate">
+                      {e.description}
+                    </TableCell>
+                    <TableCell>{formatCurrency(e.amount)}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {sourceLabelKeys[e.source]
+                        ? t(sourceLabelKeys[e.source])
+                        : e.source}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {e.cardMember ?? "—"}
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        value={e.category || "_"}
+                        onValueChange={(v) =>
+                          onUpdateCategory(e.id, v === "_" ? "" : v)
+                        }
+                      >
+                        <SelectTrigger className="w-[220px] min-w-[200px]">
+                          <SelectValue placeholder="Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="_">
+                            <CategoryOption
+                              name="Uncategorized"
+                              type="expense"
+                            />
+                          </SelectItem>
+                          {expenseCategories.map((c) => (
+                            <SelectItem key={c} value={c}>
+                              <CategoryOption name={c} type="expense" />
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDeleteOne(e)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        {t("common.delete")}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  );
+}

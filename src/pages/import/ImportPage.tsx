@@ -11,11 +11,8 @@ import {
 } from "@/lib/categoryRules";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
-import {
-  ImportSourceCard,
-  type SourceChoice,
-} from "@/pages/import/ImportSourceCard";
-import { ImportPreviewCard } from "@/pages/import/ImportPreviewCard";
+import { ImportSourceCard, type SourceChoice } from "./ImportSourceCard";
+import { ImportPreviewCard } from "./ImportPreviewCard";
 
 export function ImportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);

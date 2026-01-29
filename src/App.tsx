@@ -7,14 +7,14 @@ import {
   GoogleAuthProviderFallback,
 } from "@/context/GoogleAuthContext";
 import { Layout } from "@/components/Layout";
-import { Dashboard } from "@/pages/Dashboard";
-import { DebtPage } from "@/pages/DebtPage";
-import { MortgagePage } from "@/pages/MortgagePage";
-import { ImportPage } from "@/pages/ImportPage";
-import { TransactionsPage } from "@/pages/TransactionsPage";
-import { IncomePage } from "@/pages/IncomePage";
-import { CategoryRulesPage } from "@/pages/CategoryRulesPage";
-import { SettingsPage } from "@/pages/SettingsPage";
+import { Dashboard } from "@/pages/dashboard/Dashboard";
+import { DebtPage } from "@/pages/debt/DebtPage";
+import { MortgagePage } from "@/pages/mortgage/MortgagePage";
+import { ImportPage } from "@/pages/import/ImportPage";
+import { TransactionsPage } from "@/pages/transactions/TransactionsPage";
+import { IncomePage } from "@/pages/income/IncomePage";
+import { CategoryRulesPage } from "@/pages/rules/CategoryRulesPage";
+import { SettingsPage } from "@/pages/settings/SettingsPage";
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 

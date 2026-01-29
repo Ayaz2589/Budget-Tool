@@ -12,9 +12,9 @@ import {
 } from "@/components/ui/card";
 import { FileDown } from "lucide-react";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
-import { AddIncomeDialog } from "@/pages/income/AddIncomeDialog";
-import { EditIncomeDialog } from "@/pages/income/EditIncomeDialog";
-import { IncomeTable } from "@/pages/income/IncomeTable";
+import { AddIncomeDialog } from "./AddIncomeDialog";
+import { EditIncomeDialog } from "./EditIncomeDialog";
+import { IncomeTable } from "./IncomeTable";
 
 export function IncomePage() {
   const {

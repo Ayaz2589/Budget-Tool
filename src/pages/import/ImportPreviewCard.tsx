@@ -43,7 +43,7 @@ export function ImportPreviewCard({
   expenseCategories,
   onUpdateCategory,
   lastDetected,
-  t,
+  t: _t,
 }: ImportPreviewCardProps) {
   const isPdfExport = lastDetected === "pdf-export";
 

@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Lock, Trash2 } from "lucide-react";
 import type { CategoryRule } from "@/lib/categoryRules";
-import { BASELINE_RULES_READONLY } from "@/lib/categoryRules";
 import { CategoryOption } from "@/lib/categoryColors";
 
 export type RulesTableProps = {

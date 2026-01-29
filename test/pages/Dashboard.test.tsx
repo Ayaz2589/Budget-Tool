@@ -5,7 +5,7 @@ import { BudgetProvider } from "@/context/BudgetContext";
 import { RulesProvider } from "@/context/RulesContext";
 import { GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
 import { Layout } from "@/components/Layout";
-import { Dashboard } from "@/pages/Dashboard";
+import { Dashboard } from "@/pages/dashboard/Dashboard";
 
 function TestWrapper() {
   return (

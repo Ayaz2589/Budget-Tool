@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { extractSpreadsheetId } from "@/lib/googleSheets";
-import { GoogleSheetsCard } from "@/pages/settings/GoogleSheetsCard";
-import { ExpenseCategoriesCard } from "@/pages/settings/ExpenseCategoriesCard";
-import { IncomeCategoriesCard } from "@/pages/settings/IncomeCategoriesCard";
+import { GoogleSheetsCard } from "./GoogleSheetsCard";
+import { ExpenseCategoriesCard } from "./ExpenseCategoriesCard";
+import { IncomeCategoriesCard } from "./IncomeCategoriesCard";
 
 export function SettingsPage() {
   const {

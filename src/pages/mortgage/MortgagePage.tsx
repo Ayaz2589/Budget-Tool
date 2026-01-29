@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/card";
 import { Home } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
-import { AddMortgagePaymentDialog } from "@/pages/mortgage/AddMortgagePaymentDialog";
-import { MortgagePaymentsTable } from "@/pages/mortgage/MortgagePaymentsTable";
-import { DeleteMortgagePaymentDialog } from "@/pages/mortgage/DeleteMortgagePaymentDialog";
+import { AddMortgagePaymentDialog } from "./AddMortgagePaymentDialog";
+import { MortgagePaymentsTable } from "./MortgagePaymentsTable";
+import { DeleteMortgagePaymentDialog } from "./DeleteMortgagePaymentDialog";
 
 const MORTGAGE_CATEGORY = "Mortgage";
 const DEFAULT_MORTGAGE_AMOUNT = 5400;

@@ -1,0 +1,380 @@
+import { useState, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import { useBudget } from "@/context/BudgetContext";
+import { useGoogleAuth } from "@/context/GoogleAuthContext";
+import { useRules } from "@/context/RulesContext";
+import {
+  applyRulesToExpenses,
+  applyBaselineToExpenses,
+} from "@/lib/categoryRules";
+import type { Expense } from "@/lib/types";
+import { isValidDate } from "@/lib/totals";
+import { cleanDescription } from "@/lib/parsers";
+import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
+import { AddTransactionDialog } from "@/components/AddTransactionDialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { SyncConfirmDialog } from "./SyncConfirmDialog";
+import { TransactionsToolbar } from "./TransactionsToolbar";
+import {
+  FiltersAndActionsDialog,
+  SOURCE_LABEL_KEYS,
+} from "./FiltersAndActionsDialog";
+import { ExpensesByMonthTable, type SortColumn } from "./ExpensesByMonthTable";
+import {
+  DeleteOneTransactionDialog,
+  DeleteSelectedTransactionsDialog,
+  DeleteAllTransactionsDialog,
+} from "./DeleteTransactionDialogs";
+
+export function TransactionsPage() {
+  const { t } = useTranslation();
+  const {
+    expenses,
+    income,
+    debts,
+    debtPayments,
+    updateExpense,
+    removeExpense,
+    removeExpenses,
+    expenseCategories,
+  } = useBudget();
+  const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
+    useGoogleAuth();
+  const { rules } = useRules();
+  const [monthFilter, setMonthFilter] = useState<string>("");
+  const [sourceFilter, setSourceFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [searchFilter, setSearchFilter] = useState<string>("");
+  const [cardMemberFilter, setCardMemberFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<SortColumn>("date");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [deleteAllOpen, setDeleteAllOpen] = useState(false);
+  const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
+  const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
+    null,
+  );
+  const [filtersPopupOpen, setFiltersPopupOpen] = useState(false);
+  const [addTransactionOpen, setAddTransactionOpen] = useState(false);
+  const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
+
+  const cardMemberOptions = useMemo(() => {
+    const fromExpenses = [
+      ...new Set(
+        expenses.map((e) => e.cardMember).filter((m): m is string => !!m),
+      ),
+    ].sort();
+    if (fromExpenses.length > 0) return fromExpenses;
+    return ["AYAZ UDDIN", "TASNUVA AHMED"];
+  }, [expenses]);
+
+  const filtered = useMemo(() => {
+    let list = [...expenses]
+      .filter((e) => isValidDate(e.date))
+      .filter((e) => e.category !== "Mortgage");
+    if (monthFilter) {
+      list = list.filter((e) => e.date.startsWith(monthFilter));
+    }
+    if (sourceFilter && sourceFilter !== "all") {
+      list = list.filter((e) => e.source === sourceFilter);
+    }
+    if (categoryFilter) {
+      if (categoryFilter === "__uncategorized") {
+        list = list.filter((e) => !e.category);
+      } else {
+        list = list.filter((e) => e.category === categoryFilter);
+      }
+    }
+    if (searchFilter.trim()) {
+      const q = searchFilter.trim().toLowerCase();
+      list = list.filter((e) => e.description.toLowerCase().includes(q));
+    }
+    if (cardMemberFilter && cardMemberFilter !== "all") {
+      list = list.filter((e) => (e.cardMember ?? "") === cardMemberFilter);
+    }
+    const cmp = sortDir === "asc" ? 1 : -1;
+    list.sort((a, b) => {
+      let diff = 0;
+      switch (sortBy) {
+        case "date":
+          diff = a.date.localeCompare(b.date);
+          break;
+        case "amount":
+          diff = a.amount - b.amount;
+          break;
+        case "description":
+          diff = a.description.localeCompare(b.description);
+          break;
+        case "source":
+          diff = a.source.localeCompare(b.source);
+          break;
+        case "category":
+          diff = (a.category ?? "").localeCompare(b.category ?? "");
+          break;
+        case "cardMember":
+          diff = (a.cardMember ?? "").localeCompare(b.cardMember ?? "");
+          break;
+        default:
+          diff = a.date.localeCompare(b.date);
+      }
+      return diff * cmp;
+    });
+    return list;
+  }, [
+    expenses,
+    monthFilter,
+    sourceFilter,
+    categoryFilter,
+    searchFilter,
+    cardMemberFilter,
+    sortBy,
+    sortDir,
+  ]);
+
+  const byMonth = useMemo(() => {
+    const map = new Map<string, Expense[]>();
+    for (const e of filtered) {
+      const key = e.date.slice(0, 7);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(e);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [filtered]);
+
+  const currentMonthKey = new Date().toISOString().slice(0, 7);
+  const defaultOpenMonth = byMonth.some(([k]) => k === currentMonthKey)
+    ? currentMonthKey
+    : (byMonth[0]?.[0] ?? "");
+
+  const reapplyRules = useCallback(() => {
+    const expenseRules = rules.filter((r) => r.type === "expense");
+    const uncategorized = expenses.filter((e) => !e.category);
+    const withRules = applyRulesToExpenses(uncategorized, expenseRules);
+    const withBaseline = applyBaselineToExpenses(withRules);
+    withBaseline.forEach((e) => updateExpense(e.id, { category: e.category }));
+  }, [rules, expenses, updateExpense]);
+
+  const cleanAllDescriptions = useCallback(() => {
+    expenses.forEach((e) => {
+      const cleaned = cleanDescription(e.description);
+      if (cleaned !== e.description) {
+        updateExpense(e.id, { description: cleaned });
+      }
+    });
+  }, [expenses, updateExpense]);
+
+  const uncategorizedCount = expenses.filter((e) => !e.category).length;
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const toggleMonthSelection = useCallback((monthExpenses: Expense[]) => {
+    setSelectedIds((prev) => {
+      const ids = new Set(monthExpenses.map((e) => e.id));
+      const allSelected =
+        ids.size > 0 && [...ids].every((id: string) => prev.has(id));
+      const next = new Set(prev);
+      if (allSelected) ids.forEach((id) => next.delete(id));
+      else ids.forEach((id) => next.add(id));
+      return next;
+    });
+  }, []);
+
+  const selectAllFiltered = useCallback(() => {
+    setSelectedIds((prev) => {
+      const filteredIds = new Set(filtered.map((e) => e.id));
+      const allSelected =
+        filtered.length > 0 && filtered.every((e) => prev.has(e.id));
+      return allSelected ? new Set() : filteredIds;
+    });
+  }, [filtered]);
+
+  const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
+
+  const allFilteredSelected =
+    filtered.length > 0 && filtered.every((e) => selectedIds.has(e.id));
+  const someSelected = selectedIds.size > 0;
+
+  const hasActiveFilters = Boolean(
+    monthFilter ||
+    sourceFilter !== "all" ||
+    categoryFilter ||
+    searchFilter.trim() ||
+    cardMemberFilter !== "all",
+  );
+
+  const clearFilters = useCallback(() => {
+    setMonthFilter("");
+    setSourceFilter("all");
+    setCategoryFilter("");
+    setSearchFilter("");
+    setCardMemberFilter("all");
+  }, []);
+
+  const toggleSort = useCallback(
+    (col: SortColumn) => {
+      if (sortBy === col) {
+        setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      } else {
+        setSortBy(col);
+        setSortDir(col === "date" || col === "amount" ? "desc" : "asc");
+      }
+    },
+    [sortBy],
+  );
+
+  const handleDeleteSelected = useCallback(() => {
+    removeExpenses(Array.from(selectedIds));
+    clearSelection();
+    setDeleteSelectedOpen(false);
+  }, [selectedIds, removeExpenses, clearSelection]);
+
+  const handleDeleteAll = useCallback(() => {
+    removeExpenses(expenses.map((e) => e.id));
+    clearSelection();
+    setDeleteAllOpen(false);
+  }, [expenses, removeExpenses, clearSelection]);
+
+  const handleDeleteOne = useCallback(() => {
+    if (deleteOneExpense) {
+      removeExpense(deleteOneExpense.id);
+      setDeleteOneExpense(null);
+    }
+  }, [deleteOneExpense, removeExpense]);
+
+  const handleDownloadPdf = useCallback(() => {
+    downloadTransactionsAndIncomePdf(expenses, income, debts, debtPayments);
+  }, [expenses, income, debts, debtPayments]);
+
+  return (
+    <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
+      <h1 className="text-2xl font-semibold shrink-0 mb-4">
+        {t("transactions.title")}
+      </h1>
+      <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
+        <CardHeader className="shrink-0">
+          <CardTitle>{t("transactions.expenses")}</CardTitle>
+          <CardDescription>{t("transactions.filterAndEdit")}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-4">
+          <TransactionsToolbar
+            onOpenFilters={() => setFiltersPopupOpen(true)}
+            onAddTransaction={() => setAddTransactionOpen(true)}
+            hasActiveFilters={hasActiveFilters}
+            showSync={!!(isSignedIn && spreadsheetId)}
+            syncStatus={syncStatus}
+            onSync={() => setSyncConfirmOpen(true)}
+            t={t}
+          />
+
+          <SyncConfirmDialog
+            open={syncConfirmOpen}
+            onOpenChange={setSyncConfirmOpen}
+            onConfirm={syncToSheets}
+            t={t}
+          />
+
+          <FiltersAndActionsDialog
+            open={filtersPopupOpen}
+            onOpenChange={setFiltersPopupOpen}
+            monthFilter={monthFilter}
+            onMonthFilterChange={setMonthFilter}
+            sourceFilter={sourceFilter}
+            onSourceFilterChange={setSourceFilter}
+            categoryFilter={categoryFilter}
+            onCategoryFilterChange={setCategoryFilter}
+            cardMemberFilter={cardMemberFilter}
+            onCardMemberFilterChange={setCardMemberFilter}
+            searchFilter={searchFilter}
+            onSearchFilterChange={setSearchFilter}
+            expenseCategories={expenseCategories}
+            cardMemberOptions={cardMemberOptions}
+            hasActiveFilters={hasActiveFilters}
+            onClearFilters={clearFilters}
+            onAddTransaction={() => setAddTransactionOpen(true)}
+            onReapplyRules={reapplyRules}
+            uncategorizedCount={uncategorizedCount}
+            onCleanDescriptions={cleanAllDescriptions}
+            onDownloadPdf={handleDownloadPdf}
+            filteredCount={filtered.length}
+            allFilteredSelected={allFilteredSelected}
+            onSelectAllFiltered={selectAllFiltered}
+            someSelected={someSelected}
+            selectedCount={selectedIds.size}
+            onDeleteSelected={() => setDeleteSelectedOpen(true)}
+            onClearSelection={clearSelection}
+            expensesCount={expenses.length}
+            onDeleteAll={() => setDeleteAllOpen(true)}
+            t={t}
+          />
+
+          <div className="flex-1 min-h-0 overflow-auto border rounded-md">
+            {filtered.length === 0 ? (
+              <div className="text-center text-muted-foreground py-12 px-4">
+                {t("transactions.noTransactions")}
+              </div>
+            ) : (
+              <ExpensesByMonthTable
+                byMonth={byMonth}
+                defaultOpenMonth={defaultOpenMonth}
+                selectedIds={selectedIds}
+                onToggleSelect={toggleSelect}
+                onToggleMonthSelection={toggleMonthSelection}
+                sortBy={sortBy}
+                sortDir={sortDir}
+                onSort={toggleSort}
+                onUpdateCategory={(id, category) =>
+                  updateExpense(id, { category })
+                }
+                expenseCategories={expenseCategories}
+                onDeleteOne={setDeleteOneExpense}
+                sourceLabelKeys={SOURCE_LABEL_KEYS}
+                t={t}
+              />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <AddTransactionDialog
+        open={addTransactionOpen}
+        onOpenChange={setAddTransactionOpen}
+      />
+
+      <DeleteOneTransactionDialog
+        expense={deleteOneExpense}
+        onClose={() => setDeleteOneExpense(null)}
+        onConfirm={handleDeleteOne}
+        t={t}
+      />
+
+      <DeleteSelectedTransactionsDialog
+        open={deleteSelectedOpen}
+        onOpenChange={setDeleteSelectedOpen}
+        count={selectedIds.size}
+        onConfirm={handleDeleteSelected}
+        t={t}
+      />
+
+      <DeleteAllTransactionsDialog
+        open={deleteAllOpen}
+        onOpenChange={setDeleteAllOpen}
+        count={expenses.length}
+        onConfirm={handleDeleteAll}
+        t={t}
+      />
+    </div>
+  );
+}

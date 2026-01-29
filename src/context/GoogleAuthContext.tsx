@@ -43,8 +43,15 @@ const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
 
 type SyncStatus = "idle" | "syncing" | "success" | "error";
 
+export interface GoogleUserProfile {
+  name: string;
+  picture: string;
+  email: string;
+}
+
 interface GoogleAuthContextValue {
   isSignedIn: boolean;
+  userProfile: GoogleUserProfile | null;
   signIn: () => void;
   signOut: () => void;
   spreadsheetId: string | null;
@@ -104,6 +111,7 @@ export function GoogleAuthProviderFallback({
   const value = useMemo<GoogleAuthContextValue>(
     () => ({
       isSignedIn: false,
+      userProfile: null,
       signIn: () => {},
       signOut: () => {},
       spreadsheetId,
@@ -129,8 +137,13 @@ export function GoogleAuthProviderFallback({
   );
 }
 
+const USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
+
 export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<GoogleUserProfile | null>(
+    null,
+  );
   const [spreadsheetId, setSpreadsheetIdState] = useState<string | null>(() => {
     try {
       return localStorage.getItem(SPREADSHEET_ID_KEY);
@@ -147,10 +160,48 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     },
     onError: () => {
       setAccessToken(null);
+      setUserProfile(null);
     },
-    scope: "https://www.googleapis.com/auth/spreadsheets",
+    scope:
+      "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
     flow: "implicit",
   });
+
+  useEffect(() => {
+    if (!accessToken) {
+      setUserProfile(null);
+      return;
+    }
+    let cancelled = false;
+    fetch(USERINFO_URL, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+      .then((res) =>
+        res.ok
+          ? res.json()
+          : Promise.reject(new Error("Failed to fetch profile")),
+      )
+      .then((data: { name?: string; picture?: string; email?: string }) => {
+        if (
+          !cancelled &&
+          data.name != null &&
+          data.picture != null &&
+          data.email != null
+        ) {
+          setUserProfile({
+            name: data.name,
+            picture: data.picture,
+            email: data.email,
+          });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setUserProfile(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken]);
 
   useEffect(() => {
     if (spreadsheetId) {
@@ -174,6 +225,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(() => {
     setAccessToken(null);
+    setUserProfile(null);
   }, []);
 
   const setSpreadsheetId = useCallback((id: string | null) => {
@@ -417,6 +469,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo<GoogleAuthContextValue>(
     () => ({
       isSignedIn: !!accessToken,
+      userProfile,
       signIn,
       signOut,
       spreadsheetId,
@@ -428,6 +481,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     }),
     [
       accessToken,
+      userProfile,
       signIn,
       signOut,
       spreadsheetId,

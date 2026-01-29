@@ -11,41 +11,11 @@ import {
 } from "@/lib/categoryRules";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
-import { CategoryOption } from "@/lib/categoryColors";
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Upload } from "lucide-react";
-import { formatCurrency } from "@/lib/format";
-
-type SourceChoice = "amex" | "apple" | "chase" | "pdf-export";
-
-const SOURCE_OPTIONS: { value: SourceChoice; label: string }[] = [
-  { value: "amex", label: "American Express" },
-  { value: "apple", label: "Apple Card" },
-  { value: "chase", label: "Chase (PDF statement)" },
-  { value: "pdf-export", label: "Exported PDF (re-import)" },
-];
+  ImportSourceCard,
+  type SourceChoice,
+} from "@/pages/import/ImportSourceCard";
+import { ImportPreviewCard } from "@/pages/import/ImportPreviewCard";
 
 export function ImportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -72,6 +42,7 @@ export function ImportPage() {
     expenseCategories,
   } = useBudget();
   const { rules } = useRules();
+  const { t } = useTranslation();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -88,8 +59,6 @@ export function ImportPage() {
           const toAddExpenses = parsed.expenses.filter(
             (ex) => !existingExpenseIds.has(ex.id),
           );
-          // Omit income that already exists by id OR by (date, amount, category)
-          // so auto-generated paychecks/rent (random ids) are not duplicated
           const toAddIncome = parsed.income.filter((i) => {
             if (income.some((existing) => existing.id === i.id)) return false;
             const sameEntry = income.some(
@@ -230,18 +199,11 @@ export function ImportPage() {
     );
   };
 
-  const { t } = useTranslation();
   const addToTransactions = () => {
     addExpenses(previewExpenses);
-    if (previewIncome.length > 0) {
-      addIncomes(previewIncome);
-    }
-    if (previewDebts.length > 0) {
-      addDebts(previewDebts);
-    }
-    if (previewDebtPayments.length > 0) {
-      addDebtPayments(previewDebtPayments);
-    }
+    if (previewIncome.length > 0) addIncomes(previewIncome);
+    if (previewDebts.length > 0) addDebts(previewDebts);
+    if (previewDebtPayments.length > 0) addDebtPayments(previewDebtPayments);
     setPreviewExpenses([]);
     setPreviewIncome([]);
     setPreviewDebts([]);
@@ -252,284 +214,49 @@ export function ImportPage() {
     setImportError("");
   };
 
+  const hasPreview =
+    previewExpenses.length > 0 ||
+    previewIncome.length > 0 ||
+    previewDebts.length > 0 ||
+    previewDebtPayments.length > 0;
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">{t("import.title")}</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("import.uploadStatement")}</CardTitle>
-          <CardDescription>{t("import.uploadStatementDesc")}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium whitespace-nowrap">
-              CSV source:
-            </span>
-            <Select
-              value={selectedSource}
-              onValueChange={(v) => setSelectedSource(v as SourceChoice)}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {SOURCE_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={
-              selectedSource === "chase" || selectedSource === "pdf-export"
-                ? ".pdf"
-                : ".csv"
-            }
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          <Button onClick={() => fileInputRef.current?.click()}>
-            <Upload className="size-4" />
-            {selectedSource === "pdf-export"
-              ? "Choose exported PDF"
-              : selectedSource === "chase"
-                ? "Choose PDF statement"
-                : "Choose CSV file"}
-          </Button>
-          {importError && (
-            <span className="text-sm text-destructive self-center">
-              {importError}
-            </span>
-          )}
-          {lastDetected && !importError && (
-            <span className="text-sm text-muted-foreground self-center">
-              {sourceLabel}
-              {lastDetected === "pdf-export"
-                ? ` · ${previewExpenses.length} expenses, ${previewIncome.length} income${previewDebts.length > 0 ? `, ${previewDebts.length} debts` : ""}${previewDebtPayments.length > 0 ? `, ${previewDebtPayments.length} debt payments` : ""} to add (existing IDs omitted)`
-                : ` · ${previewExpenses.length} rows${skippedDuplicates > 0 ? ` (${skippedDuplicates} duplicates skipped)` : ""}`}
-            </span>
-          )}
-          {(previewExpenses.length > 0 ||
-            previewIncome.length > 0 ||
-            previewDebts.length > 0 ||
-            previewDebtPayments.length > 0) && (
-            <>
-              {lastDetected !== "pdf-export" && (
-                <Button variant="outline" onClick={applyRules}>
-                  Apply rules
-                </Button>
-              )}
-              <Button onClick={addToTransactions}>
-                {lastDetected === "pdf-export"
-                  ? "Add all"
-                  : "Add to transactions"}
-              </Button>
-            </>
-          )}
-        </CardContent>
-      </Card>
-      {(previewExpenses.length > 0 ||
-        previewIncome.length > 0 ||
-        previewDebts.length > 0 ||
-        previewDebtPayments.length > 0) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Preview</CardTitle>
-            <CardDescription>
-              {lastDetected === "pdf-export"
-                ? 'Transactions and income with existing IDs are omitted. Click "Add all" to add the rest.'
-                : 'Transactions matching existing entries (same date and amount) are skipped. Edit category per row if needed, then click "Add to transactions".'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {previewExpenses.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium mb-2">Expenses to add</h3>
-                <div className="overflow-x-auto max-h-[40vh] overflow-y-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Card Member</TableHead>
-                        <TableHead>Category</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {previewExpenses.map((e) => (
-                        <TableRow key={e.id}>
-                          <TableCell className="font-mono text-xs">
-                            {e.id}
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">
-                            {e.date}
-                          </TableCell>
-                          <TableCell className="max-w-[200px] truncate">
-                            {e.description}
-                          </TableCell>
-                          <TableCell>{formatCurrency(e.amount)}</TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {e.cardMember ?? "—"}
-                          </TableCell>
-                          <TableCell>
-                            {lastDetected === "pdf-export" ? (
-                              e.category || "—"
-                            ) : (
-                              <Select
-                                value={e.category || "_"}
-                                onValueChange={(v) =>
-                                  updatePreviewCategory(
-                                    e.id,
-                                    v === "_" ? "" : v,
-                                  )
-                                }
-                              >
-                                <SelectTrigger className="w-[220px] min-w-[200px]">
-                                  <SelectValue placeholder="Category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="_">
-                                    <CategoryOption
-                                      name="Uncategorized"
-                                      type="expense"
-                                    />
-                                  </SelectItem>
-                                  {expenseCategories.map((c) => (
-                                    <SelectItem key={c} value={c}>
-                                      <CategoryOption name={c} type="expense" />
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-            )}
-            {previewIncome.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium mb-2">Income to add</h3>
-                <div className="overflow-x-auto max-h-[40vh] overflow-y-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Owner</TableHead>
-                        <TableHead>Recurring</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {previewIncome.map((i) => (
-                        <TableRow key={i.id}>
-                          <TableCell className="font-mono text-xs">
-                            {i.id}
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">
-                            {i.date}
-                          </TableCell>
-                          <TableCell className="max-w-[200px] truncate">
-                            {i.description}
-                          </TableCell>
-                          <TableCell>{formatCurrency(i.amount)}</TableCell>
-                          <TableCell>{i.category || "—"}</TableCell>
-                          <TableCell>{i.owner ?? "Ayaz"}</TableCell>
-                          <TableCell className="text-muted-foreground text-sm">
-                            {i.recurringAmount != null && i.recurringAmount > 0
-                              ? i.recurringFrequency === "biweekly" &&
-                                i.recurringStartDate
-                                ? `Biweekly from ${i.recurringStartDate}`
-                                : i.recurringFrequency === "monthly" &&
-                                    i.recurringDayOfMonth != null
-                                  ? `Monthly on ${i.recurringDayOfMonth}`
-                                  : "—"
-                              : "—"}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-            )}
-            {lastDetected === "pdf-export" && previewDebts.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium mb-2">Debts to add</h3>
-                <div className="overflow-x-auto max-h-[30vh] overflow-y-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Initial Amount</TableHead>
-                        <TableHead>Start Date</TableHead>
-                        <TableHead>Owner</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {previewDebts.map((d) => (
-                        <TableRow key={d.id}>
-                          <TableCell>{d.name}</TableCell>
-                          <TableCell>
-                            {formatCurrency(d.initialAmount)}
-                          </TableCell>
-                          <TableCell>{d.startDate ?? "—"}</TableCell>
-                          <TableCell>{d.owner ?? "Ayaz"}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-            )}
-            {lastDetected === "pdf-export" &&
-              previewDebtPayments.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium mb-2">
-                    Debt payments to add
-                  </h3>
-                  <div className="overflow-x-auto max-h-[30vh] overflow-y-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Debt Id</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Amount</TableHead>
-                          <TableHead>Note</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {previewDebtPayments.map((p) => (
-                          <TableRow key={p.id}>
-                            <TableCell className="font-mono text-xs">
-                              {p.debtId}
-                            </TableCell>
-                            <TableCell>{p.date}</TableCell>
-                            <TableCell>{formatCurrency(p.amount)}</TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {p.note ?? "—"}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </div>
-              )}
-          </CardContent>
-        </Card>
+      <ImportSourceCard
+        selectedSource={selectedSource}
+        onSourceChange={setSelectedSource}
+        fileInputRef={fileInputRef}
+        accept={
+          selectedSource === "chase" || selectedSource === "pdf-export"
+            ? ".pdf"
+            : ".csv"
+        }
+        onFileChange={handleFileChange}
+        importError={importError}
+        lastDetected={lastDetected}
+        sourceLabel={sourceLabel}
+        previewExpensesCount={previewExpenses.length}
+        previewIncomeCount={previewIncome.length}
+        previewDebtsCount={previewDebts.length}
+        previewDebtPaymentsCount={previewDebtPayments.length}
+        skippedDuplicates={skippedDuplicates}
+        onApplyRules={applyRules}
+        onAddToTransactions={addToTransactions}
+        isPdfExport={lastDetected === "pdf-export"}
+        t={t}
+      />
+      {hasPreview && (
+        <ImportPreviewCard
+          previewExpenses={previewExpenses}
+          previewIncome={previewIncome}
+          previewDebts={previewDebts}
+          previewDebtPayments={previewDebtPayments}
+          expenseCategories={expenseCategories}
+          onUpdateCategory={updatePreviewCategory}
+          lastDetected={lastDetected}
+          t={t}
+        />
       )}
     </div>
   );

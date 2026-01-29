@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import type { Expense } from "@/lib/types";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,28 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Plus, Trash2, Home } from "lucide-react";
-import { CategoryOption } from "@/lib/categoryColors";
+import { Home } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
+import { AddMortgagePaymentDialog } from "@/pages/mortgage/AddMortgagePaymentDialog";
+import { MortgagePaymentsTable } from "@/pages/mortgage/MortgagePaymentsTable";
+import { DeleteMortgagePaymentDialog } from "@/pages/mortgage/DeleteMortgagePaymentDialog";
 
 const MORTGAGE_CATEGORY = "Mortgage";
 const DEFAULT_MORTGAGE_AMOUNT = 5400;
@@ -100,127 +82,32 @@ export function MortgagePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap items-center gap-4">
-            <Dialog open={addOpen} onOpenChange={setAddOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="size-4" />
-                  Add payment
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add mortgage payment</DialogTitle>
-                  <DialogDescription>
-                    Enter the payment date and amount.
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleAdd} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Date</Label>
-                    <Input
-                      type="date"
-                      value={addDate}
-                      onChange={(e) => setAddDate(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Amount</Label>
-                    <Input
-                      type="text"
-                      placeholder="0.00"
-                      value={addAmount}
-                      onChange={(e) => setAddAmount(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setAddOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">Add</Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <AddMortgagePaymentDialog
+              open={addOpen}
+              onOpenChange={setAddOpen}
+              date={addDate}
+              onDateChange={setAddDate}
+              amount={addAmount}
+              onAmountChange={setAddAmount}
+              onSubmit={handleAdd}
+            />
             <span className="text-sm text-muted-foreground">
               Total this year: {formatCurrency(totalThisYear)}
             </span>
           </div>
 
-          {mortgagePayments.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              No mortgage payments recorded yet. Add one above.
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead className="w-[80px]" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mortgagePayments.map((e) => (
-                  <TableRow key={e.id}>
-                    <TableCell>{e.date}</TableCell>
-                    <TableCell>
-                      <CategoryOption name={e.category ?? ""} type="expense" />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {formatCurrency(e.amount)}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => setDeleteConfirm(e)}
-                        aria-label="Remove payment"
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <MortgagePaymentsTable
+            payments={mortgagePayments}
+            onRemove={setDeleteConfirm}
+          />
         </CardContent>
       </Card>
 
-      <Dialog
-        open={!!deleteConfirm}
-        onOpenChange={(open) => !open && setDeleteConfirm(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Remove mortgage payment?</DialogTitle>
-            <DialogDescription>
-              {deleteConfirm
-                ? `Remove ${deleteConfirm.date} payment of ${formatCurrency(deleteConfirm.amount)}? This cannot be undone.`
-                : ""}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => deleteConfirm && handleRemove(deleteConfirm)}
-            >
-              Remove
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteMortgagePaymentDialog
+        expense={deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        onConfirm={() => deleteConfirm && handleRemove(deleteConfirm)}
+      />
     </div>
   );
 }

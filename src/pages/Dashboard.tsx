@@ -6,48 +6,22 @@ import {
   computeAllTotals,
   computeGrandTotals,
   computeMonthTotals,
-  getMonthLabel,
   type MonthTotals,
 } from "@/lib/totals";
 import { DEFAULT_INCOME_CATEGORIES } from "@/lib/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { formatCurrency } from "@/lib/format";
+import type { ChartConfig } from "@/components/ui/chart";
 import { SummaryCards } from "@/pages/dashboard/SummaryCards";
 import { DebtSection } from "@/pages/dashboard/DebtSection";
 import { ByMonthSection } from "@/pages/dashboard/ByMonthSection";
+import { MonthSelector } from "@/pages/dashboard/MonthSelector";
+import { OverviewSection } from "@/pages/dashboard/OverviewSection";
+import { SpendingByTypeSection } from "@/pages/dashboard/SpendingByTypeSection";
 
 export function Dashboard() {
   const { t } = useTranslation();
@@ -214,13 +188,6 @@ export function Dashboard() {
     ];
   }, [selectedMonth]);
 
-  const PIE_COLORS = [
-    "oklch(0.65 0.2 25)",
-    "oklch(0.7 0.18 55)",
-    "oklch(0.65 0.2 280)",
-    "oklch(0.6 0.2 160)",
-  ];
-
   // Normalize description for grouping (merge "UBER EATS" / "Uber Eats")
   const normalizeDescKey = (s: string) =>
     (s || "").trim().toLowerCase().replace(/\s+/g, " ") || "other";
@@ -362,32 +329,14 @@ export function Dashboard() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
-      <div className="flex flex-wrap items-end gap-4">
-        <div className="space-y-2">
-          <Label>{t("dashboard.viewMonth")}</Label>
-          <Select value={selectedMonthKey} onValueChange={setSelectedMonthKey}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {monthOptions.map((key) => (
-                <SelectItem key={key} value={key}>
-                  {getMonthLabel(key)}
-                  {key === currentMonthKey ? ` (${t("common.current")})` : ""}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <p className="text-muted-foreground text-sm pb-2">
-          {isCurrentMonth
-            ? t("dashboard.currentMonthSummary")
-            : t("dashboard.showingMonth", {
-                month: getMonthLabel(selectedMonthKey),
-              })}{" "}
-          {t("dashboard.syncFromSettings")}
-        </p>
-      </div>
+      <MonthSelector
+        value={selectedMonthKey}
+        onChange={setSelectedMonthKey}
+        options={monthOptions}
+        currentMonthKey={currentMonthKey}
+        isCurrentMonth={isCurrentMonth}
+        t={t}
+      />
 
       <Accordion
         type="multiple"
@@ -402,222 +351,15 @@ export function Dashboard() {
             <SummaryCards selectedMonth={selectedMonth} grand={grand} />
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="overview">
-          <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
-            {t("dashboard.overview")}
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
-            <div className="grid gap-4 lg:grid-cols-2">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {t("dashboard.earnedVsSpentVsSaved")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {summaryBarData.some((d) => d.value > 0) ? (
-                    <ChartContainer
-                      config={summaryBarConfig}
-                      className="h-[220px] w-full"
-                    >
-                      <BarChart
-                        data={summaryBarData}
-                        layout="vertical"
-                        margin={{ top: 5, right: 10, left: 60, bottom: 5 }}
-                        accessibilityLayer
-                      >
-                        <XAxis
-                          type="number"
-                          tickLine={false}
-                          axisLine={false}
-                          tickFormatter={(v) => formatCurrency(v)}
-                        />
-                        <YAxis
-                          type="category"
-                          dataKey="metric"
-                          tickLine={false}
-                          axisLine={false}
-                          width={55}
-                          tick={{ fontSize: 11 }}
-                        />
-                        <ChartTooltip
-                          content={
-                            <ChartTooltipContent
-                              formatter={(value) =>
-                                typeof value === "number"
-                                  ? formatCurrency(value)
-                                  : String(value ?? "")
-                              }
-                            />
-                          }
-                        />
-                        <Bar
-                          dataKey="value"
-                          radius={[0, 4, 4, 0]}
-                          maxBarSize={28}
-                        >
-                          {summaryBarData.map((_, i) => (
-                            <Cell key={i} fill={summaryBarData[i]!.fill} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ChartContainer>
-                  ) : (
-                    <p className="text-sm text-muted-foreground py-8 text-center">
-                      {t("dashboard.noDataForMonth")}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {t("dashboard.spendingBreakdown")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {spendingPieData.length > 0 ? (
-                    <ChartContainer
-                      config={{
-                        "50/50": {
-                          label: "50/50",
-                          theme: { light: PIE_COLORS[0], dark: PIE_COLORS[0] },
-                        },
-                        "Tasnuva's": {
-                          label: "Tasnuva's",
-                          theme: { light: PIE_COLORS[1], dark: PIE_COLORS[1] },
-                        },
-                        My: {
-                          label: "My",
-                          theme: { light: PIE_COLORS[2], dark: PIE_COLORS[2] },
-                        },
-                      }}
-                      className="h-[220px] w-full"
-                    >
-                      <PieChart>
-                        <ChartTooltip
-                          content={
-                            <ChartTooltipContent
-                              formatter={(value) =>
-                                typeof value === "number"
-                                  ? formatCurrency(value)
-                                  : String(value ?? "")
-                              }
-                            />
-                          }
-                        />
-                        <Pie
-                          data={spendingPieData}
-                          dataKey="value"
-                          nameKey="name"
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={80}
-                          paddingAngle={2}
-                        >
-                          {spendingPieData.map((_, i) => (
-                            <Cell
-                              key={i}
-                              fill={PIE_COLORS[i % PIE_COLORS.length]}
-                            />
-                          ))}
-                        </Pie>
-                        <Legend />
-                      </PieChart>
-                    </ChartContainer>
-                  ) : (
-                    <p className="text-sm text-muted-foreground py-8 text-center">
-                      {t("dashboard.noSpendingForMonth")}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {t("dashboard.incomeBreakdown")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {incomeStackedBarData.length > 0 ? (
-                    <ChartContainer
-                      config={incomeStackedBarConfig}
-                      className="h-[220px] w-full"
-                    >
-                      <BarChart
-                        data={incomeStackedBarData}
-                        layout="vertical"
-                        margin={{ top: 5, right: 10, left: 80, bottom: 5 }}
-                        accessibilityLayer
-                      >
-                        <XAxis
-                          type="number"
-                          tickLine={false}
-                          axisLine={false}
-                          tickFormatter={(v) => formatCurrency(v)}
-                        />
-                        <YAxis
-                          type="category"
-                          dataKey="name"
-                          tickLine={false}
-                          axisLine={false}
-                          width={76}
-                          tick={{ fontSize: 11 }}
-                        />
-                        <ChartTooltip
-                          content={
-                            <ChartTooltipContent
-                              labelFormatter={(_, payload) =>
-                                payload?.[0]?.payload?.name ?? ""
-                              }
-                              formatter={(value, name) => (
-                                <div className="flex w-full items-center justify-between gap-4">
-                                  <span className="text-muted-foreground">
-                                    {String(name)}
-                                  </span>
-                                  <span>
-                                    {typeof value === "number"
-                                      ? formatCurrency(value)
-                                      : String(value ?? "")}
-                                  </span>
-                                </div>
-                              )}
-                            />
-                          }
-                        />
-                        <ChartLegend content={<ChartLegendContent />} />
-                        {incomeCategoryKeys.map((cat, idx) => (
-                          <Bar
-                            key={cat}
-                            dataKey={cat}
-                            stackId="income"
-                            radius={
-                              idx === incomeCategoryKeys.length - 1
-                                ? [0, 4, 4, 0]
-                                : 0
-                            }
-                            maxBarSize={36}
-                            fill={
-                              INCOME_CATEGORY_COLORS[cat] ??
-                              "oklch(0.6 0.15 200)"
-                            }
-                          />
-                        ))}
-                      </BarChart>
-                    </ChartContainer>
-                  ) : (
-                    <p className="text-sm text-muted-foreground py-8 text-center">
-                      {t("dashboard.noIncomeForMonth")}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+        <OverviewSection
+          summaryBarData={summaryBarData}
+          summaryBarConfig={summaryBarConfig}
+          spendingPieData={spendingPieData}
+          incomeStackedBarData={incomeStackedBarData}
+          incomeStackedBarConfig={incomeStackedBarConfig}
+          incomeCategoryKeys={incomeCategoryKeys}
+          t={t}
+        />
         <AccordionItem value="debt">
           <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
             {t("dashboard.debt")}
@@ -626,236 +368,15 @@ export function Dashboard() {
             <DebtSection debtSummary={debtSummary} />
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="spending">
-          <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
-            {t("dashboard.spendingByType")}
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {t("dashboard.fiftyFiftySpendByType")}
-                </CardTitle>
-                <p className="text-xs text-muted-foreground">
-                  {t("dashboard.fiftyFiftyExpensesInCategory")}
-                </p>
-              </CardHeader>
-              <CardContent>
-                {fiftyFiftyByType.length > 0 ? (
-                  <ChartContainer
-                    config={fiftyFiftyChartConfig}
-                    className="h-[480px] w-full"
-                  >
-                    <BarChart
-                      data={fiftyFiftyByType}
-                      layout="vertical"
-                      margin={{ top: 5, right: 24, left: 0, bottom: 5 }}
-                      barCategoryGap="20%"
-                      accessibilityLayer
-                    >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        horizontal
-                        vertical
-                      />
-                      <XAxis
-                        type="number"
-                        tickLine={false}
-                        axisLine={false}
-                        tickFormatter={(v) => formatCurrency(v)}
-                      />
-                      <YAxis
-                        type="category"
-                        dataKey="name"
-                        tickLine={false}
-                        axisLine={false}
-                        width={240}
-                        tick={{ fontSize: 11 }}
-                        tickFormatter={(v) =>
-                          v.length > 52 ? `${v.slice(0, 50)}…` : v
-                        }
-                      />
-                      <ChartTooltip
-                        content={
-                          <ChartTooltipContent
-                            labelFormatter={(_, payload) =>
-                              payload?.[0]?.payload?.name ?? ""
-                            }
-                            formatter={(value) =>
-                              typeof value === "number"
-                                ? formatCurrency(value)
-                                : String(value ?? "")
-                            }
-                          />
-                        }
-                      />
-                      <Bar
-                        dataKey="amount"
-                        fill="var(--color-amount)"
-                        radius={[0, 4, 4, 0]}
-                        maxBarSize={16}
-                      />
-                    </BarChart>
-                  </ChartContainer>
-                ) : (
-                  <p className="text-sm text-muted-foreground py-8 text-center">
-                    {t("dashboard.no5050Expenses")}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-
-            <div className="grid gap-4 lg:grid-cols-2">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {t("dashboard.mySpendingByType")}
-                  </CardTitle>
-                  <p className="text-xs text-muted-foreground">
-                    {t("dashboard.myExpensesExcluding")}
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  {mySpendingByType.length > 0 ? (
-                    <ChartContainer
-                      config={mySpendingChartConfig}
-                      className="h-[480px] w-full"
-                    >
-                      <BarChart
-                        data={mySpendingByType}
-                        layout="vertical"
-                        margin={{ top: 5, right: 24, left: 0, bottom: 5 }}
-                        barCategoryGap="20%"
-                        accessibilityLayer
-                      >
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          horizontal
-                          vertical
-                        />
-                        <XAxis
-                          type="number"
-                          tickLine={false}
-                          axisLine={false}
-                          tickFormatter={(v) => formatCurrency(v)}
-                        />
-                        <YAxis
-                          type="category"
-                          dataKey="name"
-                          tickLine={false}
-                          axisLine={false}
-                          width={240}
-                          tick={{ fontSize: 11 }}
-                          tickFormatter={(v) =>
-                            v.length > 52 ? `${v.slice(0, 50)}…` : v
-                          }
-                        />
-                        <ChartTooltip
-                          content={
-                            <ChartTooltipContent
-                              labelFormatter={(_, payload) =>
-                                payload?.[0]?.payload?.name ?? ""
-                              }
-                              formatter={(value) =>
-                                typeof value === "number"
-                                  ? formatCurrency(value)
-                                  : String(value ?? "")
-                              }
-                            />
-                          }
-                        />
-                        <Bar
-                          dataKey="amount"
-                          fill="var(--color-amount)"
-                          radius={[0, 4, 4, 0]}
-                          maxBarSize={16}
-                        />
-                      </BarChart>
-                    </ChartContainer>
-                  ) : (
-                    <p className="text-sm text-muted-foreground py-8 text-center">
-                      {t("dashboard.noExpensesForMonth")}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {t("dashboard.tasnuvasSpendingByType")}
-                  </CardTitle>
-                  <p className="text-xs text-muted-foreground">
-                    {t("dashboard.tasnuvasOnly")}
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  {tasnuvasSpendingByType.length > 0 ? (
-                    <ChartContainer
-                      config={tasnuvasSpendingChartConfig}
-                      className="h-[480px] w-full"
-                    >
-                      <BarChart
-                        data={tasnuvasSpendingByType}
-                        layout="vertical"
-                        margin={{ top: 5, right: 24, left: 0, bottom: 5 }}
-                        barCategoryGap="20%"
-                        accessibilityLayer
-                      >
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          horizontal
-                          vertical
-                        />
-                        <XAxis
-                          type="number"
-                          tickLine={false}
-                          axisLine={false}
-                          tickFormatter={(v) => formatCurrency(v)}
-                        />
-                        <YAxis
-                          type="category"
-                          dataKey="name"
-                          tickLine={false}
-                          axisLine={false}
-                          width={240}
-                          tick={{ fontSize: 11 }}
-                          tickFormatter={(v) =>
-                            v.length > 52 ? `${v.slice(0, 50)}…` : v
-                          }
-                        />
-                        <ChartTooltip
-                          content={
-                            <ChartTooltipContent
-                              labelFormatter={(_, payload) =>
-                                payload?.[0]?.payload?.name ?? ""
-                              }
-                              formatter={(value) =>
-                                typeof value === "number"
-                                  ? formatCurrency(value)
-                                  : String(value ?? "")
-                              }
-                            />
-                          }
-                        />
-                        <Bar
-                          dataKey="amount"
-                          fill="var(--color-amount)"
-                          radius={[0, 4, 4, 0]}
-                          maxBarSize={16}
-                        />
-                      </BarChart>
-                    </ChartContainer>
-                  ) : (
-                    <p className="text-sm text-muted-foreground py-8 text-center">
-                      {t("dashboard.noExpensesForMonth")}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+        <SpendingByTypeSection
+          fiftyFiftyByType={fiftyFiftyByType}
+          mySpendingByType={mySpendingByType}
+          tasnuvasSpendingByType={tasnuvasSpendingByType}
+          fiftyFiftyChartConfig={fiftyFiftyChartConfig}
+          mySpendingChartConfig={mySpendingChartConfig}
+          tasnuvasSpendingChartConfig={tasnuvasSpendingChartConfig}
+          t={t}
+        />
         <AccordionItem value="bymonth">
           <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
             {t("dashboard.byMonth")}

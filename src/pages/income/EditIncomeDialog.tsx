@@ -1,0 +1,269 @@
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CategoryOption } from "@/lib/categoryColors";
+import type { DebtOwner, Income } from "@/lib/types";
+import type { RecurringFrequency } from "./AddIncomeDialog";
+
+export type EditIncomeFormPayload = {
+  date: string;
+  amount: number;
+  description: string;
+  category: string;
+  owner: DebtOwner;
+  recurringAmount?: number;
+  recurringFrequency?: RecurringFrequency;
+  recurringDayOfMonth?: number;
+  recurringStartDate?: string;
+};
+
+export type EditIncomeDialogProps = {
+  income: Income | null;
+  onClose: () => void;
+  incomeCategories: string[];
+  onSubmit: (id: string, payload: EditIncomeFormPayload) => void;
+};
+
+export function EditIncomeDialog({
+  income,
+  onClose,
+  incomeCategories,
+  onSubmit,
+}: EditIncomeDialogProps) {
+  const [date, setDate] = useState("");
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [owner, setOwner] = useState<DebtOwner>("Ayaz");
+  const [recurringChecked, setRecurringChecked] = useState(false);
+  const [recurringAmount, setRecurringAmount] = useState("");
+  const [recurringFrequency, setRecurringFrequency] =
+    useState<RecurringFrequency>("monthly");
+  const [recurringDay, setRecurringDay] = useState("15");
+  const [recurringStartDate, setRecurringStartDate] = useState("");
+
+  useEffect(() => {
+    if (income) {
+      setDate(income.date);
+      setAmount(String(income.amount));
+      setDescription(income.description ?? "");
+      setCategory(income.category ?? incomeCategories[0] ?? "Paycheck");
+      setOwner(income.owner ?? "Ayaz");
+      const hasRecurring =
+        income.recurringAmount != null &&
+        income.recurringAmount > 0 &&
+        (income.recurringFrequency === "monthly"
+          ? income.recurringDayOfMonth != null
+          : !!income.recurringStartDate);
+      setRecurringChecked(!!hasRecurring);
+      setRecurringAmount(
+        income.recurringAmount != null ? String(income.recurringAmount) : "",
+      );
+      setRecurringFrequency(
+        income.recurringFrequency === "biweekly" ? "biweekly" : "monthly",
+      );
+      setRecurringDay(
+        income.recurringDayOfMonth != null
+          ? String(income.recurringDayOfMonth)
+          : "15",
+      );
+      setRecurringStartDate(income.recurringStartDate ?? "");
+    }
+  }, [income, incomeCategories]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!income) return;
+    const num = parseFloat(amount.replace(/[$,]/g, ""));
+    if (Number.isNaN(num) || num <= 0) return;
+    const recurringAmountNum =
+      recurringChecked &&
+      (() => {
+        const n = parseFloat(recurringAmount.replace(/[$,]/g, ""));
+        return !Number.isNaN(n) && n > 0 ? n : undefined;
+      })();
+    const freq = recurringFrequency;
+    const recurringDayNum =
+      recurringChecked &&
+      freq === "monthly" &&
+      (() => {
+        const n = parseInt(recurringDay, 10);
+        return n >= 1 && n <= 31 ? n : undefined;
+      })();
+    const recurringStart =
+      recurringChecked && freq === "biweekly" && recurringStartDate.trim()
+        ? recurringStartDate.trim()
+        : undefined;
+    onSubmit(income.id, {
+      date: date.trim(),
+      amount: num,
+      description: description.trim() || "Income",
+      category: category || (incomeCategories[0] ?? "Paycheck"),
+      owner,
+      recurringAmount:
+        typeof recurringAmountNum === "number" ? recurringAmountNum : undefined,
+      recurringFrequency: recurringAmountNum != null ? freq : undefined,
+      recurringDayOfMonth:
+        typeof recurringDayNum === "number" ? recurringDayNum : undefined,
+      recurringStartDate: recurringStart,
+    });
+  };
+
+  return (
+    <Dialog open={!!income} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit income</DialogTitle>
+          <DialogDescription>
+            Update the date, amount, description, and category.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Date</Label>
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Amount</Label>
+            <Input
+              type="text"
+              placeholder="0.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <Input
+              placeholder="e.g. Paycheck, Basement Rent"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Category</Label>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {incomeCategories.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    <CategoryOption name={c} type="income" />
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Owner</Label>
+            <Select
+              value={owner}
+              onValueChange={(v) => setOwner(v as DebtOwner)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Ayaz">Ayaz</SelectItem>
+                <SelectItem value="Tasnuva">Tasnuva</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="edit-recurring"
+              checked={recurringChecked}
+              onCheckedChange={(c) => setRecurringChecked(c === true)}
+            />
+            <Label htmlFor="edit-recurring" className="cursor-pointer">
+              Recurring income
+            </Label>
+          </div>
+          {recurringChecked && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Recurring amount</Label>
+                <Input
+                  type="text"
+                  placeholder="0.00"
+                  value={recurringAmount}
+                  onChange={(e) => setRecurringAmount(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Frequency</Label>
+                <Select
+                  value={recurringFrequency}
+                  onValueChange={(v) =>
+                    setRecurringFrequency(v as RecurringFrequency)
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="biweekly">
+                      Bi-weekly (every 2 weeks)
+                    </SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {recurringFrequency === "biweekly" ? (
+                <div className="space-y-2">
+                  <Label>First payment date</Label>
+                  <Input
+                    type="date"
+                    value={recurringStartDate}
+                    onChange={(e) => setRecurringStartDate(e.target.value)}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label>Day of month (1–31)</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={31}
+                    value={recurringDay}
+                    onChange={(e) => setRecurringDay(e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">Save</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

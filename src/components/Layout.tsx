@@ -137,14 +137,14 @@ function SidebarContent({
             to={to}
             onClick={onNavClick}
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors shrink-0",
+              "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors min-w-0",
               location.pathname === to
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
-            <Icon className="size-4" />
-            {t(labelKey)}
+            <Icon className="size-4 shrink-0" />
+            <span className="truncate">{t(labelKey)}</span>
           </Link>
         ))}
       </div>
@@ -240,8 +240,8 @@ export function Layout() {
         </Link>
       </header>
 
-      {/* Desktop sidebar: hidden on mobile */}
-      <nav className="hidden md:flex border-r bg-muted/30 p-2 flex-col gap-1 shrink-0 overflow-hidden min-w-[180px]">
+      {/* Desktop sidebar: fixed width so it doesn't change with language */}
+      <nav className="hidden md:flex border-r bg-muted/30 p-2 flex-col gap-1 shrink-0 w-[200px] overflow-hidden">
         <SidebarContent
           location={location}
           t={t}

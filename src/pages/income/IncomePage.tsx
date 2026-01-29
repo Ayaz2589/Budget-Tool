@@ -15,6 +15,8 @@ import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { AddIncomeDialog } from "./AddIncomeDialog";
 import { EditIncomeDialog } from "./EditIncomeDialog";
 import { IncomeTable } from "./IncomeTable";
+import { IncomeList } from "./IncomeList";
+import { IncomeActionsDialog } from "./IncomeActionsDialog";
 
 export function IncomePage() {
   const {
@@ -29,6 +31,7 @@ export function IncomePage() {
   } = useBudget();
   const [addOpen, setAddOpen] = useState(false);
   const [editIncome, setEditIncome] = useState<Income | null>(null);
+  const [incomeForActions, setIncomeForActions] = useState<Income | null>(null);
 
   const { t } = useTranslation();
   const sortedIncome = [...income].sort((a, b) => b.date.localeCompare(a.date));
@@ -87,16 +90,48 @@ export function IncomePage() {
           </div>
         </CardHeader>
         <CardContent>
-          <IncomeTable
-            sortedIncome={sortedIncome}
-            incomeCategories={incomeCategories}
-            onEdit={setEditIncome}
-            onDelete={removeIncome}
-            onUpdateCategory={(id, category) => updateIncome(id, { category })}
-            onUpdateOwner={(id, owner) => updateIncome(id, { owner })}
-          />
+          {sortedIncome.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8 px-4 border rounded-md">
+              No income entries. Add one above.
+            </div>
+          ) : (
+            <>
+              <div className="hidden md:block">
+                <IncomeTable
+                  sortedIncome={sortedIncome}
+                  incomeCategories={incomeCategories}
+                  onEdit={setEditIncome}
+                  onDelete={removeIncome}
+                  onUpdateCategory={(id, category) =>
+                    updateIncome(id, { category })
+                  }
+                  onUpdateOwner={(id, owner) => updateIncome(id, { owner })}
+                />
+              </div>
+              <div className="md:hidden max-h-[50vh] overflow-y-auto border rounded-md">
+                <IncomeList
+                  sortedIncome={sortedIncome}
+                  onIncomeTap={setIncomeForActions}
+                />
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
+
+      <IncomeActionsDialog
+        income={incomeForActions}
+        onClose={() => setIncomeForActions(null)}
+        onUpdateCategory={(id, category) => updateIncome(id, { category })}
+        onUpdateOwner={(id, owner) => updateIncome(id, { owner })}
+        onEdit={(i) => {
+          setIncomeForActions(null);
+          setEditIncome(i);
+        }}
+        onDelete={removeIncome}
+        incomeCategories={incomeCategories}
+        t={t}
+      />
 
       <EditIncomeDialog
         income={editIncome}

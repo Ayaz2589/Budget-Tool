@@ -31,12 +31,16 @@ import {
   ensureSheetsExist,
   clearAndWriteExpenses,
   clearAndWriteIncome,
+  clearAndWriteDebts,
+  clearAndWriteDebtPayments,
   writeTotalsSheet,
   getSheetIds,
   applySheetsFormatting,
   extractSpreadsheetId,
   readExpensesFromSheet,
   readIncomeFromSheet,
+  readDebtsFromSheet,
+  readDebtPaymentsFromSheet,
 } from "@/lib/googleSheets";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
@@ -252,6 +256,12 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       await ensureSheetsExist(accessToken, spreadsheetId);
       await clearAndWriteExpenses(accessToken, spreadsheetId, budget.expenses);
       await clearAndWriteIncome(accessToken, spreadsheetId, budget.income);
+      await clearAndWriteDebts(accessToken, spreadsheetId, budget.debts);
+      await clearAndWriteDebtPayments(
+        accessToken,
+        spreadsheetId,
+        budget.debtPayments,
+      );
       const months = computeAllTotals({
         expenses: budget.expenses,
         income: budget.income,
@@ -276,6 +286,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     spreadsheetId,
     budget.expenses,
     budget.income,
+    budget.debts,
+    budget.debtPayments,
     budget.iOweNova,
   ]);
 
@@ -332,6 +344,22 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         }
       }
 
+      const appDebtIds = new Set(budget.debts.map((d) => d.id));
+      const appPaymentIds = new Set(budget.debtPayments.map((p) => p.id));
+      const sheetDebts = await readDebtsFromSheet(accessToken, spreadsheetId);
+      const sheetPayments = await readDebtPaymentsFromSheet(
+        accessToken,
+        spreadsheetId,
+      );
+      const newDebts = sheetDebts.filter((d) => !appDebtIds.has(d.id));
+      const newPayments = sheetPayments.filter((p) => !appPaymentIds.has(p.id));
+      if (newDebts.length > 0) {
+        budget.addDebts(newDebts);
+      }
+      if (newPayments.length > 0) {
+        budget.addDebtPayments(newPayments);
+      }
+
       setSyncStatus("success");
       setSyncErrorMessage(null);
     } catch (err) {
@@ -345,8 +373,12 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     spreadsheetId,
     budget.expenses,
     budget.income,
+    budget.debts,
+    budget.debtPayments,
     budget.addExpenses,
     budget.addIncome,
+    budget.addDebts,
+    budget.addDebtPayments,
   ]);
 
   useEffect(() => {

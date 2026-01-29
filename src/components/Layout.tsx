@@ -6,6 +6,7 @@ import {
   Upload,
   List,
   Wallet,
+  CreditCard,
   ListOrdered,
   Settings,
   LogIn,
@@ -52,6 +53,7 @@ const nav = [
   { to: "/import", label: "Import CSV", icon: Upload },
   { to: "/transactions", label: "Transactions", icon: List },
   { to: "/income", label: "Income", icon: Wallet },
+  { to: "/debt", label: "Debt", icon: CreditCard },
   { to: "/rules", label: "Category Rules", icon: ListOrdered },
   { to: "/settings", label: "Settings", icon: Settings },
 ];

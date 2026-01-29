@@ -107,6 +107,11 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 - **Add income:** Form (date, amount, description, category). List of income entries with edit category and delete.
 - **Categories:** Rent, Paycheck, Bonus, Other (color-coded in dropdowns).
 
+### 4.5.1 Debt
+
+- **Debt page:** Track debts (e.g. car loan, credit card) and payments. **Add debt:** dialog with name, initial amount owed, optional start date, **owner** (Ayaz or Tasnuva), and optional **recurring payment** (checkbox: when checked, amount and **frequency** — **bi-weekly** (every 14 days from first payment date) or **monthly** (day of month 1–31)). Each debt shows owner, initial amount, and **current balance** (initial minus sum of payments minus recurring deductions). **Recurring:** bi-weekly = amount subtracted every 14 days from first payment date; monthly = amount subtracted on the chosen day each month (from debt start date). **Set/Edit recurring:** per-debt button opens dialog to set or clear recurring amount, frequency, and (first payment date or day of month). **Make payment:** per-debt dialog (date, amount, optional note); payments listed under each debt with delete. **Delete debt:** confirmation dialog; removes the debt and all its payments (cascade).
+- **Persistence:** Debts and debt payments stored in localStorage with expenses/income. **Sync to Google Sheets** writes **Debts** sheet (Id, Name, Initial Amount, Start Date, Owner, Recurring Amount, Recurring Day, Recurring Frequency, Recurring Start Date) and **DebtPayments** sheet (Id, Debt Id, Date, Amount, Note). **Restore from Sheet** merges debts and payments by id (add-only).
+
 ### 4.6 Dashboard
 
 - **View month:** A "View month" dropdown lets the user select which month's totals to show. Default is current month. Options include the current month plus every month that has expense/income data (newest first).
@@ -131,14 +136,14 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 - **Nav sign-in:** At the bottom of the sidebar, the app shows either **"Sign in with Google"** or, when signed in, the **user's name and avatar** (profile picture from Google userinfo; fallback to initials if the image fails to load) and a **Sign out** button. Same OAuth scope and account as Google Sheets; user profile (name, picture, email) is fetched after sign-in for display only.
 - **Auth:** Google OAuth (e.g. `@react-oauth/google`). Requires `VITE_GOOGLE_CLIENT_ID` in `.env`. If not set, app shows a fallback and does not initialize the Google client (avoids “Missing required parameter client_id”).
 - **Spreadsheet:** User pastes spreadsheet ID or URL in Settings. App can use an **empty** sheet; it creates/ensures required sheets and structure.
-- **Sync to Google Sheets (push only):** "Sync to Google Sheets" in Settings **overwrites** the Sheet with the app's current state. Clears and writes **Expenses** (6 columns: Date, Amount, Description, Category, **Source**, **Card Member**), **Income** table, and **Totals** sheet (monthly rows + TOTALS row). If the user deletes all transactions in the app and syncs, the Sheet is updated to match (empty expenses/income).
-- **Restore from Sheet (pull only):** "Restore from Sheet" in Settings **reads** the Expenses and Income sheets and **merges** rows into the app (add-only by key: date + description + amount). Use case: e.g. after clearing local storage, load data back from the Sheet. Sheet-originated expenses get `source` and `cardMember` from columns when present; older 4-column sheets default to `manual` / no card member.
+- **Sync to Google Sheets (push only):** "Sync to Google Sheets" in Settings **overwrites** the Sheet with the app's current state. Clears and writes **Expenses** (6 columns: Date, Amount, Description, Category, **Source**, **Card Member**), **Income** table, **Debts** sheet, **DebtPayments** sheet, and **Totals** sheet (monthly rows + TOTALS row). If the user deletes all transactions in the app and syncs, the Sheet is updated to match (empty expenses/income/debts).
+- **Restore from Sheet (pull only):** "Restore from Sheet" in Settings **reads** the Expenses, Income, Debts, and DebtPayments sheets and **merges** rows into the app (expenses/income add-only by key: date + description + amount; debts and debt payments add-only by id). Use case: e.g. after clearing local storage, load data back from the Sheet. Sheet-originated expenses get `source` and `cardMember` from columns when present; older 4-column sheets default to `manual` / no card member.
 - **Formatting:** Left-align cells, **Amount** columns as currency ($), **header row** bold and larger font (applied via Sheets API `batchUpdate` after data write).
 - **When sync runs:** Only when the user clicks the sync or restore button. No automatic or periodic sync.
 
 ### 4.9 Persistence
 
-- **localStorage:** Expenses, income, category rules, I Owe Nova (and related state), and spreadsheet ID are persisted so they survive refresh. No expiry; data stays until the user or browser clears storage.
+- **localStorage:** Expenses, income, debts, debt payments, category rules, I Owe Nova (and related state), and spreadsheet ID are persisted so they survive refresh. No expiry; data stays until the user or browser clears storage.
 - **Clearing localStorage:** Wipes all app data (transactions, income, rules, spreadsheet ID). **Does not** change the Google Sheet. If the user then syncs, the app overwrites the Sheet with the current (empty) app data.
 
 ### 4.10 Settings
@@ -167,16 +172,16 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 
 ## 7. File / Module Overview
 
-| Area            | Path / files                                                                 |
-| --------------- | ---------------------------------------------------------------------------- |
-| Types           | `src/lib/types.ts` (Expense, Income, categories)                             |
-| Parsers         | `src/lib/parsers/amex.ts`, `apple.ts`, `index.ts` (no Chase)                 |
-| Category rules  | `src/lib/categoryRules.ts` (pattern + baseline)                              |
-| Totals          | `src/lib/totals.ts` (getMonthLabel exported for Dashboard/Transactions)      |
-| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses 6-col, Income, Totals)        |
-| Category colors | `src/lib/categoryColors.tsx` (colors + CategoryOption component)             |
-| Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `GoogleAuthContext.tsx` |
-| Pages           | Dashboard, Import, Transactions, Income, Category Rules, Settings            |
+| Area            | Path / files                                                                         |
+| --------------- | ------------------------------------------------------------------------------------ |
+| Types           | `src/lib/types.ts` (Expense, Income, Debt, DebtPayment, categories)                  |
+| Parsers         | `src/lib/parsers/amex.ts`, `apple.ts`, `index.ts` (no Chase)                         |
+| Category rules  | `src/lib/categoryRules.ts` (pattern + baseline)                                      |
+| Totals          | `src/lib/totals.ts` (getMonthLabel exported for Dashboard/Transactions)              |
+| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Debts, DebtPayments, Totals) |
+| Category colors | `src/lib/categoryColors.tsx` (colors + CategoryOption component)                     |
+| Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `GoogleAuthContext.tsx`         |
+| Pages           | Dashboard, Import, Transactions, Income, Debt, Category Rules, Settings              |
 
 ---
 

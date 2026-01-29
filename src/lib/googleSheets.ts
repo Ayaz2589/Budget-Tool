@@ -1,4 +1,10 @@
-import type { Expense, Income, ExpenseSource } from "@/lib/types";
+import type {
+  Debt,
+  DebtPayment,
+  Expense,
+  Income,
+  ExpenseSource,
+} from "@/lib/types";
 import type { MonthTotals } from "@/lib/totals";
 
 const VALID_EXPENSE_SOURCES: ExpenseSource[] = [
@@ -151,6 +157,95 @@ export async function readIncomeFromSheet(
   return income;
 }
 
+function parseDebtOwner(value: unknown): "Ayaz" | "Tasnuva" {
+  const s = String(value ?? "").trim();
+  if (s === "Tasnuva") return "Tasnuva";
+  return "Ayaz";
+}
+
+function parseRecurringDay(value: unknown): number | undefined {
+  const n = Number(value);
+  if (Number.isInteger(n) && n >= 1 && n <= 31) return n;
+  return undefined;
+}
+
+function parseRecurringFrequency(
+  value: unknown,
+): "monthly" | "biweekly" {
+  const s = String(value ?? "").trim().toLowerCase();
+  if (s === "biweekly" || s === "bi-weekly") return "biweekly";
+  return "monthly";
+}
+
+export async function readDebtsFromSheet(
+  accessToken: string,
+  spreadsheetId: string
+): Promise<Debt[]> {
+  const rows = await getSheetValues(
+    accessToken,
+    spreadsheetId,
+    "Debts!A2:I",
+    "UNFORMATTED_VALUE",
+  );
+  const debts: Debt[] = [];
+  for (const row of rows) {
+    const id = String(row[0] ?? "").trim();
+    const name = String(row[1] ?? "").trim();
+    const initialAmount = parseAmount(row[2]);
+    const startDate = normalizeDate(row[3]);
+    const owner = parseDebtOwner(row[4]);
+    const recurringAmount = parseAmount(row[5]);
+    const recurringDay = parseRecurringDay(row[6]);
+    const recurringFrequency = parseRecurringFrequency(row[7]);
+    const recurringStartDate = normalizeDate(row[8]);
+    if (!name || initialAmount == null || initialAmount < 0) continue;
+    debts.push({
+      id: id || generateId(),
+      name,
+      initialAmount,
+      startDate: startDate ?? undefined,
+      owner,
+      recurringAmount:
+        recurringAmount != null && recurringAmount > 0
+          ? recurringAmount
+          : undefined,
+      recurringFrequency,
+      recurringDayOfMonth: recurringDay,
+      recurringStartDate: recurringStartDate ?? undefined,
+    });
+  }
+  return debts;
+}
+
+export async function readDebtPaymentsFromSheet(
+  accessToken: string,
+  spreadsheetId: string
+): Promise<DebtPayment[]> {
+  const rows = await getSheetValues(
+    accessToken,
+    spreadsheetId,
+    "DebtPayments!A2:E",
+    "UNFORMATTED_VALUE",
+  );
+  const payments: DebtPayment[] = [];
+  for (const row of rows) {
+    const id = String(row[0] ?? "").trim();
+    const debtId = String(row[1] ?? "").trim();
+    const date = normalizeDate(row[2]);
+    const amount = parseAmount(row[3]);
+    const note = String(row[4] ?? "").trim() || undefined;
+    if (!debtId || !date || amount == null || amount <= 0) continue;
+    payments.push({
+      id: id || generateId(),
+      debtId,
+      date,
+      amount,
+      note,
+    });
+  }
+  return payments;
+}
+
 export async function appendExpenses(
   accessToken: string,
   spreadsheetId: string,
@@ -222,6 +317,64 @@ export async function clearAndWriteIncome(
   const values = [...headers, ...rows];
   const range = "Income!A1:D";
   await clearRange(accessToken, spreadsheetId, "Income!A1:D10000");
+  if (values.length > 0) {
+    await updateSheet(accessToken, spreadsheetId, range, values, false);
+  }
+}
+
+export async function clearAndWriteDebts(
+  accessToken: string,
+  spreadsheetId: string,
+  debts: Debt[]
+): Promise<void> {
+  const headers = [
+    [
+      "Id",
+      "Name",
+      "Initial Amount",
+      "Start Date",
+      "Owner",
+      "Recurring Amount",
+      "Recurring Day",
+      "Recurring Frequency",
+      "Recurring Start Date",
+    ],
+  ];
+  const rows = debts.map((d) => [
+    d.id,
+    d.name,
+    d.initialAmount,
+    d.startDate ?? "",
+    d.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+    d.recurringAmount ?? "",
+    d.recurringDayOfMonth ?? "",
+    d.recurringFrequency === "biweekly" ? "biweekly" : d.recurringFrequency ?? "",
+    d.recurringStartDate ?? "",
+  ]);
+  const values = [...headers, ...rows];
+  const range = "Debts!A1:I";
+  await clearRange(accessToken, spreadsheetId, "Debts!A1:I10000");
+  if (values.length > 0) {
+    await updateSheet(accessToken, spreadsheetId, range, values, false);
+  }
+}
+
+export async function clearAndWriteDebtPayments(
+  accessToken: string,
+  spreadsheetId: string,
+  debtPayments: DebtPayment[]
+): Promise<void> {
+  const headers = [["Id", "Debt Id", "Date", "Amount", "Note"]];
+  const rows = debtPayments.map((p) => [
+    p.id,
+    p.debtId,
+    p.date,
+    p.amount,
+    p.note ?? "",
+  ]);
+  const values = [...headers, ...rows];
+  const range = "DebtPayments!A1:E";
+  await clearRange(accessToken, spreadsheetId, "DebtPayments!A1:E10000");
   if (values.length > 0) {
     await updateSheet(accessToken, spreadsheetId, range, values, false);
   }
@@ -342,6 +495,8 @@ export interface SheetIds {
   expenses: number;
   income: number;
   totals: number;
+  debts: number;
+  debtPayments: number;
 }
 
 export async function getSheetIds(
@@ -363,8 +518,17 @@ export async function getSheetIds(
   const expenses = byTitle["Expenses"];
   const income = byTitle["Income"];
   const totals = byTitle["Totals"];
-  if (expenses == null || income == null || totals == null) return null;
-  return { expenses, income, totals };
+  const debts = byTitle["Debts"];
+  const debtPayments = byTitle["DebtPayments"];
+  if (
+    expenses == null ||
+    income == null ||
+    totals == null ||
+    debts == null ||
+    debtPayments == null
+  )
+    return null;
+  return { expenses, income, totals, debts, debtPayments };
 }
 
 export async function ensureSheetsExist(
@@ -380,7 +544,7 @@ export async function ensureSheetsExist(
     sheets?: { properties: { sheetId: number; title: string } }[];
   };
   const titles = new Set((data.sheets ?? []).map((s) => s.properties.title));
-  const needed = ["Expenses", "Income", "Totals"];
+  const needed = ["Expenses", "Income", "Totals", "Debts", "DebtPayments"];
   const toAdd = needed.filter((t) => !titles.has(t));
   if (toAdd.length === 0) return;
   const addRes = await fetch(`${SHEETS_API}/${spreadsheetId}:batchUpdate`, {
@@ -522,6 +686,96 @@ export async function applySheetsFormatting(
       10000,
       1,
       2,
+      {
+        horizontalAlignment: "LEFT",
+        numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },
+      },
+      currencyFields
+    )
+  );
+
+  // Debts: header bold + larger, all left align (A–I), columns C and F (Initial Amount, Recurring Amount) currency
+  requests.push(
+    repeatCellRequest(
+      sheetIds.debts,
+      0,
+      1,
+      0,
+      9,
+      { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
+      headerFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.debts,
+      0,
+      10000,
+      0,
+      9,
+      { horizontalAlignment: "LEFT" },
+      leftAlignFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.debts,
+      1,
+      10000,
+      2,
+      3,
+      {
+        horizontalAlignment: "LEFT",
+        numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },
+      },
+      currencyFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.debts,
+      1,
+      10000,
+      5,
+      6,
+      {
+        horizontalAlignment: "LEFT",
+        numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },
+      },
+      currencyFields
+    )
+  );
+
+  // DebtPayments: header bold + larger, all left align (A–E), column D (Amount) currency
+  requests.push(
+    repeatCellRequest(
+      sheetIds.debtPayments,
+      0,
+      1,
+      0,
+      5,
+      { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
+      headerFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.debtPayments,
+      0,
+      10000,
+      0,
+      5,
+      { horizontalAlignment: "LEFT" },
+      leftAlignFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.debtPayments,
+      1,
+      10000,
+      3,
+      4,
       {
         horizontalAlignment: "LEFT",
         numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },

@@ -51,7 +51,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Plus, FileDown } from "lucide-react";
+import { Plus, FileDown, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
 function formatCurrency(n: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -85,6 +85,12 @@ export function TransactionsPage() {
   const [monthFilter, setMonthFilter] = useState<string>("");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [searchFilter, setSearchFilter] = useState<string>("");
+  const [cardMemberFilter, setCardMemberFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<
+    "date" | "amount" | "description" | "source" | "category" | "cardMember"
+  >("date");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
   const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
@@ -112,9 +118,7 @@ export function TransactionsPage() {
   }, [expenses]);
 
   const filtered = useMemo(() => {
-    let list = [...expenses]
-      .filter((e) => isValidDate(e.date))
-      .sort((a, b) => b.date.localeCompare(a.date));
+    let list = [...expenses].filter((e) => isValidDate(e.date));
     if (monthFilter) {
       list = list.filter((e) => e.date.startsWith(monthFilter));
     }
@@ -122,10 +126,57 @@ export function TransactionsPage() {
       list = list.filter((e) => e.source === sourceFilter);
     }
     if (categoryFilter) {
-      list = list.filter((e) => e.category === categoryFilter);
+      if (categoryFilter === "__uncategorized") {
+        list = list.filter((e) => !e.category);
+      } else {
+        list = list.filter((e) => e.category === categoryFilter);
+      }
     }
+    if (searchFilter.trim()) {
+      const q = searchFilter.trim().toLowerCase();
+      list = list.filter((e) => e.description.toLowerCase().includes(q));
+    }
+    if (cardMemberFilter && cardMemberFilter !== "all") {
+      list = list.filter((e) => (e.cardMember ?? "") === cardMemberFilter);
+    }
+    const cmp = sortDir === "asc" ? 1 : -1;
+    list.sort((a, b) => {
+      let diff = 0;
+      switch (sortBy) {
+        case "date":
+          diff = a.date.localeCompare(b.date);
+          break;
+        case "amount":
+          diff = a.amount - b.amount;
+          break;
+        case "description":
+          diff = a.description.localeCompare(b.description);
+          break;
+        case "source":
+          diff = a.source.localeCompare(b.source);
+          break;
+        case "category":
+          diff = (a.category ?? "").localeCompare(b.category ?? "");
+          break;
+        case "cardMember":
+          diff = (a.cardMember ?? "").localeCompare(b.cardMember ?? "");
+          break;
+        default:
+          diff = a.date.localeCompare(b.date);
+      }
+      return diff * cmp;
+    });
     return list;
-  }, [expenses, monthFilter, sourceFilter, categoryFilter]);
+  }, [
+    expenses,
+    monthFilter,
+    sourceFilter,
+    categoryFilter,
+    searchFilter,
+    cardMemberFilter,
+    sortBy,
+    sortDir,
+  ]);
 
   const byMonth = useMemo(() => {
     const map = new Map<string, typeof filtered>();
@@ -184,6 +235,43 @@ export function TransactionsPage() {
   const allFilteredSelected =
     filtered.length > 0 && filtered.every((e) => selectedIds.has(e.id));
   const someSelected = selectedIds.size > 0;
+
+  const hasActiveFilters =
+    monthFilter ||
+    sourceFilter !== "all" ||
+    categoryFilter ||
+    searchFilter.trim() ||
+    cardMemberFilter !== "all";
+
+  const clearFilters = useCallback(() => {
+    setMonthFilter("");
+    setSourceFilter("all");
+    setCategoryFilter("");
+    setSearchFilter("");
+    setCardMemberFilter("all");
+  }, []);
+
+  const toggleSort = useCallback(
+    (col: typeof sortBy) => {
+      if (sortBy === col) {
+        setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      } else {
+        setSortBy(col);
+        setSortDir(col === "date" || col === "amount" ? "desc" : "asc");
+      }
+    },
+    [sortBy],
+  );
+
+  const SortIcon = ({ column }: { column: typeof sortBy }) => {
+    if (sortBy !== column)
+      return <ArrowUpDown className="size-3.5 opacity-50" />;
+    return sortDir === "asc" ? (
+      <ArrowUp className="size-3.5" />
+    ) : (
+      <ArrowDown className="size-3.5" />
+    );
+  };
 
   const handleDeleteSelected = useCallback(() => {
     removeExpenses(Array.from(selectedIds));
@@ -399,6 +487,9 @@ export function TransactionsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="_">All</SelectItem>
+                  <SelectItem value="__uncategorized">
+                    <CategoryOption name="Uncategorized" type="expense" />
+                  </SelectItem>
                   {expenseCategories.map((c) => (
                     <SelectItem key={c} value={c}>
                       <CategoryOption name={c} type="expense" />
@@ -407,6 +498,39 @@ export function TransactionsPage() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label>Card member</Label>
+              <Select
+                value={cardMemberFilter}
+                onValueChange={setCardMemberFilter}
+              >
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  {cardMemberOptions.map((name) => (
+                    <SelectItem key={name} value={name}>
+                      {name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Search description</Label>
+              <Input
+                placeholder="Filter by description..."
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                className="w-[200px]"
+              />
+            </div>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                Clear filters
+              </Button>
+            )}
             {uncategorizedCount > 0 && (
               <Button variant="outline" onClick={reapplyRules}>
                 Re-apply rules ({uncategorizedCount} uncategorized)
@@ -488,7 +612,7 @@ export function TransactionsPage() {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-[40px]">
+                            <TableHead className="w-[40px] px-2">
                               <Checkbox
                                 checked={
                                   monthExpenses.length > 0 &&
@@ -517,12 +641,66 @@ export function TransactionsPage() {
                               />
                             </TableHead>
                             <TableHead className="w-[100px]">ID</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Source</TableHead>
-                            <TableHead>Card Member</TableHead>
-                            <TableHead>Category</TableHead>
+                            <TableHead>
+                              <button
+                                type="button"
+                                onClick={() => toggleSort("date")}
+                                className="flex items-center gap-1 hover:text-foreground"
+                              >
+                                Date
+                                <SortIcon column="date" />
+                              </button>
+                            </TableHead>
+                            <TableHead>
+                              <button
+                                type="button"
+                                onClick={() => toggleSort("description")}
+                                className="flex items-center gap-1 hover:text-foreground"
+                              >
+                                Description
+                                <SortIcon column="description" />
+                              </button>
+                            </TableHead>
+                            <TableHead>
+                              <button
+                                type="button"
+                                onClick={() => toggleSort("amount")}
+                                className="flex items-center gap-1 hover:text-foreground"
+                              >
+                                Amount
+                                <SortIcon column="amount" />
+                              </button>
+                            </TableHead>
+                            <TableHead>
+                              <button
+                                type="button"
+                                onClick={() => toggleSort("source")}
+                                className="flex items-center gap-1 hover:text-foreground"
+                              >
+                                Source
+                                <SortIcon column="source" />
+                              </button>
+                            </TableHead>
+                            <TableHead>
+                              <button
+                                type="button"
+                                onClick={() => toggleSort("cardMember")}
+                                className="flex items-center gap-1 hover:text-foreground"
+                              >
+                                Card Member
+                                <SortIcon column="cardMember" />
+                              </button>
+                            </TableHead>
+                            <TableHead>
+                              <button
+                                type="button"
+                                onClick={() => toggleSort("category")}
+                                className="flex items-center gap-1 hover:text-foreground"
+                              >
+                                Category
+                                <SortIcon column="category" />
+                              </button>
+                            </TableHead>
                             <TableHead className="w-[80px]">Actions</TableHead>
                           </TableRow>
                         </TableHeader>

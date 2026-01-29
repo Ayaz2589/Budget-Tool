@@ -13,7 +13,13 @@
     "appName": "Ortho",
     "signIn": "Googleでサインイン",
     "signOut": "サインアウト",
-    "loading": "読み込み中…"
+    "loading": "読み込み中…",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる",
+    "menu": "メニュー",
+    "more": "その他",
+    "navigation": "ナビゲーション",
+    "language": "言語"
   },
   "common": {
     "save": "保存",

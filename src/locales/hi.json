@@ -13,7 +13,13 @@
     "appName": "Ortho",
     "signIn": "Google से साइन इन करें",
     "signOut": "साइन आउट",
-    "loading": "लोड हो रहा है…"
+    "loading": "लोड हो रहा है…",
+    "openMenu": "मेनू खोलें",
+    "closeMenu": "मेनू बंद करें",
+    "menu": "मेनू",
+    "more": "अधिक",
+    "navigation": "नेविगेशन",
+    "language": "भाषा"
   },
   "common": {
     "save": "सहेजें",

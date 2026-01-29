@@ -13,7 +13,13 @@
     "appName": "Ortho",
     "signIn": "Sign in with Google",
     "signOut": "Sign out",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "menu": "Menu",
+    "more": "More",
+    "navigation": "Navigation",
+    "language": "Language"
   },
   "common": {
     "save": "Save",

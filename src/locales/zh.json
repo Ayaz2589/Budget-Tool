@@ -13,7 +13,13 @@
     "appName": "Ortho",
     "signIn": "使用 Google 登录",
     "signOut": "退出登录",
-    "loading": "加载中…"
+    "loading": "加载中…",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单",
+    "menu": "菜单",
+    "more": "更多",
+    "navigation": "导航",
+    "language": "语言"
   },
   "common": {
     "save": "保存",

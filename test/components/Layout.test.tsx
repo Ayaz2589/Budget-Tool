@@ -26,7 +26,12 @@ function TestWrapper() {
 
 test("Layout renders branding and nav", () => {
   render(<TestWrapper />);
-  expect(screen.getByText("Ortho")).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: /dashboard/i })).toBeInTheDocument();
+  // App name appears in mobile header and in desktop sidebar
+  expect(screen.getAllByText("Ortho").length).toBeGreaterThanOrEqual(1);
+  expect(
+    screen.getAllByRole("link", { name: /dashboard/i }).length,
+  ).toBeGreaterThanOrEqual(1);
   expect(screen.getByText("Dashboard content")).toBeInTheDocument();
+  // Mobile bottom nav has More button
+  expect(screen.getByRole("button", { name: /more/i })).toBeInTheDocument();
 });

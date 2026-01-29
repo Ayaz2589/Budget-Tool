@@ -26,6 +26,8 @@ import {
   SOURCE_LABEL_KEYS,
 } from "./FiltersAndActionsDialog";
 import { ExpensesByMonthTable, type SortColumn } from "./ExpensesByMonthTable";
+import { ExpensesByMonthList } from "./ExpensesByMonthList";
+import { ExpenseActionsDialog } from "./ExpenseActionsDialog";
 import {
   DeleteOneTransactionDialog,
   DeleteSelectedTransactionsDialog,
@@ -58,6 +60,9 @@ export function TransactionsPage() {
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
   const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
   const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
+    null,
+  );
+  const [expenseForActions, setExpenseForActions] = useState<Expense | null>(
     null,
   );
   const [filtersPopupOpen, setFiltersPopupOpen] = useState(false);
@@ -326,23 +331,38 @@ export function TransactionsPage() {
                 {t("transactions.noTransactions")}
               </div>
             ) : (
-              <ExpensesByMonthTable
-                byMonth={byMonth}
-                defaultOpenMonth={defaultOpenMonth}
-                selectedIds={selectedIds}
-                onToggleSelect={toggleSelect}
-                onToggleMonthSelection={toggleMonthSelection}
-                sortBy={sortBy}
-                sortDir={sortDir}
-                onSort={toggleSort}
-                onUpdateCategory={(id, category) =>
-                  updateExpense(id, { category })
-                }
-                expenseCategories={expenseCategories}
-                onDeleteOne={setDeleteOneExpense}
-                sourceLabelKeys={SOURCE_LABEL_KEYS}
-                t={t}
-              />
+              <>
+                <div className="hidden md:block">
+                  <ExpensesByMonthTable
+                    byMonth={byMonth}
+                    defaultOpenMonth={defaultOpenMonth}
+                    selectedIds={selectedIds}
+                    onToggleSelect={toggleSelect}
+                    onToggleMonthSelection={toggleMonthSelection}
+                    sortBy={sortBy}
+                    sortDir={sortDir}
+                    onSort={toggleSort}
+                    onUpdateCategory={(id, category) =>
+                      updateExpense(id, { category })
+                    }
+                    expenseCategories={expenseCategories}
+                    onDeleteOne={setDeleteOneExpense}
+                    sourceLabelKeys={SOURCE_LABEL_KEYS}
+                    t={t}
+                  />
+                </div>
+                <div className="md:hidden">
+                  <ExpensesByMonthList
+                    byMonth={byMonth}
+                    defaultOpenMonth={defaultOpenMonth}
+                    selectedIds={selectedIds}
+                    onToggleSelect={toggleSelect}
+                    onToggleMonthSelection={toggleMonthSelection}
+                    onExpenseTap={setExpenseForActions}
+                    t={t}
+                  />
+                </div>
+              </>
             )}
           </div>
         </CardContent>
@@ -351,6 +371,18 @@ export function TransactionsPage() {
       <AddTransactionDialog
         open={addTransactionOpen}
         onOpenChange={setAddTransactionOpen}
+      />
+
+      <ExpenseActionsDialog
+        expense={expenseForActions}
+        onClose={() => setExpenseForActions(null)}
+        onUpdateCategory={(id, category) => updateExpense(id, { category })}
+        onDelete={(e) => {
+          setExpenseForActions(null);
+          setDeleteOneExpense(e);
+        }}
+        expenseCategories={expenseCategories}
+        t={t}
       />
 
       <DeleteOneTransactionDialog

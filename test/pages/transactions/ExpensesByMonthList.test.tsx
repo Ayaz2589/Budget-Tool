@@ -1,0 +1,78 @@
+import { test, expect, afterEach } from "bun:test";
+import { render, screen, cleanup } from "@testing-library/react";
+import { ExpensesByMonthList } from "@/pages/transactions/ExpensesByMonthList";
+import type { Expense } from "@/lib/types";
+
+afterEach(cleanup);
+
+const mockT = (key: string, opts?: { count?: number }) =>
+  opts?.count != null ? `${key}:${opts.count}` : key;
+
+test("ExpensesByMonthList shows month header and expense when has one month and one expense", () => {
+  const byMonth: [string, Expense[]][] = [
+    [
+      "2025-01",
+      [
+        {
+          id: "e1",
+          date: "2025-01-15",
+          amount: 50,
+          description: "Test purchase",
+          category: "Food",
+          source: "manual",
+        },
+      ],
+    ],
+  ];
+  render(
+    <ExpensesByMonthList
+      byMonth={byMonth}
+      defaultOpenMonth="2025-01"
+      selectedIds={new Set()}
+      onToggleSelect={() => {}}
+      onToggleMonthSelection={() => {}}
+      onExpenseTap={() => {}}
+      t={mockT}
+    />,
+  );
+  expect(screen.getByText("January 2025")).toBeInTheDocument();
+  expect(screen.getByText("Test purchase")).toBeInTheDocument();
+  expect(screen.getByText("$50.00")).toBeInTheDocument();
+});
+
+test("ExpensesByMonthList has checkbox and tap target for each expense", () => {
+  const byMonth: [string, Expense[]][] = [
+    [
+      "2025-01",
+      [
+        {
+          id: "e1",
+          date: "2025-01-15",
+          amount: 50,
+          description: "Test purchase",
+          category: "Food",
+          source: "manual",
+        },
+      ],
+    ],
+  ];
+  render(
+    <ExpensesByMonthList
+      byMonth={byMonth}
+      defaultOpenMonth="2025-01"
+      selectedIds={new Set()}
+      onToggleSelect={() => {}}
+      onToggleMonthSelection={() => {}}
+      onExpenseTap={() => {}}
+      t={mockT}
+    />,
+  );
+  const checkbox = screen.getByRole("checkbox", {
+    name: /select test purchase/i,
+  });
+  expect(checkbox).toBeInTheDocument();
+  const tapTarget = screen.getByRole("button", {
+    name: /test purchase.*\$50\.00.*2025-01-15/i,
+  });
+  expect(tapTarget).toBeInTheDocument();
+});

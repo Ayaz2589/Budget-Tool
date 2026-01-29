@@ -24,7 +24,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  RadialBarChart,
+  RadialBar,
+  Legend,
+} from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -107,6 +119,93 @@ export function Dashboard() {
     },
   } satisfies ChartConfig;
 
+  // Selected month summary bar chart data (Earned, Spent, Spent w/o Mortgage, Saved)
+  const summaryBarConfig = {
+    earned: {
+      label: "Earned",
+      theme: { light: "oklch(0.55 0.2 160)", dark: "oklch(0.7 0.18 165)" },
+    },
+    spent: {
+      label: "Spent",
+      theme: { light: "oklch(0.72 0.18 55)", dark: "oklch(0.78 0.15 55)" },
+    },
+    spentWoMtg: {
+      label: "Spent w/o Mtg",
+      theme: { light: "oklch(0.75 0.15 45)", dark: "oklch(0.8 0.12 45)" },
+    },
+    saved: {
+      label: "Saved",
+      theme: { light: "oklch(0.6 0.2 160)", dark: "oklch(0.65 0.18 165)" },
+    },
+  } satisfies ChartConfig;
+
+  const summaryBarData = useMemo(
+    () => [
+      {
+        metric: "Earned",
+        value: selectedMonth.totalEarned,
+        fill: "var(--color-earned)",
+      },
+      {
+        metric: "Spent",
+        value: selectedMonth.totalSpent,
+        fill: "var(--color-spent)",
+      },
+      {
+        metric: "Spent w/o Mtg",
+        value: selectedMonth.totalSpentWithoutMortgage,
+        fill: "var(--color-spentWoMtg)",
+      },
+      {
+        metric: "Saved",
+        value: selectedMonth.totalSaved,
+        fill: "var(--color-saved)",
+      },
+    ],
+    [selectedMonth],
+  );
+
+  // Spending breakdown pie (Mortgage, 50/50, Tasnuva's, My)
+  const spendingPieData = useMemo(() => {
+    const mortgage =
+      selectedMonth.totalSpent - selectedMonth.totalSpentWithoutMortgage;
+    const fiftyFifty = selectedMonth.total5050Spent;
+    const tasnuvas = selectedMonth.novasPurchase;
+    const mySpending =
+      selectedMonth.myTotalSpendingWithoutMortgage - selectedMonth.split5050;
+    return [
+      ...(mortgage > 0 ? [{ name: "Mortgage", value: mortgage }] : []),
+      ...(fiftyFifty > 0 ? [{ name: "50/50", value: fiftyFifty }] : []),
+      ...(tasnuvas > 0 ? [{ name: "Tasnuva's", value: tasnuvas }] : []),
+      ...(mySpending > 0 ? [{ name: "My", value: mySpending }] : []),
+    ];
+  }, [selectedMonth]);
+
+  const PIE_COLORS = [
+    "oklch(0.65 0.2 25)",
+    "oklch(0.7 0.18 55)",
+    "oklch(0.65 0.2 280)",
+    "oklch(0.6 0.2 160)",
+  ];
+
+  const savingsRatePercent = selectedMonth.personalSavingsRate * 100;
+  const savingsRadialData = useMemo(
+    () => [
+      {
+        name: "Savings rate",
+        value: savingsRatePercent,
+        fill: "var(--color-savings)",
+      },
+    ],
+    [savingsRatePercent],
+  );
+  const savingsConfig = {
+    savings: {
+      label: "Savings rate",
+      theme: { light: "oklch(0.6 0.2 160)", dark: "oklch(0.7 0.18 165)" },
+    },
+  } satisfies ChartConfig;
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Dashboard</h1>
@@ -134,6 +233,168 @@ export function Dashboard() {
           Sync to Google Sheets from Settings.
         </p>
       </div>
+
+      {/* Chart visualizations for selected month */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Earned vs Spent vs Saved
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {summaryBarData.some((d) => d.value > 0) ? (
+              <ChartContainer
+                config={summaryBarConfig}
+                className="h-[220px] w-full"
+              >
+                <BarChart
+                  data={summaryBarData}
+                  layout="vertical"
+                  margin={{ top: 5, right: 10, left: 60, bottom: 5 }}
+                  accessibilityLayer
+                >
+                  <XAxis type="number" hide />
+                  <YAxis
+                    type="category"
+                    dataKey="metric"
+                    tickLine={false}
+                    axisLine={false}
+                    width={55}
+                    tick={{ fontSize: 11 }}
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) =>
+                          typeof value === "number"
+                            ? formatCurrency(value)
+                            : String(value ?? "")
+                        }
+                      />
+                    }
+                  />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={28}>
+                    {summaryBarData.map((_, i) => (
+                      <Cell key={i} fill={summaryBarData[i]!.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No data for this month.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Spending breakdown
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {spendingPieData.length > 0 ? (
+              <ChartContainer
+                config={{
+                  mortgage: {
+                    label: "Mortgage",
+                    theme: { light: PIE_COLORS[0], dark: PIE_COLORS[0] },
+                  },
+                  "50/50": {
+                    label: "50/50",
+                    theme: { light: PIE_COLORS[1], dark: PIE_COLORS[1] },
+                  },
+                  "Tasnuva's": {
+                    label: "Tasnuva's",
+                    theme: { light: PIE_COLORS[2], dark: PIE_COLORS[2] },
+                  },
+                  My: {
+                    label: "My",
+                    theme: { light: PIE_COLORS[3], dark: PIE_COLORS[3] },
+                  },
+                }}
+                className="h-[220px] w-full"
+              >
+                <PieChart>
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) =>
+                          typeof value === "number"
+                            ? formatCurrency(value)
+                            : String(value ?? "")
+                        }
+                      />
+                    }
+                  />
+                  <Pie
+                    data={spendingPieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    paddingAngle={2}
+                  >
+                    {spendingPieData.map((_, i) => (
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Legend />
+                </PieChart>
+              </ChartContainer>
+            ) : (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No spending for this month.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Personal savings rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={savingsConfig} className="h-[220px] w-full">
+              <RadialBarChart
+                data={savingsRadialData}
+                innerRadius="60%"
+                outerRadius="90%"
+                startAngle={90}
+                endAngle={-270}
+              >
+                <RadialBar
+                  dataKey="value"
+                  fill="var(--color-savings)"
+                  cornerRadius={4}
+                />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value) =>
+                        typeof value === "number"
+                          ? `${value.toFixed(1)}%`
+                          : String(value ?? "")
+                      }
+                    />
+                  }
+                />
+              </RadialBarChart>
+            </ChartContainer>
+            <p className="text-center text-2xl font-semibold mt-[-40px]">
+              {formatPercent(selectedMonth.personalSavingsRate)}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">

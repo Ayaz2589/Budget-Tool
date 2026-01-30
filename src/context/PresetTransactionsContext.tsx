@@ -18,6 +18,7 @@ interface PresetTransactionsContextValue {
   presetTransactions: PresetTransaction[];
   addPreset: (preset: Omit<PresetTransaction, "id">) => void;
   removePreset: (id: string) => void;
+  setPresets: (presets: PresetTransaction[]) => void;
 }
 
 const PresetTransactionsContext =
@@ -60,13 +61,21 @@ export function PresetTransactionsProvider({ children }: { children: ReactNode }
     [persist, presetTransactions],
   );
 
+  const setPresets = useCallback(
+    (presets: PresetTransaction[]) => {
+      persist(presets);
+    },
+    [persist],
+  );
+
   const value = useMemo<PresetTransactionsContextValue>(
     () => ({
       presetTransactions,
       addPreset,
       removePreset,
+      setPresets,
     }),
-    [presetTransactions, addPreset, removePreset],
+    [presetTransactions, addPreset, removePreset, setPresets],
   );
 
   return (

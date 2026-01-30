@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
+import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { useRules } from "@/context/RulesContext";
 import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
@@ -46,6 +47,7 @@ export function TransactionsPage() {
   const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
     useGoogleAuth();
   const { rules } = useRules();
+  const { presetTransactions } = usePresetTransactions();
   const [monthFilter, setMonthFilter] = useState<string>("");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
@@ -242,8 +244,9 @@ export function TransactionsPage() {
       debts,
       debtPayments,
       rules,
+      presetTransactions,
     );
-  }, [expenses, income, debts, debtPayments, rules]);
+  }, [expenses, income, debts, debtPayments, rules, presetTransactions]);
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">

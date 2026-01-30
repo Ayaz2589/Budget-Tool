@@ -4,6 +4,7 @@ import type {
   Expense,
   Income,
   ExpenseSource,
+  PresetTransaction,
 } from "@/lib/types";
 import type { MonthTotals } from "@/lib/totals";
 import type { Rule } from "@/lib/rules";
@@ -567,6 +568,61 @@ export async function clearAndWriteRules(
   }
 }
 
+export async function clearAndWritePresets(
+  accessToken: string,
+  spreadsheetId: string,
+  presetTransactions: PresetTransaction[]
+): Promise<void> {
+  const headers = [["Id", "Source", "Description", "Category", "Card Member"]];
+  const rows = presetTransactions.map((p) => [
+    p.id,
+    p.source,
+    p.description,
+    p.category,
+    p.cardMember,
+  ]);
+  const values = [...headers, ...rows];
+  const range = "PresetTransactions!A1:E";
+  await clearRange(accessToken, spreadsheetId, "PresetTransactions!A1:E10000");
+  if (values.length > 0) {
+    await updateSheet(accessToken, spreadsheetId, range, values, false);
+  }
+}
+
+export async function readPresetsFromSheet(
+  accessToken: string,
+  spreadsheetId: string
+): Promise<PresetTransaction[]> {
+  const rows = await getSheetValues(
+    accessToken,
+    spreadsheetId,
+    "PresetTransactions!A2:E",
+    "UNFORMATTED_VALUE",
+  );
+  const presets: PresetTransaction[] = [];
+  for (const row of rows) {
+    const id = String(row[0] ?? "").trim();
+    const rawSource = String(row[1] ?? "").trim().toLowerCase();
+    const description = String(row[2] ?? "").trim();
+    const category = String(row[3] ?? "").trim();
+    const cardMember = String(row[4] ?? "").trim();
+    if (!id) continue;
+    const source: ExpenseSource = VALID_EXPENSE_SOURCES.includes(
+      rawSource as ExpenseSource,
+    )
+      ? (rawSource as ExpenseSource)
+      : "manual";
+    presets.push({
+      id,
+      source,
+      description,
+      category,
+      cardMember,
+    });
+  }
+  return presets;
+}
+
 export async function writeTotalsSheet(
   accessToken: string,
   spreadsheetId: string,
@@ -686,6 +742,7 @@ export interface SheetIds {
   debtPayments: number;
   mortgage: number;
   rules: number;
+  presetTransactions: number;
 }
 
 export async function getSheetIds(
@@ -711,6 +768,7 @@ export async function getSheetIds(
   const debtPayments = byTitle["DebtPayments"];
   const mortgage = byTitle["Mortgage"];
   const rules = byTitle["Rules"];
+  const presetTransactions = byTitle["PresetTransactions"];
   if (
     expenses == null ||
     income == null ||
@@ -718,10 +776,11 @@ export async function getSheetIds(
     debts == null ||
     debtPayments == null ||
     mortgage == null ||
-    rules == null
+    rules == null ||
+    presetTransactions == null
   )
     return null;
-  return { expenses, income, totals, debts, debtPayments, mortgage, rules };
+  return { expenses, income, totals, debts, debtPayments, mortgage, rules, presetTransactions };
 }
 
 export async function ensureSheetsExist(
@@ -745,6 +804,7 @@ export async function ensureSheetsExist(
     "DebtPayments",
     "Mortgage",
     "Rules",
+    "PresetTransactions",
   ];
   const toAdd = needed.filter((t) => !titles.has(t));
   if (toAdd.length === 0) return;
@@ -1100,6 +1160,30 @@ export async function applySheetsFormatting(
       10000,
       0,
       4,
+      { horizontalAlignment: "LEFT" },
+      leftAlignFields
+    )
+  );
+
+  // PresetTransactions: header row bold + larger, all left align (A–E)
+  requests.push(
+    repeatCellRequest(
+      sheetIds.presetTransactions,
+      0,
+      1,
+      0,
+      5,
+      { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
+      headerFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.presetTransactions,
+      0,
+      10000,
+      0,
+      5,
       { horizontalAlignment: "LEFT" },
       leftAlignFields
     )

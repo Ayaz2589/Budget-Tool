@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
+import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { useRules } from "@/context/RulesContext";
 import type { Income } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ export function IncomePage() {
     incomeCategories,
   } = useBudget();
   const { rules } = useRules();
+  const { presetTransactions } = usePresetTransactions();
   const [addOpen, setAddOpen] = useState(false);
   const [editIncome, setEditIncome] = useState<Income | null>(null);
   const [incomeForActions, setIncomeForActions] = useState<Income | null>(null);
@@ -84,6 +86,7 @@ export function IncomePage() {
                   debts,
                   debtPayments,
                   rules,
+                  presetTransactions,
                 )
               }
             >

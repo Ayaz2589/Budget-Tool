@@ -6,6 +6,7 @@ import type {
   Expense,
   Income,
   ExpenseSource,
+  PresetTransaction,
 } from "@/lib/types";
 import type { Rule } from "@/lib/rules";
 import { getMonthLabel } from "@/lib/totals";
@@ -45,7 +46,8 @@ export function downloadTransactionsAndIncomePdf(
   income: Income[],
   debts: Debt[] = [],
   debtPayments: DebtPayment[] = [],
-  rules: Rule[] = []
+  rules: Rule[] = [],
+  presetTransactions: PresetTransaction[] = []
 ): void {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const margin = 14;
@@ -362,6 +364,18 @@ export function downloadTransactionsAndIncomePdf(
       ].join(FIELD_SEP)
     );
   }
+  for (const p of presetTransactions) {
+    lines.push(
+      [
+        "PRESET",
+        p.id,
+        p.source,
+        sanitize(p.description),
+        sanitize(p.category),
+        sanitize(p.cardMember),
+      ].join(FIELD_SEP)
+    );
+  }
   const bodyBlock = lines.join(RECORD_SEP);
   if (y > 260) {
     doc.addPage();
@@ -408,6 +422,7 @@ export interface ParsedExportedPdf {
   debts: Debt[];
   debtPayments: DebtPayment[];
   rules: Rule[];
+  presetTransactions: PresetTransaction[];
 }
 
 /**
@@ -432,6 +447,7 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
   const debts: Debt[] = [];
   const debtPayments: DebtPayment[] = [];
   const rules: Rule[] = [];
+  const presetTransactions: PresetTransaction[] = [];
   // Normalize: PDF wrapping can split markers across lines (e.g. "BUDGET_TOOL_DATA_" + " START")
   const normalized = pdfText
     .replace(/\s+/g, " ")
@@ -559,9 +575,20 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
         } catch {
           // ignore malformed rule entries
         }
+      } else if (parts[0] === "PRESET" && parts.length >= 6) {
+        const source = VALID_EXPENSE_SOURCES.includes(parts[2] as ExpenseSource)
+          ? (parts[2] as ExpenseSource)
+          : "manual";
+        presetTransactions.push({
+          id: parts[1]!.trim(),
+          source,
+          description: parts[3]?.trim() ?? "",
+          category: parts[4]?.trim() ?? "",
+          cardMember: parts[5]?.trim() ?? "",
+        });
       }
     }
-    return { expenses, income, debts, debtPayments, rules };
+    return { expenses, income, debts, debtPayments, rules, presetTransactions };
   }
   // No data block: fallback to parsing the human-readable table (no debts/debtPayments)
   const fallback = parseExportedPdfTableFallback(normalized);
@@ -570,6 +597,7 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
     debts: [],
     debtPayments: [],
     rules: [],
+    presetTransactions: [],
   };
 }
 
@@ -656,5 +684,5 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
     });
   }
 
-  return { expenses, income, debts: [], debtPayments: [], rules: [] };
+  return { expenses, income, debts: [], debtPayments: [], rules: [], presetTransactions: [] };
 }

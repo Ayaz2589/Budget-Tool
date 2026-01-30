@@ -187,7 +187,9 @@
     "editIncomeDesc": "날짜, 금액, 설명, 카테고리를 업데이트하세요.",
     "noIncomeEntries": "수입 항목이 없습니다. 위에서 추가하세요.",
     "placeholderDescription": "예: 급여, 지하실 임대료",
-    "defaultDescription": "수입"
+    "defaultDescription": "수입",
+    "deleteIncomeTitle": "이 수입을 삭제하시겠습니까?",
+    "deleteIncomeDesc": "이 수입 항목이 제거됩니다. 실행 취소할 수 없습니다."
   },
   "debt": {
     "title": "부채",
@@ -228,6 +230,9 @@
     "clearRecurring": "정기 지우기",
     "deleteDebtTitle": "부채를 삭제하시겠습니까?",
     "deleteDebtDesc": "부채와 모든 결제 기록이 영구적으로 제거됩니다. 실행 취소할 수 없습니다.",
+    "removePaymentTitle": "이 결제를 삭제하시겠습니까?",
+    "removePaymentDesc": "{{date}} {{amount}} 결제가 제거됩니다. 실행 취소할 수 없습니다.",
+    "removePayment": "삭제",
     "placeholderName": "예: 자동차 대출, 신용카드",
     "placeholderNote": "예: 월별 결제",
     "started": "{{date}} 시작"
@@ -306,7 +311,23 @@
     "ifAmount": "If amount",
     "ifCategoryTotal": "If category total",
     "thenSetCategory": "Then set category to",
-    "thenShowWarning": "Then show warning:"
+    "thenShowWarning": "Then show warning:",
+    "deleteRuleTitle": "이 규칙을 삭제하시겠습니까?",
+    "deleteRuleDesc": "이 규칙이 제거됩니다. 실행 취소할 수 없습니다."
+  },
+  "presetTransactions": {
+    "title": "Preset Transactions",
+    "description": "Templates for quick-fill when adding transactions.",
+    "addPreset": "Add preset",
+    "newPreset": "New preset",
+    "source": "Source",
+    "descriptionLabel": "Description",
+    "category": "Category",
+    "member": "Member",
+    "empty": "No presets yet. Add one to quick-fill when adding transactions.",
+    "delete": "Delete",
+    "deletePresetTitle": "이 프리셋을 삭제하시겠습니까?",
+    "deletePresetDesc": "이 프리셋이 제거됩니다. 실행 취소할 수 없습니다."
   },
   "settings": {
     "title": "설정",
@@ -361,7 +382,9 @@
     "addTransactions": "{{count}}개 거래 추가",
     "placeholderAmount": "0.00",
     "placeholderDescription": "예: 식료품",
-    "uncategorized": "미분류"
+    "uncategorized": "미분류",
+    "preset": "Preset",
+    "presetNone": "None"
   },
   "auth": {
     "googleNotConfigured": "Google 로그인이 구성되지 않았습니다.",

@@ -63,10 +63,10 @@ export function OverviewSection({
 }: OverviewSectionProps) {
   return (
     <AccordionItem value="overview">
-      <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
+      <AccordionTrigger className="px-0 py-3 text-lg font-semibold hover:no-underline md:px-4 md:py-4">
         {t("dashboard.overview")}
       </AccordionTrigger>
-      <AccordionContent className="px-1 pt-4 pb-4 space-y-6 md:px-4">
+      <AccordionContent className="px-0 pt-0 pb-0 space-y-6 md:px-4 md:pt-4 md:pb-4">
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardHeader className="pb-2 px-2 md:px-6">

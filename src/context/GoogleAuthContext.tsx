@@ -10,6 +10,7 @@ import {
 import { useGoogleLogin } from "@react-oauth/google";
 import i18n from "@/i18n";
 import { useBudget } from "@/context/BudgetContext";
+import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { useRules } from "@/context/RulesContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
 import {
@@ -20,6 +21,7 @@ import {
   clearAndWriteDebts,
   clearAndWriteDebtPayments,
   clearAndWriteRules,
+  clearAndWritePresets,
   writeTotalsSheet,
   getSheetIds,
   applySheetsFormatting,
@@ -28,6 +30,7 @@ import {
   readMortgageFromSheet,
   readIncomeFromSheet,
   readDebtsFromSheet,
+  readPresetsFromSheet,
   readDebtPaymentsFromSheet,
   readRulesFromSheet,
 } from "@/lib/googleSheets";
@@ -232,6 +235,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
 
   const budget = useBudget();
   const rulesContext = useRules();
+  const { presetTransactions, setPresets } = usePresetTransactions();
 
   const syncToSheets = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
@@ -263,6 +267,11 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         budget.debtPayments,
       );
       await clearAndWriteRules(accessToken, spreadsheetId, rulesContext.rules);
+      await clearAndWritePresets(
+        accessToken,
+        spreadsheetId,
+        presetTransactions,
+      );
       const months = computeAllTotals({
         expenses: budget.expenses,
         income: budget.income,
@@ -291,6 +300,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.debtPayments,
     budget.iOweNova,
     rulesContext.rules,
+    presetTransactions,
   ]);
 
   const pullFromSheet = useCallback(async () => {
@@ -361,6 +371,10 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         spreadsheetId,
       );
       const sheetRules = await readRulesFromSheet(accessToken, spreadsheetId);
+      const sheetPresets = await readPresetsFromSheet(
+        accessToken,
+        spreadsheetId,
+      );
       const newDebts = sheetDebts.filter((d) => !appDebtIds.has(d.id));
       const newPayments = sheetPayments.filter((p) => !appPaymentIds.has(p.id));
       if (newDebts.length > 0) {
@@ -372,6 +386,9 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
 
       if (sheetRules.length > 0) {
         rulesContext.setRules(sheetRules);
+      }
+      if (sheetPresets.length > 0) {
+        setPresets(sheetPresets);
       }
 
       setSyncStatus("success");
@@ -391,6 +408,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.debtPayments,
     rulesContext.rules,
     rulesContext.setRules,
+    setPresets,
     budget.addExpenses,
     budget.addIncome,
     budget.addDebts,

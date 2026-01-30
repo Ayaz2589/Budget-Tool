@@ -187,7 +187,9 @@
     "editIncomeDesc": "更新日期、金额、描述与分类。",
     "noIncomeEntries": "暂无收入条目。请在上方添加。",
     "placeholderDescription": "如：工资、地下室租金",
-    "defaultDescription": "收入"
+    "defaultDescription": "收入",
+    "deleteIncomeTitle": "删除此收入？",
+    "deleteIncomeDesc": "该收入条目将被移除。无法撤销。"
   },
   "debt": {
     "title": "债务",
@@ -228,6 +230,9 @@
     "clearRecurring": "清除定期",
     "deleteDebtTitle": "删除债务？",
     "deleteDebtDesc": "将永久删除该债务及其全部还款记录。无法撤销。",
+    "removePaymentTitle": "删除此还款？",
+    "removePaymentDesc": "将移除 {{date}} 的 {{amount}} 还款。无法撤销。",
+    "removePayment": "移除",
     "placeholderName": "如：车贷、信用卡",
     "placeholderNote": "如：月供",
     "started": "开始于 {{date}}"
@@ -306,7 +311,23 @@
     "ifAmount": "If amount",
     "ifCategoryTotal": "If category total",
     "thenSetCategory": "Then set category to",
-    "thenShowWarning": "Then show warning:"
+    "thenShowWarning": "Then show warning:",
+    "deleteRuleTitle": "删除此规则？",
+    "deleteRuleDesc": "该规则将被移除。无法撤销。"
+  },
+  "presetTransactions": {
+    "title": "Preset Transactions",
+    "description": "Templates for quick-fill when adding transactions.",
+    "addPreset": "Add preset",
+    "newPreset": "New preset",
+    "source": "Source",
+    "descriptionLabel": "Description",
+    "category": "Category",
+    "member": "Member",
+    "empty": "No presets yet. Add one to quick-fill when adding transactions.",
+    "delete": "Delete",
+    "deletePresetTitle": "删除此预设？",
+    "deletePresetDesc": "该预设将被移除。无法撤销。"
   },
   "settings": {
     "title": "设置",
@@ -361,7 +382,9 @@
     "addTransactions": "添加 {{count}} 笔交易",
     "placeholderAmount": "0.00",
     "placeholderDescription": "如：杂货",
-    "uncategorized": "未分类"
+    "uncategorized": "未分类",
+    "preset": "Preset",
+    "presetNone": "None"
   },
   "auth": {
     "googleNotConfigured": "未配置 Google 登录。",

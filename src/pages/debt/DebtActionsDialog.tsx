@@ -1,6 +1,9 @@
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -19,7 +22,7 @@ export type DebtActionsDialogProps = {
   onEditRecurring: (debt: Debt) => void;
   onDelete: (debtId: string) => void;
   onRemovePayment: (paymentId: string) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 };
 
 export function DebtActionsDialog({
@@ -30,8 +33,12 @@ export function DebtActionsDialog({
   onEditRecurring,
   onDelete,
   onRemovePayment,
-  t: _t,
+  t,
 }: DebtActionsDialogProps) {
+  const [paymentToRemove, setPaymentToRemove] = useState<DebtPayment | null>(
+    null,
+  );
+
   if (debt === null) return null;
 
   const balance = getDebtBalance(debt, payments);
@@ -124,7 +131,7 @@ export function DebtActionsDialog({
               className="w-full justify-start"
               onClick={handleDelete}
             >
-              <Trash2 className="size-4" />
+              <Trash2 className="size-4 text-destructive" />
               Delete debt
             </Button>
           </div>
@@ -149,11 +156,12 @@ export function DebtActionsDialog({
                     <Button
                       type="button"
                       variant="ghost"
-                      size="sm"
-                      className="h-8 text-muted-foreground hover:text-destructive shrink-0"
-                      onClick={() => onRemovePayment(p.id)}
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+                      onClick={() => setPaymentToRemove(p)}
+                      aria-label={t("debt.removePayment")}
                     >
-                      Remove
+                      <Trash2 className="size-4 text-destructive" />
                     </Button>
                   </li>
                 ))}
@@ -162,6 +170,46 @@ export function DebtActionsDialog({
           )}
         </div>
       </DialogContent>
+      <Dialog
+        open={paymentToRemove !== null}
+        onOpenChange={(open) => !open && setPaymentToRemove(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("debt.removePaymentTitle")}</DialogTitle>
+            <DialogDescription>
+              {paymentToRemove
+                ? t("debt.removePaymentDesc", {
+                    amount: formatCurrency(paymentToRemove.amount),
+                    date: paymentToRemove.date,
+                  })
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPaymentToRemove(null)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                if (paymentToRemove) {
+                  onRemovePayment(paymentToRemove.id);
+                  setPaymentToRemove(null);
+                }
+              }}
+            >
+              <Trash2 className="size-4" />
+              {t("debt.removePayment")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

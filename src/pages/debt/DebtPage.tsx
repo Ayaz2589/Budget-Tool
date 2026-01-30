@@ -18,6 +18,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { formatCurrency } from "@/lib/format";
 import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
 import { EditRecurringDialog } from "./EditRecurringDialog";
@@ -42,6 +44,9 @@ export function DebtPage() {
     null,
   );
   const [debtForActions, setDebtForActions] = useState<Debt | null>(null);
+  const [paymentToRemoveId, setPaymentToRemoveId] = useState<string | null>(
+    null,
+  );
 
   const paymentsByDebt = useMemo(() => {
     const map = new Map<string, DebtPayment[]>();
@@ -104,7 +109,7 @@ export function DebtPage() {
                   onAddPayment={setPaymentDebtId}
                   onEditRecurring={(debt) => setRecurringDebtId(debt.id)}
                   onDelete={setDeleteConfirmDebtId}
-                  onRemovePayment={removeDebtPayment}
+                  onRemovePayment={setPaymentToRemoveId}
                 />
               </div>
               <div className="md:hidden max-h-[50vh] overflow-y-auto border rounded-md">
@@ -142,15 +147,58 @@ export function DebtPage() {
       />
 
       <Dialog
+        open={paymentToRemoveId !== null}
+        onOpenChange={(open) => !open && setPaymentToRemoveId(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("debt.removePaymentTitle")}</DialogTitle>
+            <DialogDescription>
+              {(() => {
+                const p = debtPayments.find((x) => x.id === paymentToRemoveId);
+                return p
+                  ? t("debt.removePaymentDesc", {
+                      amount: formatCurrency(p.amount),
+                      date: p.date,
+                    })
+                  : "";
+              })()}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPaymentToRemoveId(null)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                if (paymentToRemoveId) {
+                  removeDebtPayment(paymentToRemoveId);
+                  setPaymentToRemoveId(null);
+                }
+              }}
+            >
+              <Trash2 className="size-4" />
+              {t("debt.removePayment")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
         open={deleteConfirmDebtId !== null}
         onOpenChange={(open) => !open && setDeleteConfirmDebtId(null)}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete debt?</DialogTitle>
+            <DialogTitle>{t("debt.deleteDebtTitle")}</DialogTitle>
             <DialogDescription>
-              This will permanently remove the debt and all its payment history.
-              This cannot be undone.
+              {t("debt.deleteDebtDesc")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -159,7 +207,7 @@ export function DebtPage() {
               variant="outline"
               onClick={() => setDeleteConfirmDebtId(null)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               type="button"
@@ -171,7 +219,8 @@ export function DebtPage() {
                 }
               }}
             >
-              Delete debt
+              <Trash2 className="size-4" />
+              {t("debt.deleteDebt")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { BudgetProvider } from "@/context/BudgetContext";
+import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
 import { RulesProvider } from "@/context/RulesContext";
 import {
   GoogleAuthProvider,
@@ -40,7 +41,8 @@ function AppContent() {
 function App() {
   return (
     <BudgetProvider>
-      <RulesProvider>
+      <PresetTransactionsProvider>
+        <RulesProvider>
         {googleClientId ? (
           <GoogleOAuthProvider clientId={googleClientId}>
             <GoogleAuthProvider>
@@ -52,7 +54,8 @@ function App() {
             <AppContent />
           </GoogleAuthProviderFallback>
         )}
-      </RulesProvider>
+        </RulesProvider>
+      </PresetTransactionsProvider>
     </BudgetProvider>
   );
 }

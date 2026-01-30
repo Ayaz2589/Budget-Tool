@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Home } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { AddMortgagePaymentDialog } from "./AddMortgagePaymentDialog";
 import { MortgagePaymentsTable } from "./MortgagePaymentsTable";
@@ -74,10 +73,7 @@ export function MortgagePage() {
   const { t } = useTranslation();
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold flex items-center gap-2">
-        <Home className="size-6" />
-        {t("mortgage.title")}
-      </h1>
+      <h1 className="text-2xl font-semibold">{t("mortgage.title")}</h1>
       <Card>
         <CardHeader>
           <CardTitle>{t("mortgage.mortgagePayments")}</CardTitle>

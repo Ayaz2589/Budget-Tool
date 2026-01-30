@@ -1,9 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
+import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { useRules } from "@/context/RulesContext";
 import type { ExpenseSource } from "@/lib/types";
-import { CategoryOption } from "@/lib/categoryColors";
+import {
+  CategoryOption,
+  getCategoryColor,
+} from "@/lib/categoryColors";
 import {
   applyRulesToExpenses,
   computeTotalsByCategoryForMonth,
@@ -51,6 +55,7 @@ interface TransactionRow {
   category: string;
   source: ExpenseSource;
   cardMember: string;
+  presetId?: string;
 }
 
 function defaultRow(): TransactionRow {
@@ -77,6 +82,7 @@ export function AddTransactionDialog({
   const { t } = useTranslation();
   const { expenses, addExpense, expenseCategories } = useBudget();
   const { rules } = useRules();
+  const { presetTransactions } = usePresetTransactions();
   const [rows, setRows] = useState<TransactionRow[]>(() => [defaultRow()]);
 
   useEffect(() => {
@@ -165,6 +171,25 @@ export function AddTransactionDialog({
   const compactInput = "h-8 px-2 text-sm min-w-0";
   const compactSelectTrigger = "h-8 min-w-0 max-w-full";
 
+  const PRESET_NONE_VALUE = "_none";
+
+  const handlePresetChange = (index: number, presetId: string) => {
+    if (presetId === PRESET_NONE_VALUE || !presetId) {
+      updateRow(index, { presetId: undefined });
+      return;
+    }
+    const preset = presetTransactions.find((p) => p.id === presetId);
+    if (preset) {
+      updateRow(index, {
+        source: preset.source,
+        description: preset.description,
+        category: preset.category,
+        cardMember: preset.cardMember,
+        presetId: preset.id,
+      });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex flex-col w-[94vw] max-w-[94vw]! h-[92vh] max-h-[92vh] p-4 gap-3 overflow-hidden">
@@ -186,6 +211,11 @@ export function AddTransactionDialog({
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
+                  {presetTransactions.length > 0 && (
+                    <TableHead className="w-32 py-1.5 text-xs font-medium">
+                      {t("addTransaction.preset")}
+                    </TableHead>
+                  )}
                   <TableHead className="w-20 py-1.5 text-xs font-medium">
                     {t("addTransaction.source")}
                   </TableHead>
@@ -212,6 +242,59 @@ export function AddTransactionDialog({
               <TableBody>
                 {rows.map((row, index) => (
                   <TableRow key={row.id} className="align-middle">
+                    {presetTransactions.length > 0 && (
+                      <TableCell className="p-1 align-middle">
+                        <Select
+                          value={row.presetId ?? PRESET_NONE_VALUE}
+                          onValueChange={(v) =>
+                            handlePresetChange(index, v)
+                          }
+                        >
+                          <SelectTrigger
+                            className={`${compactSelectTrigger} border-0 bg-transparent shadow-none focus-visible:ring-2`}
+                          >
+                            <SelectValue
+                              placeholder={t("addTransaction.presetNone")}
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={PRESET_NONE_VALUE}>
+                              {t("addTransaction.presetNone")}
+                            </SelectItem>
+                            {presetTransactions.map((preset) => {
+                              const sourceLabel = t(
+                                SOURCE_KEYS[preset.source],
+                              );
+                              const descPart =
+                                preset.description.trim().length > 0
+                                  ? `${preset.description.slice(0, 30)}${preset.description.length > 30 ? "…" : ""}`
+                                  : "";
+                              const label = descPart
+                                ? `${sourceLabel} – ${descPart} · ${preset.category}`
+                                : `${sourceLabel} · ${preset.category}`;
+                              const dotColor = getCategoryColor(
+                                preset.category,
+                                "expense",
+                              );
+                              return (
+                                <SelectItem
+                                  key={preset.id}
+                                  value={preset.id}
+                                >
+                                  <span className="flex items-center gap-2">
+                                    <span
+                                      className={`size-2 shrink-0 rounded-full ${dotColor}`}
+                                      aria-hidden
+                                    />
+                                    {label}
+                                  </span>
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                    )}
                     <TableCell className="p-1 align-middle">
                       <Select
                         value={row.source}
@@ -342,11 +425,11 @@ export function AddTransactionDialog({
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="size-7 text-muted-foreground hover:text-destructive"
+                            className="size-7 text-destructive hover:text-destructive"
                             onClick={() => removeRow(index)}
                             title={t("addTransaction.removeRow")}
                           >
-                            <Trash2 className="size-3.5" />
+                            <Trash2 className="size-3.5 text-destructive" />
                           </Button>
                         )}
                       </div>

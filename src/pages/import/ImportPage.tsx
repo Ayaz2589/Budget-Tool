@@ -9,6 +9,7 @@ import {
   applyRulesToExpenses,
   computeTotalsByCategoryForMonth,
 } from "@/lib/rules";
+import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { useRules } from "@/context/RulesContext";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
 import { ImportSourceCard, type SourceChoice } from "./ImportSourceCard";
@@ -39,6 +40,7 @@ export function ImportPage() {
     expenseCategories,
   } = useBudget();
   const { rules, setRules } = useRules();
+  const { setPresets } = usePresetTransactions();
   const { t } = useTranslation();
   const currentMonthKey = new Date().toISOString().slice(0, 7);
 
@@ -94,6 +96,7 @@ export function ImportPage() {
             parsed.debts.length === 0 &&
             parsed.debtPayments.length === 0 &&
             parsed.rules.length === 0 &&
+            parsed.presetTransactions.length === 0 &&
             text.trim().length > 0
           ) {
             setImportError(
@@ -107,6 +110,9 @@ export function ImportPage() {
           }
           if (parsed.rules.length > 0) {
             setRules(parsed.rules);
+          }
+          if (parsed.presetTransactions.length > 0) {
+            setPresets(parsed.presetTransactions);
           }
           setPreviewExpenses(applyRulesForPreview(toAddExpenses));
           setPreviewIncome(toAddIncome);

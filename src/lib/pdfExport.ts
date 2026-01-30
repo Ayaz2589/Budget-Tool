@@ -6,10 +6,11 @@ import type {
   Expense,
   Income,
   ExpenseSource,
+  PresetTransaction,
 } from "@/lib/types";
 import type { Rule } from "@/lib/rules";
-import { getMonthLabel } from "@/lib/totals";
-import { formatCurrency } from "@/lib/format";
+import { getMonthLabel, computeMonthTotals } from "@/lib/totals";
+import { formatCurrency, formatPercent } from "@/lib/format";
 
 const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
 const INCOME_ROW_RE = /(\d{4}-\d{2}-\d{2})\s+(Paycheck|Rent)\s+\$([\d,]+\.\d{2})\s+(Paycheck|Rent)/g;
@@ -45,7 +46,8 @@ export function downloadTransactionsAndIncomePdf(
   income: Income[],
   debts: Debt[] = [],
   debtPayments: DebtPayment[] = [],
-  rules: Rule[] = []
+  rules: Rule[] = [],
+  presetTransactions: PresetTransaction[] = []
 ): void {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const margin = 14;
@@ -54,6 +56,47 @@ export function downloadTransactionsAndIncomePdf(
   doc.setFontSize(18);
   doc.text("Transactions & Income", margin, y);
   y += 12;
+
+  // Dashboard summary (current month, like the dashboard)
+  const currentMonthKey = new Date().toISOString().slice(0, 7);
+  const selectedMonth = computeMonthTotals(
+    currentMonthKey,
+    expenses,
+    income,
+    0,
+    0,
+    0,
+  );
+  if (y > 260) {
+    doc.addPage();
+    y = 20;
+  }
+  doc.setFontSize(14);
+  doc.text(`Summary (${selectedMonth.monthLabel})`, margin, y);
+  y += 8;
+  const summaryRows: [string, string][] = [
+    ["Total Earned", formatCurrency(selectedMonth.totalEarned)],
+    ["Total Spent", formatCurrency(selectedMonth.totalSpent)],
+    ["Total Spent w/o Mortgage", formatCurrency(selectedMonth.totalSpentWithoutMortgage)],
+    ["50/50 Split", formatCurrency(selectedMonth.split5050)],
+    ["Tasnuva's Total Spending", formatCurrency(selectedMonth.novasTotalSpending)],
+    ["My Total Spending w/o Mortgage", formatCurrency(selectedMonth.myTotalSpendingWithoutMortgage)],
+    ["Total Saved", formatCurrency(selectedMonth.totalSaved)],
+    ["Personal Savings Rate", formatPercent(selectedMonth.personalSavingsRate)],
+  ];
+  const summaryHead = [["Metric", "Value"]];
+  const summaryBody = summaryRows.map(([label, value]) => [label, value]);
+  autoTable(doc, {
+    startY: y,
+    head: summaryHead,
+    body: summaryBody,
+    theme: "grid",
+    margin: { left: margin, right: margin },
+    tableWidth: "auto",
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [66, 66, 66], textColor: 255 },
+  });
+  y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 14;
 
   const expenseByMonth = groupByMonth(expenses);
   const incomeByMonth = groupByMonth(income);
@@ -362,6 +405,18 @@ export function downloadTransactionsAndIncomePdf(
       ].join(FIELD_SEP)
     );
   }
+  for (const p of presetTransactions) {
+    lines.push(
+      [
+        "PRESET",
+        p.id,
+        p.source,
+        sanitize(p.description),
+        sanitize(p.category),
+        sanitize(p.cardMember),
+      ].join(FIELD_SEP)
+    );
+  }
   const bodyBlock = lines.join(RECORD_SEP);
   if (y > 260) {
     doc.addPage();
@@ -408,6 +463,7 @@ export interface ParsedExportedPdf {
   debts: Debt[];
   debtPayments: DebtPayment[];
   rules: Rule[];
+  presetTransactions: PresetTransaction[];
 }
 
 /**
@@ -432,6 +488,7 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
   const debts: Debt[] = [];
   const debtPayments: DebtPayment[] = [];
   const rules: Rule[] = [];
+  const presetTransactions: PresetTransaction[] = [];
   // Normalize: PDF wrapping can split markers across lines (e.g. "BUDGET_TOOL_DATA_" + " START")
   const normalized = pdfText
     .replace(/\s+/g, " ")
@@ -559,9 +616,20 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
         } catch {
           // ignore malformed rule entries
         }
+      } else if (parts[0] === "PRESET" && parts.length >= 6) {
+        const source = VALID_EXPENSE_SOURCES.includes(parts[2] as ExpenseSource)
+          ? (parts[2] as ExpenseSource)
+          : "manual";
+        presetTransactions.push({
+          id: parts[1]!.trim(),
+          source,
+          description: parts[3]?.trim() ?? "",
+          category: parts[4]?.trim() ?? "",
+          cardMember: parts[5]?.trim() ?? "",
+        });
       }
     }
-    return { expenses, income, debts, debtPayments, rules };
+    return { expenses, income, debts, debtPayments, rules, presetTransactions };
   }
   // No data block: fallback to parsing the human-readable table (no debts/debtPayments)
   const fallback = parseExportedPdfTableFallback(normalized);
@@ -570,6 +638,7 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
     debts: [],
     debtPayments: [],
     rules: [],
+    presetTransactions: [],
   };
 }
 
@@ -656,5 +725,5 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
     });
   }
 
-  return { expenses, income, debts: [], debtPayments: [], rules: [] };
+  return { expenses, income, debts: [], debtPayments: [], rules: [], presetTransactions: [] };
 }

@@ -136,7 +136,7 @@ export function IncomeTable({
                       onClick={() => onDelete(i.id)}
                       aria-label="Delete"
                     >
-                      <Trash2 className="size-4" />
+                      <Trash2 className="size-4 text-destructive" />
                     </Button>
                   </div>
                 </TableCell>

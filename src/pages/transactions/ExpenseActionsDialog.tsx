@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
 import type { Expense } from "@/lib/types";
@@ -90,6 +91,7 @@ export function ExpenseActionsDialog({
             className="w-full"
             onClick={handleDelete}
           >
+            <Trash2 className="size-4" />
             {t("common.delete")}
           </Button>
         </div>

@@ -187,7 +187,9 @@
     "editIncomeDesc": "日付、金額、説明、カテゴリを更新。",
     "noIncomeEntries": "収入エントリがありません。上で追加してください。",
     "placeholderDescription": "例：給与、地下室家賃",
-    "defaultDescription": "収入"
+    "defaultDescription": "収入",
+    "deleteIncomeTitle": "この収入を削除しますか？",
+    "deleteIncomeDesc": "この収入エントリは削除されます。元に戻せません。"
   },
   "debt": {
     "title": "債務",
@@ -228,6 +230,9 @@
     "clearRecurring": "定期をクリア",
     "deleteDebtTitle": "債務を削除しますか？",
     "deleteDebtDesc": "債務とその支払い履歴は永久に削除されます。元に戻せません。",
+    "removePaymentTitle": "この支払いを削除しますか？",
+    "removePaymentDesc": "{{date}}の{{amount}}の支払いは削除されます。元に戻せません。",
+    "removePayment": "削除",
     "placeholderName": "例：車ローン、クレジットカード",
     "placeholderNote": "例：月々の支払い",
     "started": "{{date}}開始"
@@ -306,7 +311,23 @@
     "ifAmount": "If amount",
     "ifCategoryTotal": "If category total",
     "thenSetCategory": "Then set category to",
-    "thenShowWarning": "Then show warning:"
+    "thenShowWarning": "Then show warning:",
+    "deleteRuleTitle": "このルールを削除しますか？",
+    "deleteRuleDesc": "このルールは削除されます。元に戻せません。"
+  },
+  "presetTransactions": {
+    "title": "Preset Transactions",
+    "description": "Templates for quick-fill when adding transactions.",
+    "addPreset": "Add preset",
+    "newPreset": "New preset",
+    "source": "Source",
+    "descriptionLabel": "Description",
+    "category": "Category",
+    "member": "Member",
+    "empty": "No presets yet. Add one to quick-fill when adding transactions.",
+    "delete": "Delete",
+    "deletePresetTitle": "このプリセットを削除しますか？",
+    "deletePresetDesc": "このプリセットは削除されます。元に戻せません。"
   },
   "settings": {
     "title": "設定",
@@ -361,7 +382,9 @@
     "addTransactions": "{{count}}件の取引を追加",
     "placeholderAmount": "0.00",
     "placeholderDescription": "例：食料品",
-    "uncategorized": "未分類"
+    "uncategorized": "未分類",
+    "preset": "Preset",
+    "presetNone": "None"
   },
   "auth": {
     "googleNotConfigured": "Googleサインインが設定されていません。",

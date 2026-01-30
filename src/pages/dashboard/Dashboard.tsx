@@ -5,7 +5,6 @@ import { useRules } from "@/context/RulesContext";
 import { getDebtBalance } from "@/lib/debtUtils";
 import {
   computeAllTotals,
-  computeGrandTotals,
   computeMonthTotals,
   type MonthTotals,
 } from "@/lib/totals";
@@ -34,7 +33,6 @@ export function Dashboard() {
     income,
     iOweNovaByMonth: iOweNova,
   });
-  const grand = computeGrandTotals(months);
   const currentMonthKey = new Date().toISOString().slice(0, 7);
   const warnings = useMemo(
     () => getDashboardWarnings(expenses, rules, currentMonthKey),
@@ -361,14 +359,14 @@ export function Dashboard() {
       <Accordion
         type="multiple"
         defaultValue={["summary", "overview", "debt", "spending", "bymonth"]}
-        className="rounded-lg border pt-4 min-w-0"
+        className="min-w-0 border-0 rounded-none pt-0 md:rounded-lg md:border md:pt-4"
       >
         <AccordionItem value="summary">
-          <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
+          <AccordionTrigger className="px-0 py-3 text-lg font-semibold hover:no-underline md:px-4 md:py-4">
             {t("dashboard.summary")}
           </AccordionTrigger>
-          <AccordionContent className="px-4 pt-4 pb-4 space-y-6">
-            <SummaryCards selectedMonth={selectedMonth} grand={grand} />
+          <AccordionContent className="px-0 pt-0 pb-0 space-y-6 md:px-4 md:pt-4 md:pb-4">
+            <SummaryCards selectedMonth={selectedMonth} />
           </AccordionContent>
         </AccordionItem>
         <OverviewSection
@@ -381,10 +379,10 @@ export function Dashboard() {
           t={t}
         />
         <AccordionItem value="debt">
-          <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
+          <AccordionTrigger className="px-0 py-3 text-lg font-semibold hover:no-underline md:px-4 md:py-4">
             {t("dashboard.debt")}
           </AccordionTrigger>
-          <AccordionContent className="px-1 pt-4 pb-4 space-y-6 md:px-4">
+          <AccordionContent className="px-0 pt-0 pb-0 space-y-6 md:px-4 md:pt-4 md:pb-4">
             <DebtSection debtSummary={debtSummary} />
           </AccordionContent>
         </AccordionItem>
@@ -398,10 +396,10 @@ export function Dashboard() {
           t={t}
         />
         <AccordionItem value="bymonth">
-          <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
+          <AccordionTrigger className="px-0 py-3 text-lg font-semibold hover:no-underline md:px-4 md:py-4">
             {t("dashboard.byMonth")}
           </AccordionTrigger>
-          <AccordionContent className="px-1 pt-4 pb-4 space-y-6 md:px-4">
+          <AccordionContent className="px-0 pt-0 pb-0 space-y-6 md:px-4 md:pt-4 md:pb-4">
             <ByMonthSection
               chartData={chartData}
               months={months}

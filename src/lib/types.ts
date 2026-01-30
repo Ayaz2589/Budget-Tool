@@ -59,6 +59,14 @@ export interface DebtPayment {
   note?: string;
 }
 
+export interface PresetTransaction {
+  id: string;
+  source: ExpenseSource;
+  description: string;
+  category: string;
+  cardMember: string;
+}
+
 export interface ParseResult {
   expenses: Expense[];
   source: ExpenseSource;

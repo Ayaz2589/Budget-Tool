@@ -187,7 +187,9 @@
     "editIncomeDesc": "Update the date, amount, description, and category.",
     "noIncomeEntries": "No income entries. Add one above.",
     "placeholderDescription": "e.g. Paycheck, Basement Rent",
-    "defaultDescription": "Income"
+    "defaultDescription": "Income",
+    "deleteIncomeTitle": "Delete this income?",
+    "deleteIncomeDesc": "This income entry will be removed. This cannot be undone."
   },
   "debt": {
     "title": "Debt",
@@ -228,6 +230,9 @@
     "clearRecurring": "Clear recurring",
     "deleteDebtTitle": "Delete debt?",
     "deleteDebtDesc": "This will permanently remove the debt and all its payment history. This cannot be undone.",
+    "removePaymentTitle": "Remove this payment?",
+    "removePaymentDesc": "Payment of {{amount}} on {{date}} will be removed. This cannot be undone.",
+    "removePayment": "Remove",
     "placeholderName": "e.g. Car loan, Credit card",
     "placeholderNote": "e.g. Monthly payment",
     "started": "Started {{date}}"
@@ -306,7 +311,23 @@
     "ifAmount": "If amount",
     "ifCategoryTotal": "If category total",
     "thenSetCategory": "Then set category to",
-    "thenShowWarning": "Then show warning:"
+    "thenShowWarning": "Then show warning:",
+    "deleteRuleTitle": "Delete this rule?",
+    "deleteRuleDesc": "This rule will be removed. This cannot be undone."
+  },
+  "presetTransactions": {
+    "title": "Preset Transactions",
+    "description": "Templates for quick-fill when adding transactions.",
+    "addPreset": "Add preset",
+    "newPreset": "New preset",
+    "source": "Source",
+    "descriptionLabel": "Description",
+    "category": "Category",
+    "member": "Member",
+    "empty": "No presets yet. Add one to quick-fill when adding transactions.",
+    "delete": "Delete",
+    "deletePresetTitle": "Delete this preset?",
+    "deletePresetDesc": "This preset will be removed. This cannot be undone."
   },
   "settings": {
     "title": "Settings",
@@ -335,7 +356,10 @@
     "expenseCategoriesPlaceholder": "My Purchase, Tasnuva's Purchases, 50/50, Amazon",
     "incomeCategories": "Income categories",
     "incomeCategoriesDesc": "Comma-separated list for income entries.",
-    "incomeCategoriesPlaceholder": "Rent, Paycheck, Bonus, ..."
+    "incomeCategoriesPlaceholder": "Rent, Paycheck, Bonus, ...",
+    "deleteAllData": "Delete all data",
+    "deleteAllDataConfirmTitle": "Delete all data?",
+    "deleteAllDataConfirmDesc": "This will permanently remove all expenses, income, debts, rules, and preset transactions from this device. This cannot be undone. The page will reload."
   },
   "addTransaction": {
     "sourceAmex": "Amex",
@@ -361,7 +385,9 @@
     "addTransactions": "Add {{count}} transactions",
     "placeholderAmount": "0.00",
     "placeholderDescription": "e.g. Groceries",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "preset": "Preset",
+    "presetNone": "None"
   },
   "auth": {
     "googleNotConfigured": "Google sign-in is not configured.",

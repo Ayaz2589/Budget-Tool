@@ -2,13 +2,13 @@
 
 ## Budget Tool — What Was Done So Far
 
-**Last updated:** January 29, 2026 (Ortho branding, mobile nav, i18n, rules warnings, debt/mortgage, PDF/Sheets)
+**Last updated:** January 29, 2026 (Preset transactions, confirmation modals, PRD sync)
 
 ---
 
 ## Summary
 
-Budget Tool (**Ortho**) is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, debts, and mortgage payments, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage gambit-style rules (with optional dashboard warnings when category thresholds are met), and sign in with Google in the nav. The app supports multiple UI languages (globe dropdown) and a mobile bottom nav for key sections. Data lives in the app and localStorage; Sheets and PDF export/import include expenses, income, debts, debt payments, mortgage, and rules.
+Budget Tool (**Ortho**) is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, debts, and mortgage payments, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage gambit-style rules (with optional dashboard warnings when category thresholds are met), and use **preset transactions** (templates for quick-fill when adding transactions). Delete and remove actions (income, debt, debt payment, mortgage payment, rule, preset, and “Delete all data” in Settings) **require confirmation** before applying. Sign in with Google in the nav. The app supports multiple UI languages (globe dropdown) and a mobile bottom nav for key sections. Data lives in the app and localStorage; Sheets and PDF export/import include expenses, income, debts, debt payments, mortgage, rules, and preset transactions.
 
 ---
 
@@ -96,7 +96,11 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
   4. **Category total threshold** for the **current month** (lt / gte).
 - **Actions (MVP):** Set expense category, or **show warning** (for category-total rules; message shown on dashboard).
 - **Apply points:** Import preview, manual add, and “Apply rules” on Transactions (uncategorized only). Rules with "show warning" display messages on the dashboard when the category total threshold is met for the current month.
-- **UI:** Rules page with a priority-ordered list, enable/disable toggle, reorder controls, and a rule editor dialog. Card Member condition uses a dropdown (AYAZ UDDIN / TASNUVA AHMED). User can override category by editing the expense after rules run.
+- **UI:** Rules page with a priority-ordered list, enable/disable toggle, reorder controls, and a rule editor dialog. Card Member condition uses a dropdown (AYAZ UDDIN / TASNUVA AHMED). User can override category by editing the expense after rules run. **Delete rule** and **delete preset transaction** each require a confirmation modal.
+
+### 4.2.1 Preset Transactions
+
+- **Rules page:** A “Preset Transactions” card stores templates (source, description, category, card member) for quick-fill when adding transactions. Add and remove presets; **delete preset** requires a confirmation modal. Presets are persisted in localStorage and included in **PDF export/import** and **Google Sheets** sync/restore (PresetTransactions sheet). In the Add Transaction dialog, user can choose a preset to populate a row.
 
 ### 4.3 Description Cleanup
 
@@ -111,12 +115,12 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 
 ### 4.5 Income
 
-- **Add income:** Form (date, amount, description, category, **owner** Ayaz/Tasnuva, optional **recurring** amount/frequency). List of income entries with edit category/owner and delete. **Mobile:** list view + bottom-sheet action dialog for edit/delete/category/owner.
+- **Add income:** Form (date, amount, description, category, **owner** Ayaz/Tasnuva, optional **recurring** amount/frequency). List of income entries with edit category/owner and delete. **Delete income** (table or mobile action sheet) requires a confirmation modal. **Mobile:** list view + bottom-sheet action dialog for edit/delete/category/owner.
 - **Categories:** Rent, Paycheck, Bonus, Other (color-coded in dropdowns).
 
 ### 4.5.1 Debt
 
-- **Debt page:** Track debts (e.g. car loan, credit card) and payments. **Add debt:** dialog with name, initial amount owed, optional start date, **owner** (Ayaz or Tasnuva), and optional **recurring payment** (checkbox: when checked, amount and **frequency** — **bi-weekly** (every 14 days from first payment date) or **monthly** (day of month 1–31)). Each debt shows owner, initial amount, and **current balance** (initial minus sum of payments minus recurring deductions). **Set/Edit recurring:** per-debt button; **Make payment:** per-debt dialog (date, amount, optional note); payments listed with delete. **Delete debt:** confirmation; cascade removes payments. **Mobile:** list + bottom-sheet for payment/recurring/delete.
+- **Debt page:** Track debts (e.g. car loan, credit card) and payments. **Add debt:** dialog with name, initial amount owed, optional start date, **owner** (Ayaz or Tasnuva), and optional **recurring payment** (checkbox: when checked, amount and **frequency** — **bi-weekly** (every 14 days from first payment date) or **monthly** (day of month 1–31)). Each debt shows owner, initial amount, and **current balance** (initial minus sum of payments minus recurring deductions). **Set/Edit recurring:** per-debt button; **Make payment:** per-debt dialog (date, amount, optional note); payments listed with remove. **Remove individual debt payment** (list or mobile sheet) requires confirmation. **Delete debt:** confirmation; cascade removes payments. **Mobile:** list + bottom-sheet for payment/recurring/delete.
 - **Persistence:** Debts and debt payments in localStorage. **Sync to Google Sheets** writes **Debts** and **DebtPayments** sheets. **Restore from Sheet** merges by id (add-only). **PDF export/import** includes debts and debt payments.
 
 ### 4.5.2 Mortgage
@@ -131,7 +135,6 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
   2. **Spending breakdown** — Donut (pie): 50/50, Tasnuva's (her purchases only), My (your spending excluding 50/50). **Mortgage is excluded** from this breakdown. Only segments with value &gt; 0 shown; legend and currency tooltip.
   3. **Income breakdown** — Stacked horizontal bar by **person** (Ayaz/Tasnuva), stacked by income category (Rent/Paycheck/Bonus/Other) with labeled tooltips.
 - **Summary cards:** Total Earned, Total Spent, Total Spent w/o Mortgage, 50/50 Split, Tasnuva's Total Spending, My Total Spending w/o Mortgage, Total Saved, Personal Savings Rate — all for the **selected month**.
-- **All-time totals:** Single card with Total Earned, Total Spent, Total Saved across all months.
 - **Debt section:** Accordion with chart showing **remaining vs paid off** (no total debt amount in summary).
 - **Warnings:** Dashboard shows rules-based warnings when a category total threshold is met for the current month.
 - **Spending by month (table):** Table with one row per month: Month, Total Earned, Total Spent, Spent w/o Mortgage, Total Saved, Savings Rate. Current month row is highlighted.
@@ -149,19 +152,20 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 - **Nav sign-in:** At the bottom of the sidebar, the app shows either **"Sign in with Google"** or, when signed in, the **user's name and avatar** (profile picture from Google userinfo; fallback to initials if the image fails to load) and a **Sign out** button. Same OAuth scope and account as Google Sheets; user profile (name, picture, email) is fetched after sign-in for display only.
 - **Auth:** Google OAuth (e.g. `@react-oauth/google`). Requires `VITE_GOOGLE_CLIENT_ID` in `.env`. If not set, app shows a fallback and does not initialize the Google client (avoids “Missing required parameter client_id”).
 - **Spreadsheet:** User pastes spreadsheet ID or URL in Settings. App can use an **empty** sheet; it creates/ensures required sheets and structure.
-- **Sync to Google Sheets (push only):** "Sync to Google Sheets" in Settings **overwrites** the Sheet with the app's current state. Clears and writes **Expenses** (6 columns), **Income** (with owner/recurring fields), **Mortgage** sheet, **Debts** sheet, **DebtPayments** sheet, **Rules** sheet (Id, Enabled, Condition, Action), and **Totals** sheet (monthly rows + TOTALS row). If the user deletes all transactions in the app and syncs, the Sheet is updated to match (empty expenses/income/mortgage/debts/rules).
-- **Restore from Sheet (pull only):** "Restore from Sheet" in Settings **reads** the Expenses, Income, Mortgage, Debts, DebtPayments, and Rules sheets and **merges** rows into the app (expenses/income add-only by key; mortgage add-only by key; debts and debt payments add-only by id; rules replace the current rule set if any rows exist). Use case: e.g. after clearing local storage, load data back from the Sheet. Sheet-originated expenses get `source` and `cardMember` from columns when present; older 4-column sheets default to `manual` / no card member.
+- **Sync to Google Sheets (push only):** "Sync to Google Sheets" in Settings **overwrites** the Sheet with the app's current state. Clears and writes **Expenses** (6 columns), **Income** (with owner/recurring fields), **Mortgage** sheet, **Debts** sheet, **DebtPayments** sheet, **Rules** sheet (Id, Enabled, Condition, Action), **PresetTransactions** sheet, and **Totals** sheet (monthly rows + TOTALS row). If the user deletes all transactions in the app and syncs, the Sheet is updated to match (empty expenses/income/mortgage/debts/rules/presets).
+- **Restore from Sheet (pull only):** "Restore from Sheet" in Settings **reads** the Expenses, Income, Mortgage, Debts, DebtPayments, Rules, and PresetTransactions sheets and **merges** rows into the app (expenses/income add-only by key; mortgage add-only by key; debts and debt payments add-only by id; rules replace the current rule set if any rows exist; presets replace current presets when sheet has data). Use case: e.g. after clearing local storage, load data back from the Sheet. Sheet-originated expenses get `source` and `cardMember` from columns when present; older 4-column sheets default to `manual` / no card member.
 - **Formatting:** Left-align cells, **Amount** columns as currency ($), **header row** bold and larger font (applied via Sheets API `batchUpdate` after data write).
 - **When sync runs:** Only when the user clicks the sync or restore button. No automatic or periodic sync.
 
 ### 4.9 Persistence
 
-- **localStorage:** Expenses, income, mortgage payments, debts, debt payments, rules, I Owe Nova (and related state), spreadsheet ID, and locale preference are persisted so they survive refresh. No expiry; data stays until the user or browser clears storage.
-- **Clearing localStorage:** Wipes all app data (transactions, income, rules, spreadsheet ID). **Does not** change the Google Sheet. If the user then syncs, the app overwrites the Sheet with the current (empty) app data.
+- **localStorage:** Expenses, income, mortgage payments, debts, debt payments, rules, preset transactions, I Owe Nova (and related state), spreadsheet ID, and locale preference are persisted so they survive refresh. No expiry; data stays until the user or browser clears storage.
+- **Clearing localStorage:** Wipes all app data (transactions, income, debts, rules, preset transactions, spreadsheet ID). **Does not** change the Google Sheet. If the user then syncs, the app overwrites the Sheet with the current (empty) app data.
 
 ### 4.10 Settings
 
 - **Google:** Connect/disconnect, set spreadsheet URL/ID. **Restore from Sheet** (pull only: load data from Sheet into app) and **Sync to Google Sheets** (push only: overwrite Sheet with app data). Sync/restore status and error message displayed on failure.
+- **Delete all data:** Button with confirmation; on confirm, clears app localStorage (expenses, income, debts, rules, preset transactions, etc.) and reloads the page.
 - **OAuth testing:** For “Access blocked: app has not completed verification,” add test users in the Google Cloud OAuth consent screen so they can sign in.
 - **Language:** UI language is changed via the globe dropdown in the sidebar (or in the "More" sheet on mobile); preference is saved in localStorage.
 
@@ -192,10 +196,10 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 | Parsers         | `src/lib/parsers/amex.ts`, `apple.ts`, `index.ts` (no Chase)                                              |
 | Rules engine    | `src/lib/rules.ts` (conditions + actions, priority order)                                                 |
 | Totals          | `src/lib/totals.ts` (getMonthLabel exported for Dashboard/Transactions)                                   |
-| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Mortgage, Debts, DebtPayments, Rules, Totals)     |
-| PDF export      | `src/lib/pdfExport.ts` (export/import transactions, income, debts, debt payments, mortgage, rules)        |
+| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Mortgage, Debts, DebtPayments, Rules, PresetTransactions, Totals) |
+| PDF export      | `src/lib/pdfExport.ts` (export/import transactions, income, debts, debt payments, mortgage, rules, preset transactions)   |
 | Category colors | `src/lib/categoryColors.tsx` (colors + CategoryOption component)                                          |
-| Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `GoogleAuthContext.tsx`                              |
+| Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `PresetTransactionsContext.tsx`, `GoogleAuthContext.tsx`            |
 | Layout          | `src/components/Layout.tsx` (sidebar, mobile header + bottom nav + "More" sheet, globe language switcher) |
 | Pages           | Dashboard, Import, Transactions, Income, Debt, Mortgage, Rules, Settings                                  |
 

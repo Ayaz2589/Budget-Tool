@@ -54,7 +54,7 @@ const CATEGORY_TOTAL_OPERATORS = [
 
 export function RulesPage() {
   const { t } = useTranslation();
-  const { expenses, expenseCategories } = useBudget();
+  const { expenseCategories } = useBudget();
   const { rules, addRule, removeRule, reorderRule, toggleRule } = useRules();
 
   const cardMemberOptions = useMemo(() => ["AYAZ UDDIN", "TASNUVA AHMED"], []);

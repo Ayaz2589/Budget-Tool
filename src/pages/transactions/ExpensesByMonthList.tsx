@@ -25,7 +25,7 @@ export function ExpensesByMonthList({
   defaultOpenMonth,
   selectedIds,
   onToggleSelect,
-  onToggleMonthSelection,
+  onToggleMonthSelection: _onToggleMonthSelection,
   onExpenseTap,
   t,
 }: ExpensesByMonthListProps) {

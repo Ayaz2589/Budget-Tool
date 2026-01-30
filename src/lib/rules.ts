@@ -173,8 +173,14 @@ export function getDashboardWarnings(
         rule.condition.type === "categoryTotal"
     )
     .filter((rule) =>
-      evaluateCategoryTotalCondition(rule.condition, totalsByCategory)
+      evaluateCategoryTotalCondition(
+        rule.condition as Extract<RuleCondition, { type: "categoryTotal" }>,
+        totalsByCategory
+      )
     )
-    .map((rule) => rule.action.message.trim())
+    .map((rule) =>
+      (rule.action as Extract<RuleAction, { type: "showWarning" }>).message
+        .trim()
+    )
     .filter((message) => message.length > 0);
 }

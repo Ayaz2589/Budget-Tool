@@ -30,7 +30,7 @@ export function DebtActionsDialog({
   onEditRecurring,
   onDelete,
   onRemovePayment,
-  t,
+  t: _t,
 }: DebtActionsDialogProps) {
   if (debt === null) return null;
 

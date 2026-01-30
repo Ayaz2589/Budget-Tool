@@ -308,6 +308,18 @@
     "thenSetCategory": "Then set category to",
     "thenShowWarning": "Then show warning:"
   },
+  "presetTransactions": {
+    "title": "Preset Transactions",
+    "description": "Templates for quick-fill when adding transactions.",
+    "addPreset": "Add preset",
+    "newPreset": "New preset",
+    "source": "Source",
+    "descriptionLabel": "Description",
+    "category": "Category",
+    "member": "Member",
+    "empty": "No presets yet. Add one to quick-fill when adding transactions.",
+    "delete": "Delete"
+  },
   "settings": {
     "title": "설정",
     "googleSheets": "Google 스프레드시트",
@@ -361,7 +373,9 @@
     "addTransactions": "{{count}}개 거래 추가",
     "placeholderAmount": "0.00",
     "placeholderDescription": "예: 식료품",
-    "uncategorized": "미분류"
+    "uncategorized": "미분류",
+    "preset": "Preset",
+    "presetNone": "None"
   },
   "auth": {
     "googleNotConfigured": "Google 로그인이 구성되지 않았습니다.",

@@ -308,6 +308,18 @@
     "thenSetCategory": "Then set category to",
     "thenShowWarning": "Then show warning:"
   },
+  "presetTransactions": {
+    "title": "Preset Transactions",
+    "description": "Templates for quick-fill when adding transactions.",
+    "addPreset": "Add preset",
+    "newPreset": "New preset",
+    "source": "Source",
+    "descriptionLabel": "Description",
+    "category": "Category",
+    "member": "Member",
+    "empty": "No presets yet. Add one to quick-fill when adding transactions.",
+    "delete": "Delete"
+  },
   "settings": {
     "title": "Ajustes",
     "googleSheets": "Google Sheets",
@@ -361,7 +373,9 @@
     "addTransactions": "Añadir {{count}} transacciones",
     "placeholderAmount": "0.00",
     "placeholderDescription": "ej. Comestibles",
-    "uncategorized": "Sin categoría"
+    "uncategorized": "Sin categoría",
+    "preset": "Preset",
+    "presetNone": "None"
   },
   "auth": {
     "googleNotConfigured": "Inicio de sesión con Google no configurado.",

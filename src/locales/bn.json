@@ -308,6 +308,18 @@
     "thenSetCategory": "Then set category to",
     "thenShowWarning": "Then show warning:"
   },
+  "presetTransactions": {
+    "title": "Preset Transactions",
+    "description": "Templates for quick-fill when adding transactions.",
+    "addPreset": "Add preset",
+    "newPreset": "New preset",
+    "source": "Source",
+    "descriptionLabel": "Description",
+    "category": "Category",
+    "member": "Member",
+    "empty": "No presets yet. Add one to quick-fill when adding transactions.",
+    "delete": "Delete"
+  },
   "settings": {
     "title": "সেটিংস",
     "googleSheets": "Google Sheets",
@@ -361,7 +373,9 @@
     "addTransactions": "{{count}} লেনদেন যোগ করুন",
     "placeholderAmount": "0.00",
     "placeholderDescription": "যেমন মুদিখানা",
-    "uncategorized": "অবিভক্ত"
+    "uncategorized": "অবিভক্ত",
+    "preset": "Preset",
+    "presetNone": "None"
   },
   "auth": {
     "googleNotConfigured": "Google সাইন ইন কনফিগার নেই।",

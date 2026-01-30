@@ -3,13 +3,16 @@ import { render, screen } from "@testing-library/react";
 import { RulesPage } from "@/pages/rules/RulesPage";
 import { BudgetProvider } from "@/context/BudgetContext";
 import { RulesProvider } from "@/context/RulesContext";
+import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
 
 test("RulesPage shows title and empty state", () => {
   localStorage.clear();
   render(
     <BudgetProvider>
       <RulesProvider>
-        <RulesPage />
+        <PresetTransactionsProvider>
+          <RulesPage />
+        </PresetTransactionsProvider>
       </RulesProvider>
     </BudgetProvider>,
   );

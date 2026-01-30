@@ -5,7 +5,6 @@ import { useRules } from "@/context/RulesContext";
 import { getDebtBalance } from "@/lib/debtUtils";
 import {
   computeAllTotals,
-  computeGrandTotals,
   computeMonthTotals,
   type MonthTotals,
 } from "@/lib/totals";
@@ -34,7 +33,6 @@ export function Dashboard() {
     income,
     iOweNovaByMonth: iOweNova,
   });
-  const grand = computeGrandTotals(months);
   const currentMonthKey = new Date().toISOString().slice(0, 7);
   const warnings = useMemo(
     () => getDashboardWarnings(expenses, rules, currentMonthKey),
@@ -368,7 +366,7 @@ export function Dashboard() {
             {t("dashboard.summary")}
           </AccordionTrigger>
           <AccordionContent className="px-0 pt-0 pb-0 space-y-6 md:px-4 md:pt-4 md:pb-4">
-            <SummaryCards selectedMonth={selectedMonth} grand={grand} />
+            <SummaryCards selectedMonth={selectedMonth} />
           </AccordionContent>
         </AccordionItem>
         <OverviewSection

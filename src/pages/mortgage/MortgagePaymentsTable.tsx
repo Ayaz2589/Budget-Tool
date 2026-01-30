@@ -56,7 +56,7 @@ export function MortgagePaymentsTable({
                 onClick={() => onRemove(e)}
                 aria-label="Remove payment"
               >
-                <Trash2 className="size-4" />
+                <Trash2 className="size-4 text-destructive" />
               </Button>
             </TableCell>
           </TableRow>

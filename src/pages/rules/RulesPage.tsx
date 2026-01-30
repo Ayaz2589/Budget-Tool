@@ -573,7 +573,7 @@ export function RulesPage() {
                     onClick={() => setRuleToDeleteId(rule.id)}
                     aria-label={t("common.delete")}
                   >
-                    <Trash2 className="size-4" />
+                    <Trash2 className="size-4 text-destructive" />
                   </Button>
                 </div>
               </div>
@@ -611,6 +611,7 @@ export function RulesPage() {
                 }
               }}
             >
+              <Trash2 className="size-4" />
               {t("common.delete")}
             </Button>
           </DialogFooter>
@@ -646,6 +647,7 @@ export function RulesPage() {
                 }
               }}
             >
+              <Trash2 className="size-4" />
               {t("common.delete")}
             </Button>
           </DialogFooter>
@@ -777,7 +779,7 @@ export function RulesPage() {
                     onClick={() => setPresetToDeleteId(preset.id)}
                     aria-label={t("presetTransactions.delete")}
                   >
-                    <Trash2 className="size-4" />
+                    <Trash2 className="size-4 text-destructive" />
                   </Button>
                 </div>
               );

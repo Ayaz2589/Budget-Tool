@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { CategoryOption } from "@/lib/categoryColors";
 import type { ExpenseSource } from "@/lib/types";
-import { FileDown } from "lucide-react";
+import { FileDown, Trash2 } from "lucide-react";
 
 const SOURCES = ["all", "amex", "chase", "apple", "manual", "td"] as const;
 
@@ -249,11 +249,13 @@ export function FiltersAndActionsDialog({
                     size="sm"
                     onClick={onDeleteSelected}
                   >
+                    <Trash2 className="size-4" />
                     {t("transactions.deleteSelected", { count: selectedCount })}
                   </Button>
                 )}
                 {expensesCount > 0 && (
                   <Button variant="destructive" size="sm" onClick={onDeleteAll}>
+                    <Trash2 className="size-4" />
                     {t("transactions.deleteAll")}
                   </Button>
                 )}

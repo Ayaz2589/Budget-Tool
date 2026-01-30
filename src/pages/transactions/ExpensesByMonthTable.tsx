@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
@@ -272,11 +273,12 @@ export function ExpensesByMonthTable({
                     <TableCell>
                       <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
                         onClick={() => onDeleteOne(e)}
-                        className="text-destructive hover:text-destructive"
+                        className="size-8 text-destructive hover:text-destructive"
+                        aria-label={t("common.delete")}
                       >
-                        {t("common.delete")}
+                        <Trash2 className="size-4 text-destructive" />
                       </Button>
                     </TableCell>
                   </TableRow>

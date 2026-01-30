@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
 import type { DebtOwner, Income } from "@/lib/types";
@@ -120,6 +121,7 @@ export function IncomeActionsDialog({
               className="w-full"
               onClick={handleDeleteClick}
             >
+              <Trash2 className="size-4" />
               {t("common.delete")}
             </Button>
           </div>
@@ -149,6 +151,7 @@ export function IncomeActionsDialog({
               variant="destructive"
               onClick={handleDeleteConfirm}
             >
+              <Trash2 className="size-4" />
               {t("common.delete")}
             </Button>
           </DialogFooter>

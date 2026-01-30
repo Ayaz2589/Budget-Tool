@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Trash2 } from "lucide-react";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { extractSpreadsheetId } from "@/lib/googleSheets";
@@ -136,6 +137,7 @@ export function SettingsPage() {
           className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
           onClick={() => setDeleteAllConfirmOpen(true)}
         >
+          <Trash2 className="size-4" />
           {t("settings.deleteAllData")}
         </Button>
       </div>
@@ -162,6 +164,7 @@ export function SettingsPage() {
               variant="destructive"
               onClick={handleDeleteAllData}
             >
+              <Trash2 className="size-4" />
               {t("settings.deleteAllData")}
             </Button>
           </DialogFooter>

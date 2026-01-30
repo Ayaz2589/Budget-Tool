@@ -131,7 +131,7 @@ export function DebtActionsDialog({
               className="w-full justify-start"
               onClick={handleDelete}
             >
-              <Trash2 className="size-4" />
+              <Trash2 className="size-4 text-destructive" />
               Delete debt
             </Button>
           </div>
@@ -156,11 +156,12 @@ export function DebtActionsDialog({
                     <Button
                       type="button"
                       variant="ghost"
-                      size="sm"
-                      className="h-8 text-muted-foreground hover:text-destructive shrink-0"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
                       onClick={() => setPaymentToRemove(p)}
+                      aria-label={t("debt.removePayment")}
                     >
-                      Remove
+                      <Trash2 className="size-4 text-destructive" />
                     </Button>
                   </li>
                 ))}
@@ -203,6 +204,7 @@ export function DebtActionsDialog({
                 }
               }}
             >
+              <Trash2 className="size-4" />
               {t("debt.removePayment")}
             </Button>
           </DialogFooter>

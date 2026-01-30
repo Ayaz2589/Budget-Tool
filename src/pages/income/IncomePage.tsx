@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileDown } from "lucide-react";
+import { FileDown, Trash2 } from "lucide-react";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { AddIncomeDialog } from "./AddIncomeDialog";
 import { EditIncomeDialog } from "./EditIncomeDialog";
@@ -177,6 +177,7 @@ export function IncomePage() {
                 }
               }}
             >
+              <Trash2 className="size-4" />
               {t("common.delete")}
             </Button>
           </DialogFooter>

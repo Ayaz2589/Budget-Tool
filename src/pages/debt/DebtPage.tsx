@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
@@ -182,6 +183,7 @@ export function DebtPage() {
                 }
               }}
             >
+              <Trash2 className="size-4" />
               {t("debt.removePayment")}
             </Button>
           </DialogFooter>
@@ -217,6 +219,7 @@ export function DebtPage() {
                 }
               }}
             >
+              <Trash2 className="size-4" />
               {t("debt.deleteDebt")}
             </Button>
           </DialogFooter>

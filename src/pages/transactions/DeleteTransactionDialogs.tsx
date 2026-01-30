@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format";
 import type { Expense } from "@/lib/types";
@@ -47,6 +48,7 @@ export function DeleteOneTransactionDialog({
             {t("common.cancel")}
           </Button>
           <Button variant="destructive" onClick={onConfirm}>
+            <Trash2 className="size-4" />
             {t("common.delete")}
           </Button>
         </DialogFooter>
@@ -84,6 +86,7 @@ export function DeleteSelectedTransactionsDialog({
             {t("common.cancel")}
           </Button>
           <Button variant="destructive" onClick={onConfirm}>
+            <Trash2 className="size-4" />
             {t("transactions.deleteSelected", { count })}
           </Button>
         </DialogFooter>
@@ -121,6 +124,7 @@ export function DeleteAllTransactionsDialog({
             {t("common.cancel")}
           </Button>
           <Button variant="destructive" onClick={onConfirm}>
+            <Trash2 className="size-4" />
             {t("transactions.deleteAll")}
           </Button>
         </DialogFooter>

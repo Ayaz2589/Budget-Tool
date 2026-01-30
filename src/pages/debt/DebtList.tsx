@@ -123,7 +123,7 @@ export function DebtList({
                   className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive ml-auto"
                   onClick={() => onDelete(debt.id)}
                 >
-                  <Trash2 className="size-4" />
+                  <Trash2 className="size-4 text-destructive" />
                   Delete debt
                 </Button>
               </div>
@@ -163,11 +163,12 @@ export function DebtList({
                               <Button
                                 type="button"
                                 variant="ghost"
-                                size="sm"
-                                className="h-8 text-muted-foreground hover:text-destructive"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
                                 onClick={() => onRemovePayment(p.id)}
+                                aria-label="Remove"
                               >
-                                Remove
+                                <Trash2 className="size-4 text-destructive" />
                               </Button>
                             </TableCell>
                           </TableRow>

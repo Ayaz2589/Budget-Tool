@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
 import type { Expense } from "@/lib/types";
@@ -54,6 +55,7 @@ export function MortgagePaymentActionsDialog({
             className="w-full"
             onClick={handleRemove}
           >
+            <Trash2 className="size-4" />
             {t("common.remove")}
           </Button>
         </div>

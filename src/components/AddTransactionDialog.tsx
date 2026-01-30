@@ -425,11 +425,11 @@ export function AddTransactionDialog({
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="size-7 text-muted-foreground hover:text-destructive"
+                            className="size-7 text-destructive hover:text-destructive"
                             onClick={() => removeRow(index)}
                             title={t("addTransaction.removeRow")}
                           >
-                            <Trash2 className="size-3.5" />
+                            <Trash2 className="size-3.5 text-destructive" />
                           </Button>
                         )}
                       </div>

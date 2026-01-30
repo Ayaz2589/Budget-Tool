@@ -24,8 +24,6 @@ test("FiltersAndActionsDialog shows title and Filters section when open", () => 
       cardMemberOptions={["AYAZ UDDIN", "TASNUVA AHMED"]}
       hasActiveFilters={false}
       onClearFilters={() => {}}
-      onReapplyRules={() => {}}
-      uncategorizedCount={0}
       onCleanDescriptions={() => {}}
       onDownloadPdf={() => {}}
       someSelected={false}

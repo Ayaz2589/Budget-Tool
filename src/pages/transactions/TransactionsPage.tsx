@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
+import { useRules } from "@/context/RulesContext";
 import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
@@ -44,6 +45,7 @@ export function TransactionsPage() {
   } = useBudget();
   const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
     useGoogleAuth();
+  const { rules } = useRules();
   const [monthFilter, setMonthFilter] = useState<string>("");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
@@ -234,8 +236,14 @@ export function TransactionsPage() {
   }, [deleteOneExpense, removeExpense]);
 
   const handleDownloadPdf = useCallback(() => {
-    downloadTransactionsAndIncomePdf(expenses, income, debts, debtPayments);
-  }, [expenses, income, debts, debtPayments]);
+    downloadTransactionsAndIncomePdf(
+      expenses,
+      income,
+      debts,
+      debtPayments,
+      rules,
+    );
+  }, [expenses, income, debts, debtPayments, rules]);
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">

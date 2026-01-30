@@ -7,6 +7,7 @@ import type {
   Income,
   ExpenseSource,
 } from "@/lib/types";
+import type { Rule } from "@/lib/rules";
 import { getMonthLabel } from "@/lib/totals";
 import { formatCurrency } from "@/lib/format";
 
@@ -43,7 +44,8 @@ export function downloadTransactionsAndIncomePdf(
   expenses: Expense[],
   income: Income[],
   debts: Debt[] = [],
-  debtPayments: DebtPayment[] = []
+  debtPayments: DebtPayment[] = [],
+  rules: Rule[] = []
 ): void {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const margin = 14;
@@ -347,6 +349,19 @@ export function downloadTransactionsAndIncomePdf(
       ].join(FIELD_SEP)
     );
   }
+  for (const rule of rules) {
+    const conditionJson = encodeURIComponent(JSON.stringify(rule.condition));
+    const actionJson = encodeURIComponent(JSON.stringify(rule.action));
+    lines.push(
+      [
+        "RULE",
+        rule.id,
+        rule.enabled ? "1" : "0",
+        conditionJson,
+        actionJson,
+      ].join(FIELD_SEP)
+    );
+  }
   const bodyBlock = lines.join(RECORD_SEP);
   if (y > 260) {
     doc.addPage();
@@ -392,6 +407,7 @@ export interface ParsedExportedPdf {
   income: Income[];
   debts: Debt[];
   debtPayments: DebtPayment[];
+  rules: Rule[];
 }
 
 /**
@@ -415,6 +431,7 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
   const income: Income[] = [];
   const debts: Debt[] = [];
   const debtPayments: DebtPayment[] = [];
+  const rules: Rule[] = [];
   // Normalize: PDF wrapping can split markers across lines (e.g. "BUDGET_TOOL_DATA_" + " START")
   const normalized = pdfText
     .replace(/\s+/g, " ")
@@ -529,9 +546,22 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
           amount: Number.isNaN(amount) ? 0 : amount,
           note: parts[5]?.trim() || undefined,
         });
+      } else if (parts[0] === "RULE" && parts.length >= 5) {
+        try {
+          const condition = JSON.parse(decodeURIComponent(parts[3] ?? ""));
+          const action = JSON.parse(decodeURIComponent(parts[4] ?? ""));
+          rules.push({
+            id: parts[1]!.trim(),
+            enabled: parts[2]!.trim() !== "0",
+            condition,
+            action,
+          });
+        } catch {
+          // ignore malformed rule entries
+        }
       }
     }
-    return { expenses, income, debts, debtPayments };
+    return { expenses, income, debts, debtPayments, rules };
   }
   // No data block: fallback to parsing the human-readable table (no debts/debtPayments)
   const fallback = parseExportedPdfTableFallback(normalized);
@@ -539,6 +569,7 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
     ...fallback,
     debts: [],
     debtPayments: [],
+    rules: [],
   };
 }
 
@@ -625,5 +656,5 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
     });
   }
 
-  return { expenses, income, debts: [], debtPayments: [] };
+  return { expenses, income, debts: [], debtPayments: [], rules: [] };
 }

@@ -6,6 +6,7 @@ import type {
   ExpenseSource,
 } from "@/lib/types";
 import type { MonthTotals } from "@/lib/totals";
+import type { Rule } from "@/lib/rules";
 
 const VALID_EXPENSE_SOURCES: ExpenseSource[] = [
   "amex",
@@ -322,6 +323,31 @@ export async function readDebtPaymentsFromSheet(
   return payments;
 }
 
+export async function readRulesFromSheet(
+  accessToken: string,
+  spreadsheetId: string
+): Promise<Rule[]> {
+  const rows = await getSheetValues(accessToken, spreadsheetId, "Rules!A2:D");
+  const rules: Rule[] = [];
+  for (const row of rows) {
+    if (!row || row.length < 4) continue;
+    const [idRaw, enabledRaw, conditionRaw, actionRaw] = row;
+    const id = String(idRaw ?? "").trim();
+    if (!id) continue;
+    try {
+      const enabled =
+        String(enabledRaw ?? "").toLowerCase() === "true" ||
+        String(enabledRaw ?? "") === "1";
+      const condition = JSON.parse(String(conditionRaw ?? "{}"));
+      const action = JSON.parse(String(actionRaw ?? "{}"));
+      rules.push({ id, enabled, condition, action });
+    } catch {
+      // ignore malformed rows
+    }
+  }
+  return rules;
+}
+
 export async function appendExpenses(
   accessToken: string,
   spreadsheetId: string,
@@ -521,6 +547,26 @@ export async function clearAndWriteDebtPayments(
   }
 }
 
+export async function clearAndWriteRules(
+  accessToken: string,
+  spreadsheetId: string,
+  rules: Rule[]
+): Promise<void> {
+  const headers = [["Id", "Enabled", "Condition", "Action"]];
+  const rows = rules.map((rule) => [
+    rule.id,
+    rule.enabled ? "TRUE" : "FALSE",
+    JSON.stringify(rule.condition),
+    JSON.stringify(rule.action),
+  ]);
+  const values = [...headers, ...rows];
+  const range = "Rules!A1:D";
+  await clearRange(accessToken, spreadsheetId, "Rules!A1:D10000");
+  if (values.length > 0) {
+    await updateSheet(accessToken, spreadsheetId, range, values, false);
+  }
+}
+
 export async function writeTotalsSheet(
   accessToken: string,
   spreadsheetId: string,
@@ -639,6 +685,7 @@ export interface SheetIds {
   debts: number;
   debtPayments: number;
   mortgage: number;
+  rules: number;
 }
 
 export async function getSheetIds(
@@ -663,16 +710,18 @@ export async function getSheetIds(
   const debts = byTitle["Debts"];
   const debtPayments = byTitle["DebtPayments"];
   const mortgage = byTitle["Mortgage"];
+  const rules = byTitle["Rules"];
   if (
     expenses == null ||
     income == null ||
     totals == null ||
     debts == null ||
     debtPayments == null ||
-    mortgage == null
+    mortgage == null ||
+    rules == null
   )
     return null;
-  return { expenses, income, totals, debts, debtPayments, mortgage };
+  return { expenses, income, totals, debts, debtPayments, mortgage, rules };
 }
 
 export async function ensureSheetsExist(
@@ -688,7 +737,15 @@ export async function ensureSheetsExist(
     sheets?: { properties: { sheetId: number; title: string } }[];
   };
   const titles = new Set((data.sheets ?? []).map((s) => s.properties.title));
-  const needed = ["Expenses", "Income", "Totals", "Debts", "DebtPayments", "Mortgage"];
+  const needed = [
+    "Expenses",
+    "Income",
+    "Totals",
+    "Debts",
+    "DebtPayments",
+    "Mortgage",
+    "Rules",
+  ];
   const toAdd = needed.filter((t) => !titles.has(t));
   if (toAdd.length === 0) return;
   const addRes = await fetch(`${SHEETS_API}/${spreadsheetId}:batchUpdate`, {
@@ -1023,6 +1080,30 @@ export async function applySheetsFormatting(
       );
     }
   }
+
+  // Rules: header row bold + larger, all left align (A–D)
+  requests.push(
+    repeatCellRequest(
+      sheetIds.rules,
+      0,
+      1,
+      0,
+      4,
+      { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
+      headerFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.rules,
+      0,
+      10000,
+      0,
+      4,
+      { horizontalAlignment: "LEFT" },
+      leftAlignFields
+    )
+  );
 
   const batchRes = await fetch(`${SHEETS_API}/${spreadsheetId}:batchUpdate`, {
     method: "POST",

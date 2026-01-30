@@ -5,6 +5,11 @@ import { parseCsv, parseChasePdfFromText, type CsvSource } from "@/lib/parsers";
 import { extractTextFromPdf } from "@/lib/pdfText";
 import { parseExportedPdfData } from "@/lib/pdfExport";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
+import {
+  applyRulesToExpenses,
+  computeTotalsByCategoryForMonth,
+} from "@/lib/rules";
+import { useRules } from "@/context/RulesContext";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
 import { ImportSourceCard, type SourceChoice } from "./ImportSourceCard";
 import { ImportPreviewCard } from "./ImportPreviewCard";
@@ -33,7 +38,21 @@ export function ImportPage() {
     addDebtPayments,
     expenseCategories,
   } = useBudget();
+  const { rules, setRules } = useRules();
   const { t } = useTranslation();
+  const currentMonthKey = new Date().toISOString().slice(0, 7);
+
+  const applyRulesForPreview = (incoming: Expense[]) => {
+    if (rules.length === 0) return incoming;
+    const totals = computeTotalsByCategoryForMonth(
+      [...expenses, ...incoming],
+      currentMonthKey,
+    );
+    return applyRulesToExpenses(incoming, rules, {
+      totalsByCategory: totals,
+      currentMonthKey,
+    });
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -74,6 +93,7 @@ export function ImportPage() {
             parsed.income.length === 0 &&
             parsed.debts.length === 0 &&
             parsed.debtPayments.length === 0 &&
+            parsed.rules.length === 0 &&
             text.trim().length > 0
           ) {
             setImportError(
@@ -85,7 +105,10 @@ export function ImportPage() {
             setSourceLabel("");
             return;
           }
-          setPreviewExpenses(toAddExpenses);
+          if (parsed.rules.length > 0) {
+            setRules(parsed.rules);
+          }
+          setPreviewExpenses(applyRulesForPreview(toAddExpenses));
           setPreviewIncome(toAddIncome);
           setPreviewDebts(toAddDebts);
           setPreviewDebtPayments(toAddDebtPayments);
@@ -115,7 +138,7 @@ export function ImportPage() {
           const result = parseChasePdfFromText(text);
           const toAdd = filterOutExistingExpenses(result.expenses, expenses);
           setSkippedDuplicates(result.expenses.length - toAdd.length);
-          setPreviewExpenses(toAdd);
+          setPreviewExpenses(applyRulesForPreview(toAdd));
           setPreviewIncome([]);
           setSourceLabel("Chase");
           setLastDetected("chase");
@@ -139,7 +162,7 @@ export function ImportPage() {
           const result = parseCsv(text, selectedSource as CsvSource);
           const toAdd = filterOutExistingExpenses(result.expenses, expenses);
           setSkippedDuplicates(result.expenses.length - toAdd.length);
-          setPreviewExpenses(toAdd);
+          setPreviewExpenses(applyRulesForPreview(toAdd));
           setPreviewIncome([]);
           const label =
             selectedSource === "amex" ? "American Express" : "Apple Card";

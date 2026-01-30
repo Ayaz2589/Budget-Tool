@@ -10,6 +10,7 @@ import {
 import { useGoogleLogin } from "@react-oauth/google";
 import i18n from "@/i18n";
 import { useBudget } from "@/context/BudgetContext";
+import { useRules } from "@/context/RulesContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
 import {
   ensureSheetsExist,
@@ -18,6 +19,7 @@ import {
   clearAndWriteIncome,
   clearAndWriteDebts,
   clearAndWriteDebtPayments,
+  clearAndWriteRules,
   writeTotalsSheet,
   getSheetIds,
   applySheetsFormatting,
@@ -27,6 +29,7 @@ import {
   readIncomeFromSheet,
   readDebtsFromSheet,
   readDebtPaymentsFromSheet,
+  readRulesFromSheet,
 } from "@/lib/googleSheets";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
@@ -228,6 +231,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const budget = useBudget();
+  const rulesContext = useRules();
 
   const syncToSheets = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
@@ -258,6 +262,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         spreadsheetId,
         budget.debtPayments,
       );
+      await clearAndWriteRules(accessToken, spreadsheetId, rulesContext.rules);
       const months = computeAllTotals({
         expenses: budget.expenses,
         income: budget.income,
@@ -285,6 +290,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.debts,
     budget.debtPayments,
     budget.iOweNova,
+    rulesContext.rules,
   ]);
 
   const pullFromSheet = useCallback(async () => {
@@ -354,6 +360,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         accessToken,
         spreadsheetId,
       );
+      const sheetRules = await readRulesFromSheet(accessToken, spreadsheetId);
       const newDebts = sheetDebts.filter((d) => !appDebtIds.has(d.id));
       const newPayments = sheetPayments.filter((p) => !appPaymentIds.has(p.id));
       if (newDebts.length > 0) {
@@ -361,6 +368,10 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       }
       if (newPayments.length > 0) {
         budget.addDebtPayments(newPayments);
+      }
+
+      if (sheetRules.length > 0) {
+        rulesContext.setRules(sheetRules);
       }
 
       setSyncStatus("success");
@@ -378,6 +389,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.income,
     budget.debts,
     budget.debtPayments,
+    rulesContext.rules,
+    rulesContext.setRules,
     budget.addExpenses,
     budget.addIncome,
     budget.addDebts,

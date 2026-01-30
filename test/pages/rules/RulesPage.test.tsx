@@ -18,4 +18,6 @@ test("RulesPage shows title and empty state", () => {
   );
   expect(screen.getByRole("heading", { name: /rules/i })).toBeInTheDocument();
   expect(screen.getByText(/no rules yet/i)).toBeInTheDocument();
+  expect(screen.getByText("Preset Transactions")).toBeInTheDocument();
+  expect(screen.getByText(/no presets yet/i)).toBeInTheDocument();
 });

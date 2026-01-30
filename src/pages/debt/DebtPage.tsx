@@ -194,10 +194,9 @@ export function DebtPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete debt?</DialogTitle>
+            <DialogTitle>{t("debt.deleteDebtTitle")}</DialogTitle>
             <DialogDescription>
-              This will permanently remove the debt and all its payment history.
-              This cannot be undone.
+              {t("debt.deleteDebtDesc")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -206,7 +205,7 @@ export function DebtPage() {
               variant="outline"
               onClick={() => setDeleteConfirmDebtId(null)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               type="button"
@@ -218,7 +217,7 @@ export function DebtPage() {
                 }
               }}
             >
-              Delete debt
+              {t("debt.deleteDebt")}
             </Button>
           </DialogFooter>
         </DialogContent>

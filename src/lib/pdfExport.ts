@@ -30,6 +30,98 @@ const SOURCE_LABELS: Record<ExpenseSource, string> = {
   td: "Debit (TD Bank)",
 };
 
+/** Omit undefined, null, and empty string from objects for smaller payload. */
+function omitEmpty<T extends Record<string, unknown>>(obj: T): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined && v !== null && v !== "") out[k] = v;
+  }
+  return out;
+}
+
+/** Build minified payload with short keys and omitted optional fields. */
+function buildMinifiedPayload(
+  expenses: Expense[],
+  income: Income[],
+  debts: Debt[],
+  debtPayments: DebtPayment[],
+  rules: Rule[],
+  presetTransactions: PresetTransaction[],
+  expenseCategoriesWithColors: CategoryWithColorPayload[],
+  incomeCategoriesWithColors: CategoryWithColorPayload[],
+): Record<string, unknown> {
+  return {
+    e: expenses.map((x) =>
+      omitEmpty({
+        i: x.id,
+        d: x.date,
+        a: x.amount,
+        desc: x.description,
+        c: x.category || undefined,
+        s: x.source,
+        cm: x.cardMember,
+      }),
+    ),
+    i: income.map((x) =>
+      omitEmpty({
+        i: x.id,
+        d: x.date,
+        a: x.amount,
+        desc: x.description || undefined,
+        c: x.category || undefined,
+        o: x.owner,
+        ra: x.recurringAmount,
+        rf: x.recurringFrequency,
+        rdom: x.recurringDayOfMonth,
+        rs: x.recurringStartDate,
+      }),
+    ),
+    d: debts.map((x) =>
+      omitEmpty({
+        i: x.id,
+        n: x.name,
+        ia: x.initialAmount,
+        sd: x.startDate,
+        o: x.owner,
+        ra: x.recurringAmount,
+        rd: x.recurringDayOfMonth,
+        rf: x.recurringFrequency,
+        rs: x.recurringStartDate,
+      }),
+    ),
+    dp: debtPayments.map((x) =>
+      omitEmpty({
+        i: x.id,
+        di: x.debtId,
+        d: x.date,
+        a: x.amount,
+        n: x.note,
+      }),
+    ),
+    r: rules.map((x) => ({
+      i: x.id,
+      e: x.enabled,
+      co: x.condition,
+      ac: x.action,
+    })),
+    pt: presetTransactions.map((x) => ({
+      i: x.id,
+      s: x.source,
+      desc: x.description,
+      c: x.category,
+      cm: x.cardMember,
+    })),
+    ec:
+      expenseCategoriesWithColors.length > 0
+        ? expenseCategoriesWithColors.map((x) => ({ n: x.name, c: x.color }))
+        : undefined,
+    ic:
+      incomeCategoriesWithColors.length > 0
+        ? incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color }))
+        : undefined,
+  };
+}
+
 function groupByMonth<T extends { date: string }>(items: T[]): Map<string, T[]> {
   const map = new Map<string, T[]>();
   for (const item of items) {
@@ -330,10 +422,10 @@ export function downloadTransactionsAndIncomePdf(
     y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
   }
 
-  // Machine-readable block for re-import (V2: gzip + Base64).
+  // Machine-readable block for re-import (V2: minified JSON + gzip + Base64).
   const DATA_START = "BUDGET_TOOL_DATA_START";
   const DATA_END = "BUDGET_TOOL_DATA_END";
-  const payload = {
+  const payload = buildMinifiedPayload(
     expenses,
     income,
     debts,
@@ -342,7 +434,7 @@ export function downloadTransactionsAndIncomePdf(
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,
-  };
+  );
   const jsonString = JSON.stringify(payload);
   const compressed = pako.gzip(new TextEncoder().encode(jsonString));
   let base64 = "";
@@ -381,13 +473,6 @@ export function downloadTransactionsAndIncomePdf(
 
 const DATA_START_MARKER = "BUDGET_TOOL_DATA_START";
 const DATA_END_MARKER = "BUDGET_TOOL_DATA_END";
-const VALID_EXPENSE_SOURCES = [
-  "amex",
-  "chase",
-  "apple",
-  "manual",
-  "td",
-] as const;
 
 export interface ParsedExportedPdf {
   expenses: Expense[];
@@ -398,6 +483,130 @@ export interface ParsedExportedPdf {
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
+}
+
+/** Expand minified payload (short keys) or pass through full keys. Supports both formats. */
+function expandPayload(raw: Record<string, unknown>): {
+  expenses: Expense[];
+  income: Income[];
+  debts: Debt[];
+  debtPayments: DebtPayment[];
+  rules: Rule[];
+  presetTransactions: PresetTransaction[];
+  expenseCategoriesWithColors?: CategoryWithColorPayload[];
+  incomeCategoriesWithColors?: CategoryWithColorPayload[];
+} {
+  const arr = (key: string, short: string) =>
+    (Array.isArray(raw[key]) ? raw[key] : Array.isArray(raw[short]) ? raw[short] : []) as unknown[];
+
+  const expenses = arr("expenses", "e").map((x) => {
+    const o = x as Record<string, unknown>;
+    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
+    return {
+      id: String(get("id", "i", "")),
+      date: String(get("date", "d", "")),
+      amount: Number(get("amount", "a", 0)),
+      description: String(get("description", "desc", "")),
+      category: String(get("category", "c", "")),
+      source: (get("source", "s", "manual") as ExpenseSource) || "manual",
+      cardMember: (get("cardMember", "cm", undefined) as string | undefined) ?? undefined,
+    } as Expense;
+  });
+
+  const income = arr("income", "i").map((x) => {
+    const o = x as Record<string, unknown>;
+    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
+    return {
+      id: String(get("id", "i", "")),
+      date: String(get("date", "d", "")),
+      amount: Number(get("amount", "a", 0)),
+      description: String(get("description", "desc", "Income")),
+      category: String(get("category", "c", "")),
+      owner: get("owner", "o", undefined) as "Ayaz" | "Tasnuva" | undefined,
+      recurringAmount: get("recurringAmount", "ra", undefined) as number | undefined,
+      recurringFrequency: get("recurringFrequency", "rf", undefined) as "monthly" | "biweekly" | undefined,
+      recurringDayOfMonth: get("recurringDayOfMonth", "rdom", undefined) as number | undefined,
+      recurringStartDate: get("recurringStartDate", "rs", undefined) as string | undefined,
+    } as Income;
+  });
+
+  const debts = arr("debts", "d").map((x) => {
+    const o = x as Record<string, unknown>;
+    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
+    return {
+      id: String(get("id", "i", "")),
+      name: String(get("name", "n", "")),
+      initialAmount: Number(get("initialAmount", "ia", 0)),
+      startDate: get("startDate", "sd", undefined) as string | undefined,
+      owner: get("owner", "o", undefined) as "Ayaz" | "Tasnuva" | undefined,
+      recurringAmount: get("recurringAmount", "ra", undefined) as number | undefined,
+      recurringDayOfMonth: get("recurringDayOfMonth", "rd", undefined) as number | undefined,
+      recurringFrequency: get("recurringFrequency", "rf", undefined) as "monthly" | "biweekly" | undefined,
+      recurringStartDate: get("recurringStartDate", "rs", undefined) as string | undefined,
+    } as Debt;
+  });
+
+  const debtPayments = arr("debtPayments", "dp").map((x) => {
+    const o = x as Record<string, unknown>;
+    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
+    return {
+      id: String(get("id", "i", "")),
+      debtId: String(get("debtId", "di", "")),
+      date: String(get("date", "d", "")),
+      amount: Number(get("amount", "a", 0)),
+      note: get("note", "n", undefined) as string | undefined,
+    } as DebtPayment;
+  });
+
+  const rules = arr("rules", "r").map((x) => {
+    const o = x as Record<string, unknown>;
+    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
+    return {
+      id: String(get("id", "i", "")),
+      enabled: Boolean(get("enabled", "e", true)),
+      condition: get("condition", "co", {}) as Rule["condition"],
+      action: get("action", "ac", { type: "setCategory", value: "" }) as Rule["action"],
+    } as Rule;
+  });
+
+  const presetTransactions = arr("presetTransactions", "pt").map((x) => {
+    const o = x as Record<string, unknown>;
+    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
+    return {
+      id: String(get("id", "i", "")),
+      source: (get("source", "s", "manual") as ExpenseSource) || "manual",
+      description: String(get("description", "desc", "")),
+      category: String(get("category", "c", "")),
+      cardMember: String(get("cardMember", "cm", "")),
+    } as PresetTransaction;
+  });
+
+  const ecRaw = raw.expenseCategoriesWithColors ?? raw.ec;
+  const expenseCategoriesWithColors = Array.isArray(ecRaw)
+    ? (ecRaw as Record<string, unknown>[]).map((x) => ({
+        name: String(x.name ?? x.n ?? ""),
+        color: String(x.color ?? x.c ?? ""),
+      }))
+    : undefined;
+
+  const icRaw = raw.incomeCategoriesWithColors ?? raw.ic;
+  const incomeCategoriesWithColors = Array.isArray(icRaw)
+    ? (icRaw as Record<string, unknown>[]).map((x) => ({
+        name: String(x.name ?? x.n ?? ""),
+        color: String(x.color ?? x.c ?? ""),
+      }))
+    : undefined;
+
+  return {
+    expenses,
+    income,
+    debts,
+    debtPayments,
+    rules,
+    presetTransactions,
+    expenseCategoriesWithColors,
+    incomeCategoriesWithColors,
+  };
 }
 
 function emptyParsed(): ParsedExportedPdf {
@@ -437,29 +646,21 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
           bytes[i] = binary.charCodeAt(i);
         }
         const decompressed = pako.ungzip(bytes, { to: "string" });
-        const payload = JSON.parse(decompressed) as {
-          expenses?: Expense[];
-          income?: Income[];
-          debts?: Debt[];
-          debtPayments?: DebtPayment[];
-          rules?: Rule[];
-          presetTransactions?: PresetTransaction[];
-          expenseCategoriesWithColors?: CategoryWithColorPayload[];
-          incomeCategoriesWithColors?: CategoryWithColorPayload[];
-        };
+        const raw = JSON.parse(decompressed) as Record<string, unknown>;
+        const expanded = expandPayload(raw);
         return {
-          expenses: Array.isArray(payload.expenses) ? payload.expenses : [],
-          income: Array.isArray(payload.income) ? payload.income : [],
-          debts: Array.isArray(payload.debts) ? payload.debts : [],
-          debtPayments: Array.isArray(payload.debtPayments)
-            ? payload.debtPayments
+          expenses: Array.isArray(expanded.expenses) ? expanded.expenses : [],
+          income: Array.isArray(expanded.income) ? expanded.income : [],
+          debts: Array.isArray(expanded.debts) ? expanded.debts : [],
+          debtPayments: Array.isArray(expanded.debtPayments)
+            ? expanded.debtPayments
             : [],
-          rules: Array.isArray(payload.rules) ? payload.rules : [],
-          presetTransactions: Array.isArray(payload.presetTransactions)
-            ? payload.presetTransactions
+          rules: Array.isArray(expanded.rules) ? expanded.rules : [],
+          presetTransactions: Array.isArray(expanded.presetTransactions)
+            ? expanded.presetTransactions
             : [],
-          expenseCategoriesWithColors: payload.expenseCategoriesWithColors,
-          incomeCategoriesWithColors: payload.incomeCategoriesWithColors,
+          expenseCategoriesWithColors: expanded.expenseCategoriesWithColors,
+          incomeCategoriesWithColors: expanded.incomeCategoriesWithColors,
         };
       } catch {
         return emptyParsed();

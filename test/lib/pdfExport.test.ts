@@ -222,3 +222,31 @@ test("parseExportedPdfData table fallback when no data block: parses expense and
   expect(result.rules).toEqual([]);
   expect(result.presetTransactions).toEqual([]);
 });
+
+test("parseExportedPdfData V2 minified (short-key) format: parses correctly", () => {
+  const payload = {
+    e: [{ i: "manual-x1", d: "2025-02-01", a: 25, desc: "Lunch", c: "50/50", s: "manual" }],
+    i: [{ i: "inc-1", d: "2025-02-01", a: 3000, desc: "Paycheck", c: "Paycheck" }],
+    d: [],
+    dp: [],
+    r: [],
+    pt: [],
+  };
+  const jsonString = JSON.stringify(payload);
+  const compressed = pako.gzip(new TextEncoder().encode(jsonString));
+  let binary = "";
+  for (let i = 0; i < compressed.length; i++) {
+    binary += String.fromCharCode(compressed[i]!);
+  }
+  const base64 = btoa(binary);
+  const pdfText = `${DATA_START}\nV2${base64}\n${DATA_END}`;
+  const result = parseExportedPdfData(pdfText);
+  expect(result.expenses).toHaveLength(1);
+  expect(result.expenses[0]!.id).toBe("manual-x1");
+  expect(result.expenses[0]!.amount).toBe(25);
+  expect(result.expenses[0]!.category).toBe("50/50");
+  expect(result.income).toHaveLength(1);
+  expect(result.income[0]!.amount).toBe(3000);
+  expect(result.debts).toEqual([]);
+  expect(result.debtPayments).toEqual([]);
+});

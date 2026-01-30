@@ -8,7 +8,7 @@
 
 ## Summary
 
-Budget Tool is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage category rules, and sign in with Google in the nav. Data lives in the app and localStorage; Sheets sync is manual push/restore.
+Budget Tool is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage gambit-style rules, and sign in with Google in the nav. Data lives in the app and localStorage; Sheets sync is manual push/restore.
 
 ---
 
@@ -80,16 +80,20 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 - **Parsers:**
   - **Amex:** Columns `Date`, `Description`, `Card Member`, `Account #`, `Amount`. Date `MM/DD/YYYY` or `MM/DD/YY` → `YYYY-MM-DD`. Dedup via hash of date + description + amount + cardMember.
   - **Apple Card:** Columns `Transaction Date`, `Clearing Date`, `Description`, `Merchant`, `Category`, `Type`, `Amount (USD)`, `Purchased By`. Only rows with Type **Purchase** or **Installment** are imported (Payment rows skipped). Quoted CSV fields supported; BOM stripped.
-- **After import:** Rules and baseline rules are applied; user sees a **preview** with editable category per row, then clicks **“Add to transactions”** to merge into the app’s transaction list (and persist to localStorage).
+- **After import:** Rules are applied; user sees a **preview** with editable category per row, then clicks **“Add to transactions”** to merge into the app’s transaction list (and persist to localStorage).
 
-### 4.2 Category Rules
+### 4.2 Rules (Gambit-style)
 
-- **Pattern rules:** User-defined rules of the form “if description contains pattern (case-insensitive) → set category.” First matching rule wins; only applied to **uncategorized** expenses.
-- **Baseline rules (hardcoded, applied after pattern rules):**
-  1. **Apple Card** → category **My Purchase**.
-  2. **Card Member = TASNUVA AHMED** → **Tasnuva's Purchases**.
-  3. **UBER EATS** in description, card member not Tasnuva, amount &lt; $25 → **My Purchase**.
-- **UI:** Category Rules page to add/remove pattern rules. “Re-apply rules” on Transactions page reapplies pattern + baseline to uncategorized rows.
+- **Structure:** Rules are **If condition → then action**, evaluated **top-to-bottom** (priority order). First match wins; disabled rules are skipped.
+- **Scope:** Expenses only (income/debts not covered in MVP).
+- **Conditions (MVP):**
+  1. **Card Source** (e.g., Chase, Apple Card, Amex, Manual, TD).
+  2. **Card Member** (equals or contains, case-insensitive).
+  3. **Expense amount threshold** (lt / gte / between).
+  4. **Category total threshold** for the **current month** (lt / gte).
+- **Actions (MVP):** Set expense category.
+- **Apply points:** Import preview, manual add, and “Apply rules” on Transactions (uncategorized only).
+- **UI:** Rules page with a priority-ordered list, enable/disable toggle, reorder controls, and a rule editor dialog.
 
 ### 4.3 Description Cleanup
 
@@ -136,8 +140,8 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 - **Nav sign-in:** At the bottom of the sidebar, the app shows either **"Sign in with Google"** or, when signed in, the **user's name and avatar** (profile picture from Google userinfo; fallback to initials if the image fails to load) and a **Sign out** button. Same OAuth scope and account as Google Sheets; user profile (name, picture, email) is fetched after sign-in for display only.
 - **Auth:** Google OAuth (e.g. `@react-oauth/google`). Requires `VITE_GOOGLE_CLIENT_ID` in `.env`. If not set, app shows a fallback and does not initialize the Google client (avoids “Missing required parameter client_id”).
 - **Spreadsheet:** User pastes spreadsheet ID or URL in Settings. App can use an **empty** sheet; it creates/ensures required sheets and structure.
-- **Sync to Google Sheets (push only):** "Sync to Google Sheets" in Settings **overwrites** the Sheet with the app's current state. Clears and writes **Expenses** (6 columns: Date, Amount, Description, Category, **Source**, **Card Member**), **Income** table, **Debts** sheet, **DebtPayments** sheet, and **Totals** sheet (monthly rows + TOTALS row). If the user deletes all transactions in the app and syncs, the Sheet is updated to match (empty expenses/income/debts).
-- **Restore from Sheet (pull only):** "Restore from Sheet" in Settings **reads** the Expenses, Income, Debts, and DebtPayments sheets and **merges** rows into the app (expenses/income add-only by key: date + description + amount; debts and debt payments add-only by id). Use case: e.g. after clearing local storage, load data back from the Sheet. Sheet-originated expenses get `source` and `cardMember` from columns when present; older 4-column sheets default to `manual` / no card member.
+- **Sync to Google Sheets (push only):** "Sync to Google Sheets" in Settings **overwrites** the Sheet with the app's current state. Clears and writes **Expenses** (6 columns: Date, Amount, Description, Category, **Source**, **Card Member**), **Income** table, **Debts** sheet, **DebtPayments** sheet, **Rules** sheet (Id, Enabled, Condition, Action), and **Totals** sheet (monthly rows + TOTALS row). If the user deletes all transactions in the app and syncs, the Sheet is updated to match (empty expenses/income/debts/rules).
+- **Restore from Sheet (pull only):** "Restore from Sheet" in Settings **reads** the Expenses, Income, Debts, DebtPayments, and Rules sheets and **merges** rows into the app (expenses/income add-only by key: date + description + amount; debts and debt payments add-only by id; rules replace the current rule set if any rows exist). Use case: e.g. after clearing local storage, load data back from the Sheet. Sheet-originated expenses get `source` and `cardMember` from columns when present; older 4-column sheets default to `manual` / no card member.
 - **Formatting:** Left-align cells, **Amount** columns as currency ($), **header row** bold and larger font (applied via Sheets API `batchUpdate` after data write).
 - **When sync runs:** Only when the user clicks the sync or restore button. No automatic or periodic sync.
 
@@ -172,16 +176,16 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 
 ## 7. File / Module Overview
 
-| Area            | Path / files                                                                         |
-| --------------- | ------------------------------------------------------------------------------------ |
-| Types           | `src/lib/types.ts` (Expense, Income, Debt, DebtPayment, categories)                  |
-| Parsers         | `src/lib/parsers/amex.ts`, `apple.ts`, `index.ts` (no Chase)                         |
-| Category rules  | `src/lib/categoryRules.ts` (pattern + baseline)                                      |
-| Totals          | `src/lib/totals.ts` (getMonthLabel exported for Dashboard/Transactions)              |
-| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Debts, DebtPayments, Totals) |
-| Category colors | `src/lib/categoryColors.tsx` (colors + CategoryOption component)                     |
-| Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `GoogleAuthContext.tsx`         |
-| Pages           | Dashboard, Import, Transactions, Income, Debt, Category Rules, Settings              |
+| Area            | Path / files                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------- |
+| Types           | `src/lib/types.ts` (Expense, Income, Debt, DebtPayment, categories)                         |
+| Parsers         | `src/lib/parsers/amex.ts`, `apple.ts`, `index.ts` (no Chase)                                |
+| Rules engine    | `src/lib/rules.ts` (conditions + actions, priority order)                                   |
+| Totals          | `src/lib/totals.ts` (getMonthLabel exported for Dashboard/Transactions)                     |
+| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Debts, DebtPayments, Rules, Totals) |
+| Category colors | `src/lib/categoryColors.tsx` (colors + CategoryOption component)                            |
+| Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `GoogleAuthContext.tsx`                |
+| Pages           | Dashboard, Import, Transactions, Income, Debt, Rules, Settings                              |
 
 ---
 

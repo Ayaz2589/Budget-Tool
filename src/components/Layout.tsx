@@ -9,6 +9,7 @@ import {
   Wallet,
   CreditCard,
   Home,
+  ListOrdered,
   Settings,
   LogIn,
   LogOut,
@@ -74,6 +75,7 @@ const nav = [
   { to: "/debt", labelKey: "nav.debt", icon: CreditCard },
   { to: "/mortgage", labelKey: "nav.mortgage", icon: Home },
   { to: "/import", labelKey: "nav.import", icon: Upload },
+  { to: "/rules", labelKey: "nav.rules", icon: ListOrdered },
   { to: "/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
@@ -89,6 +91,7 @@ const moreNavItems = [
   { to: "/debt", labelKey: "nav.debt", icon: CreditCard },
   { to: "/mortgage", labelKey: "nav.mortgage", icon: Home },
   { to: "/import", labelKey: "nav.import", icon: Upload },
+  { to: "/rules", labelKey: "nav.rules", icon: ListOrdered },
   { to: "/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
@@ -199,7 +202,7 @@ function SidebarContent({
           <Button
             variant="outline"
             size="sm"
-            className="justify-start gap-2"
+            className="justify-start gap-2 whitespace-normal text-left text-xs leading-snug h-auto py-2"
             onClick={signIn}
           >
             <LogIn className="size-4" />
@@ -381,7 +384,7 @@ export function Layout() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full justify-start gap-2"
+                  className="w-full justify-start gap-2 whitespace-normal text-left text-xs leading-snug h-auto py-2"
                   onClick={() => {
                     signIn();
                     setMoreOpen(false);

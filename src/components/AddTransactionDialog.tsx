@@ -1,8 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
+import { useRules } from "@/context/RulesContext";
 import type { ExpenseSource } from "@/lib/types";
 import { CategoryOption } from "@/lib/categoryColors";
+import {
+  applyRulesToExpenses,
+  computeTotalsByCategoryForMonth,
+} from "@/lib/rules";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -71,6 +76,7 @@ export function AddTransactionDialog({
 }: AddTransactionDialogProps) {
   const { t } = useTranslation();
   const { expenses, addExpense, expenseCategories } = useBudget();
+  const { rules } = useRules();
   const [rows, setRows] = useState<TransactionRow[]>(() => [defaultRow()]);
 
   useEffect(() => {
@@ -116,20 +122,35 @@ export function AddTransactionDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    let added = 0;
-    for (const row of rows) {
+    const toAdd = rows.flatMap((row) => {
       const num = parseFloat(row.amount.replace(/[$,]/g, ""));
-      if (Number.isNaN(num) || num <= 0) continue;
-      addExpense({
-        date: row.date,
-        amount: num,
-        description: row.description.trim() || t("addTransaction.sourceManual"),
-        category: row.category || "",
-        source: row.source,
-        cardMember: row.cardMember.trim() || undefined,
-      });
-      added += 1;
-    }
+      if (Number.isNaN(num) || num <= 0) return [];
+      return [
+        {
+          date: row.date,
+          amount: num,
+          description:
+            row.description.trim() || t("addTransaction.sourceManual"),
+          category: row.category || "",
+          source: row.source,
+          cardMember: row.cardMember.trim() || undefined,
+        },
+      ];
+    });
+    const currentMonthKey = new Date().toISOString().slice(0, 7);
+    const totals = computeTotalsByCategoryForMonth(
+      [...expenses, ...toAdd],
+      currentMonthKey,
+    );
+    const withRules =
+      rules.length > 0
+        ? applyRulesToExpenses(toAdd, rules, {
+            totalsByCategory: totals,
+            currentMonthKey,
+          })
+        : toAdd;
+    withRules.forEach((expense) => addExpense(expense));
+    const added = withRules.length;
     if (added > 0) {
       setRows([defaultRow()]);
       onOpenChange(false);

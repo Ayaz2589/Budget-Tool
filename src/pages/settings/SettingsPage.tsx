@@ -3,9 +3,22 @@ import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { extractSpreadsheetId } from "@/lib/googleSheets";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { GoogleSheetsCard } from "./GoogleSheetsCard";
 import { ExpenseCategoriesCard } from "./ExpenseCategoriesCard";
 import { IncomeCategoriesCard } from "./IncomeCategoriesCard";
+
+const BUDGET_STORAGE_KEY = "budget-tool-data";
+const RULES_STORAGE_KEY = "budget-tool-rules";
+const PRESET_STORAGE_KEY = "budget-tool-preset-transactions";
 
 export function SettingsPage() {
   const {
@@ -33,6 +46,7 @@ export function SettingsPage() {
   const [sheetIdInput, setSheetIdInput] = useState(spreadsheetId ?? "");
   const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
   const [restoreConfirmOpen, setRestoreConfirmOpen] = useState(false);
+  const [deleteAllConfirmOpen, setDeleteAllConfirmOpen] = useState(false);
   const [repairResult, setRepairResult] = useState<string | null>(null);
 
   const handleRepairDates = () => {
@@ -71,6 +85,14 @@ export function SettingsPage() {
     }
   };
 
+  const handleDeleteAllData = () => {
+    localStorage.removeItem(BUDGET_STORAGE_KEY);
+    localStorage.removeItem(RULES_STORAGE_KEY);
+    localStorage.removeItem(PRESET_STORAGE_KEY);
+    setDeleteAllConfirmOpen(false);
+    window.location.reload();
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">{t("settings.title")}</h1>
@@ -107,6 +129,44 @@ export function SettingsPage() {
         onChange={setIncomeList}
         onSave={saveIncomeCategories}
       />
+
+      <div className="pt-6 border-t">
+        <Button
+          variant="outline"
+          className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
+          onClick={() => setDeleteAllConfirmOpen(true)}
+        >
+          {t("settings.deleteAllData")}
+        </Button>
+      </div>
+
+      <Dialog
+        open={deleteAllConfirmOpen}
+        onOpenChange={setDeleteAllConfirmOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("settings.deleteAllDataConfirmTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("settings.deleteAllDataConfirmDesc")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteAllConfirmOpen(false)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteAllData}
+            >
+              {t("settings.deleteAllData")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

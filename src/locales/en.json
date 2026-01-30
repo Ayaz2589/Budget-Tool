@@ -347,7 +347,10 @@
     "expenseCategoriesPlaceholder": "My Purchase, Tasnuva's Purchases, 50/50, Amazon",
     "incomeCategories": "Income categories",
     "incomeCategoriesDesc": "Comma-separated list for income entries.",
-    "incomeCategoriesPlaceholder": "Rent, Paycheck, Bonus, ..."
+    "incomeCategoriesPlaceholder": "Rent, Paycheck, Bonus, ...",
+    "deleteAllData": "Delete all data",
+    "deleteAllDataConfirmTitle": "Delete all data?",
+    "deleteAllDataConfirmDesc": "This will permanently remove all expenses, income, debts, rules, and preset transactions from this device. This cannot be undone. The page will reload."
   },
   "addTransaction": {
     "sourceAmex": "Amex",

@@ -1,6 +1,9 @@
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -38,6 +41,8 @@ export function IncomeActionsDialog({
   incomeCategories,
   t,
 }: IncomeActionsDialogProps) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   if (income === null) return null;
 
   const handleEdit = () => {
@@ -45,8 +50,13 @@ export function IncomeActionsDialog({
     onClose();
   };
 
-  const handleDelete = () => {
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = () => {
     onDelete(income.id);
+    setShowDeleteConfirm(false);
     onClose();
   };
 
@@ -108,13 +118,42 @@ export function IncomeActionsDialog({
             <Button
               variant="destructive"
               className="w-full"
-              onClick={handleDelete}
+              onClick={handleDeleteClick}
             >
               {t("common.delete")}
             </Button>
           </div>
         </div>
       </DialogContent>
+      <Dialog
+        open={showDeleteConfirm}
+        onOpenChange={(open) => !open && setShowDeleteConfirm(false)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("income.deleteIncomeTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("income.deleteIncomeDesc")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+            >
+              {t("common.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

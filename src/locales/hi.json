@@ -187,7 +187,9 @@
     "editIncomeDesc": "तारीख, राशि, विवरण और श्रेणी अपडेट करें।",
     "noIncomeEntries": "कोई आय प्रविष्टि नहीं। ऊपर जोड़ें।",
     "placeholderDescription": "जैसे वेतन, बेसमेंट किराया",
-    "defaultDescription": "आय"
+    "defaultDescription": "आय",
+    "deleteIncomeTitle": "यह आय हटाएं?",
+    "deleteIncomeDesc": "यह आय एंट्री हटा दी जाएगी। पूर्ववत नहीं हो सकता।"
   },
   "debt": {
     "title": "कर्ज",
@@ -228,6 +230,9 @@
     "clearRecurring": "आवर्ती साफ़ करें",
     "deleteDebtTitle": "कर्ज हटाएं?",
     "deleteDebtDesc": "यह कर्ज और उसका सारा भुगतान इतिहास स्थायी रूप से हटा देगा। पूर्ववत नहीं हो सकता।",
+    "removePaymentTitle": "यह भुगतान हटाएं?",
+    "removePaymentDesc": "{{date}} का {{amount}} भुगतान हटा दिया जाएगा। पूर्ववत नहीं हो सकता।",
+    "removePayment": "हटाएं",
     "placeholderName": "जैसे कार लोन, क्रेडिट कार्ड",
     "placeholderNote": "जैसे मासिक भुगतान",
     "started": "{{date}} को शुरू"
@@ -306,7 +311,9 @@
     "ifAmount": "If amount",
     "ifCategoryTotal": "If category total",
     "thenSetCategory": "Then set category to",
-    "thenShowWarning": "Then show warning:"
+    "thenShowWarning": "Then show warning:",
+    "deleteRuleTitle": "यह नियम हटाएं?",
+    "deleteRuleDesc": "यह नियम हटा दिया जाएगा। पूर्ववत नहीं हो सकता।"
   },
   "presetTransactions": {
     "title": "Preset Transactions",
@@ -318,7 +325,9 @@
     "category": "Category",
     "member": "Member",
     "empty": "No presets yet. Add one to quick-fill when adding transactions.",
-    "delete": "Delete"
+    "delete": "Delete",
+    "deletePresetTitle": "यह प्रीसेट हटाएं?",
+    "deletePresetDesc": "यह प्रीसेट हटा दिया जाएगा। पूर्ववत नहीं हो सकता।"
   },
   "settings": {
     "title": "सेटिंग्स",

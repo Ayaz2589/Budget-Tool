@@ -187,7 +187,9 @@
     "editIncomeDesc": "তারিখ, পরিমাণ, বিবরণ ও ক্যাটাগরি আপডেট করুন।",
     "noIncomeEntries": "কোনো আয়ের এন্ট্রি নেই। উপরে একটি যোগ করুন।",
     "placeholderDescription": "যেমন বেতন, বেসমেন্ট ভাড়া",
-    "defaultDescription": "আয়"
+    "defaultDescription": "আয়",
+    "deleteIncomeTitle": "এই আয় মুছবেন?",
+    "deleteIncomeDesc": "এই আয় এন্ট্রি সরানো হবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।"
   },
   "debt": {
     "title": "ঋণ",
@@ -228,6 +230,9 @@
     "clearRecurring": "পুনরাবৃত্ত সাফ করুন",
     "deleteDebtTitle": "ঋণ মুছবেন?",
     "deleteDebtDesc": "এটি ঋণ ও এর সব পেমেন্ট ইতিহাস স্থায়ীভাবে সরাবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।",
+    "removePaymentTitle": "এই পেমেন্ট মুছবেন?",
+    "removePaymentDesc": "{{date}}-এর {{amount}} পেমেন্ট সরানো হবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।",
+    "removePayment": "মুছুন",
     "placeholderName": "যেমন গাড়ি লোন, ক্রেডিট কার্ড",
     "placeholderNote": "যেমন মাসিক পেমেন্ট",
     "started": "শুরু {{date}}"
@@ -306,7 +311,9 @@
     "ifAmount": "If amount",
     "ifCategoryTotal": "If category total",
     "thenSetCategory": "Then set category to",
-    "thenShowWarning": "Then show warning:"
+    "thenShowWarning": "Then show warning:",
+    "deleteRuleTitle": "এই নিয়ম মুছবেন?",
+    "deleteRuleDesc": "এই নিয়ম সরানো হবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।"
   },
   "presetTransactions": {
     "title": "Preset Transactions",
@@ -318,7 +325,9 @@
     "category": "Category",
     "member": "Member",
     "empty": "No presets yet. Add one to quick-fill when adding transactions.",
-    "delete": "Delete"
+    "delete": "Delete",
+    "deletePresetTitle": "এই প্রিসেট মুছবেন?",
+    "deletePresetDesc": "এই প্রিসেট সরানো হবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।"
   },
   "settings": {
     "title": "সেটিংস",

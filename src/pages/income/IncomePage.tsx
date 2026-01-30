@@ -12,6 +12,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { FileDown } from "lucide-react";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { AddIncomeDialog } from "./AddIncomeDialog";
@@ -36,6 +44,7 @@ export function IncomePage() {
   const [addOpen, setAddOpen] = useState(false);
   const [editIncome, setEditIncome] = useState<Income | null>(null);
   const [incomeForActions, setIncomeForActions] = useState<Income | null>(null);
+  const [incomeToDeleteId, setIncomeToDeleteId] = useState<string | null>(null);
 
   const { t } = useTranslation();
   const sortedIncome = [...income].sort((a, b) => b.date.localeCompare(a.date));
@@ -107,7 +116,7 @@ export function IncomePage() {
                   sortedIncome={sortedIncome}
                   incomeCategories={incomeCategories}
                   onEdit={setEditIncome}
-                  onDelete={removeIncome}
+                  onDelete={setIncomeToDeleteId}
                   onUpdateCategory={(id, category) =>
                     updateIncome(id, { category })
                   }
@@ -138,6 +147,41 @@ export function IncomePage() {
         incomeCategories={incomeCategories}
         t={t}
       />
+
+      <Dialog
+        open={incomeToDeleteId !== null}
+        onOpenChange={(open) => !open && setIncomeToDeleteId(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("income.deleteIncomeTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("income.deleteIncomeDesc")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIncomeToDeleteId(null)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                if (incomeToDeleteId) {
+                  removeIncome(incomeToDeleteId);
+                  setIncomeToDeleteId(null);
+                }
+              }}
+            >
+              {t("common.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <EditIncomeDialog
         income={editIncome}

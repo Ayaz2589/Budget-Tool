@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -101,6 +103,8 @@ export function RulesPage() {
     expenseCategories[0] ?? "",
   );
   const [warningMessage, setWarningMessage] = useState("");
+  const [ruleToDeleteId, setRuleToDeleteId] = useState<string | null>(null);
+  const [presetToDeleteId, setPresetToDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     if (conditionType !== "categoryTotal" && actionType === "showWarning") {
@@ -566,7 +570,7 @@ export function RulesPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => removeRule(rule.id)}
+                    onClick={() => setRuleToDeleteId(rule.id)}
                     aria-label={t("common.delete")}
                   >
                     <Trash2 className="size-4" />
@@ -577,6 +581,76 @@ export function RulesPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog
+        open={ruleToDeleteId !== null}
+        onOpenChange={(open) => !open && setRuleToDeleteId(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("rules.deleteRuleTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("rules.deleteRuleDesc")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setRuleToDeleteId(null)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                if (ruleToDeleteId) {
+                  removeRule(ruleToDeleteId);
+                  setRuleToDeleteId(null);
+                }
+              }}
+            >
+              {t("common.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={presetToDeleteId !== null}
+        onOpenChange={(open) => !open && setPresetToDeleteId(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("presetTransactions.deletePresetTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("presetTransactions.deletePresetDesc")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPresetToDeleteId(null)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                if (presetToDeleteId) {
+                  removePreset(presetToDeleteId);
+                  setPresetToDeleteId(null);
+                }
+              }}
+            >
+              {t("common.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardHeader>
@@ -700,7 +774,7 @@ export function RulesPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => removePreset(preset.id)}
+                    onClick={() => setPresetToDeleteId(preset.id)}
                     aria-label={t("presetTransactions.delete")}
                   >
                     <Trash2 className="size-4" />

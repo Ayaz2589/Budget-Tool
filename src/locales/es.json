@@ -187,7 +187,9 @@
     "editIncomeDesc": "Actualiza fecha, importe, descripción y categoría.",
     "noIncomeEntries": "No hay ingresos. Añade uno arriba.",
     "placeholderDescription": "ej. Nómina, Alquiler sótano",
-    "defaultDescription": "Ingreso"
+    "defaultDescription": "Ingreso",
+    "deleteIncomeTitle": "¿Eliminar este ingreso?",
+    "deleteIncomeDesc": "Esta entrada de ingreso se eliminará. No se puede deshacer."
   },
   "debt": {
     "title": "Deudas",
@@ -228,6 +230,9 @@
     "clearRecurring": "Quitar recurrente",
     "deleteDebtTitle": "¿Eliminar deuda?",
     "deleteDebtDesc": "Se eliminará la deuda y todo su historial de pagos. No se puede deshacer.",
+    "removePaymentTitle": "¿Eliminar este pago?",
+    "removePaymentDesc": "Se eliminará el pago de {{amount}} del {{date}}. No se puede deshacer.",
+    "removePayment": "Eliminar",
     "placeholderName": "ej. Préstamo coche, Tarjeta crédito",
     "placeholderNote": "ej. Pago mensual",
     "started": "Iniciado {{date}}"
@@ -306,7 +311,9 @@
     "ifAmount": "If amount",
     "ifCategoryTotal": "If category total",
     "thenSetCategory": "Then set category to",
-    "thenShowWarning": "Then show warning:"
+    "thenShowWarning": "Then show warning:",
+    "deleteRuleTitle": "¿Eliminar esta regla?",
+    "deleteRuleDesc": "Esta regla se eliminará. No se puede deshacer."
   },
   "presetTransactions": {
     "title": "Preset Transactions",
@@ -318,7 +325,9 @@
     "category": "Category",
     "member": "Member",
     "empty": "No presets yet. Add one to quick-fill when adding transactions.",
-    "delete": "Delete"
+    "delete": "Delete",
+    "deletePresetTitle": "¿Eliminar este preset?",
+    "deletePresetDesc": "Este preset se eliminará. No se puede deshacer."
   },
   "settings": {
     "title": "Ajustes",

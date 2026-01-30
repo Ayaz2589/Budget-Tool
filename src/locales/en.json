@@ -187,7 +187,9 @@
     "editIncomeDesc": "Update the date, amount, description, and category.",
     "noIncomeEntries": "No income entries. Add one above.",
     "placeholderDescription": "e.g. Paycheck, Basement Rent",
-    "defaultDescription": "Income"
+    "defaultDescription": "Income",
+    "deleteIncomeTitle": "Delete this income?",
+    "deleteIncomeDesc": "This income entry will be removed. This cannot be undone."
   },
   "debt": {
     "title": "Debt",
@@ -228,6 +230,9 @@
     "clearRecurring": "Clear recurring",
     "deleteDebtTitle": "Delete debt?",
     "deleteDebtDesc": "This will permanently remove the debt and all its payment history. This cannot be undone.",
+    "removePaymentTitle": "Remove this payment?",
+    "removePaymentDesc": "Payment of {{amount}} on {{date}} will be removed. This cannot be undone.",
+    "removePayment": "Remove",
     "placeholderName": "e.g. Car loan, Credit card",
     "placeholderNote": "e.g. Monthly payment",
     "started": "Started {{date}}"
@@ -306,7 +311,9 @@
     "ifAmount": "If amount",
     "ifCategoryTotal": "If category total",
     "thenSetCategory": "Then set category to",
-    "thenShowWarning": "Then show warning:"
+    "thenShowWarning": "Then show warning:",
+    "deleteRuleTitle": "Delete this rule?",
+    "deleteRuleDesc": "This rule will be removed. This cannot be undone."
   },
   "presetTransactions": {
     "title": "Preset Transactions",
@@ -318,7 +325,9 @@
     "category": "Category",
     "member": "Member",
     "empty": "No presets yet. Add one to quick-fill when adding transactions.",
-    "delete": "Delete"
+    "delete": "Delete",
+    "deletePresetTitle": "Delete this preset?",
+    "deletePresetDesc": "This preset will be removed. This cannot be undone."
   },
   "settings": {
     "title": "Settings",

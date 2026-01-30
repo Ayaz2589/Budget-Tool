@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/format";
 import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
 import { EditRecurringDialog } from "./EditRecurringDialog";
@@ -42,6 +43,9 @@ export function DebtPage() {
     null,
   );
   const [debtForActions, setDebtForActions] = useState<Debt | null>(null);
+  const [paymentToRemoveId, setPaymentToRemoveId] = useState<string | null>(
+    null,
+  );
 
   const paymentsByDebt = useMemo(() => {
     const map = new Map<string, DebtPayment[]>();
@@ -104,7 +108,7 @@ export function DebtPage() {
                   onAddPayment={setPaymentDebtId}
                   onEditRecurring={(debt) => setRecurringDebtId(debt.id)}
                   onDelete={setDeleteConfirmDebtId}
-                  onRemovePayment={removeDebtPayment}
+                  onRemovePayment={setPaymentToRemoveId}
                 />
               </div>
               <div className="md:hidden max-h-[50vh] overflow-y-auto border rounded-md">
@@ -140,6 +144,49 @@ export function DebtPage() {
         onRemovePayment={removeDebtPayment}
         t={t}
       />
+
+      <Dialog
+        open={paymentToRemoveId !== null}
+        onOpenChange={(open) => !open && setPaymentToRemoveId(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("debt.removePaymentTitle")}</DialogTitle>
+            <DialogDescription>
+              {(() => {
+                const p = debtPayments.find((x) => x.id === paymentToRemoveId);
+                return p
+                  ? t("debt.removePaymentDesc", {
+                      amount: formatCurrency(p.amount),
+                      date: p.date,
+                    })
+                  : "";
+              })()}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPaymentToRemoveId(null)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                if (paymentToRemoveId) {
+                  removeDebtPayment(paymentToRemoveId);
+                  setPaymentToRemoveId(null);
+                }
+              }}
+            >
+              {t("debt.removePayment")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={deleteConfirmDebtId !== null}

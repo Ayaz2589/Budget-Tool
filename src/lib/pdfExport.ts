@@ -9,8 +9,8 @@ import type {
   PresetTransaction,
 } from "@/lib/types";
 import type { Rule } from "@/lib/rules";
-import { getMonthLabel } from "@/lib/totals";
-import { formatCurrency } from "@/lib/format";
+import { getMonthLabel, computeMonthTotals } from "@/lib/totals";
+import { formatCurrency, formatPercent } from "@/lib/format";
 
 const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
 const INCOME_ROW_RE = /(\d{4}-\d{2}-\d{2})\s+(Paycheck|Rent)\s+\$([\d,]+\.\d{2})\s+(Paycheck|Rent)/g;
@@ -56,6 +56,47 @@ export function downloadTransactionsAndIncomePdf(
   doc.setFontSize(18);
   doc.text("Transactions & Income", margin, y);
   y += 12;
+
+  // Dashboard summary (current month, like the dashboard)
+  const currentMonthKey = new Date().toISOString().slice(0, 7);
+  const selectedMonth = computeMonthTotals(
+    currentMonthKey,
+    expenses,
+    income,
+    0,
+    0,
+    0,
+  );
+  if (y > 260) {
+    doc.addPage();
+    y = 20;
+  }
+  doc.setFontSize(14);
+  doc.text(`Summary (${selectedMonth.monthLabel})`, margin, y);
+  y += 8;
+  const summaryRows: [string, string][] = [
+    ["Total Earned", formatCurrency(selectedMonth.totalEarned)],
+    ["Total Spent", formatCurrency(selectedMonth.totalSpent)],
+    ["Total Spent w/o Mortgage", formatCurrency(selectedMonth.totalSpentWithoutMortgage)],
+    ["50/50 Split", formatCurrency(selectedMonth.split5050)],
+    ["Tasnuva's Total Spending", formatCurrency(selectedMonth.novasTotalSpending)],
+    ["My Total Spending w/o Mortgage", formatCurrency(selectedMonth.myTotalSpendingWithoutMortgage)],
+    ["Total Saved", formatCurrency(selectedMonth.totalSaved)],
+    ["Personal Savings Rate", formatPercent(selectedMonth.personalSavingsRate)],
+  ];
+  const summaryHead = [["Metric", "Value"]];
+  const summaryBody = summaryRows.map(([label, value]) => [label, value]);
+  autoTable(doc, {
+    startY: y,
+    head: summaryHead,
+    body: summaryBody,
+    theme: "grid",
+    margin: { left: margin, right: margin },
+    tableWidth: "auto",
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [66, 66, 66], textColor: 255 },
+  });
+  y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 14;
 
   const expenseByMonth = groupByMonth(expenses);
   const incomeByMonth = groupByMonth(income);

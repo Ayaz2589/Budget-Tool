@@ -24,7 +24,7 @@ export function ExpenseCategoriesCard({
       <CardHeader>
         <CardTitle>Expense categories</CardTitle>
         <CardDescription>
-          Comma-separated list. Used in dropdowns and rules.
+          Comma-separated list. Used in dropdowns.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">

@@ -131,7 +131,7 @@
     "sourceTd": "직불 (TD Bank)",
     "title": "거래",
     "expenses": "지출",
-    "filterAndEdit": "카테고리 필터 및 편집. 미분류 행에 규칙 재적용.",
+    "filterAndEdit": "카테고리 필터 및 편집.",
     "add": "추가",
     "syncing": "동기화 중...",
     "syncToSheets": "스프레드시트로 동기화",

@@ -131,7 +131,7 @@
     "sourceTd": "Debit (TD Bank)",
     "title": "Transactions",
     "expenses": "Expenses",
-    "filterAndEdit": "Filter and edit categories. Re-apply rules to uncategorized rows.",
+    "filterAndEdit": "Filter and edit categories.",
     "add": "Add",
     "syncing": "Syncing...",
     "syncToSheets": "Sync to Sheets",

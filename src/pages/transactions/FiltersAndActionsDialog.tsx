@@ -47,8 +47,6 @@ export type FiltersAndActionsDialogProps = {
   cardMemberOptions: string[];
   hasActiveFilters: boolean;
   onClearFilters: () => void;
-  onReapplyRules: () => void;
-  uncategorizedCount: number;
   onCleanDescriptions: () => void;
   onDownloadPdf: () => void;
   someSelected: boolean;
@@ -77,8 +75,6 @@ export function FiltersAndActionsDialog({
   cardMemberOptions,
   hasActiveFilters,
   onClearFilters,
-  onReapplyRules,
-  uncategorizedCount,
   onCleanDescriptions,
   onDownloadPdf,
   someSelected,
@@ -216,13 +212,6 @@ export function FiltersAndActionsDialog({
             <h3 className="text-sm font-semibold">{t("common.actions")}</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {uncategorizedCount > 0 && (
-                <Button variant="outline" size="sm" onClick={onReapplyRules}>
-                  {t("transactions.reapplyRules", {
-                    count: uncategorizedCount,
-                  })}
-                </Button>
-              )}
               <Button
                 variant="outline"
                 size="sm"

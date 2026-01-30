@@ -2,11 +2,6 @@ import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
-import { useRules } from "@/context/RulesContext";
-import {
-  applyRulesToExpenses,
-  applyBaselineToExpenses,
-} from "@/lib/categoryRules";
 import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
@@ -49,7 +44,6 @@ export function TransactionsPage() {
   } = useBudget();
   const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
     useGoogleAuth();
-  const { rules } = useRules();
   const [monthFilter, setMonthFilter] = useState<string>("");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
@@ -158,14 +152,6 @@ export function TransactionsPage() {
     ? currentMonthKey
     : (byMonth[0]?.[0] ?? "");
 
-  const reapplyRules = useCallback(() => {
-    const expenseRules = rules.filter((r) => r.type === "expense");
-    const uncategorized = expenses.filter((e) => !e.category);
-    const withRules = applyRulesToExpenses(uncategorized, expenseRules);
-    const withBaseline = applyBaselineToExpenses(withRules);
-    withBaseline.forEach((e) => updateExpense(e.id, { category: e.category }));
-  }, [rules, expenses, updateExpense]);
-
   const cleanAllDescriptions = useCallback(() => {
     expenses.forEach((e) => {
       const cleaned = cleanDescription(e.description);
@@ -174,8 +160,6 @@ export function TransactionsPage() {
       }
     });
   }, [expenses, updateExpense]);
-
-  const uncategorizedCount = expenses.filter((e) => !e.category).length;
 
   const toggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -299,8 +283,6 @@ export function TransactionsPage() {
             cardMemberOptions={cardMemberOptions}
             hasActiveFilters={hasActiveFilters}
             onClearFilters={clearFilters}
-            onReapplyRules={reapplyRules}
-            uncategorizedCount={uncategorizedCount}
             onCleanDescriptions={cleanAllDescriptions}
             onDownloadPdf={handleDownloadPdf}
             someSelected={someSelected}

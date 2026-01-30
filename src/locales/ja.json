@@ -131,7 +131,7 @@
     "sourceTd": "デビット (TD Bank)",
     "title": "取引",
     "expenses": "支出",
-    "filterAndEdit": "カテゴリをフィルタ・編集。未分類行にルールを再適用。",
+    "filterAndEdit": "カテゴリをフィルタ・編集。",
     "add": "追加",
     "syncing": "同期中...",
     "syncToSheets": "シートに同期",

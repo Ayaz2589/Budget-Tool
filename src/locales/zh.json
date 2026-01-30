@@ -131,7 +131,7 @@
     "sourceTd": "借记 (TD Bank)",
     "title": "交易",
     "expenses": "支出",
-    "filterAndEdit": "筛选并编辑分类。对未分类行重新应用规则。",
+    "filterAndEdit": "筛选并编辑分类。",
     "add": "添加",
     "syncing": "同步中...",
     "syncToSheets": "同步到表格",

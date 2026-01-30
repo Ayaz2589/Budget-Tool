@@ -1,14 +1,9 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
-import { useRules } from "@/context/RulesContext";
 import { parseCsv, parseChasePdfFromText, type CsvSource } from "@/lib/parsers";
 import { extractTextFromPdf } from "@/lib/pdfText";
 import { parseExportedPdfData } from "@/lib/pdfExport";
-import {
-  applyRulesToExpenses,
-  applyBaselineToExpenses,
-} from "@/lib/categoryRules";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
 import { ImportSourceCard, type SourceChoice } from "./ImportSourceCard";
@@ -38,7 +33,6 @@ export function ImportPage() {
     addDebtPayments,
     expenseCategories,
   } = useBudget();
-  const { rules } = useRules();
   const { t } = useTranslation();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,12 +85,7 @@ export function ImportPage() {
             setSourceLabel("");
             return;
           }
-          const withRules = applyRulesToExpenses(
-            toAddExpenses,
-            rules.filter((r) => r.type === "expense"),
-          );
-          const withBaseline = applyBaselineToExpenses(withRules);
-          setPreviewExpenses(withBaseline);
+          setPreviewExpenses(toAddExpenses);
           setPreviewIncome(toAddIncome);
           setPreviewDebts(toAddDebts);
           setPreviewDebtPayments(toAddDebtPayments);
@@ -126,12 +115,7 @@ export function ImportPage() {
           const result = parseChasePdfFromText(text);
           const toAdd = filterOutExistingExpenses(result.expenses, expenses);
           setSkippedDuplicates(result.expenses.length - toAdd.length);
-          const withRules = applyRulesToExpenses(
-            toAdd,
-            rules.filter((r) => r.type === "expense"),
-          );
-          const withBaseline = applyBaselineToExpenses(withRules);
-          setPreviewExpenses(withBaseline);
+          setPreviewExpenses(toAdd);
           setPreviewIncome([]);
           setSourceLabel("Chase");
           setLastDetected("chase");
@@ -155,12 +139,7 @@ export function ImportPage() {
           const result = parseCsv(text, selectedSource as CsvSource);
           const toAdd = filterOutExistingExpenses(result.expenses, expenses);
           setSkippedDuplicates(result.expenses.length - toAdd.length);
-          const withRules = applyRulesToExpenses(
-            toAdd,
-            rules.filter((r) => r.type === "expense"),
-          );
-          const withBaseline = applyBaselineToExpenses(withRules);
-          setPreviewExpenses(withBaseline);
+          setPreviewExpenses(toAdd);
           setPreviewIncome([]);
           const label =
             selectedSource === "amex" ? "American Express" : "Apple Card";
@@ -178,16 +157,6 @@ export function ImportPage() {
       reader.readAsText(file, "UTF-8");
     }
     e.target.value = "";
-  };
-
-  const applyRules = () => {
-    setPreviewExpenses((prev) => {
-      const withRules = applyRulesToExpenses(
-        prev,
-        rules.filter((r) => r.type === "expense"),
-      );
-      return applyBaselineToExpenses(withRules);
-    });
   };
 
   const updatePreviewCategory = (id: string, category: string) => {
@@ -238,7 +207,6 @@ export function ImportPage() {
         previewDebtsCount={previewDebts.length}
         previewDebtPaymentsCount={previewDebtPayments.length}
         skippedDuplicates={skippedDuplicates}
-        onApplyRules={applyRules}
         onAddToTransactions={addToTransactions}
         isPdfExport={lastDetected === "pdf-export"}
         t={t}

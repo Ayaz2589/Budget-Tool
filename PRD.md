@@ -2,13 +2,13 @@
 
 ## Budget Tool — What Was Done So Far
 
-**Last updated:** January 2026 (mobile dashboard compactness, chart overflow fixes, max-width on all pages)
+**Last updated:** January 2026 (multi-transaction add, nav Google sign-in, dashboard charts)
 
 ---
 
 ## Summary
 
-Budget Tool is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage category rules, and sign in with Google in the nav. Dashboard summary cards and charts are compact and overflow-safe on mobile; all pages use a max content width on large screens. Data lives in the app and localStorage; Sheets sync is manual push/restore.
+Budget Tool is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage category rules, and sign in with Google in the nav. Data lives in the app and localStorage; Sheets sync is manual push/restore.
 
 ---
 
@@ -123,8 +123,6 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 - **All-time totals:** Single card with Total Earned, Total Spent, Total Saved across all months.
 - **Spending by month (table):** Table with one row per month: Month, Total Earned, Total Spent, Spent w/o Mortgage, Total Saved, Savings Rate. Current month row is highlighted.
 - **Monthly breakdown (bar chart):** Bar chart (recharts) showing **Total Earned** vs **Total Spent** per month (chronological order). Two bars per month; tooltip formats as currency; legend. Empty state if no data.
-- **Summary cards (mobile):** On small screens, summary cards use tighter padding, gap, and smaller label/value font sizes so they take less vertical space.
-- **Charts (mobile):** Dedicated mobile chart variants with reduced left margins and Y-axis widths; spending-by-type charts use overflow containment (min-width, overflow-hidden, max-width) and a larger right margin for X-axis labels to prevent horizontal overflow. Pie and bar charts scale down on mobile.
 - **Totals:** Sourced from `lib/totals.ts` (see below).
 
 ### 4.7 Totals Logic
@@ -153,10 +151,6 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 - **Google:** Connect/disconnect, set spreadsheet URL/ID. **Restore from Sheet** (pull only: load data from Sheet into app) and **Sync to Google Sheets** (push only: overwrite Sheet with app data). Sync/restore status and error message displayed on failure.
 - **OAuth testing:** For “Access blocked: app has not completed verification,” add test users in the Google Cloud OAuth consent screen so they can sign in.
 
-### 4.11 Layout
-
-- **Page content width:** All page content (Dashboard, Transactions, Income, Debt, Mortgage, Import, Rules, Settings) is rendered inside a centered wrapper with **max width 7xl** (1280px) so layouts do not stretch on ultra-wide monitors. Implemented in `Layout.tsx` around the main `<Outlet />`.
-
 ---
 
 ## 5. Technical Stack
@@ -178,17 +172,16 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 
 ## 7. File / Module Overview
 
-| Area            | Path / files                                                                           |
-| --------------- | -------------------------------------------------------------------------------------- |
-| Types           | `src/lib/types.ts` (Expense, Income, Debt, DebtPayment, categories)                    |
-| Parsers         | `src/lib/parsers/amex.ts`, `apple.ts`, `index.ts` (no Chase)                           |
-| Category rules  | `src/lib/categoryRules.ts` (pattern + baseline)                                        |
-| Totals          | `src/lib/totals.ts` (getMonthLabel exported for Dashboard/Transactions)                |
-| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Debts, DebtPayments, Totals)   |
-| Category colors | `src/lib/categoryColors.tsx` (colors + CategoryOption component)                       |
-| Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `GoogleAuthContext.tsx`           |
-| Layout          | `src/components/Layout.tsx` (sidebar, main content wrapper with max-w-7xl, mobile nav) |
-| Pages           | Dashboard, Import, Transactions, Income, Debt, Category Rules, Settings                |
+| Area            | Path / files                                                                         |
+| --------------- | ------------------------------------------------------------------------------------ |
+| Types           | `src/lib/types.ts` (Expense, Income, Debt, DebtPayment, categories)                  |
+| Parsers         | `src/lib/parsers/amex.ts`, `apple.ts`, `index.ts` (no Chase)                         |
+| Category rules  | `src/lib/categoryRules.ts` (pattern + baseline)                                      |
+| Totals          | `src/lib/totals.ts` (getMonthLabel exported for Dashboard/Transactions)              |
+| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Debts, DebtPayments, Totals) |
+| Category colors | `src/lib/categoryColors.tsx` (colors + CategoryOption component)                     |
+| Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `GoogleAuthContext.tsx`         |
+| Pages           | Dashboard, Import, Transactions, Income, Debt, Category Rules, Settings              |
 
 ---
 

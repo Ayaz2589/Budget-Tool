@@ -131,7 +131,7 @@
     "sourceTd": "Débito (TD Bank)",
     "title": "Transacciones",
     "expenses": "Gastos",
-    "filterAndEdit": "Filtrar y editar categorías. Reaplicar reglas a filas sin categoría.",
+    "filterAndEdit": "Filtrar y editar categorías.",
     "add": "Añadir",
     "syncing": "Sincronizando...",
     "syncToSheets": "Sincronizar con Sheets",

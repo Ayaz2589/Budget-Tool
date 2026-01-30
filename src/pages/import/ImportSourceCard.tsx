@@ -38,7 +38,6 @@ export type ImportSourceCardProps = {
   previewDebtsCount: number;
   previewDebtPaymentsCount: number;
   skippedDuplicates: number;
-  onApplyRules: () => void;
   onAddToTransactions: () => void;
   isPdfExport: boolean;
   t: (key: string) => string;
@@ -58,7 +57,6 @@ export function ImportSourceCard({
   previewDebtsCount,
   previewDebtPaymentsCount,
   skippedDuplicates,
-  onApplyRules,
   onAddToTransactions,
   isPdfExport,
   t,
@@ -126,11 +124,6 @@ export function ImportSourceCard({
         )}
         {hasPreview && (
           <>
-            {!isPdfExport && (
-              <Button variant="outline" onClick={onApplyRules}>
-                Apply rules
-              </Button>
-            )}
             <Button onClick={onAddToTransactions}>
               {isPdfExport ? "Add all" : "Add to transactions"}
             </Button>

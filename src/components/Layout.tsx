@@ -9,7 +9,6 @@ import {
   Wallet,
   CreditCard,
   Home,
-  ListOrdered,
   Settings,
   LogIn,
   LogOut,
@@ -75,7 +74,6 @@ const nav = [
   { to: "/debt", labelKey: "nav.debt", icon: CreditCard },
   { to: "/mortgage", labelKey: "nav.mortgage", icon: Home },
   { to: "/import", labelKey: "nav.import", icon: Upload },
-  { to: "/rules", labelKey: "nav.categoryRules", icon: ListOrdered },
   { to: "/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
@@ -91,7 +89,6 @@ const moreNavItems = [
   { to: "/debt", labelKey: "nav.debt", icon: CreditCard },
   { to: "/mortgage", labelKey: "nav.mortgage", icon: Home },
   { to: "/import", labelKey: "nav.import", icon: Upload },
-  { to: "/rules", labelKey: "nav.categoryRules", icon: ListOrdered },
   { to: "/settings", labelKey: "nav.settings", icon: Settings },
 ];
 

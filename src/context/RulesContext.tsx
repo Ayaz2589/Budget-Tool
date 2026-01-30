@@ -24,7 +24,7 @@ interface RulesContextValue {
 const RulesContext = createContext<RulesContextValue | null>(null);
 
 export function RulesProvider({ children }: { children: ReactNode }) {
-  const [rules, setRules] = useState<Rule[]>(() => {
+  const [rules, setRulesState] = useState<Rule[]>(() => {
     const raw = localStorage.getItem(RULES_STORAGE_KEY);
     if (raw) {
       try {
@@ -37,7 +37,7 @@ export function RulesProvider({ children }: { children: ReactNode }) {
   });
 
   const persist = useCallback((next: Rule[]) => {
-    setRules(next);
+    setRulesState(next);
     localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(next));
   }, []);
 

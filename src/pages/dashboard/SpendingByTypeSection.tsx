@@ -63,10 +63,10 @@ export function SpendingByTypeSection({
 
   return (
     <AccordionItem value="spending">
-      <AccordionTrigger className="px-4 py-4 text-lg font-semibold hover:no-underline data-[state=open]:border-b">
+      <AccordionTrigger className="px-0 py-3 text-lg font-semibold hover:no-underline md:px-4 md:py-4">
         {t("dashboard.spendingByType")}
       </AccordionTrigger>
-      <AccordionContent className="px-1 pt-4 pb-4 space-y-6 md:px-4 min-w-0">
+      <AccordionContent className="px-0 pt-0 pb-0 space-y-6 md:px-4 md:pt-4 md:pb-4 min-w-0">
         <Card className="min-w-0">
           <CardHeader className="pb-2 px-2 md:px-6">
             <CardTitle className="text-sm font-medium text-muted-foreground">

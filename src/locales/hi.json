@@ -126,7 +126,8 @@
     "addDebt": "कर्ज जोड़ें"
   },
   "transactions": {
-    "sourceAmex": "American Express",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
     "sourceApple": "Apple Card",
     "sourceManual": "मैनुअल",
@@ -254,8 +255,10 @@
     "uploadStatement": "स्टेटमेंट अपलोड करें",
     "uploadStatementDesc": "ड्रॉपडाउन से अपना बैंक या \"एक्सपोर्ट PDF (फिर से आयात)\" चुनें, फिर CSV (Amex, Apple), PDF स्टेटमेंट (Chase) या पहले डाउनलोड किया लेनदेन PDF चुनें। CSV और Chase आयात मौजूदा लेनदेन (समान तारीख और राशि) छोड़ देते हैं। फिर से आयातित PDF ID से छोड़ते हैं। प्रीव्यू के बाद \"लेनदेन में जोड़ें\" या \"सभी जोड़ें\" क्लिक करके सहेजें।",
     "csvSource": "CSV स्रोत:",
-    "americanExpress": "American Express",
+    "amexPlatinum": "Amex Platinum Card",
+    "amexGold": "Amex Gold Card",
     "appleCard": "Apple Card",
+    "chase": "Chase",
     "chasePdf": "Chase (PDF स्टेटमेंट)",
     "exportedPdf": "एक्सपोर्ट PDF (फिर से आयात)",
     "chooseExportedPdf": "एक्सपोर्ट PDF चुनें",
@@ -359,7 +362,8 @@
     "incomeCategoriesPlaceholder": "किराया, वेतन, बोनस, ..."
   },
   "addTransaction": {
-    "sourceAmex": "Amex",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
     "sourceApple": "Apple",
     "sourceManual": "मैनुअल",

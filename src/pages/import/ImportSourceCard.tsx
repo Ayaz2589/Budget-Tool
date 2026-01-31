@@ -6,22 +6,42 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Upload, FileText } from "lucide-react";
+
+function PdfExportIcon({
+  className = "",
+  size = 40,
+}: {
+  className?: string;
+  size?: number;
+}) {
+  return <FileText size={size} className={className} />;
+}
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Upload } from "lucide-react";
+  AmexPlatinumCardIcon,
+  AmexGoldCardIcon,
+  AppleCardIcon,
+  ChaseCardIcon,
+} from "@/components/cards";
+import { cn } from "@/lib/utils";
 
-export type SourceChoice = "amex" | "apple" | "chase" | "pdf-export";
+export type SourceChoice =
+  | "amex"
+  | "amex-gold"
+  | "apple"
+  | "chase"
+  | "pdf-export";
 
-const SOURCE_OPTIONS: { value: SourceChoice; label: string }[] = [
-  { value: "amex", label: "American Express" },
-  { value: "apple", label: "Apple Card" },
-  { value: "chase", label: "Chase (PDF statement)" },
-  { value: "pdf-export", label: "Exported PDF (re-import)" },
+const SOURCE_OPTIONS: {
+  value: SourceChoice;
+  label: string;
+  icon: React.ComponentType<{ className?: string; size?: number }>;
+}[] = [
+  { value: "amex", label: "Amex Platinum Card", icon: AmexPlatinumCardIcon },
+  { value: "amex-gold", label: "Amex Gold Card", icon: AmexGoldCardIcon },
+  { value: "apple", label: "Apple Card", icon: AppleCardIcon },
+  { value: "chase", label: "Chase", icon: ChaseCardIcon },
+  { value: "pdf-export", label: "Exported PDF (re-import)", icon: PdfExportIcon },
 ];
 
 export type ImportSourceCardProps = {
@@ -73,26 +93,36 @@ export function ImportSourceCard({
         <CardTitle>{t("import.uploadStatement")}</CardTitle>
         <CardDescription>{t("import.uploadStatementDesc")}</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium whitespace-nowrap">
-            CSV source:
-          </span>
-          <Select
-            value={selectedSource}
-            onValueChange={(v) => onSourceChange(v as SourceChoice)}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {SOURCE_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {SOURCE_OPTIONS.map((opt) => {
+            const Icon = opt.icon;
+            const isPdfOpt = opt.value === "pdf-export";
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => onSourceChange(opt.value)}
+                className={cn(
+                  "flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors text-left",
+                  "hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  selectedSource === opt.value
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-muted-foreground/30"
+                )}
+              >
+                <div className="flex items-center justify-center size-12 shrink-0 text-foreground">
+                  <Icon
+                    size={isPdfOpt ? 32 : 48}
+                    className={isPdfOpt ? "text-muted-foreground" : ""}
+                  />
+                </div>
+                <span className="text-xs font-medium text-center leading-tight">
                   {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                </span>
+              </button>
+            );
+          })}
         </div>
         <input
           ref={fileInputRef}
@@ -107,15 +137,15 @@ export function ImportSourceCard({
             ? "Choose exported PDF"
             : selectedSource === "chase"
               ? "Choose PDF statement"
-              : "Choose CSV file"}
+              : "Choose CSV/PDF file"}
         </Button>
         {importError && (
-          <span className="text-sm text-destructive self-center">
+          <span className="text-sm text-destructive block">
             {importError}
           </span>
         )}
         {lastDetected && !importError && (
-          <span className="text-sm text-muted-foreground self-center">
+          <span className="text-sm text-muted-foreground block">
             {sourceLabel}
             {isPdfExport
               ? ` · ${previewExpensesCount} expenses, ${previewIncomeCount} income${previewDebtsCount > 0 ? `, ${previewDebtsCount} debts` : ""}${previewDebtPaymentsCount > 0 ? `, ${previewDebtPaymentsCount} debt payments` : ""} to add (existing IDs omitted)`
@@ -123,11 +153,9 @@ export function ImportSourceCard({
           </span>
         )}
         {hasPreview && (
-          <>
-            <Button onClick={onAddToTransactions}>
-              {isPdfExport ? "Add all" : "Add to transactions"}
-            </Button>
-          </>
+          <Button onClick={onAddToTransactions}>
+            {isPdfExport ? "Add all" : "Add to transactions"}
+          </Button>
         )}
       </CardContent>
     </Card>

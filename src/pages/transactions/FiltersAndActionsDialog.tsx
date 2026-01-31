@@ -15,15 +15,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SourceIcon } from "@/components/cards";
 import { CategoryOption } from "@/lib/categoryColors";
 import type { ExpenseSource } from "@/lib/types";
 import { FileDown, Trash2 } from "lucide-react";
 
-const SOURCES = ["all", "amex", "chase", "apple", "manual", "td"] as const;
+const SOURCES = [
+  "all",
+  "amex",
+  "amex-gold",
+  "chase",
+  "apple",
+  "manual",
+  "td",
+] as const;
 
 export const SOURCE_LABEL_KEYS: Record<ExpenseSource | "all", string> = {
   all: "common.all",
-  amex: "transactions.sourceAmex",
+  amex: "transactions.sourceAmexPlatinum",
+  "amex-gold": "transactions.sourceAmexGold",
   chase: "transactions.sourceChase",
   apple: "transactions.sourceApple",
   manual: "transactions.sourceManual",
@@ -137,7 +147,15 @@ export function FiltersAndActionsDialog({
                   <SelectContent>
                     {SOURCES.map((s) => (
                       <SelectItem key={s} value={s}>
-                        {t(SOURCE_LABEL_KEYS[s])}
+                        <span className="flex items-center gap-2">
+                          {s !== "all" && (
+                            <SourceIcon
+                              source={s as ExpenseSource}
+                              size={18}
+                            />
+                          )}
+                          {t(SOURCE_LABEL_KEYS[s])}
+                        </span>
                       </SelectItem>
                     ))}
                   </SelectContent>

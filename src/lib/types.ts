@@ -1,5 +1,6 @@
 export type ExpenseSource =
   | "amex"
+  | "amex-gold"
   | "chase"
   | "apple"
   | "manual"

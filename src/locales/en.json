@@ -126,7 +126,8 @@
     "addDebt": "Add a debt"
   },
   "transactions": {
-    "sourceAmex": "American Express",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
     "sourceApple": "Apple Card",
     "sourceManual": "Manual",
@@ -254,8 +255,10 @@
     "uploadStatement": "Upload statement",
     "uploadStatementDesc": "Select your bank or \"Exported PDF (re-import)\" from the dropdown, then choose a CSV file (Amex, Apple), PDF statement (Chase), or a previously downloaded transactions PDF. CSV and Chase imports skip transactions that already exist (same date and amount). Re-imported PDFs skip by ID. After reviewing the preview, click \"Add to transactions\" or \"Add all\" to save—they persist across refreshes and appear on the Transactions and Income pages.",
     "csvSource": "CSV source:",
-    "americanExpress": "American Express",
+    "amexPlatinum": "Amex Platinum Card",
+    "amexGold": "Amex Gold Card",
     "appleCard": "Apple Card",
+    "chase": "Chase",
     "chasePdf": "Chase (PDF statement)",
     "exportedPdf": "Exported PDF (re-import)",
     "chooseExportedPdf": "Choose exported PDF",
@@ -362,11 +365,12 @@
     "deleteAllDataConfirmDesc": "This will permanently remove all expenses, income, debts, rules, and preset transactions from this device. This cannot be undone. The page will reload."
   },
   "addTransaction": {
-    "sourceAmex": "Amex",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
-    "sourceApple": "Apple",
+    "sourceApple": "Apple Card",
     "sourceManual": "Manual",
-    "sourceTd": "TD",
+    "sourceTd": "Debit (TD Bank)",
     "newTransaction": "New transaction",
     "newTransactions": "New transactions",
     "dialogDesc": "One row per transaction. Copy a row to duplicate, then edit. Rows with a valid amount are added on submit.",

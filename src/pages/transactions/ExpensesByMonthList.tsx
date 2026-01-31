@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SourceIcon } from "@/components/cards";
 import { formatCurrency } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
 import type { Expense } from "@/lib/types";
@@ -83,6 +84,7 @@ export function ExpensesByMonthList({
                       </span>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                      <SourceIcon source={e.source} size={14} />
                       <span>{e.date}</span>
                       <span>·</span>
                       <span>{e.category || "Uncategorized"}</span>

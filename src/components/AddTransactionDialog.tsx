@@ -4,6 +4,7 @@ import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { useRules } from "@/context/RulesContext";
 import type { ExpenseSource } from "@/lib/types";
+import { SourceIcon } from "@/components/cards";
 import {
   CategoryOption,
   getCategoryColor,
@@ -40,7 +41,8 @@ import {
 } from "@/components/ui/table";
 
 const SOURCE_KEYS: Record<ExpenseSource, string> = {
-  amex: "addTransaction.sourceAmex",
+  amex: "addTransaction.sourceAmexPlatinum",
+  "amex-gold": "addTransaction.sourceAmexGold",
   chase: "addTransaction.sourceChase",
   apple: "addTransaction.sourceApple",
   manual: "addTransaction.sourceManual",
@@ -309,19 +311,40 @@ export function AddTransactionDialog({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="manual">
-                            {t(SOURCE_KEYS.manual)}
+                            <span className="flex items-center gap-2">
+                              <SourceIcon source="manual" size={18} />
+                              {t(SOURCE_KEYS.manual)}
+                            </span>
                           </SelectItem>
                           <SelectItem value="td">
-                            {t(SOURCE_KEYS.td)}
+                            <span className="flex items-center gap-2">
+                              <SourceIcon source="td" size={18} />
+                              {t(SOURCE_KEYS.td)}
+                            </span>
                           </SelectItem>
                           <SelectItem value="amex">
-                            {t(SOURCE_KEYS.amex)}
+                            <span className="flex items-center gap-2">
+                              <SourceIcon source="amex" size={18} />
+                              {t(SOURCE_KEYS.amex)}
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="amex-gold">
+                            <span className="flex items-center gap-2">
+                              <SourceIcon source="amex-gold" size={18} />
+                              {t(SOURCE_KEYS["amex-gold"])}
+                            </span>
                           </SelectItem>
                           <SelectItem value="apple">
-                            {t(SOURCE_KEYS.apple)}
+                            <span className="flex items-center gap-2">
+                              <SourceIcon source="apple" size={18} />
+                              {t(SOURCE_KEYS.apple)}
+                            </span>
                           </SelectItem>
                           <SelectItem value="chase">
-                            {t(SOURCE_KEYS.chase)}
+                            <span className="flex items-center gap-2">
+                              <SourceIcon source="chase" size={18} />
+                              {t(SOURCE_KEYS.chase)}
+                            </span>
                           </SelectItem>
                         </SelectContent>
                       </Select>

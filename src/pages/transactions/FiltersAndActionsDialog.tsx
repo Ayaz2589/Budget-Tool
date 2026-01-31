@@ -18,17 +18,8 @@ import {
 import { SourceIcon } from "@/components/cards";
 import { CategoryOption } from "@/lib/categoryColors";
 import type { ExpenseSource } from "@/lib/types";
+import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
 import { FileDown, Trash2 } from "lucide-react";
-
-export const SOURCE_LABEL_KEYS: Record<ExpenseSource | "all", string> = {
-  all: "common.all",
-  amex: "transactions.sourceAmexPlatinum",
-  "amex-gold": "transactions.sourceAmexGold",
-  chase: "transactions.sourceChase",
-  apple: "transactions.sourceApple",
-  manual: "transactions.sourceManual",
-  td: "transactions.sourceTd",
-};
 
 export type FiltersAndActionsDialogProps = {
   open: boolean;

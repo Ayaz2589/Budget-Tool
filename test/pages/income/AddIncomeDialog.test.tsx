@@ -2,7 +2,7 @@ import { test, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { AddIncomeDialog } from "@/pages/income/AddIncomeDialog";
 
-test("AddIncomeDialog shows Add income button when closed", () => {
+test("AddIncomeDialog does not show dialog content when closed", () => {
   render(
     <AddIncomeDialog
       open={false}
@@ -11,9 +11,7 @@ test("AddIncomeDialog shows Add income button when closed", () => {
       onSubmit={() => {}}
     />,
   );
-  expect(
-    screen.getByRole("button", { name: /add income/i }),
-  ).toBeInTheDocument();
+  expect(screen.queryByText("New income")).not.toBeInTheDocument();
 });
 
 test("AddIncomeDialog shows New income title when open", () => {

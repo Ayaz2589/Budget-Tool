@@ -22,14 +22,14 @@ test("ImportSourceCard shows upload card title and file choose button", () => {
       previewDebtsCount={0}
       previewDebtPaymentsCount={0}
       skippedDuplicates={0}
-      onApplyRules={() => {}}
       onAddToTransactions={() => {}}
       isPdfExport={false}
+      cardSources={["amex", "amex-gold", "chase", "apple", "manual", "td"]}
       t={mockT}
     />,
   );
   expect(screen.getByText("import.uploadStatement")).toBeInTheDocument();
   expect(
-    screen.getByRole("button", { name: /choose csv file/i }),
+    screen.getByRole("button", { name: /choose csv\/pdf file/i }),
   ).toBeInTheDocument();
 });

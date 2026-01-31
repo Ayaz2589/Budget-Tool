@@ -23,6 +23,7 @@ import {
   AppleCardIcon,
   ChaseCardIcon,
 } from "@/components/cards";
+import { EXPENSE_SOURCE_DISPLAY_LABELS } from "@/lib/sourceLabels";
 import { cn } from "@/lib/utils";
 
 export type SourceChoice =
@@ -37,10 +38,26 @@ const ALL_SOURCE_OPTIONS: {
   label: string;
   icon: React.ComponentType<{ className?: string; size?: number }>;
 }[] = [
-  { value: "amex", label: "Amex Platinum Card", icon: AmexPlatinumCardIcon },
-  { value: "amex-gold", label: "Amex Gold Card", icon: AmexGoldCardIcon },
-  { value: "apple", label: "Apple Card", icon: AppleCardIcon },
-  { value: "chase", label: "Chase", icon: ChaseCardIcon },
+  {
+    value: "amex",
+    label: EXPENSE_SOURCE_DISPLAY_LABELS.amex,
+    icon: AmexPlatinumCardIcon,
+  },
+  {
+    value: "amex-gold",
+    label: EXPENSE_SOURCE_DISPLAY_LABELS["amex-gold"],
+    icon: AmexGoldCardIcon,
+  },
+  {
+    value: "apple",
+    label: EXPENSE_SOURCE_DISPLAY_LABELS.apple,
+    icon: AppleCardIcon,
+  },
+  {
+    value: "chase",
+    label: EXPENSE_SOURCE_DISPLAY_LABELS.chase,
+    icon: ChaseCardIcon,
+  },
   { value: "pdf-export", label: "Exported PDF (re-import)", icon: PdfExportIcon },
 ];
 

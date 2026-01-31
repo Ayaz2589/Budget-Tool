@@ -1,0 +1,2 @@
+npm run docs:update
+npm test

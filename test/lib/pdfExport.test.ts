@@ -126,6 +126,7 @@ test("parseExportedPdfData V2 round-trip: decompresses and parses payload", () =
       { name: "Amazon", color: "orange" },
     ],
     incomeCategoriesWithColors: [{ name: "Paycheck", color: "green" }],
+    cardSources: ["amex", "chase", "manual"],
   };
   const jsonString = JSON.stringify(payload);
   const compressed = pako.gzip(new TextEncoder().encode(jsonString));
@@ -181,6 +182,7 @@ test("parseExportedPdfData V2 round-trip: decompresses and parses payload", () =
   expect(result.incomeCategoriesWithColors).toEqual([
     { name: "Paycheck", color: "green" },
   ]);
+  expect(result.cardSources).toEqual(["amex", "chase", "manual"]);
 });
 
 test("parseExportedPdfData V2 with whitespace in Base64: strips and decodes", () => {

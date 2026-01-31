@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { ExpenseSource } from "@/lib/types";
 import { ALL_EXPENSE_SOURCES } from "@/lib/types";
+import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import {
@@ -12,15 +13,6 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SourceIcon } from "@/components/cards";
-
-const SOURCE_LABEL_KEYS: Record<ExpenseSource, string> = {
-  amex: "addTransaction.sourceAmexPlatinum",
-  "amex-gold": "addTransaction.sourceAmexGold",
-  chase: "addTransaction.sourceChase",
-  apple: "addTransaction.sourceApple",
-  manual: "addTransaction.sourceManual",
-  td: "addTransaction.sourceTd",
-};
 
 export function CardSourcesCard() {
   const { t } = useTranslation();
@@ -71,7 +63,7 @@ export function CardSourcesCard() {
                     handleToggle(sourceId, checked === true)
                   }
                   disabled={isLast}
-                  aria-label={t(SOURCE_LABEL_KEYS[sourceId])}
+                  aria-label={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
                 />
                 <label
                   htmlFor={`card-source-${sourceId}`}
@@ -79,7 +71,7 @@ export function CardSourcesCard() {
                 >
                   <SourceIcon source={sourceId} size={20} />
                   <span className="text-sm font-medium truncate">
-                    {t(SOURCE_LABEL_KEYS[sourceId])}
+                    {t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
                   </span>
                 </label>
               </li>

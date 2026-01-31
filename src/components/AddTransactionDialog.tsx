@@ -4,6 +4,7 @@ import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { useRules } from "@/context/RulesContext";
 import type { ExpenseSource } from "@/lib/types";
+import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { SourceIcon } from "@/components/cards";
 import {
   CategoryOption,
@@ -39,15 +40,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-const SOURCE_KEYS: Record<ExpenseSource, string> = {
-  amex: "addTransaction.sourceAmexPlatinum",
-  "amex-gold": "addTransaction.sourceAmexGold",
-  chase: "addTransaction.sourceChase",
-  apple: "addTransaction.sourceApple",
-  manual: "addTransaction.sourceManual",
-  td: "addTransaction.sourceTd",
-};
 
 interface TransactionRow {
   id: string;
@@ -142,7 +134,8 @@ export function AddTransactionDialog({
           date: row.date,
           amount: num,
           description:
-            row.description.trim() || t("addTransaction.sourceManual"),
+            row.description.trim() ||
+                t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS.manual}`),
           category: row.category || "",
           source: row.source,
           cardMember: row.cardMember.trim() || undefined,
@@ -269,7 +262,7 @@ export function AddTransactionDialog({
                             </SelectItem>
                             {presetTransactions.map((preset) => {
                               const sourceLabel = t(
-                                SOURCE_KEYS[preset.source],
+                                `addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[preset.source]}`,
                               );
                               const descPart =
                                 preset.description.trim().length > 0
@@ -322,7 +315,7 @@ export function AddTransactionDialog({
                             <SelectItem key={s} value={s}>
                               <span className="flex items-center gap-2">
                                 <SourceIcon source={s as ExpenseSource} size={18} />
-                                {t(SOURCE_KEYS[s as ExpenseSource])}
+                                {t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[s as ExpenseSource]}`)}
                               </span>
                             </SelectItem>
                           ))}

@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
+import { SourceIcon } from "@/components/cards";
 import { formatCurrency } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
 import type { Expense } from "@/lib/types";
@@ -238,9 +239,12 @@ export function ExpensesByMonthTable({
                     </TableCell>
                     <TableCell>{formatCurrency(e.amount)}</TableCell>
                     <TableCell className="text-muted-foreground">
-                      {sourceLabelKeys[e.source]
-                        ? t(sourceLabelKeys[e.source])
-                        : e.source}
+                      <span className="flex items-center gap-2">
+                        <SourceIcon source={e.source} size={20} />
+                        {sourceLabelKeys[e.source]
+                          ? t(sourceLabelKeys[e.source])
+                          : e.source}
+                      </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {e.cardMember ?? "—"}

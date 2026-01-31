@@ -126,7 +126,8 @@
     "addDebt": "債務を追加"
   },
   "transactions": {
-    "sourceAmex": "American Express",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
     "sourceApple": "Apple Card",
     "sourceManual": "手動",
@@ -254,8 +255,10 @@
     "uploadStatement": "明細をアップロード",
     "uploadStatementDesc": "ドロップダウンで銀行または「エクスポートPDF（再インポート）」を選択し、CSV（Amex、Apple）、PDF明細（Chase）、または以前ダウンロードした取引PDFを選択。CSV・Chaseインポートは既存取引（同日同額）をスキップ。再インポートPDFはIDでスキップ。プレビュー後「取引に追加」または「すべて追加」で保存。",
     "csvSource": "CSVソース：",
-    "americanExpress": "American Express",
+    "amexPlatinum": "Amex Platinum Card",
+    "amexGold": "Amex Gold Card",
     "appleCard": "Apple Card",
+    "chase": "Chase",
     "chasePdf": "Chase（PDF明細）",
     "exportedPdf": "エクスポートPDF（再インポート）",
     "chooseExportedPdf": "エクスポートPDFを選択",
@@ -359,7 +362,8 @@
     "incomeCategoriesPlaceholder": "家賃、給与、ボーナス、..."
   },
   "addTransaction": {
-    "sourceAmex": "Amex",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
     "sourceApple": "Apple",
     "sourceManual": "手動",

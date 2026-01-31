@@ -126,7 +126,8 @@
     "addDebt": "添加债务"
   },
   "transactions": {
-    "sourceAmex": "American Express",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
     "sourceApple": "Apple Card",
     "sourceManual": "手动",
@@ -359,11 +360,12 @@
     "incomeCategoriesPlaceholder": "租金、工资、奖金、..."
   },
   "addTransaction": {
-    "sourceAmex": "Amex",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
-    "sourceApple": "Apple",
+    "sourceApple": "Apple Card",
     "sourceManual": "手动",
-    "sourceTd": "TD",
+    "sourceTd": "借记 (TD Bank)",
     "newTransaction": "新交易",
     "newTransactions": "新交易",
     "dialogDesc": "每笔交易一行。复制行以重复，再编辑。带有效金额的行在提交时添加。",

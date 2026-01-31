@@ -11,6 +11,7 @@ import type { Rule } from "@/lib/rules";
 
 const VALID_EXPENSE_SOURCES: ExpenseSource[] = [
   "amex",
+  "amex-gold",
   "chase",
   "apple",
   "manual",

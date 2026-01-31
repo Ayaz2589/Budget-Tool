@@ -126,7 +126,8 @@
     "addDebt": "ঋণ যোগ করুন"
   },
   "transactions": {
-    "sourceAmex": "American Express",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
     "sourceApple": "Apple Card",
     "sourceManual": "ম্যানুয়াল",
@@ -254,8 +255,10 @@
     "uploadStatement": "স্টেটমেন্ট আপলোড",
     "uploadStatementDesc": "ড্রপডাউন থেকে আপনার ব্যাংক বা \"এক্সপোর্টেড PDF (পুনরায় আমদানি)\" নির্বাচন করুন, তারপর CSV (Amex, Apple), PDF স্টেটমেন্ট (Chase) বা আগে ডাউনলোড করা লেনদেন PDF চয়ন করুন। CSV ও Chase আমদানি ইতিমধ্যে থাকা লেনদেন (একই তারিখ ও পরিমাণ) এড়িয়ে যায়। পুনরায় আমদানিকৃত PDF আইডি দিয়ে এড়ায়। প্রিভিউ দেখে \"লেনদেনে যোগ করুন\" বা \"সব যোগ করুন\" ক্লিক করে সংরক্ষণ করুন।",
     "csvSource": "CSV উৎস:",
-    "americanExpress": "American Express",
+    "amexPlatinum": "Amex Platinum Card",
+    "amexGold": "Amex Gold Card",
     "appleCard": "Apple Card",
+    "chase": "Chase",
     "chasePdf": "Chase (PDF স্টেটমেন্ট)",
     "exportedPdf": "এক্সপোর্টেড PDF (পুনরায় আমদানি)",
     "chooseExportedPdf": "এক্সপোর্টেড PDF চয়ন করুন",
@@ -359,7 +362,8 @@
     "incomeCategoriesPlaceholder": "ভাড়া, বেতন, বোনাস, ..."
   },
   "addTransaction": {
-    "sourceAmex": "Amex",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
     "sourceApple": "Apple",
     "sourceManual": "ম্যানুয়াল",

@@ -126,7 +126,8 @@
     "addDebt": "Añadir una deuda"
   },
   "transactions": {
-    "sourceAmex": "American Express",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
     "sourceApple": "Apple Card",
     "sourceManual": "Manual",
@@ -359,11 +360,12 @@
     "incomeCategoriesPlaceholder": "Alquiler, Nómina, Bonus, ..."
   },
   "addTransaction": {
-    "sourceAmex": "Amex",
+    "sourceAmexPlatinum": "Amex Platinum Card",
+    "sourceAmexGold": "Amex Gold Card",
     "sourceChase": "Chase",
-    "sourceApple": "Apple",
+    "sourceApple": "Apple Card",
     "sourceManual": "Manual",
-    "sourceTd": "TD",
+    "sourceTd": "Débito (TD Bank)",
     "newTransaction": "Nueva transacción",
     "newTransactions": "Nuevas transacciones",
     "dialogDesc": "Una fila por transacción. Copia una fila para duplicar y editar. Las filas con importe válido se añaden al enviar.",

@@ -165,13 +165,32 @@ export function ImportPage() {
       reader.onload = () => {
         try {
           const text = String(reader.result);
-          const result = parseCsv(text, selectedSource as CsvSource);
-          const toAdd = filterOutExistingExpenses(result.expenses, expenses);
+          const csvSource: CsvSource =
+            selectedSource === "amex" || selectedSource === "amex-gold"
+              ? "amex"
+              : (selectedSource as CsvSource);
+          const result = parseCsv(text, csvSource);
+          let toAdd = filterOutExistingExpenses(result.expenses, expenses);
+          if (selectedSource === "amex-gold") {
+            toAdd = toAdd.map((e) => ({
+              ...e,
+              source: "amex-gold" as const,
+              id: e.id.replace(/^amex-/, "amex-gold-"),
+            }));
+          } else if (selectedSource === "amex") {
+            toAdd = toAdd.map((e) => ({ ...e, source: "amex" as const }));
+          }
           setSkippedDuplicates(result.expenses.length - toAdd.length);
           setPreviewExpenses(applyRulesForPreview(toAdd));
           setPreviewIncome([]);
           const label =
-            selectedSource === "amex" ? "American Express" : "Apple Card";
+            selectedSource === "amex"
+              ? "Amex Platinum Card"
+              : selectedSource === "amex-gold"
+                ? "Amex Gold Card"
+                : selectedSource === "apple"
+                  ? "Apple Card"
+                  : "Chase";
           setSourceLabel(label);
           setLastDetected(selectedSource);
         } catch (err) {

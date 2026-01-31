@@ -21,7 +21,8 @@ const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
 const INCOME_ROW_RE = /(\d{4}-\d{2}-\d{2})\s+(Paycheck|Rent)\s+\$([\d,]+\.\d{2})\s+(Paycheck|Rent)/g;
 
 const SOURCE_LABELS: Record<ExpenseSource, string> = {
-  amex: "American Express",
+  amex: "Amex Platinum Card",
+  "amex-gold": "Amex Gold Card",
   chase: "Chase",
   apple: "Apple Card",
   manual: "Manual",
@@ -457,9 +458,15 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
 
   // Find all expense rows: "amex-xxx 2026-01-26 ... $110.60 ..." (id prefix + id suffix + date, then later $amount)
   const expenseIdRe =
-    /(amex-|chase-|apple-|manual-|td-)([a-z0-9-]+)\s+(\d{4}-\d{2}-\d{2})\s/g;
+    /(amex-gold-|amex-|chase-|apple-|manual-|td-)([a-z0-9-]+)\s+(\d{4}-\d{2}-\d{2})\s/g;
   let match: RegExpExecArray | null;
-  const expenseMatches: { id: string; date: string; index: number; end: number }[] = [];
+  const expenseMatches: {
+    id: string;
+    prefix: string;
+    date: string;
+    index: number;
+    end: number;
+  }[] = [];
   while ((match = expenseIdRe.exec(text)) !== null) {
     const prefix = match[1]!;
     const suffix = match[2]!;
@@ -468,6 +475,7 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
     const end = expenseIdRe.lastIndex;
     expenseMatches.push({
       id,
+      prefix,
       date,
       index: match.index,
       end,
@@ -475,7 +483,7 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
   }
   const seenExpenseIds = new Set<string>();
   for (let i = 0; i < expenseMatches.length; i++) {
-    const { id, date, index, end } = expenseMatches[i]!;
+    const { id, prefix, date, index, end } = expenseMatches[i]!;
     if (seenExpenseIds.has(id)) continue;
     seenExpenseIds.add(id);
     const rowEnd = expenseMatches[i + 1]?.index ?? text.length;
@@ -489,12 +497,13 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
     const description = (descMatch ? descMatch[1]!.trim() : "Imported from PDF").slice(0, 200);
     const sourceMap: Record<string, ExpenseSource> = {
       "amex-": "amex",
+      "amex-gold-": "amex-gold",
       "chase-": "chase",
       "apple-": "apple",
       "manual-": "manual",
       "td-": "td",
     };
-    const source = sourceMap[id.slice(0, id.indexOf("-") + 1) as keyof typeof sourceMap] ?? "manual";
+    const source = sourceMap[prefix as keyof typeof sourceMap] ?? "manual";
     expenses.push({
       id,
       date,

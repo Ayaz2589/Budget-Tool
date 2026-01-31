@@ -38,7 +38,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 type ConditionType = RuleCondition["type"];
 
 const SOURCE_OPTIONS: { value: ExpenseSource; label: string }[] = [
-  { value: "amex", label: "American Express" },
+  { value: "amex", label: "Amex Platinum Card" },
+  { value: "amex-gold", label: "Amex Gold Card" },
   { value: "chase", label: "Chase" },
   { value: "apple", label: "Apple Card" },
   { value: "manual", label: "Manual" },
@@ -211,7 +212,7 @@ export function RulesPage() {
   const renderCondition = (condition: RuleCondition) => {
     switch (condition.type) {
       case "source":
-        return `${t("rules.ifSource")} ${condition.value}`;
+        return `${t("rules.ifSource")} ${SOURCE_OPTIONS.find((o) => o.value === condition.value)?.label ?? condition.value}`;
       case "cardMember":
         return `${t("rules.ifCardMember")} ${
           condition.match === "equals" ? t("rules.equals") : t("rules.contains")

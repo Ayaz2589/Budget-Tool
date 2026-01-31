@@ -32,7 +32,7 @@ export type SourceChoice =
   | "chase"
   | "pdf-export";
 
-const SOURCE_OPTIONS: {
+const ALL_SOURCE_OPTIONS: {
   value: SourceChoice;
   label: string;
   icon: React.ComponentType<{ className?: string; size?: number }>;
@@ -60,6 +60,8 @@ export type ImportSourceCardProps = {
   skippedDuplicates: number;
   onAddToTransactions: () => void;
   isPdfExport: boolean;
+  /** Enabled card sources; only these (plus pdf-export) are shown. */
+  cardSources: string[];
   t: (key: string) => string;
 };
 
@@ -79,8 +81,13 @@ export function ImportSourceCard({
   skippedDuplicates,
   onAddToTransactions,
   isPdfExport,
+  cardSources,
   t,
 }: ImportSourceCardProps) {
+  const sourceOptions = ALL_SOURCE_OPTIONS.filter(
+    (opt) =>
+      opt.value === "pdf-export" || cardSources.includes(opt.value),
+  );
   const hasPreview =
     previewExpensesCount > 0 ||
     previewIncomeCount > 0 ||
@@ -95,7 +102,7 @@ export function ImportSourceCard({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {SOURCE_OPTIONS.map((opt) => {
+          {sourceOptions.map((opt) => {
             const Icon = opt.icon;
             const isPdfOpt = opt.value === "pdf-export";
             return (

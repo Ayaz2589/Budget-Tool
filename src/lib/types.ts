@@ -6,6 +6,16 @@ export type ExpenseSource =
   | "manual"
   | "td";
 
+/** All possible expense/card sources; used for defaults and settings. */
+export const ALL_EXPENSE_SOURCES: ExpenseSource[] = [
+  "amex",
+  "amex-gold",
+  "chase",
+  "apple",
+  "manual",
+  "td",
+];
+
 export interface Expense {
   id: string;
   date: string; // ISO date YYYY-MM-DD

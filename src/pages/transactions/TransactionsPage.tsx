@@ -43,6 +43,7 @@ export function TransactionsPage() {
     removeExpense,
     removeExpenses,
     expenseCategories,
+    cardSources,
   } = useBudget();
   const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
     useGoogleAuth();
@@ -245,8 +246,11 @@ export function TransactionsPage() {
       debtPayments,
       rules,
       presetTransactions,
+      [],
+      [],
+      cardSources,
     );
-  }, [expenses, income, debts, debtPayments, rules, presetTransactions]);
+  }, [expenses, income, debts, debtPayments, rules, presetTransactions, cardSources]);
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
@@ -293,6 +297,7 @@ export function TransactionsPage() {
             onSearchFilterChange={setSearchFilter}
             expenseCategories={expenseCategories}
             cardMemberOptions={cardMemberOptions}
+            cardSources={cardSources}
             hasActiveFilters={hasActiveFilters}
             onClearFilters={clearFilters}
             onCleanDescriptions={cleanAllDescriptions}

@@ -59,7 +59,7 @@ const CATEGORY_TOTAL_OPERATORS = [
 
 export function RulesPage() {
   const { t } = useTranslation();
-  const { expenseCategories } = useBudget();
+  const { expenseCategories, cardSources } = useBudget();
   const { rules, addRule, removeRule, reorderRule, toggleRule } = useRules();
   const {
     presetTransactions,
@@ -67,6 +67,10 @@ export function RulesPage() {
     removePreset,
   } = usePresetTransactions();
 
+  const sourceOptionsFiltered = useMemo(
+    () => SOURCE_OPTIONS.filter((o) => cardSources.includes(o.value)),
+    [cardSources],
+  );
   const cardMemberOptions = useMemo(() => ["AYAZ UDDIN", "TASNUVA AHMED"], []);
 
   const [presetOpen, setPresetOpen] = useState(false);
@@ -292,14 +296,18 @@ export function RulesPage() {
                 <div className="space-y-2">
                   <Label>{t("rules.source")}</Label>
                   <Select
-                    value={sourceValue}
+                    value={
+                      cardSources.includes(sourceValue)
+                        ? sourceValue
+                        : (cardSources[0] as ExpenseSource)
+                    }
                     onValueChange={(v) => setSourceValue(v as ExpenseSource)}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {SOURCE_OPTIONS.map((opt) => (
+                      {sourceOptionsFiltered.map((opt) => (
                         <SelectItem key={opt.value} value={opt.value}>
                           {opt.label}
                         </SelectItem>
@@ -681,14 +689,18 @@ export function RulesPage() {
                 <div className="space-y-2">
                   <Label>{t("presetTransactions.source")}</Label>
                   <Select
-                    value={presetSource}
+                    value={
+                      cardSources.includes(presetSource)
+                        ? presetSource
+                        : (cardSources[0] as ExpenseSource)
+                    }
                     onValueChange={(v) => setPresetSource(v as ExpenseSource)}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {SOURCE_OPTIONS.map((opt) => (
+                      {sourceOptionsFiltered.map((opt) => (
                         <SelectItem key={opt.value} value={opt.value}>
                           {opt.label}
                         </SelectItem>

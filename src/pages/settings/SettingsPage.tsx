@@ -100,7 +100,10 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <h1 className="text-xl font-semibold sm:text-2xl">{t("settings.title")}</h1>
+      <div className="space-y-1">
+        <h1 className="text-xl font-semibold sm:text-2xl">{t("settings.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("settings.subtitle")}</p>
+      </div>
 
       <GoogleSheetsCard
         isSignedIn={isSignedIn}

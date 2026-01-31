@@ -246,7 +246,10 @@ export function RulesPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">{t("rules.title")}</h1>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold">{t("rules.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("rules.subtitle")}</p>
+        </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="gap-2">

@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
@@ -69,23 +69,25 @@ export function DebtPage() {
   const { t } = useTranslation();
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">{t("debt.title")}</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("debt.addDebt")}</CardTitle>
-          <CardDescription>{t("debt.addDebtDesc")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AddDebtDialog
-            open={addDebtOpen}
-            onOpenChange={setAddDebtOpen}
-            onSubmit={(payload) => {
-              addDebt(payload);
-              setAddDebtOpen(false);
-            }}
-          />
-        </CardContent>
-      </Card>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold">{t("debt.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("debt.subtitle")}</p>
+        </div>
+        <Button onClick={() => setAddDebtOpen(true)}>
+          <Plus className="size-4" />
+          {t("debt.addDebt")}
+        </Button>
+      </div>
+
+      <AddDebtDialog
+        open={addDebtOpen}
+        onOpenChange={setAddDebtOpen}
+        onSubmit={(payload) => {
+          addDebt(payload);
+          setAddDebtOpen(false);
+        }}
+      />
 
       <Card>
         <CardHeader>
@@ -98,7 +100,7 @@ export function DebtPage() {
         <CardContent>
           {debts.length === 0 ? (
             <p className="text-muted-foreground text-sm py-6 text-center">
-              No debts yet. Add one above.
+              No debts yet.
             </p>
           ) : (
             <>

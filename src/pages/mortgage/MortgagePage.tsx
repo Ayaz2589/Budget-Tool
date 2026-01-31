@@ -73,7 +73,10 @@ export function MortgagePage() {
   const { t } = useTranslation();
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">{t("mortgage.title")}</h1>
+      <div className="space-y-1">
+        <h1 className="text-2xl font-semibold">{t("mortgage.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("mortgage.subtitle")}</p>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>{t("mortgage.mortgagePayments")}</CardTitle>

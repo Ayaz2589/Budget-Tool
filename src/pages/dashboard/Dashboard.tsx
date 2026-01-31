@@ -333,7 +333,10 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6 min-w-0 overflow-x-hidden">
-      <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
+      <div className="space-y-1">
+        <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
+      </div>
       <MonthSelector
         value={selectedMonthKey}
         onChange={setSelectedMonthKey}

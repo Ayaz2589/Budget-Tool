@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileDown, Trash2 } from "lucide-react";
+import { FileDown, Plus, Trash2 } from "lucide-react";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { AddIncomeDialog } from "./AddIncomeDialog";
 import { EditIncomeDialog } from "./EditIncomeDialog";
@@ -64,21 +64,23 @@ export function IncomePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">{t("income.title")}</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("income.addIncome")}</CardTitle>
-          <CardDescription>{t("income.addIncomeDesc")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AddIncomeDialog
-            open={addOpen}
-            onOpenChange={setAddOpen}
-            incomeCategories={incomeCategories}
-            onSubmit={handleAdd}
-          />
-        </CardContent>
-      </Card>
+      <div className="space-y-1">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h1 className="text-2xl font-semibold">{t("income.title")}</h1>
+          <Button onClick={() => setAddOpen(true)}>
+            <Plus className="size-4" />
+            {t("income.addIncome")}
+          </Button>
+        </div>
+        <p className="text-sm text-muted-foreground">{t("income.subtitle")}</p>
+      </div>
+
+      <AddIncomeDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        incomeCategories={incomeCategories}
+        onSubmit={handleAdd}
+      />
 
       <Card>
         <CardHeader>
@@ -107,7 +109,7 @@ export function IncomePage() {
         <CardContent>
           {sortedIncome.length === 0 ? (
             <div className="text-center text-muted-foreground py-8 px-4 border rounded-md">
-              No income entries. Add one above.
+              No income entries yet.
             </div>
           ) : (
             <>

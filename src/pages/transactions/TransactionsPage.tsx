@@ -250,9 +250,10 @@ export function TransactionsPage() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <h1 className="text-2xl font-semibold shrink-0 mb-4">
-        {t("transactions.title")}
-      </h1>
+      <div className="space-y-1 shrink-0 mb-4">
+        <h1 className="text-2xl font-semibold">{t("transactions.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("transactions.subtitle")}</p>
+      </div>
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
         <CardHeader className="shrink-0">
           <CardTitle>{t("transactions.expenses")}</CardTitle>

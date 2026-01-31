@@ -73,6 +73,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "subtitle": "View spending, income, and savings by month.",
     "viewMonth": "View month",
     "currentMonthSummary": "Current month summary.",
     "showingMonth": "Showing {{month}}.",
@@ -133,6 +134,7 @@
     "sourceManual": "Manual",
     "sourceTd": "Debit (TD Bank)",
     "title": "Transactions",
+    "subtitle": "Browse, filter, and edit expense transactions.",
     "expenses": "Expenses",
     "filterAndEdit": "Filter and edit categories.",
     "add": "Add",
@@ -165,6 +167,7 @@
   },
   "income": {
     "title": "Income",
+    "subtitle": "Track paychecks, rent, and other income.",
     "addIncome": "Add income",
     "addIncomeDesc": "Paycheck, rent from tenants, bonus, etc.",
     "newIncome": "New income",
@@ -194,6 +197,7 @@
   },
   "debt": {
     "title": "Debt",
+    "subtitle": "Track loans and debt payments.",
     "addDebt": "Add debt",
     "addDebtDesc": "Track a loan or debt (e.g. car loan, credit card). Then record payments to see the balance go down.",
     "newDebt": "New debt",
@@ -240,6 +244,7 @@
   },
   "mortgage": {
     "title": "Mortgage",
+    "subtitle": "Record mortgage payments (excluded from Transactions list).",
     "mortgagePayments": "Mortgage payments",
     "mortgagePaymentsDesc": "Record mortgage payments here. They are excluded from the Transactions list and included in spending totals (e.g. Dashboard \"Spent w/o Mortgage\" excludes them).",
     "addPayment": "Add payment",
@@ -252,6 +257,7 @@
   },
   "import": {
     "title": "Import",
+    "subtitle": "Import transactions from bank statements (CSV or PDF).",
     "uploadStatement": "Upload statement",
     "uploadStatementDesc": "Select your bank or \"Exported PDF (re-import)\" from the dropdown, then choose a CSV file (Amex, Apple), PDF statement (Chase), or a previously downloaded transactions PDF. CSV and Chase imports skip transactions that already exist (same date and amount). Re-imported PDFs skip by ID. After reviewing the preview, click \"Add to transactions\" or \"Add all\" to save—they persist across refreshes and appear on the Transactions and Income pages.",
     "csvSource": "CSV source:",
@@ -280,6 +286,7 @@
   },
   "rules": {
     "title": "Rules",
+    "subtitle": "Auto-categorize expenses and manage preset transaction templates.",
     "addRule": "Add rule",
     "newRule": "New rule",
     "conditionType": "Condition type",
@@ -334,6 +341,7 @@
   },
   "settings": {
     "title": "Settings",
+    "subtitle": "Google Sheets sync, expense and income categories, and data.",
     "googleSheets": "Google Sheets",
     "googleSheetsDesc": "Connect your Google account and sync expenses, income, and totals to a spreadsheet.",
     "connectGoogle": "Connect Google",

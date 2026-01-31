@@ -42,8 +42,6 @@ export function SettingsPage() {
   } = useGoogleAuth();
   const { t } = useTranslation();
 
-  const [expenseList, setExpenseList] = useState(expenseCategories.join(", "));
-  const [incomeList, setIncomeList] = useState(incomeCategories.join(", "));
   const [sheetIdInput, setSheetIdInput] = useState(spreadsheetId ?? "");
   const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
   const [restoreConfirmOpen, setRestoreConfirmOpen] = useState(false);
@@ -60,20 +58,26 @@ export function SettingsPage() {
     setTimeout(() => setRepairResult(null), 5000);
   };
 
-  const saveExpenseCategories = () => {
-    const list = expenseList
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (list.length > 0) setExpenseCategories(list);
+  const handleRemoveExpenseCategory = (category: string) => {
+    setExpenseCategories(expenseCategories.filter((c) => c !== category));
   };
 
-  const saveIncomeCategories = () => {
-    const list = incomeList
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (list.length > 0) setIncomeCategories(list);
+  const handleAddExpenseCategory = (name: string) => {
+    const trimmed = name.trim();
+    if (trimmed && !expenseCategories.includes(trimmed)) {
+      setExpenseCategories([...expenseCategories, trimmed]);
+    }
+  };
+
+  const handleRemoveIncomeCategory = (category: string) => {
+    setIncomeCategories(incomeCategories.filter((c) => c !== category));
+  };
+
+  const handleAddIncomeCategory = (name: string) => {
+    const trimmed = name.trim();
+    if (trimmed && !incomeCategories.includes(trimmed)) {
+      setIncomeCategories([...incomeCategories, trimmed]);
+    }
   };
 
   const handleSetSpreadsheetId = () => {
@@ -120,15 +124,15 @@ export function SettingsPage() {
       />
 
       <ExpenseCategoriesCard
-        value={expenseList}
-        onChange={setExpenseList}
-        onSave={saveExpenseCategories}
+        categories={expenseCategories}
+        onRemove={handleRemoveExpenseCategory}
+        onAdd={handleAddExpenseCategory}
       />
 
       <IncomeCategoriesCard
-        value={incomeList}
-        onChange={setIncomeList}
-        onSave={saveIncomeCategories}
+        categories={incomeCategories}
+        onRemove={handleRemoveIncomeCategory}
+        onAdd={handleAddIncomeCategory}
       />
 
       <div className="pt-4 border-t sm:pt-6">

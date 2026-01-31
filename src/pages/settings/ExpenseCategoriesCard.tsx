@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Trash2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -7,42 +10,120 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export type ExpenseCategoriesCardProps = {
-  value: string;
-  onChange: (value: string) => void;
-  onSave: () => void;
+  categories: string[];
+  onRemove: (category: string) => void;
+  onAdd: (name: string) => void;
 };
 
 export function ExpenseCategoriesCard({
-  value,
-  onChange,
-  onSave,
+  categories,
+  onRemove,
+  onAdd,
 }: ExpenseCategoriesCardProps) {
+  const { t } = useTranslation();
+  const [newCategory, setNewCategory] = useState("");
+  const [categoryToRemove, setCategoryToRemove] = useState<string | null>(null);
+
+  const handleAdd = () => {
+    const trimmed = newCategory.trim();
+    if (trimmed) {
+      onAdd(trimmed);
+      setNewCategory("");
+    }
+  };
+
+  const handleConfirmRemove = () => {
+    if (categoryToRemove) {
+      onRemove(categoryToRemove);
+      setCategoryToRemove(null);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Expense categories</CardTitle>
+        <CardTitle>{t("settings.expenseCategories")}</CardTitle>
         <CardDescription>
-          Comma-separated list. Used in dropdowns.
+          {t("settings.expenseCategoriesDesc")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2">
-        <Input
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="My Purchase, Tasnuva's Purchases, 50/50, Amazon"
-          className="min-w-0"
-        />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onSave}
-          className="w-full sm:w-auto"
-        >
-          Save
-        </Button>
+      <CardContent className="space-y-3">
+        <ul className="space-y-2">
+          {categories.map((category) => (
+            <li
+              key={category}
+              className="flex items-center justify-between gap-2 rounded-md border bg-muted/30 px-3 py-2"
+            >
+              <span className="text-sm font-medium truncate min-w-0">
+                {category}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-8 shrink-0 text-destructive hover:text-destructive disabled:opacity-50"
+                onClick={() => setCategoryToRemove(category)}
+                aria-label={t("settings.removeCategory", { category })}
+                disabled={categories.length <= 1}
+              >
+                <Trash2 className="size-4 text-destructive" />
+              </Button>
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          {t("settings.expenseCategoriesUncategorizedHint")}
+        </p>
+        <div className="flex gap-2">
+          <Input
+            aria-label={t("settings.addCategory")}
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAdd())}
+            placeholder={t("settings.addCategoryPlaceholder")}
+            className="min-w-0 flex-1"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAdd}
+            disabled={!newCategory.trim()}
+          >
+            {t("settings.addCategory")}
+          </Button>
+        </div>
       </CardContent>
+
+      <Dialog open={!!categoryToRemove} onOpenChange={(open) => !open && setCategoryToRemove(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("settings.removeExpenseCategoryConfirmTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("settings.removeExpenseCategoryConfirmDesc", { category: categoryToRemove ?? "" })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCategoryToRemove(null)}>
+              {t("common.cancel")}
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmRemove}>
+              <Trash2 className="size-4" />
+              {t("settings.removeCategory", { category: categoryToRemove ?? "" })}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

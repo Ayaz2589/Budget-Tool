@@ -253,10 +253,24 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setExpenseCategories = useCallback((categories: string[]) => {
+    setExpenses((prev) =>
+      prev.map((e) =>
+        e.category && !categories.includes(e.category)
+          ? { ...e, category: "" }
+          : e,
+      ),
+    );
     setExpenseCategoriesState(categories);
   }, []);
 
   const setIncomeCategories = useCallback((categories: string[]) => {
+    setIncome((prev) =>
+      prev.map((i) =>
+        i.category && !categories.includes(i.category)
+          ? { ...i, category: "" }
+          : i,
+      ),
+    );
     setIncomeCategoriesState(categories);
   }, []);
 

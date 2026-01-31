@@ -9,9 +9,10 @@
 
 - **BrowserRouter** — Wraps all routes.
 - **Routes:**
-  - **`/auth`** — Renders `AuthLoginRoute`. When signed in, redirects to `/`. When not signed in, renders `LoginPage` (full-page two-column login).
-  - **AuthGate (no path)** — Layout route. When not signed in, redirects to `/auth`. When signed in, renders `<Outlet />` (child routes).
-  - **`/`** — Renders `Layout`; nested routes:
+  - **`/`** — Renders `LandingRoute`. When signed in, redirects to `/dashboard`. When not signed in and returning user (localStorage flag `budget-tool-returning-user` set), redirects to `/auth`. Else (new visitor) renders `LandingPage` (marketing hero, features, CTA to `/auth`).
+  - **`/auth`** — Renders `AuthLoginRoute`. When signed in, redirects to `/dashboard`. When not signed in, renders `LoginPage` (full-page two-column login). Visiting `/auth` sets the returning-user flag.
+  - **AuthGate (no path)** — Layout route for `/dashboard`. When not signed in, redirects to `/auth`. When signed in, renders `<Outlet />` (child routes).
+  - **`/dashboard`** — Renders `Layout`; nested routes:
     - **index** — Dashboard
     - **import** — ImportPage
     - **transactions** — TransactionsPage
@@ -21,7 +22,7 @@
     - **rules** — RulesPage
     - **settings** — SettingsPage
 
-All app pages (dashboard, transactions, income, etc.) are behind AuthGate; unauthenticated users are redirected to `/auth`.
+All app pages (dashboard, transactions, income, etc.) are behind AuthGate at `/dashboard`; unauthenticated users are redirected to `/auth`. New visitors see the landing at `/`; returning visitors (flag set on sign-out or visit to `/auth`) go straight to `/auth` when they hit `/`.
 
 ## Context hierarchy
 
@@ -38,6 +39,7 @@ All app pages (dashboard, transactions, income, etc.) are behind AuthGate; unaut
 - **Token expiry (in-session):** A 60s interval in GoogleAuthContext checks `expiresAt`; if `Date.now() >= expiresAt`, `clearSession()` is called (clear token, setAccessToken(null), setExpiresAt(null), setUserProfile(null)).
 - **401 from Sheets API:** In `syncToSheets` and `pullFromSheet` catch blocks, if the error message contains `401`, `clearSession()` is called.
 - **Redirect when sign-in lost:** In Layout, an effect watches `isSignedIn`; when it transitions from true to false, `navigate("/auth")` is called.
+- **Returning-user flag:** On sign-out, `clearSession()` in GoogleAuthContext sets `localStorage.setItem('budget-tool-returning-user', '1')`. On visit to LoginPage (`/auth`), the same key is set. LandingRoute at `/` shows the landing only when not signed in and the flag is not set; otherwise redirects to `/auth` (returning) or `/dashboard` (signed in).
 
 ## Layout
 

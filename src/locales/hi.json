@@ -411,5 +411,20 @@
     "signInDisclaimer": "साइन इन करने पर Google Sheets के साथ सिंक होगा।",
     "valuePropTitle": "खर्च, आय और बजट ट्रैक करें।",
     "valuePropSubtitle": "Google Sheets के साथ सिंक। क्रेडिट कार्ड की जरूरत नहीं।"
+  },
+  "landing": {
+    "heroTitle": "Ortho",
+    "heroTagline": "एक जगह खर्च, आय और बजट ट्रैक करें।",
+    "heroCta": "शुरू करें",
+    "valueProp": "Amex, Apple Card और Chase से इम्पोर्ट करें। खर्च कैटेगराइज़ करें, Google Sheets के साथ सिंक करें।",
+    "featureImport": "ट्रांजैक्शन इम्पोर्ट",
+    "featureImportDesc": "Amex, Apple Card, Chase से CSV और PDF।",
+    "featureRules": "कैटेगरी नियम",
+    "featureRulesDesc": "ऑटो-कैटेगराइज़ और थ्रेशहोल्ड।",
+    "featureSheets": "Google Sheets सिंक",
+    "featureSheetsDesc": "स्प्रेडशीट में डेटा पुश और पुल।",
+    "featurePdf": "PDF एक्सपोर्ट",
+    "featurePdfDesc": "ट्रांजैक्शन और आय PDF में एक्सपोर्ट करें।",
+    "footerCta": "Google से साइन इन करें"
   }
 }

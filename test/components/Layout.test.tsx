@@ -11,9 +11,9 @@ function TestWrapper() {
     <BudgetProvider>
       <RulesProvider>
         <GoogleAuthProviderFallback>
-          <MemoryRouter initialEntries={["/"]}>
+          <MemoryRouter initialEntries={["/dashboard"]}>
             <Routes>
-              <Route path="/" element={<Layout />}>
+              <Route path="/dashboard" element={<Layout />}>
                 <Route index element={<div>Dashboard content</div>} />
               </Route>
             </Routes>

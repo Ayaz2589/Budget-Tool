@@ -26,9 +26,9 @@ const mockAuthValueSignedIn: GoogleAuthContextValue = {
 test("AuthGate redirects to /auth when not signed in", () => {
   const { container } = render(
     <GoogleAuthProviderFallback>
-      <MemoryRouter initialEntries={["/"]}>
+      <MemoryRouter initialEntries={["/dashboard"]}>
         <Routes>
-          <Route path="/" element={<AuthGate />}>
+          <Route path="/dashboard" element={<AuthGate />}>
             <Route index element={<div>Protected content</div>} />
           </Route>
           <Route path="/auth" element={<div>Login page</div>} />
@@ -43,9 +43,9 @@ test("AuthGate redirects to /auth when not signed in", () => {
 test("AuthGate renders Outlet (child content) when signed in", () => {
   const { container } = render(
     <GoogleAuthContext.Provider value={mockAuthValueSignedIn}>
-      <MemoryRouter initialEntries={["/"]}>
+      <MemoryRouter initialEntries={["/dashboard"]}>
         <Routes>
-          <Route path="/" element={<AuthGate />}>
+          <Route path="/dashboard" element={<AuthGate />}>
             <Route index element={<div>Protected content</div>} />
           </Route>
           <Route path="/auth" element={<div>Login page</div>} />
@@ -57,13 +57,13 @@ test("AuthGate renders Outlet (child content) when signed in", () => {
   expect(within(container).queryByText("Login page")).not.toBeInTheDocument();
 });
 
-test("AuthLoginRoute redirects to / when signed in", () => {
+test("AuthLoginRoute redirects to /dashboard when signed in", () => {
   const { container } = render(
     <GoogleAuthContext.Provider value={mockAuthValueSignedIn}>
       <MemoryRouter initialEntries={["/auth"]}>
         <Routes>
           <Route path="/auth" element={<AuthLoginRoute />} />
-          <Route path="/" element={<div>Dashboard</div>} />
+          <Route path="/dashboard" element={<div>Dashboard</div>} />
         </Routes>
       </MemoryRouter>
     </GoogleAuthContext.Provider>,
@@ -77,7 +77,7 @@ test("AuthLoginRoute renders LoginPage when not signed in", () => {
       <MemoryRouter initialEntries={["/auth"]}>
         <Routes>
           <Route path="/auth" element={<AuthLoginRoute />} />
-          <Route path="/" element={<div>Dashboard</div>} />
+          <Route path="/dashboard" element={<div>Dashboard</div>} />
         </Routes>
       </MemoryRouter>
     </GoogleAuthProviderFallback>,

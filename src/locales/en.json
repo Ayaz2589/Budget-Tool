@@ -422,5 +422,20 @@
     "signInDisclaimer": "By signing in, you can sync your data with Google Sheets and access your dashboard from any device.",
     "valuePropTitle": "Track expenses, income, and budgets.",
     "valuePropSubtitle": "Sync with Google Sheets. No credit card needed."
+  },
+  "landing": {
+    "heroTitle": "Ortho",
+    "heroTagline": "Track expenses, income, and budgets in one place.",
+    "heroCta": "Get started",
+    "valueProp": "Import from Amex, Apple Card, and Chase. Categorize spending, sync with Google Sheets, and view your dashboard by month.",
+    "featureImport": "Import transactions",
+    "featureImportDesc": "CSV and PDF from Amex, Apple Card, Chase.",
+    "featureRules": "Category rules",
+    "featureRulesDesc": "Auto-categorize and set thresholds.",
+    "featureSheets": "Google Sheets sync",
+    "featureSheetsDesc": "Push and pull data to a spreadsheet.",
+    "featurePdf": "PDF export",
+    "featurePdfDesc": "Export transactions and income to PDF.",
+    "footerCta": "Sign in with Google"
   }
 }

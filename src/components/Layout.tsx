@@ -69,30 +69,30 @@ function Avatar({
 }
 
 const nav = [
-  { to: "/", labelKey: "nav.dashboard", icon: LayoutDashboard },
-  { to: "/transactions", labelKey: "nav.transactions", icon: List },
-  { to: "/income", labelKey: "nav.income", icon: Wallet },
-  { to: "/debt", labelKey: "nav.debt", icon: CreditCard },
-  { to: "/mortgage", labelKey: "nav.mortgage", icon: Home },
-  { to: "/import", labelKey: "nav.import", icon: Upload },
-  { to: "/rules", labelKey: "nav.rules", icon: ListOrdered },
-  { to: "/settings", labelKey: "nav.settings", icon: Settings },
+  { to: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard },
+  { to: "/dashboard/transactions", labelKey: "nav.transactions", icon: List },
+  { to: "/dashboard/income", labelKey: "nav.income", icon: Wallet },
+  { to: "/dashboard/debt", labelKey: "nav.debt", icon: CreditCard },
+  { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
+  { to: "/dashboard/import", labelKey: "nav.import", icon: Upload },
+  { to: "/dashboard/rules", labelKey: "nav.rules", icon: ListOrdered },
+  { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
 /** Primary tabs shown in mobile bottom nav */
 const bottomNavItems = [
-  { to: "/", labelKey: "nav.dashboard", icon: LayoutDashboard },
-  { to: "/transactions", labelKey: "nav.transactions", icon: List },
-  { to: "/income", labelKey: "nav.income", icon: Wallet },
+  { to: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard },
+  { to: "/dashboard/transactions", labelKey: "nav.transactions", icon: List },
+  { to: "/dashboard/income", labelKey: "nav.income", icon: Wallet },
 ];
 
 /** Links shown in the "More" bottom sheet (rest of nav) */
 const moreNavItems = [
-  { to: "/debt", labelKey: "nav.debt", icon: CreditCard },
-  { to: "/mortgage", labelKey: "nav.mortgage", icon: Home },
-  { to: "/import", labelKey: "nav.import", icon: Upload },
-  { to: "/rules", labelKey: "nav.rules", icon: ListOrdered },
-  { to: "/settings", labelKey: "nav.settings", icon: Settings },
+  { to: "/dashboard/debt", labelKey: "nav.debt", icon: CreditCard },
+  { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
+  { to: "/dashboard/import", labelKey: "nav.import", icon: Upload },
+  { to: "/dashboard/rules", labelKey: "nav.rules", icon: ListOrdered },
+  { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
 function SidebarContent({
@@ -119,7 +119,7 @@ function SidebarContent({
   return (
     <>
       <Link
-        to="/"
+        to="/dashboard"
         onClick={onNavClick}
         className="flex items-center gap-2 px-3 py-2.5 shrink-0 border-b border-border/50 mb-1 md:mb-2"
       >
@@ -239,7 +239,7 @@ export function Layout() {
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Mobile header: logo + app name only */}
       <header className="md:hidden flex items-center justify-center gap-2 px-4 py-3 border-b bg-muted/30 shrink-0">
-        <Link to="/" className="flex items-center gap-2 min-w-0">
+        <Link to="/dashboard" className="flex items-center gap-2 min-w-0">
           <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
             <Landmark className="size-5 text-primary" />
           </div>
@@ -265,13 +265,13 @@ export function Layout() {
       <main
         className={cn(
           "flex-1 min-h-0 flex flex-col overflow-hidden p-4 md:p-6 pb-20 md:pb-6",
-          location.pathname !== "/" && "flatten-mobile-cards",
+          location.pathname !== "/dashboard" && "flatten-mobile-cards",
         )}
       >
         <div
           className={cn(
             "flex-1 min-h-0 flex flex-col",
-            location.pathname === "/transactions"
+            location.pathname === "/dashboard/transactions"
               ? "overflow-hidden"
               : "overflow-auto",
           )}

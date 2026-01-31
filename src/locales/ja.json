@@ -411,5 +411,20 @@
     "signInDisclaimer": "サインインするとGoogleスプレッドシートと同期できます。",
     "valuePropTitle": "支出・収入・予算を管理。",
     "valuePropSubtitle": "Googleスプレッドシートと同期。クレジットカード不要。"
+  },
+  "landing": {
+    "heroTitle": "Ortho",
+    "heroTagline": "支出、収入、予算を一箇所で管理。",
+    "heroCta": "始める",
+    "valueProp": "Amex、Apple Card、Chaseからインポート。支出を分類し、Googleスプレッドシートと同期。",
+    "featureImport": "取引のインポート",
+    "featureImportDesc": "Amex、Apple Card、ChaseのCSVとPDF。",
+    "featureRules": "カテゴリルール",
+    "featureRulesDesc": "自動分類としきい値。",
+    "featureSheets": "Googleスプレッドシート同期",
+    "featureSheetsDesc": "スプレッドシートにデータをプッシュ・プル。",
+    "featurePdf": "PDFエクスポート",
+    "featurePdfDesc": "取引と収入をPDFにエクスポート。",
+    "footerCta": "Googleでサインイン"
   }
 }

@@ -14,9 +14,9 @@ function TestWrapper() {
       <RulesProvider>
         <PresetTransactionsProvider>
           <GoogleAuthProviderFallback>
-            <MemoryRouter initialEntries={["/transactions"]}>
+            <MemoryRouter initialEntries={["/dashboard/transactions"]}>
               <Routes>
-                <Route path="/" element={<Layout />}>
+                <Route path="/dashboard" element={<Layout />}>
                   <Route path="transactions" element={<TransactionsPage />} />
                 </Route>
               </Routes>

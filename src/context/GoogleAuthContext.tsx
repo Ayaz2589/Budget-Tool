@@ -23,6 +23,8 @@ import {
   clearAndWriteRules,
   clearAndWritePresets,
   writeTotalsSheet,
+  writeDataBlob,
+  readDataBlob,
   getSheetIds,
   applySheetsFormatting,
   extractSpreadsheetId,
@@ -34,6 +36,7 @@ import {
   readDebtPaymentsFromSheet,
   readRulesFromSheet,
 } from "@/lib/googleSheets";
+import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
 
@@ -272,6 +275,15 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         spreadsheetId,
         presetTransactions,
       );
+      const dataBlob = serializeToBlob({
+        expenses: budget.expenses,
+        income: budget.income,
+        debts: budget.debts,
+        debtPayments: budget.debtPayments,
+        rules: rulesContext.rules,
+        presetTransactions,
+      });
+      await writeDataBlob(accessToken, spreadsheetId, dataBlob);
       const months = computeAllTotals({
         expenses: budget.expenses,
         income: budget.income,
@@ -327,16 +339,64 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
 
       const appExpenseKeys = new Set(budget.expenses.map((e) => expenseKey(e)));
       const appIncomeKeys = new Set(budget.income.map((i) => incomeKey(i)));
+      const appDebtIds = new Set(budget.debts.map((d) => d.id));
+      const appPaymentIds = new Set(budget.debtPayments.map((p) => p.id));
 
-      const sheetExpenses = await readExpensesFromSheet(
-        accessToken,
-        spreadsheetId,
-      );
-      const sheetMortgage = await readMortgageFromSheet(
-        accessToken,
-        spreadsheetId,
-      );
-      const sheetIncome = await readIncomeFromSheet(accessToken, spreadsheetId);
+      let sheetExpenses: typeof budget.expenses;
+      let sheetMortgage: typeof budget.expenses;
+      let sheetIncome: typeof budget.income;
+      let sheetDebts: typeof budget.debts;
+      let sheetPayments: typeof budget.debtPayments;
+      let sheetRules: typeof rulesContext.rules;
+      let sheetPresets: typeof presetTransactions;
+
+      const blob = await readDataBlob(accessToken, spreadsheetId);
+      if (blob && blob.startsWith("V2")) {
+        try {
+          const expanded = parseFromBlob(blob);
+          const allExpenses = expanded.expenses ?? [];
+          sheetExpenses = allExpenses.filter(
+            (e) => (e.category || "").toLowerCase() !== "mortgage",
+          );
+          sheetMortgage = allExpenses.filter(
+            (e) => (e.category || "").toLowerCase() === "mortgage",
+          );
+          sheetIncome = expanded.income ?? [];
+          sheetDebts = expanded.debts ?? [];
+          sheetPayments = expanded.debtPayments ?? [];
+          sheetRules = expanded.rules ?? [];
+          sheetPresets = expanded.presetTransactions ?? [];
+        } catch {
+          const [expenses, mortgage, income, debts, payments, rules, presets] =
+            await Promise.all([
+              readExpensesFromSheet(accessToken, spreadsheetId),
+              readMortgageFromSheet(accessToken, spreadsheetId),
+              readIncomeFromSheet(accessToken, spreadsheetId),
+              readDebtsFromSheet(accessToken, spreadsheetId),
+              readDebtPaymentsFromSheet(accessToken, spreadsheetId),
+              readRulesFromSheet(accessToken, spreadsheetId),
+              readPresetsFromSheet(accessToken, spreadsheetId),
+            ]);
+          sheetExpenses = expenses;
+          sheetMortgage = mortgage;
+          sheetIncome = income;
+          sheetDebts = debts;
+          sheetPayments = payments;
+          sheetRules = rules;
+          sheetPresets = presets;
+        }
+      } else {
+        [sheetExpenses, sheetMortgage, sheetIncome, sheetDebts, sheetPayments, sheetRules, sheetPresets] =
+          await Promise.all([
+            readExpensesFromSheet(accessToken, spreadsheetId),
+            readMortgageFromSheet(accessToken, spreadsheetId),
+            readIncomeFromSheet(accessToken, spreadsheetId),
+            readDebtsFromSheet(accessToken, spreadsheetId),
+            readDebtPaymentsFromSheet(accessToken, spreadsheetId),
+            readRulesFromSheet(accessToken, spreadsheetId),
+            readPresetsFromSheet(accessToken, spreadsheetId),
+          ]);
+      }
 
       const newExpenses = sheetExpenses.filter(
         (e) => !appExpenseKeys.has(expenseKey(e)),
@@ -363,18 +423,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      const appDebtIds = new Set(budget.debts.map((d) => d.id));
-      const appPaymentIds = new Set(budget.debtPayments.map((p) => p.id));
-      const sheetDebts = await readDebtsFromSheet(accessToken, spreadsheetId);
-      const sheetPayments = await readDebtPaymentsFromSheet(
-        accessToken,
-        spreadsheetId,
-      );
-      const sheetRules = await readRulesFromSheet(accessToken, spreadsheetId);
-      const sheetPresets = await readPresetsFromSheet(
-        accessToken,
-        spreadsheetId,
-      );
       const newDebts = sheetDebts.filter((d) => !appDebtIds.has(d.id));
       const newPayments = sheetPayments.filter((p) => !appPaymentIds.has(p.id));
       if (newDebts.length > 0) {

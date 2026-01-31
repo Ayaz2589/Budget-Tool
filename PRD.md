@@ -2,13 +2,13 @@
 
 ## Budget Tool — What Was Done So Far
 
-**Last updated:** January 29, 2026 (Preset transactions, confirmation modals, PRD sync)
+**Last updated:** January 30, 2026 (PDF V2 format, Transactions list includes mortgage, tests & PRD sync)
 
 ---
 
 ## Summary
 
-Budget Tool (**Ortho**) is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, debts, and mortgage payments, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage gambit-style rules (with optional dashboard warnings when category thresholds are met), and use **preset transactions** (templates for quick-fill when adding transactions). Delete and remove actions (income, debt, debt payment, mortgage payment, rule, preset, and “Delete all data” in Settings) **require confirmation** before applying. Sign in with Google in the nav. The app supports multiple UI languages (globe dropdown) and a mobile bottom nav for key sections. Data lives in the app and localStorage; Sheets and PDF export/import include expenses, income, debts, debt payments, mortgage, rules, and preset transactions.
+Budget Tool (**Ortho**) is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, debts, and mortgage payments, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage gambit-style rules (with optional dashboard warnings when category thresholds are met), and use **preset transactions** (templates for quick-fill when adding transactions). Delete and remove actions (income, debt, debt payment, mortgage payment, rule, preset, and “Delete all data” in Settings) **require confirmation** before applying. Sign in with Google in the nav. The app supports multiple UI languages (globe dropdown) and a mobile bottom nav for key sections. Data lives in the app and localStorage; Sheets and PDF export/import include expenses, income, debts, debt payments, mortgage, rules, and preset transactions. **PDF export** uses a **V2** machine-readable block (JSON payload gzip-compressed and Base64-encoded); **PDF import** accepts only V2 (legacy text format no longer supported). PDFs without a data block (e.g. Chase statements) use a table fallback to parse visible expense/income rows.
 
 ---
 
@@ -109,7 +109,7 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 ### 4.4 Transactions UI
 
 - **Add transaction (manual):** "Add transaction" button opens a **nearly full-screen dialog** (94vw × 92vh) with a **compact table layout**: one row per transaction (Source, Date, Amount, Description, Category, Card member, Copy / Remove). User can **add multiple transactions at once**: "Add row" for a blank row; **Copy** on any row duplicates it (inserted below) for editing; remove row when more than one. Submit adds all rows that have a valid amount; empty/invalid rows are skipped. New rows get a generated id and persist like imported transactions. Source options: Manual, Debit (TD Bank), American Express, Apple Card, Chase. Card member dropdown: unique values from existing expenses or default AYAZ UDDIN / TASNUVA AHMED.
-- **List:** All expenses with filters (month, source, category). List is **grouped by month** with a month header row (e.g. "January 2025") above each group. Inline category dropdown per row; delete single row. **Mobile:** card list by month; tap row opens bottom-sheet to change category or delete.
+- **List:** All expenses (including mortgage) with filters (month, source, category). List is **grouped by month** with a month header row (e.g. "January 2025") above each group. Inline category dropdown per row; delete single row. **Mobile:** card list by month; tap row opens bottom-sheet to change category or delete.
 - **Bulk actions:** Checkboxes, “Select all” (filtered), **Delete selected**, **Delete all** (with confirmation).
 - **Display:** Source filter and table use friendly labels (e.g. American Express, Apple Card, Debit (TD Bank)). Category dropdowns are **wider** and **color-coded** (e.g. My Purchase = blue, Tasnuva’s = rose, 50/50 = amber, Mortgage = slate). **Staggered row colors** (alternating subtle background) for readability.
 
@@ -197,7 +197,7 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 | Rules engine    | `src/lib/rules.ts` (conditions + actions, priority order)                                                 |
 | Totals          | `src/lib/totals.ts` (getMonthLabel exported for Dashboard/Transactions)                                   |
 | Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Mortgage, Debts, DebtPayments, Rules, PresetTransactions, Totals) |
-| PDF export      | `src/lib/pdfExport.ts` (export/import transactions, income, debts, debt payments, mortgage, rules, preset transactions)   |
+| PDF export      | `src/lib/pdfExport.ts` (V2: JSON gzip + Base64 between markers; import V2-only; table fallback when no data block)       |
 | Category colors | `src/lib/categoryColors.tsx` (colors + CategoryOption component)                                          |
 | Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `PresetTransactionsContext.tsx`, `GoogleAuthContext.tsx`            |
 | Layout          | `src/components/Layout.tsx` (sidebar, mobile header + bottom nav + "More" sheet, globe language switcher) |

@@ -11,6 +11,11 @@ import type {
 import type { Rule } from "@/lib/rules";
 import { getMonthLabel, computeMonthTotals } from "@/lib/totals";
 import { formatCurrency, formatPercent } from "@/lib/format";
+import {
+  serializeToBlob,
+  parseFromBlob,
+  type CategoryWithColorPayload,
+} from "@/lib/minifiedPayload";
 
 const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
 const INCOME_ROW_RE = /(\d{4}-\d{2}-\d{2})\s+(Paycheck|Rent)\s+\$([\d,]+\.\d{2})\s+(Paycheck|Rent)/g;
@@ -47,7 +52,9 @@ export function downloadTransactionsAndIncomePdf(
   debts: Debt[] = [],
   debtPayments: DebtPayment[] = [],
   rules: Rule[] = [],
-  presetTransactions: PresetTransaction[] = []
+  presetTransactions: PresetTransaction[] = [],
+  expenseCategoriesWithColors: CategoryWithColorPayload[] = [],
+  incomeCategoriesWithColors: CategoryWithColorPayload[] = []
 ): void {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const margin = 14;
@@ -321,103 +328,19 @@ export function downloadTransactionsAndIncomePdf(
     y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
   }
 
-  // Machine-readable block for re-import. Record separator " || " survives PDF text extraction (space-joined).
+  // Machine-readable block for re-import (V2: minified JSON + gzip + Base64).
   const DATA_START = "BUDGET_TOOL_DATA_START";
   const DATA_END = "BUDGET_TOOL_DATA_END";
-  const RECORD_SEP = " || ";
-  const FIELD_SEP = " @@ ";
-  const sanitize = (s: string) =>
-    String(s ?? "")
-      .replace(/\t/g, " ")
-      .replace(/\s*@@\s*/g, " ")
-      .trim();
-
-  const lines: string[] = [];
-  for (const e of expenses) {
-    lines.push(
-      [
-        "EXPENSE",
-        e.id,
-        e.date,
-        String(e.amount),
-        sanitize(e.description),
-        sanitize(e.category),
-        e.source,
-        sanitize(e.cardMember ?? ""),
-      ].join(FIELD_SEP)
-    );
-  }
-  for (const i of income) {
-    lines.push(
-      [
-        "INCOME",
-        i.id,
-        i.date,
-        String(i.amount),
-        sanitize(i.description ?? "Income"),
-        sanitize(i.category ?? "Other"),
-        i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
-        i.recurringAmount != null ? String(i.recurringAmount) : "",
-        i.recurringFrequency ?? "",
-        i.recurringDayOfMonth != null ? String(i.recurringDayOfMonth) : "",
-        i.recurringStartDate ?? "",
-      ].join(FIELD_SEP)
-    );
-  }
-  for (const d of debts) {
-    lines.push(
-      [
-        "DEBT",
-        d.id,
-        sanitize(d.name),
-        String(d.initialAmount),
-        d.startDate ?? "",
-        d.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
-        d.recurringAmount != null ? String(d.recurringAmount) : "",
-        d.recurringFrequency ?? "",
-        d.recurringDayOfMonth != null ? String(d.recurringDayOfMonth) : "",
-        d.recurringStartDate ?? "",
-      ].join(FIELD_SEP)
-    );
-  }
-  for (const p of debtPayments) {
-    lines.push(
-      [
-        "DEBT_PAYMENT",
-        p.id,
-        p.debtId,
-        p.date,
-        String(p.amount),
-        sanitize(p.note ?? ""),
-      ].join(FIELD_SEP)
-    );
-  }
-  for (const rule of rules) {
-    const conditionJson = encodeURIComponent(JSON.stringify(rule.condition));
-    const actionJson = encodeURIComponent(JSON.stringify(rule.action));
-    lines.push(
-      [
-        "RULE",
-        rule.id,
-        rule.enabled ? "1" : "0",
-        conditionJson,
-        actionJson,
-      ].join(FIELD_SEP)
-    );
-  }
-  for (const p of presetTransactions) {
-    lines.push(
-      [
-        "PRESET",
-        p.id,
-        p.source,
-        sanitize(p.description),
-        sanitize(p.category),
-        sanitize(p.cardMember),
-      ].join(FIELD_SEP)
-    );
-  }
-  const bodyBlock = lines.join(RECORD_SEP);
+  const v2Block = serializeToBlob({
+    expenses,
+    income,
+    debts,
+    debtPayments,
+    rules,
+    presetTransactions,
+    expenseCategoriesWithColors,
+    incomeCategoriesWithColors,
+  });
   if (y > 260) {
     doc.addPage();
     y = 20;
@@ -425,14 +348,13 @@ export function downloadTransactionsAndIncomePdf(
   doc.setFontSize(7);
   const pageWidth = doc.internal.pageSize.getWidth();
   const maxWidth = pageWidth - margin * 2;
-  // Write markers on their own lines so they are never split by wrapping
   doc.text(DATA_START, margin, y);
   y += 4;
   if (y > 280) {
     doc.addPage();
     y = 20;
   }
-  const wrapped = doc.splitTextToSize(bodyBlock, maxWidth);
+  const wrapped = doc.splitTextToSize(v2Block, maxWidth);
   for (const line of wrapped) {
     doc.text(line, margin, y);
     y += 4;
@@ -449,13 +371,6 @@ export function downloadTransactionsAndIncomePdf(
 
 const DATA_START_MARKER = "BUDGET_TOOL_DATA_START";
 const DATA_END_MARKER = "BUDGET_TOOL_DATA_END";
-const VALID_EXPENSE_SOURCES = [
-  "amex",
-  "chase",
-  "apple",
-  "manual",
-  "td",
-] as const;
 
 export interface ParsedExportedPdf {
   expenses: Expense[];
@@ -464,32 +379,27 @@ export interface ParsedExportedPdf {
   debtPayments: DebtPayment[];
   rules: Rule[];
   presetTransactions: PresetTransaction[];
+  expenseCategoriesWithColors?: CategoryWithColorPayload[];
+  incomeCategoriesWithColors?: CategoryWithColorPayload[];
+}
+
+function emptyParsed(): ParsedExportedPdf {
+  return {
+    expenses: [],
+    income: [],
+    debts: [],
+    debtPayments: [],
+    rules: [],
+    presetTransactions: [],
+  };
 }
 
 /**
- * Parse text extracted from an exported transactions PDF (with DATA block).
- * Returns { expenses, income }. If no data block found, returns empty arrays.
+ * Parse text extracted from an exported transactions PDF (V2 data block only).
+ * If the block starts with V2: decompress and parse JSON. Otherwise returns empty.
+ * If no data block markers at all, uses table fallback (e.g. Chase PDF).
  */
-function parseDebtOwner(value: string): "Ayaz" | "Tasnuva" {
-  const s = value.trim();
-  if (s === "Tasnuva") return "Tasnuva";
-  return "Ayaz";
-}
-
-function parseRecurringFrequency(value: string): "monthly" | "biweekly" {
-  const s = value.trim().toLowerCase();
-  if (s === "biweekly" || s === "bi-weekly") return "biweekly";
-  return "monthly";
-}
-
 export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
-  const expenses: Expense[] = [];
-  const income: Income[] = [];
-  const debts: Debt[] = [];
-  const debtPayments: DebtPayment[] = [];
-  const rules: Rule[] = [];
-  const presetTransactions: PresetTransaction[] = [];
-  // Normalize: PDF wrapping can split markers across lines (e.g. "BUDGET_TOOL_DATA_" + " START")
   const normalized = pdfText
     .replace(/\s+/g, " ")
     .replace(/BUDGET_\s*TOOL_\s*DATA_\s*START/g, "BUDGET_TOOL_DATA_START")
@@ -497,141 +407,34 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
   const startIdx = normalized.indexOf(DATA_START_MARKER);
   const endIdx = normalized.indexOf(DATA_END_MARKER);
   if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-    // Normalize whitespace (PDF extraction can insert spaces/newlines when text wraps)
     const block = normalized
       .slice(startIdx + DATA_START_MARKER.length, endIdx)
       .replace(/\s+/g, " ")
       .trim();
-    const lines = block
-      .split(/\s*\|\|\s*/)
-      .map((l) => l.trim())
-      .filter(Boolean);
-    for (const line of lines) {
-      const parts = line.split(/\s*@@\s*/);
-      if (parts[0] === "EXPENSE" && parts.length >= 8) {
-        const source = VALID_EXPENSE_SOURCES.includes(parts[6] as ExpenseSource)
-          ? (parts[6] as ExpenseSource)
-          : "manual";
-        expenses.push({
-          id: parts[1]!.trim(),
-          date: parts[2]!.trim(),
-          amount: parseFloat(parts[3]!) || 0,
-          description: parts[4]!.trim() || "Expense",
-          category: parts[5]!.trim() || "",
-          source,
-          cardMember: parts[7]?.trim() || undefined,
-        });
-      } else if (parts[0] === "INCOME" && parts.length >= 6) {
-        const owner =
-          parts.length >= 7 && (parts[6] ?? "").trim() === "Tasnuva"
-            ? "Tasnuva"
-            : "Ayaz";
-        const recurringAmount =
-          parts.length >= 8 && (parts[7] ?? "").toString().trim()
-            ? parseFloat(parts[7]!)
-            : undefined;
-        const recurringFreq =
-          parts.length >= 9 && (parts[8] ?? "").toString().trim()
-            ? (parts[8]!.trim().toLowerCase() === "biweekly"
-                ? "biweekly"
-                : "monthly")
-            : undefined;
-        const recurringDay =
-          parts.length >= 10 && (parts[9] ?? "").toString().trim()
-            ? parseInt(parts[9]!, 10)
-            : undefined;
-        const recurringStart =
-          parts.length >= 11 && (parts[10] ?? "").toString().trim()
-            ? parts[10]!.trim()
-            : undefined;
-        income.push({
-          id: parts[1]!.trim(),
-          date: parts[2]!.trim(),
-          amount: parseFloat(parts[3]!) || 0,
-          description: parts[4]!.trim() || "Income",
-          category: parts[5]!.trim() || "Other",
-          owner,
-          recurringAmount:
-            recurringAmount != null &&
-            !Number.isNaN(recurringAmount) &&
-            recurringAmount > 0
-              ? recurringAmount
-              : undefined,
-          recurringFrequency: recurringFreq,
-          recurringDayOfMonth:
-            recurringDay != null &&
-            recurringDay >= 1 &&
-            recurringDay <= 31
-              ? recurringDay
-              : undefined,
-          recurringStartDate: recurringStart,
-        });
-      } else if (parts[0] === "DEBT" && parts.length >= 10) {
-        const initialAmount = parseFloat(parts[3]!) ?? 0;
-        const recurringAmount = parts[6]?.trim()
-          ? parseFloat(parts[6]) ?? undefined
-          : undefined;
-        const recurringFreq = parts[7]?.trim()
-          ? parseRecurringFrequency(parts[7])
-          : undefined;
-        const recurringDay = parts[8]?.trim()
-          ? parseInt(parts[8], 10)
-          : undefined;
-        debts.push({
-          id: parts[1]!.trim(),
-          name: parts[2]!.trim() || "Debt",
-          initialAmount: Number.isNaN(initialAmount) ? 0 : initialAmount,
-          startDate: parts[4]?.trim() || undefined,
-          owner: parseDebtOwner(parts[5] ?? "Ayaz"),
-          recurringAmount:
-            recurringAmount != null && recurringAmount > 0
-              ? recurringAmount
-              : undefined,
-          recurringFrequency: recurringFreq,
-          recurringDayOfMonth:
-            recurringDay != null && recurringDay >= 1 && recurringDay <= 31
-              ? recurringDay
-              : undefined,
-          recurringStartDate: parts[9]?.trim() || undefined,
-        });
-      } else if (parts[0] === "DEBT_PAYMENT" && parts.length >= 6) {
-        const amount = parseFloat(parts[4]!) ?? 0;
-        debtPayments.push({
-          id: parts[1]!.trim(),
-          debtId: parts[2]!.trim(),
-          date: parts[3]!.trim(),
-          amount: Number.isNaN(amount) ? 0 : amount,
-          note: parts[5]?.trim() || undefined,
-        });
-      } else if (parts[0] === "RULE" && parts.length >= 5) {
-        try {
-          const condition = JSON.parse(decodeURIComponent(parts[3] ?? ""));
-          const action = JSON.parse(decodeURIComponent(parts[4] ?? ""));
-          rules.push({
-            id: parts[1]!.trim(),
-            enabled: parts[2]!.trim() !== "0",
-            condition,
-            action,
-          });
-        } catch {
-          // ignore malformed rule entries
-        }
-      } else if (parts[0] === "PRESET" && parts.length >= 6) {
-        const source = VALID_EXPENSE_SOURCES.includes(parts[2] as ExpenseSource)
-          ? (parts[2] as ExpenseSource)
-          : "manual";
-        presetTransactions.push({
-          id: parts[1]!.trim(),
-          source,
-          description: parts[3]?.trim() ?? "",
-          category: parts[4]?.trim() ?? "",
-          cardMember: parts[5]?.trim() ?? "",
-        });
+    if (block.startsWith("V2")) {
+      try {
+        const blob = block.replace(/\s/g, "").trim();
+        const expanded = parseFromBlob(blob);
+        return {
+          expenses: Array.isArray(expanded.expenses) ? expanded.expenses : [],
+          income: Array.isArray(expanded.income) ? expanded.income : [],
+          debts: Array.isArray(expanded.debts) ? expanded.debts : [],
+          debtPayments: Array.isArray(expanded.debtPayments)
+            ? expanded.debtPayments
+            : [],
+          rules: Array.isArray(expanded.rules) ? expanded.rules : [],
+          presetTransactions: Array.isArray(expanded.presetTransactions)
+            ? expanded.presetTransactions
+            : [],
+          expenseCategoriesWithColors: expanded.expenseCategoriesWithColors,
+          incomeCategoriesWithColors: expanded.incomeCategoriesWithColors,
+        };
+      } catch {
+        return emptyParsed();
       }
     }
-    return { expenses, income, debts, debtPayments, rules, presetTransactions };
+    return emptyParsed();
   }
-  // No data block: fallback to parsing the human-readable table (no debts/debtPayments)
   const fallback = parseExportedPdfTableFallback(normalized);
   return {
     ...fallback,

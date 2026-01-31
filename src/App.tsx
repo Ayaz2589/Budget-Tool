@@ -8,6 +8,7 @@ import {
   GoogleAuthProviderFallback,
 } from "@/context/GoogleAuthContext";
 import { Layout } from "@/components/Layout";
+import { AuthGate, AuthLoginRoute } from "@/pages/auth/AuthGate";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
 import { DebtPage } from "@/pages/debt/DebtPage";
 import { MortgagePage } from "@/pages/mortgage/MortgagePage";
@@ -23,15 +24,18 @@ function AppContent() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="import" element={<ImportPage />} />
-          <Route path="transactions" element={<TransactionsPage />} />
-          <Route path="income" element={<IncomePage />} />
-          <Route path="debt" element={<DebtPage />} />
-          <Route path="mortgage" element={<MortgagePage />} />
-          <Route path="rules" element={<RulesPage />} />
-          <Route path="settings" element={<SettingsPage />} />
+        <Route path="/auth" element={<AuthLoginRoute />} />
+        <Route element={<AuthGate />}>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="import" element={<ImportPage />} />
+            <Route path="transactions" element={<TransactionsPage />} />
+            <Route path="income" element={<IncomePage />} />
+            <Route path="debt" element={<DebtPage />} />
+            <Route path="mortgage" element={<MortgagePage />} />
+            <Route path="rules" element={<RulesPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

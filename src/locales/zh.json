@@ -401,6 +401,13 @@
   },
   "auth": {
     "googleNotConfigured": "未配置 Google 登录。",
-    "notSignedInOrNoSpreadsheet": "未登录或未设置表格。"
+    "notSignedInOrNoSpreadsheet": "未登录或未设置表格。",
+    "signInToContinue": "使用 Google 登录以查看您的仪表板。",
+    "createAccountHeading": "创建您的 Ortho 账户",
+    "createAccountSubheading": "使用 Google 登录，在一个地方管理支出、收入和预算。",
+    "signInWithGoogle": "Google",
+    "signInDisclaimer": "登录后可与 Google 表格同步数据。",
+    "valuePropTitle": "管理支出、收入和预算。",
+    "valuePropSubtitle": "与 Google 表格同步。无需信用卡。"
   }
 }

@@ -403,6 +403,13 @@
   },
   "auth": {
     "googleNotConfigured": "Google साइन इन कॉन्फ़िगर नहीं।",
-    "notSignedInOrNoSpreadsheet": "साइन इन नहीं या स्प्रैडशीट सेट नहीं।"
+    "notSignedInOrNoSpreadsheet": "साइन इन नहीं या स्प्रैडशीट सेट नहीं।",
+    "signInToContinue": "अपना डैशबोर्ड देखने के लिए Google से साइन इन करें।",
+    "createAccountHeading": "अपना Ortho अकाउंट बनाएं",
+    "createAccountSubheading": "Google से साइन इन करके खर्च, आय और बजट एक जगह ट्रैक करें।",
+    "signInWithGoogle": "Google",
+    "signInDisclaimer": "साइन इन करने पर Google Sheets के साथ सिंक होगा।",
+    "valuePropTitle": "खर्च, आय और बजट ट्रैक करें।",
+    "valuePropSubtitle": "Google Sheets के साथ सिंक। क्रेडिट कार्ड की जरूरत नहीं।"
   }
 }

@@ -337,6 +337,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         debtPayments: budget.debtPayments,
         rules: rulesContext.rules,
         presetTransactions,
+        cardSources: budget.cardSources,
       });
       await writeDataBlob(accessToken, spreadsheetId, dataBlob);
       const months = computeAllTotals({
@@ -421,6 +422,9 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetPayments = expanded.debtPayments ?? [];
           sheetRules = expanded.rules ?? [];
           sheetPresets = expanded.presetTransactions ?? [];
+          if (Array.isArray(expanded.cardSources) && expanded.cardSources.length > 0) {
+            budget.setCardSources(expanded.cardSources);
+          }
         } catch {
           const [expenses, mortgage, income, debts, payments, rules, presets] =
             await Promise.all([
@@ -516,6 +520,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.addIncome,
     budget.addDebts,
     budget.addDebtPayments,
+    budget.setCardSources,
   ]);
 
   const value = useMemo<GoogleAuthContextValue>(

@@ -7,10 +7,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
+import type { Debt, DebtPayment, Expense, Income, ExpenseSource } from "@/lib/types";
 import {
   DEFAULT_EXPENSE_CATEGORIES,
   DEFAULT_INCOME_CATEGORIES,
+  ALL_EXPENSE_SOURCES,
 } from "@/lib/types";
 import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 
@@ -23,6 +24,8 @@ export interface BudgetState {
   debtPayments: DebtPayment[];
   expenseCategories: string[];
   incomeCategories: string[];
+  /** Enabled card/expense sources; used in transaction table and import. */
+  cardSources: string[];
 }
 
 interface BudgetContextValue extends BudgetState {
@@ -45,6 +48,7 @@ interface BudgetContextValue extends BudgetState {
   addDebtPayments: (payments: DebtPayment[]) => void;
   setExpenseCategories: (categories: string[]) => void;
   setIncomeCategories: (categories: string[]) => void;
+  setCardSources: (sources: string[]) => void;
   setIOweNova: (monthKey: string, amount: number) => void;
   iOweNova: Record<string, number>;
   repairCorruptedDates: () => { fixedExpenses: number; fixedIncome: number };
@@ -62,6 +66,7 @@ function loadStoredBudget(): {
   debts: Debt[];
   debtPayments: DebtPayment[];
   iOweNova: Record<string, number>;
+  cardSources: string[];
 } {
   try {
     const raw = localStorage.getItem(BUDGET_STORAGE_KEY);
@@ -72,7 +77,13 @@ function loadStoredBudget(): {
         debts?: Debt[];
         debtPayments?: DebtPayment[];
         iOweNova?: Record<string, number>;
+        cardSources?: string[];
       };
+      const cardSources = Array.isArray(data.cardSources)
+        ? data.cardSources.filter((s): s is ExpenseSource =>
+            ALL_EXPENSE_SOURCES.includes(s as ExpenseSource),
+          )
+        : [...ALL_EXPENSE_SOURCES];
       return {
         expenses: Array.isArray(data.expenses) ? data.expenses : [],
         income: Array.isArray(data.income) ? data.income : [],
@@ -82,6 +93,7 @@ function loadStoredBudget(): {
           data.iOweNova && typeof data.iOweNova === "object"
             ? data.iOweNova
             : {},
+        cardSources: cardSources.length > 0 ? cardSources : [...ALL_EXPENSE_SOURCES],
       };
     }
   } catch {
@@ -93,6 +105,7 @@ function loadStoredBudget(): {
     debts: [],
     debtPayments: [],
     iOweNova: {},
+    cardSources: [...ALL_EXPENSE_SOURCES],
   };
 }
 
@@ -110,6 +123,9 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const [incomeCategories, setIncomeCategoriesState] = useState<string[]>([
     ...DEFAULT_INCOME_CATEGORIES,
   ]);
+  const [cardSources, setCardSourcesState] = useState<string[]>(
+    stored.cardSources,
+  );
   const [iOweNova, setIOweNovaState] = useState<Record<string, number>>(
     stored.iOweNova,
   );
@@ -124,12 +140,13 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
           debts,
           debtPayments,
           iOweNova,
+          cardSources,
         }),
       );
     } catch {
       // ignore
     }
-  }, [expenses, income, debts, debtPayments, iOweNova]);
+  }, [expenses, income, debts, debtPayments, iOweNova, cardSources]);
 
   const addExpenses = useCallback((newExpenses: Expense[]) => {
     setExpenses((prev) => {
@@ -274,6 +291,17 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     setIncomeCategoriesState(categories);
   }, []);
 
+  const setCardSources = useCallback((sources: string[]) => {
+    if (sources.length === 0) return;
+    const fallback = (sources[0] as ExpenseSource) ?? "manual";
+    setExpenses((prev) =>
+      prev.map((e) =>
+        sources.includes(e.source) ? e : { ...e, source: fallback },
+      ),
+    );
+    setCardSourcesState(sources);
+  }, []);
+
   const setIOweNova = useCallback((monthKey: string, amount: number) => {
     setIOweNovaState((prev) => ({ ...prev, [monthKey]: amount }));
   }, []);
@@ -314,6 +342,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       debtPayments,
       expenseCategories,
       incomeCategories,
+      cardSources,
       addExpenses,
       addExpense,
       updateExpense,
@@ -333,6 +362,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       removeDebtPayment,
       setExpenseCategories,
       setIncomeCategories,
+      setCardSources,
       setIOweNova,
       iOweNova,
       repairCorruptedDates,
@@ -344,6 +374,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       debtPayments,
       expenseCategories,
       incomeCategories,
+      cardSources,
       iOweNova,
       addExpenses,
       addExpense,
@@ -364,6 +395,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       removeDebtPayment,
       setExpenseCategories,
       setIncomeCategories,
+      setCardSources,
       setIOweNova,
       repairCorruptedDates,
     ],

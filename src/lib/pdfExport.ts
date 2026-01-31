@@ -55,7 +55,8 @@ export function downloadTransactionsAndIncomePdf(
   rules: Rule[] = [],
   presetTransactions: PresetTransaction[] = [],
   expenseCategoriesWithColors: CategoryWithColorPayload[] = [],
-  incomeCategoriesWithColors: CategoryWithColorPayload[] = []
+  incomeCategoriesWithColors: CategoryWithColorPayload[] = [],
+  cardSources?: string[],
 ): void {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const margin = 14;
@@ -341,6 +342,7 @@ export function downloadTransactionsAndIncomePdf(
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,
+    cardSources,
   });
   if (y > 260) {
     doc.addPage();
@@ -382,6 +384,7 @@ export interface ParsedExportedPdf {
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
+  cardSources?: string[];
 }
 
 function emptyParsed(): ParsedExportedPdf {
@@ -429,6 +432,7 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
             : [],
           expenseCategoriesWithColors: expanded.expenseCategoriesWithColors,
           incomeCategoriesWithColors: expanded.incomeCategoriesWithColors,
+          cardSources: expanded.cardSources,
         };
       } catch {
         return emptyParsed();

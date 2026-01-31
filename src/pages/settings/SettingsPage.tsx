@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { GoogleSheetsCard } from "./GoogleSheetsCard";
+import { CardSourcesCard } from "./CardSourcesCard";
 import { ExpenseCategoriesCard } from "./ExpenseCategoriesCard";
 import { IncomeCategoriesCard } from "./IncomeCategoriesCard";
 
@@ -125,6 +126,8 @@ export function SettingsPage() {
         setRestoreConfirmOpen={setRestoreConfirmOpen}
         t={t}
       />
+
+      <CardSourcesCard />
 
       <ExpenseCategoriesCard
         categories={expenseCategories}

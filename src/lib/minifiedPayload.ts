@@ -24,6 +24,7 @@ export interface MinifiedPayloadInput {
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
+  cardSources?: string[];
 }
 
 export interface ExpandedPayload {
@@ -35,6 +36,7 @@ export interface ExpandedPayload {
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
+  cardSources?: string[];
 }
 
 /** Omit undefined, null, and empty string from objects for smaller payload. */
@@ -56,6 +58,7 @@ export function buildMinifiedPayload(
   presetTransactions: PresetTransaction[],
   expenseCategoriesWithColors: CategoryWithColorPayload[],
   incomeCategoriesWithColors: CategoryWithColorPayload[],
+  cardSources?: string[],
 ): Record<string, unknown> {
   return {
     e: expenses.map((x) =>
@@ -126,6 +129,7 @@ export function buildMinifiedPayload(
       incomeCategoriesWithColors.length > 0
         ? incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color }))
         : undefined,
+    sc: Array.isArray(cardSources) && cardSources.length > 0 ? cardSources : undefined,
   };
 }
 
@@ -232,6 +236,10 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
       }))
     : undefined;
 
+  const cardSources = Array.isArray(raw.cardSources ?? raw.sc)
+    ? (raw.cardSources ?? raw.sc) as string[]
+    : undefined;
+
   return {
     expenses,
     income,
@@ -241,6 +249,7 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,
+    cardSources,
   };
 }
 
@@ -255,6 +264,7 @@ export function serializeToBlob(input: MinifiedPayloadInput): string {
     input.presetTransactions,
     input.expenseCategoriesWithColors ?? [],
     input.incomeCategoriesWithColors ?? [],
+    input.cardSources,
   );
   const jsonString = JSON.stringify(payload);
   const compressed = pako.gzip(new TextEncoder().encode(jsonString));

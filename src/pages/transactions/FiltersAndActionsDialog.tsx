@@ -20,16 +20,6 @@ import { CategoryOption } from "@/lib/categoryColors";
 import type { ExpenseSource } from "@/lib/types";
 import { FileDown, Trash2 } from "lucide-react";
 
-const SOURCES = [
-  "all",
-  "amex",
-  "amex-gold",
-  "chase",
-  "apple",
-  "manual",
-  "td",
-] as const;
-
 export const SOURCE_LABEL_KEYS: Record<ExpenseSource | "all", string> = {
   all: "common.all",
   amex: "transactions.sourceAmexPlatinum",
@@ -55,6 +45,8 @@ export type FiltersAndActionsDialogProps = {
   onSearchFilterChange: (value: string) => void;
   expenseCategories: string[];
   cardMemberOptions: string[];
+  /** Enabled card sources; filter dropdown shows "all" plus these. */
+  cardSources: string[];
   hasActiveFilters: boolean;
   onClearFilters: () => void;
   onCleanDescriptions: () => void;
@@ -83,6 +75,7 @@ export function FiltersAndActionsDialog({
   onSearchFilterChange,
   expenseCategories,
   cardMemberOptions,
+  cardSources,
   hasActiveFilters,
   onClearFilters,
   onCleanDescriptions,
@@ -145,16 +138,17 @@ export function FiltersAndActionsDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {SOURCES.map((s) => (
+                    <SelectItem key="all" value="all">
+                      {t(SOURCE_LABEL_KEYS.all)}
+                    </SelectItem>
+                    {cardSources.map((s) => (
                       <SelectItem key={s} value={s}>
                         <span className="flex items-center gap-2">
-                          {s !== "all" && (
-                            <SourceIcon
-                              source={s as ExpenseSource}
-                              size={18}
-                            />
-                          )}
-                          {t(SOURCE_LABEL_KEYS[s])}
+                          <SourceIcon
+                            source={s as ExpenseSource}
+                            size={18}
+                          />
+                          {t(SOURCE_LABEL_KEYS[s as ExpenseSource])}
                         </span>
                       </SelectItem>
                     ))}

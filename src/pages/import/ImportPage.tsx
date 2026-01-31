@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { parseCsv, parseChasePdfFromText, type CsvSource } from "@/lib/parsers";
@@ -38,11 +38,31 @@ export function ImportPage() {
     addDebts,
     addDebtPayments,
     expenseCategories,
+    cardSources,
+    setCardSources,
   } = useBudget();
   const { rules, setRules } = useRules();
   const { setPresets } = usePresetTransactions();
   const { t } = useTranslation();
   const currentMonthKey = new Date().toISOString().slice(0, 7);
+
+  useEffect(() => {
+    if (
+      selectedSource !== "pdf-export" &&
+      !cardSources.includes(selectedSource)
+    ) {
+      const firstValid = cardSources.includes("amex")
+        ? "amex"
+        : cardSources.includes("amex-gold")
+          ? "amex-gold"
+          : cardSources.includes("apple")
+            ? "apple"
+            : cardSources.includes("chase")
+              ? "chase"
+              : "pdf-export";
+      setSelectedSource(firstValid as SourceChoice);
+    }
+  }, [cardSources, selectedSource]);
 
   const applyRulesForPreview = (incoming: Expense[]) => {
     if (rules.length === 0) return incoming;
@@ -113,6 +133,12 @@ export function ImportPage() {
           }
           if (parsed.presetTransactions.length > 0) {
             setPresets(parsed.presetTransactions);
+          }
+          if (
+            Array.isArray(parsed.cardSources) &&
+            parsed.cardSources.length > 0
+          ) {
+            setCardSources(parsed.cardSources);
           }
           setPreviewExpenses(applyRulesForPreview(toAddExpenses));
           setPreviewIncome(toAddIncome);
@@ -260,6 +286,7 @@ export function ImportPage() {
         skippedDuplicates={skippedDuplicates}
         onAddToTransactions={addToTransactions}
         isPdfExport={lastDetected === "pdf-export"}
+        cardSources={cardSources}
         t={t}
       />
       {hasPreview && (

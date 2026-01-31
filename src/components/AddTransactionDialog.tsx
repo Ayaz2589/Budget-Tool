@@ -60,14 +60,14 @@ interface TransactionRow {
   presetId?: string;
 }
 
-function defaultRow(): TransactionRow {
+function defaultRow(defaultSource: ExpenseSource = "manual"): TransactionRow {
   return {
     id: crypto.randomUUID(),
     date: new Date().toISOString().slice(0, 10),
     amount: "",
     description: "",
     category: "",
-    source: "manual",
+    source: defaultSource,
     cardMember: "",
   };
 }
@@ -82,16 +82,20 @@ export function AddTransactionDialog({
   onOpenChange,
 }: AddTransactionDialogProps) {
   const { t } = useTranslation();
-  const { expenses, addExpense, expenseCategories } = useBudget();
+  const { expenses, addExpense, expenseCategories, cardSources } = useBudget();
   const { rules } = useRules();
   const { presetTransactions } = usePresetTransactions();
-  const [rows, setRows] = useState<TransactionRow[]>(() => [defaultRow()]);
+  const defaultSource = (cardSources[0] as ExpenseSource) ?? "manual";
+  const [rows, setRows] = useState<TransactionRow[]>(() => [
+    defaultRow(defaultSource),
+  ]);
 
   useEffect(() => {
     if (open) {
-      setRows([defaultRow()]);
+      const fallback = (cardSources[0] as ExpenseSource) ?? "manual";
+      setRows([defaultRow(fallback)]);
     }
-  }, [open]);
+  }, [open, cardSources]);
 
   const cardMemberOptions = useMemo(() => {
     const fromExpenses = [
@@ -299,7 +303,11 @@ export function AddTransactionDialog({
                     )}
                     <TableCell className="p-1 align-middle">
                       <Select
-                        value={row.source}
+                        value={
+                          cardSources.includes(row.source)
+                            ? row.source
+                            : defaultSource
+                        }
                         onValueChange={(v) =>
                           updateRow(index, { source: v as ExpenseSource })
                         }
@@ -310,42 +318,14 @@ export function AddTransactionDialog({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="manual">
-                            <span className="flex items-center gap-2">
-                              <SourceIcon source="manual" size={18} />
-                              {t(SOURCE_KEYS.manual)}
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="td">
-                            <span className="flex items-center gap-2">
-                              <SourceIcon source="td" size={18} />
-                              {t(SOURCE_KEYS.td)}
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="amex">
-                            <span className="flex items-center gap-2">
-                              <SourceIcon source="amex" size={18} />
-                              {t(SOURCE_KEYS.amex)}
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="amex-gold">
-                            <span className="flex items-center gap-2">
-                              <SourceIcon source="amex-gold" size={18} />
-                              {t(SOURCE_KEYS["amex-gold"])}
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="apple">
-                            <span className="flex items-center gap-2">
-                              <SourceIcon source="apple" size={18} />
-                              {t(SOURCE_KEYS.apple)}
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="chase">
-                            <span className="flex items-center gap-2">
-                              <SourceIcon source="chase" size={18} />
-                              {t(SOURCE_KEYS.chase)}
-                            </span>
-                          </SelectItem>
+                          {cardSources.map((s) => (
+                            <SelectItem key={s} value={s}>
+                              <span className="flex items-center gap-2">
+                                <SourceIcon source={s as ExpenseSource} size={18} />
+                                {t(SOURCE_KEYS[s as ExpenseSource])}
+                              </span>
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </TableCell>

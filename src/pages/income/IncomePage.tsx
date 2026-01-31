@@ -38,6 +38,7 @@ export function IncomePage() {
     updateIncome,
     removeIncome,
     incomeCategories,
+    cardSources,
   } = useBudget();
   const { rules } = useRules();
   const { presetTransactions } = usePresetTransactions();
@@ -98,6 +99,9 @@ export function IncomePage() {
                   debtPayments,
                   rules,
                   presetTransactions,
+                  [],
+                  [],
+                  cardSources,
                 )
               }
             >

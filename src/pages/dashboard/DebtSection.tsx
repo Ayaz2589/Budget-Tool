@@ -51,7 +51,7 @@ export function DebtSection({ debtSummary }: DebtSectionProps) {
         </CardTitle>
         <p className="text-xs text-muted-foreground">
           {t("dashboardDebt.remainingAndPaidOff")}{" "}
-          <Link to="/debt" className="font-medium text-primary hover:underline">
+          <Link to="/dashboard/debt" className="font-medium text-primary hover:underline">
             {t("dashboardDebt.viewManageDebt")}
           </Link>
         </p>
@@ -166,7 +166,7 @@ export function DebtSection({ debtSummary }: DebtSectionProps) {
           <p className="text-sm text-muted-foreground py-6 text-center">
             {t("dashboardDebt.noDebtYet")}{" "}
             <Link
-              to="/debt"
+              to="/dashboard/debt"
               className="font-medium text-primary hover:underline"
             >
               {t("dashboardDebt.addDebt")}

@@ -41,6 +41,9 @@ import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
 const ACCESS_TOKEN_STORAGE_KEY = "budget-tool-google-access-token";
 
+/** Set when user signs out or visits /auth; used to skip landing and go to /auth on next visit. */
+export const RETURNING_USER_KEY = "budget-tool-returning-user";
+
 function getStoredAccessToken(): string | null {
   try {
     const raw = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
@@ -229,6 +232,11 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     setAccessToken(null);
     setExpiresAt(null);
     setUserProfile(null);
+    try {
+      localStorage.setItem(RETURNING_USER_KEY, "1");
+    } catch {
+      // ignore
+    }
   }, []);
 
   const login = useGoogleLogin({

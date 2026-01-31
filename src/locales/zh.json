@@ -409,5 +409,20 @@
     "signInDisclaimer": "登录后可与 Google 表格同步数据。",
     "valuePropTitle": "管理支出、收入和预算。",
     "valuePropSubtitle": "与 Google 表格同步。无需信用卡。"
+  },
+  "landing": {
+    "heroTitle": "Ortho",
+    "heroTagline": "在一个地方追踪支出、收入和预算。",
+    "heroCta": "开始使用",
+    "valueProp": "从 Amex、Apple Card 和 Chase 导入。分类支出，与 Google 表格同步，按月查看仪表板。",
+    "featureImport": "导入交易",
+    "featureImportDesc": "Amex、Apple Card、Chase 的 CSV 和 PDF。",
+    "featureRules": "分类规则",
+    "featureRulesDesc": "自动分类和阈值。",
+    "featureSheets": "Google 表格同步",
+    "featureSheetsDesc": "推送和拉取数据到电子表格。",
+    "featurePdf": "PDF 导出",
+    "featurePdfDesc": "将交易和收入导出为 PDF。",
+    "footerCta": "使用 Google 登录"
   }
 }

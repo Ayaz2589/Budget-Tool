@@ -1,12 +1,22 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Landmark, BarChart3, Wallet, CreditCard } from "lucide-react";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
+import { RETURNING_USER_KEY } from "@/context/GoogleAuthContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function LoginPage() {
   const { t } = useTranslation();
   const { signIn } = useGoogleAuth();
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(RETURNING_USER_KEY, "1");
+    } catch {
+      // ignore
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background">

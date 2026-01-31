@@ -409,5 +409,20 @@
     "signInDisclaimer": "Al iniciar sesión puedes sincronizar tus datos con Google Sheets.",
     "valuePropTitle": "Gastos, ingresos y presupuestos.",
     "valuePropSubtitle": "Sincroniza con Google Sheets. No hace falta tarjeta de crédito."
+  },
+  "landing": {
+    "heroTitle": "Ortho",
+    "heroTagline": "Rastrea gastos, ingresos y presupuestos en un solo lugar.",
+    "heroCta": "Comenzar",
+    "valueProp": "Importa desde Amex, Apple Card y Chase. Categoriza gastos, sincroniza con Google Sheets y ve tu panel por mes.",
+    "featureImport": "Importar transacciones",
+    "featureImportDesc": "CSV y PDF de Amex, Apple Card, Chase.",
+    "featureRules": "Reglas de categoría",
+    "featureRulesDesc": "Auto-categorizar y umbrales.",
+    "featureSheets": "Sincronización con Google Sheets",
+    "featureSheetsDesc": "Enviar y recibir datos de la hoja.",
+    "featurePdf": "Exportar PDF",
+    "featurePdfDesc": "Exportar transacciones e ingresos a PDF.",
+    "footerCta": "Iniciar sesión con Google"
   }
 }

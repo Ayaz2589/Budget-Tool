@@ -9,6 +9,7 @@ import {
 } from "@/context/GoogleAuthContext";
 import { Layout } from "@/components/Layout";
 import { AuthGate, AuthLoginRoute } from "@/pages/auth/AuthGate";
+import { LandingRoute } from "@/pages/landing";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
 import { DebtPage } from "@/pages/debt/DebtPage";
 import { MortgagePage } from "@/pages/mortgage/MortgagePage";
@@ -24,9 +25,10 @@ function AppContent() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<LandingRoute />} />
         <Route path="/auth" element={<AuthLoginRoute />} />
         <Route element={<AuthGate />}>
-          <Route path="/" element={<Layout />}>
+          <Route path="dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="import" element={<ImportPage />} />
             <Route path="transactions" element={<TransactionsPage />} />

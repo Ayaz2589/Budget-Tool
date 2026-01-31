@@ -62,7 +62,7 @@ export function OverviewSection({
   t,
 }: OverviewSectionProps) {
   return (
-    <AccordionItem value="overview">
+    <AccordionItem value="overview" data-tour="overview">
       <AccordionTrigger className="px-0 py-3 text-lg font-semibold hover:no-underline md:px-4 md:py-4">
         {t("dashboard.overview")}
       </AccordionTrigger>

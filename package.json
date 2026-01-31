@@ -24,6 +24,7 @@
     "@react-oauth/google": "^0.13.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "driver.js": "^1.4.0",
     "i18next": "^24.2.0",
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.7",

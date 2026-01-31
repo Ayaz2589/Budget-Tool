@@ -41,6 +41,10 @@ All app pages (dashboard, transactions, income, etc.) are behind AuthGate at `/d
 - **Redirect when sign-in lost:** In Layout, an effect watches `isSignedIn`; when it transitions from true to false, `navigate("/auth")` is called.
 - **Returning-user flag:** On sign-out, `clearSession()` in GoogleAuthContext sets `localStorage.setItem('budget-tool-returning-user', '1')`. On visit to LoginPage (`/auth`), the same key is set. LandingRoute at `/` shows the landing only when not signed in and the flag is not set; otherwise redirects to `/auth` (returning) or `/dashboard` (signed in).
 
+## Page tours
+
+- **PageTourTrigger** — Renders a help icon and optional dot badge. On click, sets `budget-tool-tour-seen-<pageId>` in localStorage and runs the page tour via `runPageTour(steps, t)` (driver.js). Each page mounts the trigger and passes its `pageId` and steps from `pageTourSteps.ts`. Step targets use `data-tour="id"` on DOM nodes.
+
 ## Layout
 
 - **Layout.tsx** — Renders sidebar (desktop) or header + bottom nav (mobile). Sidebar contains nav links, language switcher, and sign-in/sign-out + user profile. Main content area renders `<Outlet />` (the current nested route). Mobile "More" opens a dialog with additional nav links.

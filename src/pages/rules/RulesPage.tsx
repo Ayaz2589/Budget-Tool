@@ -34,7 +34,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { SOURCE_OPTIONS } from "@/lib/sourceLabels";
+import { rulesTourSteps } from "@/lib/pageTourSteps";
 
 type ConditionType = RuleCondition["type"];
 
@@ -241,18 +243,22 @@ export function RulesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold">{t("rules.title")}</h1>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">{t("rules.title")}</h1>
+            <PageTourTrigger pageId="rules" steps={rulesTourSteps} />
+          </div>
           <p className="text-sm text-muted-foreground">{t("rules.subtitle")}</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-2">
-              <Plus className="size-4" />
-              {t("rules.addRule")}
-            </Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2">
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Plus className="size-4" />
+                {t("rules.addRule")}
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{t("rules.newRule")}</DialogTitle>
@@ -518,10 +524,11 @@ export function RulesPage() {
               </div>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
-      <Card>
+      <Card data-tour="rulesList">
         <CardHeader>
           <CardTitle>{t("rules.priorityTitle")}</CardTitle>
           <CardDescription>{t("rules.priorityDesc")}</CardDescription>
@@ -658,7 +665,7 @@ export function RulesPage() {
         </DialogContent>
       </Dialog>
 
-      <Card>
+      <Card data-tour="presets">
         <CardHeader>
           <CardTitle>{t("presetTransactions.title")}</CardTitle>
           <CardDescription>

@@ -13,6 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { PageTourTrigger } from "@/components/PageTourTrigger";
+import { settingsTourSteps } from "@/lib/pageTourSteps";
 import { GoogleSheetsCard } from "./GoogleSheetsCard";
 import { CardSourcesCard } from "./CardSourcesCard";
 import { ExpenseCategoriesCard } from "./ExpenseCategoriesCard";
@@ -101,11 +103,17 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-xl font-semibold sm:text-2xl">{t("settings.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("settings.subtitle")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="space-y-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold sm:text-2xl">{t("settings.title")}</h1>
+            <PageTourTrigger pageId="settings" steps={settingsTourSteps} />
+          </div>
+          <p className="text-sm text-muted-foreground">{t("settings.subtitle")}</p>
+        </div>
       </div>
 
+      <div data-tour="googleSheets">
       <GoogleSheetsCard
         isSignedIn={isSignedIn}
         signIn={signIn}
@@ -126,7 +134,9 @@ export function SettingsPage() {
         setRestoreConfirmOpen={setRestoreConfirmOpen}
         t={t}
       />
+      </div>
 
+      <div data-tour="categories">
       <CardSourcesCard />
 
       <ExpenseCategoriesCard
@@ -140,8 +150,9 @@ export function SettingsPage() {
         onRemove={handleRemoveIncomeCategory}
         onAdd={handleAddIncomeCategory}
       />
+      </div>
 
-      <div className="pt-4 border-t sm:pt-6">
+      <div className="pt-4 border-t sm:pt-6" data-tour="deleteAll">
         <Button
           variant="outline"
           className="w-full sm:w-auto text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"

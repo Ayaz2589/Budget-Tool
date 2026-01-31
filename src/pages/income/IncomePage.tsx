@@ -21,6 +21,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { FileDown, Plus, Trash2 } from "lucide-react";
+import { PageTourTrigger } from "@/components/PageTourTrigger";
+import { incomeTourSteps } from "@/lib/pageTourSteps";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { AddIncomeDialog } from "./AddIncomeDialog";
 import { EditIncomeDialog } from "./EditIncomeDialog";
@@ -65,15 +67,20 @@ export function IncomePage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h1 className="text-2xl font-semibold">{t("income.title")}</h1>
-          <Button onClick={() => setAddOpen(true)}>
-            <Plus className="size-4" />
-            {t("income.addIncome")}
-          </Button>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="space-y-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">{t("income.title")}</h1>
+            <PageTourTrigger pageId="income" steps={incomeTourSteps} />
+          </div>
+          <p className="text-sm text-muted-foreground">{t("income.subtitle")}</p>
         </div>
-        <p className="text-sm text-muted-foreground">{t("income.subtitle")}</p>
+      </div>
+      <div data-tour="addIncome" className="flex flex-wrap items-center justify-between gap-2">
+        <Button onClick={() => setAddOpen(true)}>
+          <Plus className="size-4" />
+          {t("income.addIncome")}
+        </Button>
       </div>
 
       <AddIncomeDialog
@@ -83,7 +90,7 @@ export function IncomePage() {
         onSubmit={handleAdd}
       />
 
-      <Card>
+      <Card data-tour="incomeList">
         <CardHeader>
           <CardTitle>Income entries</CardTitle>
           <CardDescription>Edit or delete entries below.</CardDescription>

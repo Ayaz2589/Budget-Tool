@@ -423,6 +423,81 @@
     "valuePropTitle": "Track expenses, income, and budgets.",
     "valuePropSubtitle": "Sync with Google Sheets. No credit card needed."
   },
+  "tour": {
+    "ariaLabel": "How this page works",
+    "dashboard": {
+      "introTitle": "Dashboard",
+      "introContent": "View spending, income, and savings by month. Use the steps below to find key areas.",
+      "monthSelectorTitle": "Month selector",
+      "monthSelectorContent": "Pick which month to view. The dashboard shows totals and breakdowns for the selected month.",
+      "summaryTitle": "Summary",
+      "summaryContent": "Summary cards show total earned, spent, and saved for the selected month.",
+      "overviewTitle": "Overview",
+      "overviewContent": "Charts and breakdowns for earned vs spent, spending by type, and income by category.",
+      "debtTitle": "Debt",
+      "debtContent": "Remaining debt balance and total paid off. Go to the Debt page to add or manage debts.",
+      "byMonthTitle": "By month",
+      "byMonthContent": "Monthly breakdown of earned vs spent across all months."
+    },
+    "transactions": {
+      "introTitle": "Transactions",
+      "introContent": "Browse, filter, and edit expense transactions. Use the toolbar to filter or add new entries.",
+      "toolbarTitle": "Filters and actions",
+      "toolbarContent": "Filter by month, source, category, or search. Add a transaction or sync to Google Sheets if connected.",
+      "expensesListTitle": "Expenses list",
+      "expensesListContent": "Tap a row to edit category or delete. Select multiple to delete in bulk."
+    },
+    "import": {
+      "introTitle": "Import",
+      "introContent": "Import transactions from CSV or PDF. Choose a source, upload a file, then add to transactions.",
+      "uploadCardTitle": "Upload",
+      "uploadCardContent": "Select Amex, Apple Card, Chase, or exported PDF. Choose a file to preview.",
+      "previewCardTitle": "Preview",
+      "previewCardContent": "Review expenses and income before adding. Duplicates (same date and amount) are skipped."
+    },
+    "income": {
+      "introTitle": "Income",
+      "introContent": "Track paychecks, rent, and other income. Add entries and edit or delete below.",
+      "addIncomeTitle": "Add income",
+      "addIncomeContent": "Add a new income entry with date, amount, description, and category.",
+      "incomeListTitle": "Income list",
+      "incomeListContent": "Edit or delete income entries. Recurring income can be set for paychecks or rent."
+    },
+    "debt": {
+      "introTitle": "Debt",
+      "introContent": "Track loans and debt payments. Add a debt, then record payments to see the balance go down.",
+      "addDebtTitle": "Add debt",
+      "addDebtContent": "Add a new debt with name and initial amount. You can set recurring payments later.",
+      "debtListTitle": "Debts list",
+      "debtListContent": "View balance and payment history. Make payments or edit recurring from each debt."
+    },
+    "mortgage": {
+      "introTitle": "Mortgage",
+      "introContent": "Record mortgage payments. They are excluded from the Transactions list but included in spending totals.",
+      "addPaymentTitle": "Add payment",
+      "addPaymentContent": "Record a mortgage payment with date and amount.",
+      "paymentsListTitle": "Payments list",
+      "paymentsListContent": "View all mortgage payments. Remove a payment if entered by mistake."
+    },
+    "rules": {
+      "introTitle": "Rules",
+      "introContent": "Auto-categorize expenses and manage preset transaction templates. Rules are evaluated top to bottom.",
+      "rulesListTitle": "Rules",
+      "rulesListContent": "Add rules to set category by source, card member, amount, or category total. Toggle or reorder as needed.",
+      "presetsTitle": "Presets",
+      "presetsContent": "Preset transactions appear when adding a transaction for quick-fill description and category."
+    },
+    "settings": {
+      "introTitle": "Settings",
+      "introContent": "Connect Google Sheets, manage expense and income categories, and delete all data if needed.",
+      "googleSheetsTitle": "Google Sheets",
+      "googleSheetsContent": "Connect your account and set a spreadsheet ID to sync or restore data.",
+      "categoriesTitle": "Categories",
+      "categoriesContent": "Edit expense and income categories. They appear in dropdowns and rules.",
+      "deleteAllTitle": "Delete all data",
+      "deleteAllContent": "Permanently remove all expenses, income, debts, rules, and presets from this device."
+    }
+  },
   "landing": {
     "heroTitle": "Ortho",
     "heroTagline": "Track expenses, income, and budgets in one place.",

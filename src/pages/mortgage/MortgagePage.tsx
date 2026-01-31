@@ -9,7 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { formatCurrency } from "@/lib/format";
+import { mortgageTourSteps } from "@/lib/pageTourSteps";
 import { AddMortgagePaymentDialog } from "./AddMortgagePaymentDialog";
 import { MortgagePaymentsTable } from "./MortgagePaymentsTable";
 import { MortgagePaymentsList } from "./MortgagePaymentsList";
@@ -73,9 +75,14 @@ export function MortgagePage() {
   const { t } = useTranslation();
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">{t("mortgage.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("mortgage.subtitle")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="space-y-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">{t("mortgage.title")}</h1>
+            <PageTourTrigger pageId="mortgage" steps={mortgageTourSteps} />
+          </div>
+          <p className="text-sm text-muted-foreground">{t("mortgage.subtitle")}</p>
+        </div>
       </div>
       <Card>
         <CardHeader>
@@ -85,7 +92,7 @@ export function MortgagePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4" data-tour="addPayment">
             <AddMortgagePaymentDialog
               open={addOpen}
               onOpenChange={setAddOpen}
@@ -105,7 +112,7 @@ export function MortgagePage() {
               No mortgage payments recorded yet. Add one above.
             </p>
           ) : (
-            <>
+            <div data-tour="paymentsList">
               <div className="hidden md:block overflow-x-auto border rounded-md">
                 <MortgagePaymentsTable
                   payments={mortgagePayments}
@@ -118,7 +125,7 @@ export function MortgagePage() {
                   onPaymentTap={setPaymentForActions}
                 />
               </div>
-            </>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -18,6 +18,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { PageTourTrigger } from "@/components/PageTourTrigger";
+import { debtTourSteps } from "@/lib/pageTourSteps";
 import { Plus, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { AddDebtDialog } from "./AddDebtDialog";
@@ -69,11 +71,16 @@ export function DebtPage() {
   const { t } = useTranslation();
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold">{t("debt.title")}</h1>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="space-y-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">{t("debt.title")}</h1>
+            <PageTourTrigger pageId="debt" steps={debtTourSteps} />
+          </div>
           <p className="text-sm text-muted-foreground">{t("debt.subtitle")}</p>
         </div>
+      </div>
+      <div data-tour="addDebt" className="flex flex-wrap items-center justify-end gap-2">
         <Button onClick={() => setAddDebtOpen(true)}>
           <Plus className="size-4" />
           {t("debt.addDebt")}
@@ -89,7 +96,7 @@ export function DebtPage() {
         }}
       />
 
-      <Card>
+      <Card data-tour="debtList">
         <CardHeader>
           <CardTitle>Debts</CardTitle>
           <CardDescription>

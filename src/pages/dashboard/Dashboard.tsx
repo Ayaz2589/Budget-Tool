@@ -17,6 +17,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import type { ChartConfig } from "@/components/ui/chart";
+import { PageTourTrigger } from "@/components/PageTourTrigger";
+import { dashboardTourSteps } from "@/lib/pageTourSteps";
 import { SummaryCards } from "./SummaryCards";
 import { DebtSection } from "./DebtSection";
 import { ByMonthSection } from "./ByMonthSection";
@@ -333,11 +335,17 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6 min-w-0 overflow-x-hidden">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="space-y-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
+            <PageTourTrigger pageId="dashboard" steps={dashboardTourSteps} />
+          </div>
+          <p className="text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
+        </div>
       </div>
-      <MonthSelector
+      <div data-tour="monthSelector">
+        <MonthSelector
         value={selectedMonthKey}
         onChange={setSelectedMonthKey}
         options={monthOptions}
@@ -345,6 +353,7 @@ export function Dashboard() {
         isCurrentMonth={isCurrentMonth}
         t={t}
       />
+      </div>
 
       {warnings.length > 0 && (
         <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 space-y-2">
@@ -364,7 +373,7 @@ export function Dashboard() {
         defaultValue={["summary", "overview", "debt", "spending", "bymonth"]}
         className="min-w-0 border-0 rounded-none pt-0 md:rounded-lg md:border md:pt-4"
       >
-        <AccordionItem value="summary">
+        <AccordionItem value="summary" data-tour="summary">
           <AccordionTrigger className="px-0 py-3 text-lg font-semibold hover:no-underline md:px-4 md:py-4">
             {t("dashboard.summary")}
           </AccordionTrigger>
@@ -381,7 +390,7 @@ export function Dashboard() {
           incomeCategoryKeys={incomeCategoryKeys}
           t={t}
         />
-        <AccordionItem value="debt">
+        <AccordionItem value="debt" data-tour="debt">
           <AccordionTrigger className="px-0 py-3 text-lg font-semibold hover:no-underline md:px-4 md:py-4">
             {t("dashboard.debt")}
           </AccordionTrigger>
@@ -398,7 +407,7 @@ export function Dashboard() {
           tasnuvasSpendingChartConfig={tasnuvasSpendingChartConfig}
           t={t}
         />
-        <AccordionItem value="bymonth">
+        <AccordionItem value="bymonth" data-tour="byMonth">
           <AccordionTrigger className="px-0 py-3 text-lg font-semibold hover:no-underline md:px-4 md:py-4">
             {t("dashboard.byMonth")}
           </AccordionTrigger>

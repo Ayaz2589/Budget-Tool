@@ -1,5 +1,11 @@
 # Features
 
+## Page tours
+
+- **Entry:** A help icon (with optional "new" dot badge) appears in the header of each main app page (Dashboard, Transactions, Import, Income, Debt, Mortgage, Rules, Settings).
+- **Behavior:** Clicking the icon starts a step-by-step tour that highlights key areas of the page (driver.js). The badge is shown until the user has opened the tour once for that page; "seen" state is stored per page in localStorage (`budget-tool-tour-seen-<pageId>`).
+- **Backing:** `src/components/PageTourTrigger.tsx`, `src/lib/runPageTour.ts`, `src/lib/pageTourSteps.ts`. Tour copy is under `tour.*` in locale files.
+
 ## Auth
 
 - **Entry:** `/auth` route; `AuthGate` wraps all app routes; `LoginPage` at `src/pages/auth/LoginPage.tsx`.

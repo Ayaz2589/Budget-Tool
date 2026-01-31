@@ -12,6 +12,8 @@ import {
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { useRules } from "@/context/RulesContext";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
+import { PageTourTrigger } from "@/components/PageTourTrigger";
+import { importTourSteps } from "@/lib/pageTourSteps";
 import { ImportSourceCard, type SourceChoice } from "./ImportSourceCard";
 import { ImportPreviewCard } from "./ImportPreviewCard";
 
@@ -262,11 +264,17 @@ export function ImportPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">{t("import.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("import.subtitle")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="space-y-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">{t("import.title")}</h1>
+            <PageTourTrigger pageId="import" steps={importTourSteps} />
+          </div>
+          <p className="text-sm text-muted-foreground">{t("import.subtitle")}</p>
+        </div>
       </div>
-      <ImportSourceCard
+      <div data-tour="uploadCard">
+        <ImportSourceCard
         selectedSource={selectedSource}
         onSourceChange={setSelectedSource}
         fileInputRef={fileInputRef}
@@ -289,7 +297,9 @@ export function ImportPage() {
         cardSources={cardSources}
         t={t}
       />
+      </div>
       {hasPreview && (
+        <div data-tour="previewCard">
         <ImportPreviewCard
           previewExpenses={previewExpenses}
           previewIncome={previewIncome}
@@ -300,6 +310,7 @@ export function ImportPage() {
           lastDetected={lastDetected}
           t={t}
         />
+        </div>
       )}
     </div>
   );

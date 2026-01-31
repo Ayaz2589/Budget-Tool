@@ -9,6 +9,8 @@ import { isValidDate } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
+import { PageTourTrigger } from "@/components/PageTourTrigger";
+import { transactionsTourSteps } from "@/lib/pageTourSteps";
 import {
   Card,
   CardAction,
@@ -252,15 +254,20 @@ export function TransactionsPage() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="space-y-1 shrink-0 mb-4">
-        <h1 className="text-2xl font-semibold">{t("transactions.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("transactions.subtitle")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
+        <div className="space-y-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">{t("transactions.title")}</h1>
+            <PageTourTrigger pageId="transactions" steps={transactionsTourSteps} />
+          </div>
+          <p className="text-sm text-muted-foreground">{t("transactions.subtitle")}</p>
+        </div>
       </div>
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
         <CardHeader className="shrink-0">
           <CardTitle>{t("transactions.expenses")}</CardTitle>
           <CardDescription>{t("transactions.filterAndEdit")}</CardDescription>
-          <CardAction>
+          <CardAction data-tour="toolbar">
             <TransactionsToolbar
               onOpenFilters={() => setFiltersPopupOpen(true)}
               onAddTransaction={() => setAddTransactionOpen(true)}
@@ -309,7 +316,7 @@ export function TransactionsPage() {
             t={t}
           />
 
-          <div className="flex-1 min-h-0 overflow-auto border rounded-md">
+          <div className="flex-1 min-h-0 overflow-auto border rounded-md" data-tour="expensesList">
             {filtered.length === 0 ? (
               <div className="text-center text-muted-foreground py-12 px-4">
                 {t("transactions.noTransactions")}

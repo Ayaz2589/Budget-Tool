@@ -32,8 +32,14 @@ export function ExpenseCategoriesCard({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="My Purchase, Tasnuva's Purchases, 50/50, Amazon"
+          className="min-w-0"
         />
-        <Button variant="outline" size="sm" onClick={onSave}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onSave}
+          className="w-full sm:w-auto"
+        >
           Save
         </Button>
       </CardContent>

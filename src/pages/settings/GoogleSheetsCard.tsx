@@ -69,7 +69,7 @@ export function GoogleSheetsCard({
           <Button onClick={signIn}>Connect Google</Button>
         ) : (
           <>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm text-muted-foreground">Signed in</span>
               <Button variant="outline" size="sm" onClick={signOut}>
                 Disconnect
@@ -77,29 +77,38 @@ export function GoogleSheetsCard({
             </div>
             <div className="space-y-2">
               <Label>Spreadsheet ID or URL</Label>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <Input
                   placeholder="Paste spreadsheet URL or ID"
                   value={sheetIdInput}
                   onChange={(e) => onSheetIdChange(e.target.value)}
+                  className="min-w-0"
                 />
-                <Button variant="outline" onClick={onSetSheetId}>
+                <Button
+                  variant="outline"
+                  onClick={onSetSheetId}
+                  className="shrink-0 w-full sm:w-auto"
+                >
                   Set
                 </Button>
               </div>
               {spreadsheetId && (
-                <p className="text-xs text-muted-foreground">
-                  Using: {spreadsheetId.slice(0, 20)}...
+                <p
+                  className="text-xs text-muted-foreground break-all font-mono"
+                  title={spreadsheetId}
+                >
+                  Using: {spreadsheetId}
                 </p>
               )}
             </div>
             {spreadsheetId && (
               <>
-                <div className="flex flex-wrap gap-2 items-center">
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                   <Button
                     onClick={() => setRestoreConfirmOpen(true)}
                     disabled={syncStatus === "syncing"}
                     variant="outline"
+                    className="w-full sm:w-auto"
                   >
                     {syncStatus === "syncing"
                       ? "Syncing..."
@@ -108,6 +117,7 @@ export function GoogleSheetsCard({
                   <Button
                     onClick={() => setSyncConfirmOpen(true)}
                     disabled={syncStatus === "syncing"}
+                    className="w-full sm:w-auto"
                   >
                     {syncStatus === "syncing"
                       ? "Syncing..."
@@ -117,6 +127,7 @@ export function GoogleSheetsCard({
                     variant="outline"
                     onClick={onRepairDates}
                     title="Fix dates that were corrupted (e.g. from Google Sheets formatting)"
+                    className="w-full sm:w-auto"
                   >
                     Repair corrupted dates
                   </Button>
@@ -191,7 +202,7 @@ export function GoogleSheetsCard({
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Restore from Sheet: load data from the spreadsheet into the
                   app (e.g. after clearing local storage). Sync to Google
                   Sheets: pull then push so app and sheet stay in sync.

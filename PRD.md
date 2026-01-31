@@ -2,13 +2,13 @@
 
 ## Budget Tool — What Was Done So Far
 
-**Last updated:** January 30, 2026 (PDF V2 format, Transactions list includes mortgage, tests & PRD sync)
+**Last updated:** 2026-01-31
 
 ---
 
 ## Summary
 
-Budget Tool (**Ortho**) is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, debts, and mortgage payments, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage gambit-style rules (with optional dashboard warnings when category thresholds are met), and use **preset transactions** (templates for quick-fill when adding transactions). Delete and remove actions (income, debt, debt payment, mortgage payment, rule, preset, and “Delete all data” in Settings) **require confirmation** before applying. Sign in with Google in the nav. The app supports multiple UI languages (globe dropdown) and a mobile bottom nav for key sections. Data lives in the app and localStorage; Sheets and PDF export/import include expenses, income, debts, debt payments, mortgage, rules, and preset transactions. **PDF export** uses a **V2** machine-readable block (JSON payload gzip-compressed and Base64-encoded); **PDF import** accepts only V2 (legacy text format no longer supported). PDFs without a data block (e.g. Chase statements) use a table fallback to parse visible expense/income rows.
+Budget Tool (**Ortho**) is a personal budgeting app for a couple: import Amex/Apple Card CSVs, categorize spending (My, Tasnuva's, 50/50, Mortgage), track income, debts, and mortgage payments, sync to Google Sheets, and view a dashboard with monthly totals and charts. Add transactions manually (including multiple at once), manage gambit-style rules (with optional dashboard warnings when category thresholds are met), and use **preset transactions** (templates for quick-fill when adding transactions). Delete and remove actions (income, debt, debt payment, mortgage payment, rule, preset, and “Delete all data” in Settings) **require confirmation** before applying. All app pages are behind **Google sign-in**; unauthenticated users are redirected to **/auth** (login page). Token expiry and 401 from Sheets API clear the session and redirect to /auth. Sign in with Google in the nav (when authenticated). The app supports multiple UI languages (globe dropdown) and a mobile bottom nav for key sections. Data lives in the app and localStorage; Sheets and PDF export/import include expenses, income, debts, debt payments, mortgage, rules, preset transactions, and **card sources** (enabled sources list). The V2 payload includes `cardSources` and categories where applicable. **PDF export** uses a **V2** machine-readable block (JSON payload gzip-compressed and Base64-encoded); **PDF import** accepts only V2 (legacy text format no longer supported). PDFs without a data block (e.g. Chase statements) use a table fallback to parse visible expense/income rows.
 
 ---
 
@@ -16,12 +16,12 @@ Budget Tool (**Ortho**) is a personal budgeting app for a couple: import Amex/Ap
 
 Budget Tool is a personal budgeting application for a couple (you and your wife, Tasnuva) to:
 
-- Import transaction CSVs from **American Express** and **Apple Card** (Chase not supported yet).
+- Import transaction CSVs from **American Express**, **Apple Card**, and **Chase** (Chase PDF parser and CSV import supported); or upload an **exported PDF** (re-import).
 - Categorize spending as **My Purchase**, **Tasnuva's Purchases**, **50/50**, or **Mortgage** (and optionally uncategorized).
 - Track **income** (e.g. Rent, Paycheck, Bonus) and **expenses** in one place.
 - Compute **totals** by month: Total Earned, Total Spent, Total Spent w/o Mortgage, 50/50 Split, Nova’s/your spending, savings rate, etc.
 - **Sync** expenses, income, debts, debt payments, mortgage payments, rules, and totals to a **Google Sheet** (manual “Sync to Google Sheets” from Settings). **Restore from Sheet** loads data from the Sheet into the app (e.g. after clearing local storage).
-- **Add transactions manually** (date, amount, description, category, source, card member). **Multiple at once:** add several rows in one dialog; **copy** a row to duplicate and edit; remove rows. Source options: Manual, Debit (TD Bank), American Express, Apple Card, Chase. Card member is a dropdown (AYAZ UDDIN / TASNUVA AHMED).
+- **Add transactions manually** (date, amount, description, category, source, card member). **Multiple at once:** add several rows in one dialog; **copy** a row to duplicate and edit; remove rows. **Source options** are **configurable** in Settings (Card Sources card); only enabled sources appear in the source dropdown (e.g. Manual, Debit (TD Bank), American Express, Apple Card, Chase). Card member is a dropdown (AYAZ UDDIN / TASNUVA AHMED).
 - **View** dashboard and transactions **by month** (month selector, spending-by-month table, **chart visualizations** for earned/spent/saved, spending breakdown, income breakdown, plus monthly bar chart, transactions grouped by month).
 - **Google sign-in in the nav:** Sign in with Google at the bottom of the sidebar; when signed in, show the user’s name and avatar (with fallback to initials if the image fails). Same account is used for Google Sheets sync.
 - **Language switcher:** Globe dropdown to switch UI language (English, Spanish, Bangla, Chinese, Korean, Hindi, Japanese); preference is saved in localStorage.
@@ -76,13 +76,14 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 
 ## 4. Features Implemented
 
-### 4.1 CSV Import
+### 4.1 CSV & PDF Import
 
-- **Banks supported:** American Express, Apple Card. **Chase is not implemented.**
-- **Flow:** User **selects the bank from a dropdown** (American Express or Apple Card), then chooses a CSV file. There is **no auto-detect**; the selected bank is always used to parse the file.
+- **Banks supported:** American Express, Apple Card, **Chase** (PDF parser and CSV import). **Exported PDF (re-import)** is also a source option.
+- **Flow:** User **selects the source from a dropdown** (Amex, Amex Gold, Apple Card, Chase, or Exported PDF), then chooses a file (CSV or PDF). There is **no auto-detect**; the selected source is always used to parse the file. Only **enabled card sources** (see Settings) appear in the import dropdown; pdf-export is always shown.
 - **Parsers:**
   - **Amex:** Columns `Date`, `Description`, `Card Member`, `Account #`, `Amount`. Date `MM/DD/YYYY` or `MM/DD/YY` → `YYYY-MM-DD`. Dedup via hash of date + description + amount + cardMember.
   - **Apple Card:** Columns `Transaction Date`, `Clearing Date`, `Description`, `Merchant`, `Category`, `Type`, `Amount (USD)`, `Purchased By`. Only rows with Type **Purchase** or **Installment** are imported (Payment rows skipped). Quoted CSV fields supported; BOM stripped.
+  - **Chase:** PDF parser and CSV import (see `src/lib/parsers/chase.ts`). CSV columns and PDF table extraction supported.
 - **After import:** Rules are applied; user sees a **preview** with editable category per row, then clicks **“Add to transactions”** to merge into the app’s transaction list (and persist to localStorage).
 
 ### 4.2 Rules (Gambit-style)
@@ -165,6 +166,7 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 ### 4.10 Settings
 
 - **Google:** Connect/disconnect, set spreadsheet URL/ID. **Restore from Sheet** (pull only: load data from Sheet into app) and **Sync to Google Sheets** (push only: overwrite Sheet with app data). Sync/restore status and error message displayed on failure.
+- **Card sources:** A **Card Sources** card lists all expense/card sources (Amex Platinum, Amex Gold, Chase, Apple Card, Manual, Debit (TD Bank)) with checkboxes. Only **enabled** sources appear in transaction source dropdowns, filters, rules, and import. At least one source must remain enabled. Stored in app state and included in PDF/Sheets payloads.
 - **Delete all data:** Button with confirmation; on confirm, clears app localStorage (expenses, income, debts, rules, preset transactions, etc.) and reloads the page.
 - **OAuth testing:** For “Access blocked: app has not completed verification,” add test users in the Google Cloud OAuth consent screen so they can sign in.
 - **Language:** UI language is changed via the globe dropdown in the sidebar (or in the "More" sheet on mobile); preference is saved in localStorage.
@@ -181,7 +183,7 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 
 ## 6. Out of Scope / Not Done
 
-- **Chase CSV import:** Parser not implemented; import flow does not include Chase. Manual transactions can be tagged with source Chase.
+- **Chase:** Chase PDF parser and CSV import are implemented; manual transactions can also be tagged with source Chase.
 - **Auto-detect CSV source:** Removed; user must select American Express or Apple Card manually.
 - **Encryption of localStorage:** Discussed but not implemented; data is stored in plain JSON.
 - **Recurring / scheduled sync:** Sync and restore are manual only.
@@ -192,16 +194,18 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 
 | Area            | Path / files                                                                                              |
 | --------------- | --------------------------------------------------------------------------------------------------------- |
-| Types           | `src/lib/types.ts` (Expense, Income, Debt, DebtPayment, categories)                                       |
-| Parsers         | `src/lib/parsers/amex.ts`, `apple.ts`, `index.ts` (no Chase)                                              |
+| Types           | `src/lib/types.ts` (Expense, Income, Debt, DebtPayment, ExpenseSource, categories)                       |
+| Source labels   | `src/lib/sourceLabels.ts` (EXPENSE_SOURCE_LOCALE_KEYS, EXPENSE_SOURCE_DISPLAY_LABELS, SOURCE_LABEL_KEYS, SOURCE_OPTIONS) |
+| Parsers         | `src/lib/parsers/amex.ts`, `apple.ts`, `chase.ts`, `index.ts`                                              |
 | Rules engine    | `src/lib/rules.ts` (conditions + actions, priority order)                                                 |
 | Totals          | `src/lib/totals.ts` (getMonthLabel exported for Dashboard/Transactions)                                   |
-| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Mortgage, Debts, DebtPayments, Rules, PresetTransactions, Totals) |
-| PDF export      | `src/lib/pdfExport.ts` (V2: JSON gzip + Base64 between markers; import V2-only; table fallback when no data block)       |
+| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Mortgage, Debts, DebtPayments, Rules, PresetTransactions, Totals, cardSources) |
+| PDF export      | `src/lib/pdfExport.ts` (V2: JSON gzip + Base64 between markers; import V2-only; table fallback; payload includes cardSources) |
 | Category colors | `src/lib/categoryColors.tsx` (colors + CategoryOption component)                                          |
-| Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `PresetTransactionsContext.tsx`, `GoogleAuthContext.tsx`            |
-| Layout          | `src/components/Layout.tsx` (sidebar, mobile header + bottom nav + "More" sheet, globe language switcher) |
-| Pages           | Dashboard, Import, Transactions, Income, Debt, Mortgage, Rules, Settings                                  |
+| Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `PresetTransactionsContext.tsx`, `GoogleAuthContext.tsx` |
+| Layout          | `src/components/Layout.tsx` (sidebar, mobile header + bottom nav + "More" sheet, globe language switcher)  |
+| Auth            | `src/pages/auth/AuthGate.tsx` (redirect to /auth when not signed in), `src/pages/auth/LoginPage.tsx` (two-column login, Sign in with Google) |
+| Pages           | Dashboard, Import, Transactions, Income, Debt, Mortgage, Rules, Settings (Settings includes **CardSourcesCard** for configurable card sources) |
 
 ---
 

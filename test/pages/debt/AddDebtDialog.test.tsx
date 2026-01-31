@@ -2,11 +2,11 @@ import { test, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { AddDebtDialog } from "@/pages/debt/AddDebtDialog";
 
-test("AddDebtDialog shows Add debt button when closed", () => {
+test("AddDebtDialog does not show dialog content when closed", () => {
   render(
     <AddDebtDialog open={false} onOpenChange={() => {}} onSubmit={() => {}} />,
   );
-  expect(screen.getByRole("button", { name: /add debt/i })).toBeInTheDocument();
+  expect(screen.queryByText("New debt")).not.toBeInTheDocument();
 });
 
 test("AddDebtDialog shows dialog title when open", () => {

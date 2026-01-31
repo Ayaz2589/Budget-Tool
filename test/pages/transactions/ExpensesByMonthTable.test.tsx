@@ -1,7 +1,7 @@
 import { test, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { ExpensesByMonthTable } from "@/pages/transactions/ExpensesByMonthTable";
-import { SOURCE_LABEL_KEYS } from "@/pages/transactions/FiltersAndActionsDialog";
+import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
 import type { Expense } from "@/lib/types";
 
 const mockT = (key: string, opts?: { count?: number }) =>

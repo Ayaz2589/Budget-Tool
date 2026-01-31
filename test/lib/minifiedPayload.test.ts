@@ -62,6 +62,7 @@ test("serializeToBlob and parseFromBlob round-trip", () => {
       { name: "Amazon", color: "orange" },
     ],
     incomeCategoriesWithColors: [{ name: "Paycheck", color: "green" }],
+    cardSources: ["amex", "chase", "manual"],
   };
 
   const blob = serializeToBlob(input);
@@ -81,6 +82,7 @@ test("serializeToBlob and parseFromBlob round-trip", () => {
   expect(expanded.presetTransactions).toHaveLength(1);
   expect(expanded.expenseCategoriesWithColors).toHaveLength(2);
   expect(expanded.incomeCategoriesWithColors).toHaveLength(1);
+  expect(expanded.cardSources).toEqual(["amex", "chase", "manual"]);
 });
 
 test("parseFromBlob throws when blob does not start with V2", () => {

@@ -22,6 +22,7 @@ test("FiltersAndActionsDialog shows title and Filters section when open", () => 
       onSearchFilterChange={() => {}}
       expenseCategories={["My Purchase", "Amazon"]}
       cardMemberOptions={["AYAZ UDDIN", "TASNUVA AHMED"]}
+      cardSources={["amex", "chase", "apple", "manual", "td"]}
       hasActiveFilters={false}
       onClearFilters={() => {}}
       onCleanDescriptions={() => {}}

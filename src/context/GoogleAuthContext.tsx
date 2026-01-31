@@ -106,7 +106,8 @@ export interface GoogleUserProfile {
   email: string;
 }
 
-interface GoogleAuthContextValue {
+/** Exported for tests that need to inject auth state (e.g. AuthGate, LoginPage). */
+export interface GoogleAuthContextValue {
   isSignedIn: boolean;
   userProfile: GoogleUserProfile | null;
   signIn: () => void;
@@ -119,7 +120,9 @@ interface GoogleAuthContextValue {
   syncErrorMessage: string | null;
 }
 
-const GoogleAuthContext = createContext<GoogleAuthContextValue | null>(null);
+/** Exported for tests that need to inject isSignedIn (e.g. AuthGate, LoginPage). */
+export const GoogleAuthContext =
+  createContext<GoogleAuthContextValue | null>(null);
 
 /**
  * Use when VITE_GOOGLE_CLIENT_ID is not set. Provides the same context interface

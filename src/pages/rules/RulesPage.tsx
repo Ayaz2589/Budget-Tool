@@ -34,17 +34,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SOURCE_OPTIONS } from "@/lib/sourceLabels";
 
 type ConditionType = RuleCondition["type"];
-
-const SOURCE_OPTIONS: { value: ExpenseSource; label: string }[] = [
-  { value: "amex", label: "Amex Platinum Card" },
-  { value: "amex-gold", label: "Amex Gold Card" },
-  { value: "chase", label: "Chase" },
-  { value: "apple", label: "Apple Card" },
-  { value: "manual", label: "Manual" },
-  { value: "td", label: "Debit (TD Bank)" },
-];
 
 const AMOUNT_OPERATORS = [
   { value: "lt", label: "<" },

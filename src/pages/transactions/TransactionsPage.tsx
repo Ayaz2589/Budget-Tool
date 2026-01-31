@@ -19,10 +19,8 @@ import {
 } from "@/components/ui/card";
 import { SyncConfirmDialog } from "./SyncConfirmDialog";
 import { TransactionsToolbar } from "./TransactionsToolbar";
-import {
-  FiltersAndActionsDialog,
-  SOURCE_LABEL_KEYS,
-} from "./FiltersAndActionsDialog";
+import { FiltersAndActionsDialog } from "./FiltersAndActionsDialog";
+import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
 import { ExpensesByMonthTable, type SortColumn } from "./ExpensesByMonthTable";
 import { ExpensesByMonthList } from "./ExpensesByMonthList";
 import { ExpenseActionsDialog } from "./ExpenseActionsDialog";

@@ -16,18 +16,10 @@ import {
   parseFromBlob,
   type CategoryWithColorPayload,
 } from "@/lib/minifiedPayload";
+import { EXPENSE_SOURCE_DISPLAY_LABELS } from "@/lib/sourceLabels";
 
 const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
 const INCOME_ROW_RE = /(\d{4}-\d{2}-\d{2})\s+(Paycheck|Rent)\s+\$([\d,]+\.\d{2})\s+(Paycheck|Rent)/g;
-
-const SOURCE_LABELS: Record<ExpenseSource, string> = {
-  amex: "Amex Platinum Card",
-  "amex-gold": "Amex Gold Card",
-  chase: "Chase",
-  apple: "Apple Card",
-  manual: "Manual",
-  td: "Debit (TD Bank)",
-};
 
 function groupByMonth<T extends { date: string }>(items: T[]): Map<string, T[]> {
   const map = new Map<string, T[]>();
@@ -152,7 +144,7 @@ export function downloadTransactionsAndIncomePdf(
         e.description.slice(0, 40) + (e.description.length > 40 ? "…" : ""),
         formatCurrency(e.amount),
         e.category || "—",
-        SOURCE_LABELS[e.source] ?? e.source,
+        EXPENSE_SOURCE_DISPLAY_LABELS[e.source] ?? e.source,
         e.cardMember ?? "—",
       ]);
       autoTable(doc, {
@@ -189,7 +181,7 @@ export function downloadTransactionsAndIncomePdf(
         e.date,
         e.description.slice(0, 40) + (e.description.length > 40 ? "…" : ""),
         formatCurrency(e.amount),
-        SOURCE_LABELS[e.source] ?? e.source,
+        EXPENSE_SOURCE_DISPLAY_LABELS[e.source] ?? e.source,
       ]);
       autoTable(doc, {
         startY: y,

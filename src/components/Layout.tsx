@@ -253,7 +253,12 @@ export function Layout() {
           signOut={signOut}
         />
       </nav>
-      <main className="flex-1 min-h-0 flex flex-col overflow-hidden p-4 md:p-6 pb-20 md:pb-6">
+      <main
+        className={cn(
+          "flex-1 min-h-0 flex flex-col overflow-hidden p-4 md:p-6 pb-20 md:pb-6",
+          location.pathname !== "/" && "flatten-mobile-cards",
+        )}
+      >
         <div
           className={cn(
             "flex-1 min-h-0 flex flex-col",

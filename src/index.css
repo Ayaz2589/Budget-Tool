@@ -146,3 +146,25 @@
     display: none;
   }
 }
+
+/* Flatten card containers on mobile for non-dashboard pages (more screen real estate) */
+@media (max-width: 767px) {
+  .flatten-mobile-cards [data-slot="card"] {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+  .flatten-mobile-cards [data-slot="card-header"],
+  .flatten-mobile-cards [data-slot="card-content"] {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .flatten-mobile-cards [data-slot="card-footer"] {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

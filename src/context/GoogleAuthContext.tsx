@@ -39,6 +39,53 @@ import {
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
+const ACCESS_TOKEN_STORAGE_KEY = "budget-tool-google-access-token";
+
+function getStoredAccessToken(): string | null {
+  try {
+    const raw = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as {
+      access_token: string;
+      expires_at?: number;
+    };
+    if (
+      parsed.expires_at != null &&
+      Date.now() >= parsed.expires_at
+    ) {
+      localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+      return null;
+    }
+    return parsed.access_token ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredAccessToken(
+  accessToken: string,
+  expiresInSeconds?: number,
+): void {
+  try {
+    const payload: { access_token: string; expires_at?: number } = {
+      access_token: accessToken,
+    };
+    if (expiresInSeconds != null && expiresInSeconds > 0) {
+      payload.expires_at = Date.now() + expiresInSeconds * 1000;
+    }
+    localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // ignore
+  }
+}
+
+function clearStoredAccessToken(): void {
+  try {
+    localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
 
 type SyncStatus = "idle" | "syncing" | "success" | "error";
 
@@ -139,7 +186,9 @@ export function GoogleAuthProviderFallback({
 const USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 export function GoogleAuthProvider({ children }: { children: ReactNode }) {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(
+    getStoredAccessToken,
+  );
   const [userProfile, setUserProfile] = useState<GoogleUserProfile | null>(
     null,
   );
@@ -155,9 +204,14 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
 
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
+      setStoredAccessToken(
+        tokenResponse.access_token,
+        tokenResponse.expires_in,
+      );
       setAccessToken(tokenResponse.access_token);
     },
     onError: () => {
+      clearStoredAccessToken();
       setAccessToken(null);
       setUserProfile(null);
     },
@@ -223,6 +277,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, [login]);
 
   const signOut = useCallback(() => {
+    clearStoredAccessToken();
     setAccessToken(null);
     setUserProfile(null);
   }, []);

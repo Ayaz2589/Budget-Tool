@@ -95,8 +95,8 @@ export function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">{t("settings.title")}</h1>
+    <div className="space-y-4 sm:space-y-6">
+      <h1 className="text-xl font-semibold sm:text-2xl">{t("settings.title")}</h1>
 
       <GoogleSheetsCard
         isSignedIn={isSignedIn}
@@ -131,13 +131,13 @@ export function SettingsPage() {
         onSave={saveIncomeCategories}
       />
 
-      <div className="pt-6 border-t">
+      <div className="pt-4 border-t sm:pt-6">
         <Button
           variant="outline"
-          className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
+          className="w-full sm:w-auto text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
           onClick={() => setDeleteAllConfirmOpen(true)}
         >
-          <Trash2 className="size-4" />
+          <Trash2 className="size-4 shrink-0" />
           {t("settings.deleteAllData")}
         </Button>
       </div>

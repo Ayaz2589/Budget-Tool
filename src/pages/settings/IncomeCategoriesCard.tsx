@@ -32,8 +32,14 @@ export function IncomeCategoriesCard({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Rent, Paycheck, Bonus, ..."
+          className="min-w-0"
         />
-        <Button variant="outline" size="sm" onClick={onSave}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onSave}
+          className="w-full sm:w-auto"
+        >
           Save
         </Button>
       </CardContent>

@@ -62,6 +62,17 @@ function getStoredAccessToken(): string | null {
   }
 }
 
+function getStoredExpiresAt(): number | null {
+  try {
+    const raw = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { expires_at?: number };
+    return parsed.expires_at ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function setStoredAccessToken(
   accessToken: string,
   expiresInSeconds?: number,
@@ -185,10 +196,18 @@ export function GoogleAuthProviderFallback({
 
 const USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
 
+function isUnauthorizedError(err: unknown): boolean {
+  if (err instanceof Error) {
+    return err.message.includes("401") || err.message.includes(" 401 ");
+  }
+  return false;
+}
+
 export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(
     getStoredAccessToken,
   );
+  const [expiresAt, setExpiresAt] = useState<number | null>(getStoredExpiresAt);
   const [userProfile, setUserProfile] = useState<GoogleUserProfile | null>(
     null,
   );
@@ -202,18 +221,25 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
   const [syncErrorMessage, setSyncErrorMessage] = useState<string | null>(null);
 
+  const clearSession = useCallback(() => {
+    clearStoredAccessToken();
+    setAccessToken(null);
+    setExpiresAt(null);
+    setUserProfile(null);
+  }, []);
+
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
+      const expiresIn = tokenResponse.expires_in ?? 3600;
       setStoredAccessToken(
         tokenResponse.access_token,
-        tokenResponse.expires_in,
+        expiresIn,
       );
       setAccessToken(tokenResponse.access_token);
+      setExpiresAt(Date.now() + expiresIn * 1000);
     },
     onError: () => {
-      clearStoredAccessToken();
-      setAccessToken(null);
-      setUserProfile(null);
+      clearSession();
     },
     scope:
       "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
@@ -277,10 +303,18 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, [login]);
 
   const signOut = useCallback(() => {
-    clearStoredAccessToken();
-    setAccessToken(null);
-    setUserProfile(null);
-  }, []);
+    clearSession();
+  }, [clearSession]);
+
+  useEffect(() => {
+    if (expiresAt == null) return;
+    const interval = setInterval(() => {
+      if (Date.now() >= expiresAt) {
+        clearSession();
+      }
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, [expiresAt, clearSession]);
 
   const setSpreadsheetId = useCallback((id: string | null) => {
     if (id) {
@@ -354,6 +388,9 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       setSyncStatus("success");
       setSyncErrorMessage(null);
     } catch (err) {
+      if (isUnauthorizedError(err)) {
+        clearSession();
+      }
       const message = err instanceof Error ? err.message : String(err);
       console.error("Sync failed:", err);
       setSyncStatus("error");
@@ -362,6 +399,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, [
     accessToken,
     spreadsheetId,
+    clearSession,
     budget.expenses,
     budget.income,
     budget.debts,
@@ -501,6 +539,9 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       setSyncStatus("success");
       setSyncErrorMessage(null);
     } catch (err) {
+      if (isUnauthorizedError(err)) {
+        clearSession();
+      }
       const message = err instanceof Error ? err.message : String(err);
       console.error("Restore from sheet failed:", err);
       setSyncStatus("error");
@@ -509,6 +550,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, [
     accessToken,
     spreadsheetId,
+    clearSession,
     budget.expenses,
     budget.income,
     budget.debts,

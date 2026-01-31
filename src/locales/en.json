@@ -414,6 +414,13 @@
   },
   "auth": {
     "googleNotConfigured": "Google sign-in is not configured.",
-    "notSignedInOrNoSpreadsheet": "Not signed in or no spreadsheet set."
+    "notSignedInOrNoSpreadsheet": "Not signed in or no spreadsheet set.",
+    "signInToContinue": "Sign in with Google to view your dashboard.",
+    "createAccountHeading": "Create your Ortho account",
+    "createAccountSubheading": "Sign in with Google to track expenses, income, and budgets in one place.",
+    "signInWithGoogle": "Google",
+    "signInDisclaimer": "By signing in, you can sync your data with Google Sheets and access your dashboard from any device.",
+    "valuePropTitle": "Track expenses, income, and budgets.",
+    "valuePropSubtitle": "Sync with Google Sheets. No credit card needed."
   }
 }

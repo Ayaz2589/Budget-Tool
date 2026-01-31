@@ -401,6 +401,13 @@
   },
   "auth": {
     "googleNotConfigured": "Inicio de sesión con Google no configurado.",
-    "notSignedInOrNoSpreadsheet": "No has iniciado sesión o no hay hoja configurada."
+    "notSignedInOrNoSpreadsheet": "No has iniciado sesión o no hay hoja configurada.",
+    "signInToContinue": "Inicia sesión con Google para ver tu panel.",
+    "createAccountHeading": "Crea tu cuenta de Ortho",
+    "createAccountSubheading": "Inicia sesión con Google para gestionar gastos, ingresos y presupuestos.",
+    "signInWithGoogle": "Google",
+    "signInDisclaimer": "Al iniciar sesión puedes sincronizar tus datos con Google Sheets.",
+    "valuePropTitle": "Gastos, ingresos y presupuestos.",
+    "valuePropSubtitle": "Sincroniza con Google Sheets. No hace falta tarjeta de crédito."
   }
 }

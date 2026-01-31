@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -217,9 +217,18 @@ function SidebarContent({
 export function Layout() {
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const { isSignedIn, userProfile, signIn, signOut } = useGoogleAuth();
   const currentLng = i18n.language;
   const [moreOpen, setMoreOpen] = useState(false);
+  const prevSignedInRef = useRef(isSignedIn);
+
+  useEffect(() => {
+    if (prevSignedInRef.current && !isSignedIn) {
+      navigate("/auth");
+    }
+    prevSignedInRef.current = isSignedIn;
+  }, [isSignedIn, navigate]);
 
   const handleLanguageChange = (locale: string) => {
     i18n.changeLanguage(locale);

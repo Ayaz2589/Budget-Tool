@@ -403,6 +403,13 @@
   },
   "auth": {
     "googleNotConfigured": "Googleサインインが設定されていません。",
-    "notSignedInOrNoSpreadsheet": "サインインしていないか、スプレッドシートが設定されていません。"
+    "notSignedInOrNoSpreadsheet": "サインインしていないか、スプレッドシートが設定されていません。",
+    "signInToContinue": "ダッシュボードを表示するにはGoogleでサインインしてください。",
+    "createAccountHeading": "Orthoアカウントを作成",
+    "createAccountSubheading": "Googleでサインインして支出・収入・予算を一元管理。",
+    "signInWithGoogle": "Google",
+    "signInDisclaimer": "サインインするとGoogleスプレッドシートと同期できます。",
+    "valuePropTitle": "支出・収入・予算を管理。",
+    "valuePropSubtitle": "Googleスプレッドシートと同期。クレジットカード不要。"
   }
 }

@@ -403,6 +403,13 @@
   },
   "auth": {
     "googleNotConfigured": "Google 로그인이 구성되지 않았습니다.",
-    "notSignedInOrNoSpreadsheet": "로그인하지 않았거나 스프레드시트가 설정되지 않았습니다."
+    "notSignedInOrNoSpreadsheet": "로그인하지 않았거나 스프레드시트가 설정되지 않았습니다.",
+    "signInToContinue": "대시보드를 보려면 Google로 로그인하세요.",
+    "createAccountHeading": "Ortho 계정 만들기",
+    "createAccountSubheading": "Google로 로그인하여 지출, 수입, 예산을 한곳에서 관리하세요.",
+    "signInWithGoogle": "Google",
+    "signInDisclaimer": "로그인하면 Google 스프레드시트와 동기화할 수 있습니다.",
+    "valuePropTitle": "지출, 수입, 예산을 관리하세요.",
+    "valuePropSubtitle": "Google 스프레드시트와 동기화. 신용카드 불필요."
   }
 }

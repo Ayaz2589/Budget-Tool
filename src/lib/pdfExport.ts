@@ -1,6 +1,5 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import pako from "pako";
 import type {
   Debt,
   DebtPayment,
@@ -12,12 +11,11 @@ import type {
 import type { Rule } from "@/lib/rules";
 import { getMonthLabel, computeMonthTotals } from "@/lib/totals";
 import { formatCurrency, formatPercent } from "@/lib/format";
-
-/** Category name + Tailwind color for PDF payload (matches CategoryWithColor when used). */
-interface CategoryWithColorPayload {
-  name: string;
-  color: string;
-}
+import {
+  serializeToBlob,
+  parseFromBlob,
+  type CategoryWithColorPayload,
+} from "@/lib/minifiedPayload";
 
 const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
 const INCOME_ROW_RE = /(\d{4}-\d{2}-\d{2})\s+(Paycheck|Rent)\s+\$([\d,]+\.\d{2})\s+(Paycheck|Rent)/g;
@@ -29,98 +27,6 @@ const SOURCE_LABELS: Record<ExpenseSource, string> = {
   manual: "Manual",
   td: "Debit (TD Bank)",
 };
-
-/** Omit undefined, null, and empty string from objects for smaller payload. */
-function omitEmpty<T extends Record<string, unknown>>(obj: T): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(obj)) {
-    if (v !== undefined && v !== null && v !== "") out[k] = v;
-  }
-  return out;
-}
-
-/** Build minified payload with short keys and omitted optional fields. */
-function buildMinifiedPayload(
-  expenses: Expense[],
-  income: Income[],
-  debts: Debt[],
-  debtPayments: DebtPayment[],
-  rules: Rule[],
-  presetTransactions: PresetTransaction[],
-  expenseCategoriesWithColors: CategoryWithColorPayload[],
-  incomeCategoriesWithColors: CategoryWithColorPayload[],
-): Record<string, unknown> {
-  return {
-    e: expenses.map((x) =>
-      omitEmpty({
-        i: x.id,
-        d: x.date,
-        a: x.amount,
-        desc: x.description,
-        c: x.category || undefined,
-        s: x.source,
-        cm: x.cardMember,
-      }),
-    ),
-    i: income.map((x) =>
-      omitEmpty({
-        i: x.id,
-        d: x.date,
-        a: x.amount,
-        desc: x.description || undefined,
-        c: x.category || undefined,
-        o: x.owner,
-        ra: x.recurringAmount,
-        rf: x.recurringFrequency,
-        rdom: x.recurringDayOfMonth,
-        rs: x.recurringStartDate,
-      }),
-    ),
-    d: debts.map((x) =>
-      omitEmpty({
-        i: x.id,
-        n: x.name,
-        ia: x.initialAmount,
-        sd: x.startDate,
-        o: x.owner,
-        ra: x.recurringAmount,
-        rd: x.recurringDayOfMonth,
-        rf: x.recurringFrequency,
-        rs: x.recurringStartDate,
-      }),
-    ),
-    dp: debtPayments.map((x) =>
-      omitEmpty({
-        i: x.id,
-        di: x.debtId,
-        d: x.date,
-        a: x.amount,
-        n: x.note,
-      }),
-    ),
-    r: rules.map((x) => ({
-      i: x.id,
-      e: x.enabled,
-      co: x.condition,
-      ac: x.action,
-    })),
-    pt: presetTransactions.map((x) => ({
-      i: x.id,
-      s: x.source,
-      desc: x.description,
-      c: x.category,
-      cm: x.cardMember,
-    })),
-    ec:
-      expenseCategoriesWithColors.length > 0
-        ? expenseCategoriesWithColors.map((x) => ({ n: x.name, c: x.color }))
-        : undefined,
-    ic:
-      incomeCategoriesWithColors.length > 0
-        ? incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color }))
-        : undefined,
-  };
-}
 
 function groupByMonth<T extends { date: string }>(items: T[]): Map<string, T[]> {
   const map = new Map<string, T[]>();
@@ -425,7 +331,7 @@ export function downloadTransactionsAndIncomePdf(
   // Machine-readable block for re-import (V2: minified JSON + gzip + Base64).
   const DATA_START = "BUDGET_TOOL_DATA_START";
   const DATA_END = "BUDGET_TOOL_DATA_END";
-  const payload = buildMinifiedPayload(
+  const v2Block = serializeToBlob({
     expenses,
     income,
     debts,
@@ -434,15 +340,7 @@ export function downloadTransactionsAndIncomePdf(
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,
-  );
-  const jsonString = JSON.stringify(payload);
-  const compressed = pako.gzip(new TextEncoder().encode(jsonString));
-  let base64 = "";
-  for (let i = 0; i < compressed.length; i++) {
-    base64 += String.fromCharCode(compressed[i]!);
-  }
-  const base64Str = btoa(base64);
-  const v2Block = "V2" + base64Str;
+  });
   if (y > 260) {
     doc.addPage();
     y = 20;
@@ -485,130 +383,6 @@ export interface ParsedExportedPdf {
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
 }
 
-/** Expand minified payload (short keys) or pass through full keys. Supports both formats. */
-function expandPayload(raw: Record<string, unknown>): {
-  expenses: Expense[];
-  income: Income[];
-  debts: Debt[];
-  debtPayments: DebtPayment[];
-  rules: Rule[];
-  presetTransactions: PresetTransaction[];
-  expenseCategoriesWithColors?: CategoryWithColorPayload[];
-  incomeCategoriesWithColors?: CategoryWithColorPayload[];
-} {
-  const arr = (key: string, short: string) =>
-    (Array.isArray(raw[key]) ? raw[key] : Array.isArray(raw[short]) ? raw[short] : []) as unknown[];
-
-  const expenses = arr("expenses", "e").map((x) => {
-    const o = x as Record<string, unknown>;
-    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
-    return {
-      id: String(get("id", "i", "")),
-      date: String(get("date", "d", "")),
-      amount: Number(get("amount", "a", 0)),
-      description: String(get("description", "desc", "")),
-      category: String(get("category", "c", "")),
-      source: (get("source", "s", "manual") as ExpenseSource) || "manual",
-      cardMember: (get("cardMember", "cm", undefined) as string | undefined) ?? undefined,
-    } as Expense;
-  });
-
-  const income = arr("income", "i").map((x) => {
-    const o = x as Record<string, unknown>;
-    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
-    return {
-      id: String(get("id", "i", "")),
-      date: String(get("date", "d", "")),
-      amount: Number(get("amount", "a", 0)),
-      description: String(get("description", "desc", "Income")),
-      category: String(get("category", "c", "")),
-      owner: get("owner", "o", undefined) as "Ayaz" | "Tasnuva" | undefined,
-      recurringAmount: get("recurringAmount", "ra", undefined) as number | undefined,
-      recurringFrequency: get("recurringFrequency", "rf", undefined) as "monthly" | "biweekly" | undefined,
-      recurringDayOfMonth: get("recurringDayOfMonth", "rdom", undefined) as number | undefined,
-      recurringStartDate: get("recurringStartDate", "rs", undefined) as string | undefined,
-    } as Income;
-  });
-
-  const debts = arr("debts", "d").map((x) => {
-    const o = x as Record<string, unknown>;
-    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
-    return {
-      id: String(get("id", "i", "")),
-      name: String(get("name", "n", "")),
-      initialAmount: Number(get("initialAmount", "ia", 0)),
-      startDate: get("startDate", "sd", undefined) as string | undefined,
-      owner: get("owner", "o", undefined) as "Ayaz" | "Tasnuva" | undefined,
-      recurringAmount: get("recurringAmount", "ra", undefined) as number | undefined,
-      recurringDayOfMonth: get("recurringDayOfMonth", "rd", undefined) as number | undefined,
-      recurringFrequency: get("recurringFrequency", "rf", undefined) as "monthly" | "biweekly" | undefined,
-      recurringStartDate: get("recurringStartDate", "rs", undefined) as string | undefined,
-    } as Debt;
-  });
-
-  const debtPayments = arr("debtPayments", "dp").map((x) => {
-    const o = x as Record<string, unknown>;
-    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
-    return {
-      id: String(get("id", "i", "")),
-      debtId: String(get("debtId", "di", "")),
-      date: String(get("date", "d", "")),
-      amount: Number(get("amount", "a", 0)),
-      note: get("note", "n", undefined) as string | undefined,
-    } as DebtPayment;
-  });
-
-  const rules = arr("rules", "r").map((x) => {
-    const o = x as Record<string, unknown>;
-    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
-    return {
-      id: String(get("id", "i", "")),
-      enabled: Boolean(get("enabled", "e", true)),
-      condition: get("condition", "co", {}) as Rule["condition"],
-      action: get("action", "ac", { type: "setCategory", value: "" }) as Rule["action"],
-    } as Rule;
-  });
-
-  const presetTransactions = arr("presetTransactions", "pt").map((x) => {
-    const o = x as Record<string, unknown>;
-    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
-    return {
-      id: String(get("id", "i", "")),
-      source: (get("source", "s", "manual") as ExpenseSource) || "manual",
-      description: String(get("description", "desc", "")),
-      category: String(get("category", "c", "")),
-      cardMember: String(get("cardMember", "cm", "")),
-    } as PresetTransaction;
-  });
-
-  const ecRaw = raw.expenseCategoriesWithColors ?? raw.ec;
-  const expenseCategoriesWithColors = Array.isArray(ecRaw)
-    ? (ecRaw as Record<string, unknown>[]).map((x) => ({
-        name: String(x.name ?? x.n ?? ""),
-        color: String(x.color ?? x.c ?? ""),
-      }))
-    : undefined;
-
-  const icRaw = raw.incomeCategoriesWithColors ?? raw.ic;
-  const incomeCategoriesWithColors = Array.isArray(icRaw)
-    ? (icRaw as Record<string, unknown>[]).map((x) => ({
-        name: String(x.name ?? x.n ?? ""),
-        color: String(x.color ?? x.c ?? ""),
-      }))
-    : undefined;
-
-  return {
-    expenses,
-    income,
-    debts,
-    debtPayments,
-    rules,
-    presetTransactions,
-    expenseCategoriesWithColors,
-    incomeCategoriesWithColors,
-  };
-}
-
 function emptyParsed(): ParsedExportedPdf {
   return {
     expenses: [],
@@ -639,15 +413,8 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
       .trim();
     if (block.startsWith("V2")) {
       try {
-        const base64Part = block.slice(2).replace(/\s/g, "");
-        const binary = atob(base64Part);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) {
-          bytes[i] = binary.charCodeAt(i);
-        }
-        const decompressed = pako.ungzip(bytes, { to: "string" });
-        const raw = JSON.parse(decompressed) as Record<string, unknown>;
-        const expanded = expandPayload(raw);
+        const blob = block.replace(/\s/g, "").trim();
+        const expanded = parseFromBlob(blob);
         return {
           expenses: Array.isArray(expanded.expenses) ? expanded.expenses : [],
           income: Array.isArray(expanded.income) ? expanded.income : [],

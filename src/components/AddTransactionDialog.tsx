@@ -210,11 +210,12 @@ export function AddTransactionDialog({
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  {presetTransactions.length > 0 && (
-                    <TableHead className="w-32 py-1.5 text-xs font-medium">
-                      {t("addTransaction.preset")}
-                    </TableHead>
-                  )}
+                  {presetTransactions.length > 0 &&
+                    expenseCategories.length > 0 && (
+                      <TableHead className="w-32 py-1.5 text-xs font-medium">
+                        {t("addTransaction.preset")}
+                      </TableHead>
+                    )}
                   <TableHead className="w-20 py-1.5 text-xs font-medium">
                     {t("addTransaction.source")}
                   </TableHead>
@@ -241,8 +242,9 @@ export function AddTransactionDialog({
               <TableBody>
                 {rows.map((row, index) => (
                   <TableRow key={row.id} className="align-middle">
-                    {presetTransactions.length > 0 && (
-                      <TableCell className="p-1 align-middle">
+                    {presetTransactions.length > 0 &&
+                      expenseCategories.length > 0 && (
+                        <TableCell className="p-1 align-middle">
                         <Select
                           value={row.presetId ?? PRESET_NONE_VALUE}
                           onValueChange={(v) =>

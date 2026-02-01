@@ -335,6 +335,7 @@
     "category": "Category",
     "member": "Member",
     "empty": "No presets yet. Add one to quick-fill when adding transactions.",
+    "emptyNoCategories": "Add at least one expense category in Settings to create presets.",
     "delete": "Delete",
     "deletePresetTitle": "Delete this preset?",
     "deletePresetDesc": "This preset will be removed. This cannot be undone."

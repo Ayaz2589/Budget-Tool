@@ -675,7 +675,11 @@ export function RulesPage() {
         <CardContent className="space-y-3">
           <Dialog open={presetOpen} onOpenChange={setPresetOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="gap-2">
+              <Button
+                variant="outline"
+                className="gap-2"
+                disabled={expenseCategories.length === 0}
+              >
                 <Plus className="size-4" />
                 {t("presetTransactions.addPreset")}
               </Button>
@@ -759,7 +763,9 @@ export function RulesPage() {
           </Dialog>
           {presetTransactions.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              {t("presetTransactions.empty")}
+              {expenseCategories.length === 0
+                ? t("presetTransactions.emptyNoCategories")
+                : t("presetTransactions.empty")}
             </div>
           ) : (
             presetTransactions.map((preset) => {

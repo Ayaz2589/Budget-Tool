@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
+import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { extractSpreadsheetId } from "@/lib/googleSheets";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +44,7 @@ export function SettingsPage() {
     syncStatus,
     syncErrorMessage,
   } = useGoogleAuth();
+  const { presetTransactions, setPresets } = usePresetTransactions();
   const { t } = useTranslation();
 
   const [sheetIdInput, setSheetIdInput] = useState(spreadsheetId ?? "");
@@ -63,6 +65,12 @@ export function SettingsPage() {
 
   const handleRemoveExpenseCategory = (category: string) => {
     setExpenseCategories(expenseCategories.filter((c) => c !== category));
+    const presetsWithoutCategory = presetTransactions.filter(
+      (p) => p.category !== category,
+    );
+    if (presetsWithoutCategory.length !== presetTransactions.length) {
+      setPresets(presetsWithoutCategory);
+    }
   };
 
   const handleAddExpenseCategory = (name: string) => {

@@ -228,7 +228,7 @@ export function downloadTransactionsAndIncomePdf(
         (i.description || "Income").slice(0, 50) +
           ((i.description || "").length > 50 ? "…" : ""),
         formatCurrency(i.amount),
-        i.category || "—",
+        i.category || "Uncategorized",
         i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
         incomeRecurringLabel(i),
       ]);
@@ -403,15 +403,32 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
   const startIdx = normalized.indexOf(DATA_START_MARKER);
   const endIdx = normalized.indexOf(DATA_END_MARKER);
   if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-    const block = normalized
+    let block = normalized
       .slice(startIdx + DATA_START_MARKER.length, endIdx)
       .replace(/\s+/g, " ")
       .trim();
+    // If the block between first START and first END doesn't start with V2, extraction
+    // order may have put table content between START and END. Find "V2" after START and
+    // use the END that follows that V2 blob.
+    if (!block.startsWith("V2")) {
+      const afterStart = normalized.slice(startIdx + DATA_START_MARKER.length);
+      const v2Idx = afterStart.indexOf("V2");
+      if (v2Idx !== -1) {
+        const blobStartInNorm = startIdx + DATA_START_MARKER.length + v2Idx;
+        const endAfterV2 = normalized.indexOf(DATA_END_MARKER, blobStartInNorm);
+        if (endAfterV2 !== -1 && endAfterV2 > blobStartInNorm) {
+          block = normalized
+            .slice(blobStartInNorm, endAfterV2)
+            .replace(/\s+/g, " ")
+            .trim();
+        }
+      }
+    }
     if (block.startsWith("V2")) {
-      try {
-        const blob = block.replace(/\s/g, "").trim();
-        const expanded = parseFromBlob(blob);
-        return {
+    try {
+      const blob = block.replace(/\s/g, "").trim();
+      const expanded = parseFromBlob(blob);
+      return {
           expenses: Array.isArray(expanded.expenses) ? expanded.expenses : [],
           income: Array.isArray(expanded.income) ? expanded.income : [],
           debts: Array.isArray(expanded.debts) ? expanded.debts : [],
@@ -426,11 +443,10 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
           incomeCategoriesWithColors: expanded.incomeCategoriesWithColors,
           cardSources: expanded.cardSources,
         };
-      } catch {
-        return emptyParsed();
-      }
+    } catch {
+      return emptyParsed();
     }
-    return emptyParsed();
+    }
   }
   const fallback = parseExportedPdfTableFallback(normalized);
   return {

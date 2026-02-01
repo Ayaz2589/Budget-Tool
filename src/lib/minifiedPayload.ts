@@ -121,14 +121,8 @@ export function buildMinifiedPayload(
       c: x.category,
       cm: x.cardMember,
     })),
-    ec:
-      expenseCategoriesWithColors.length > 0
-        ? expenseCategoriesWithColors.map((x) => ({ n: x.name, c: x.color }))
-        : undefined,
-    ic:
-      incomeCategoriesWithColors.length > 0
-        ? incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color }))
-        : undefined,
+    ec: expenseCategoriesWithColors.map((x) => ({ n: x.name, c: x.color })),
+    ic: incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color })),
     sc: Array.isArray(cardSources) && cardSources.length > 0 ? cardSources : undefined,
   };
 }

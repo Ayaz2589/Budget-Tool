@@ -4,7 +4,6 @@ import { Trash2 } from "lucide-react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -53,11 +52,8 @@ export function ExpenseCategoriesCard({
     <Card>
       <CardHeader>
         <CardTitle>{t("settings.expenseCategories")}</CardTitle>
-        <CardDescription>
-          {t("settings.expenseCategoriesDesc")}
-        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 pb-6">
         <ul className="space-y-2">
           {categories.map((category) => (
             <li
@@ -71,10 +67,9 @@ export function ExpenseCategoriesCard({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="size-8 shrink-0 text-destructive hover:text-destructive disabled:opacity-50"
+                className="size-8 shrink-0 text-destructive hover:text-destructive"
                 onClick={() => setCategoryToRemove(category)}
                 aria-label={t("settings.removeCategory", { category })}
-                disabled={categories.length <= 1}
               >
                 <Trash2 className="size-4 text-destructive" />
               </Button>
@@ -95,10 +90,11 @@ export function ExpenseCategoriesCard({
           />
           <Button
             type="button"
-            variant="outline"
+            variant="default"
             size="sm"
             onClick={handleAdd}
             disabled={!newCategory.trim()}
+            className="shrink-0"
           >
             {t("settings.addCategory")}
           </Button>

@@ -8,6 +8,7 @@ import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
+import { getCategoryColor } from "@/lib/categoryColors";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { transactionsTourSteps } from "@/lib/pageTourSteps";
@@ -43,6 +44,7 @@ export function TransactionsPage() {
     removeExpense,
     removeExpenses,
     expenseCategories,
+    incomeCategories,
     cardSources,
   } = useBudget();
   const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
@@ -239,6 +241,14 @@ export function TransactionsPage() {
   }, [deleteOneExpense, removeExpense]);
 
   const handleDownloadPdf = useCallback(() => {
+    const expenseCategoriesWithColors = expenseCategories.map((name) => ({
+      name,
+      color: getCategoryColor(name, "expense"),
+    }));
+    const incomeCategoriesWithColors = incomeCategories.map((name) => ({
+      name,
+      color: getCategoryColor(name, "income"),
+    }));
     downloadTransactionsAndIncomePdf(
       expenses,
       income,
@@ -246,11 +256,21 @@ export function TransactionsPage() {
       debtPayments,
       rules,
       presetTransactions,
-      [],
-      [],
+      expenseCategoriesWithColors,
+      incomeCategoriesWithColors,
       cardSources,
     );
-  }, [expenses, income, debts, debtPayments, rules, presetTransactions, cardSources]);
+  }, [
+    expenses,
+    income,
+    debts,
+    debtPayments,
+    rules,
+    presetTransactions,
+    expenseCategories,
+    incomeCategories,
+    cardSources,
+  ]);
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">

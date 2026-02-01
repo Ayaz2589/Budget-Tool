@@ -37,6 +37,7 @@ import {
   readRulesFromSheet,
 } from "@/lib/googleSheets";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
+import { getCategoryColor } from "@/lib/categoryColors";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
 const ACCESS_TOKEN_STORAGE_KEY = "budget-tool-google-access-token";
@@ -375,6 +376,14 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         spreadsheetId,
         presetTransactions,
       );
+      const expenseCategoriesWithColors = budget.expenseCategories.map((name) => ({
+        name,
+        color: getCategoryColor(name, "expense"),
+      }));
+      const incomeCategoriesWithColors = budget.incomeCategories.map((name) => ({
+        name,
+        color: getCategoryColor(name, "income"),
+      }));
       const dataBlob = serializeToBlob({
         expenses: budget.expenses,
         income: budget.income,
@@ -382,6 +391,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         debtPayments: budget.debtPayments,
         rules: rulesContext.rules,
         presetTransactions,
+        expenseCategoriesWithColors,
+        incomeCategoriesWithColors,
         cardSources: budget.cardSources,
       });
       await writeDataBlob(accessToken, spreadsheetId, dataBlob);
@@ -415,7 +426,10 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.income,
     budget.debts,
     budget.debtPayments,
+    budget.expenseCategories,
+    budget.incomeCategories,
     budget.iOweNova,
+    budget.cardSources,
     rulesContext.rules,
     presetTransactions,
   ]);
@@ -474,6 +488,16 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           if (Array.isArray(expanded.cardSources) && expanded.cardSources.length > 0) {
             budget.setCardSources(expanded.cardSources);
           }
+          if (Array.isArray(expanded.expenseCategoriesWithColors)) {
+            budget.setExpenseCategories(
+              expanded.expenseCategoriesWithColors.map((x) => x.name),
+            );
+          }
+          if (Array.isArray(expanded.incomeCategoriesWithColors)) {
+            budget.setIncomeCategories(
+              expanded.incomeCategoriesWithColors.map((x) => x.name),
+            );
+          }
         } catch {
           const [expenses, mortgage, income, debts, payments, rules, presets] =
             await Promise.all([
@@ -516,8 +540,27 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         (i) => !appIncomeKeys.has(incomeKey(i)),
       );
 
-      if (newExpenses.length > 0 || newMortgage.length > 0) {
-        budget.addExpenses([...newExpenses, ...newMortgage]);
+      const expenseCatSet = new Set(budget.expenseCategories);
+      const incomeCatSet = new Set(budget.incomeCategories);
+      const normalizeExpenseCategory = (category: string) =>
+        expenseCatSet.has(category) ? category : "";
+      const normalizeIncomeCategory = (category: string) =>
+        incomeCatSet.has(category) ? category : "";
+
+      const normalizedNewExpenses = newExpenses.map((e) => ({
+        ...e,
+        category: normalizeExpenseCategory(e.category || ""),
+      }));
+      const normalizedNewMortgage = newMortgage.map((e) => ({
+        ...e,
+        category: normalizeExpenseCategory(e.category || ""),
+      }));
+
+      if (normalizedNewExpenses.length > 0 || normalizedNewMortgage.length > 0) {
+        budget.addExpenses([
+          ...normalizedNewExpenses,
+          ...normalizedNewMortgage,
+        ]);
       }
       for (const i of newIncome) {
         if (!appIncomeKeys.has(incomeKey(i))) {
@@ -526,7 +569,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
             date: i.date,
             amount: i.amount,
             description: i.description,
-            category: i.category,
+            category: normalizeIncomeCategory(i.category || ""),
           });
         }
       }

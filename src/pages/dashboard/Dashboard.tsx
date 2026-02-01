@@ -120,7 +120,10 @@ export function Dashboard() {
     Bonus: "oklch(0.55 0.22 85)",
     Other: "oklch(0.6 0.15 280)",
   };
-  const defaultCategoryOrder: string[] = [...DEFAULT_INCOME_CATEGORIES];
+  const defaultCategoryOrder: string[] = [
+    "Uncategorized",
+    ...DEFAULT_INCOME_CATEGORIES,
+  ];
 
   const { incomeStackedBarData, incomeCategoryKeys, incomeStackedBarConfig } =
     useMemo(() => {
@@ -131,7 +134,7 @@ export function Dashboard() {
       const categorySet = new Set<string>(defaultCategoryOrder);
       for (const i of monthIncome) {
         const person = i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz";
-        const cat = (i.category || "Other").trim() || "Other";
+        const cat = (i.category || "Uncategorized").trim() || "Uncategorized";
         categorySet.add(cat);
         if (!byPersonByCat.has(person)) {
           byPersonByCat.set(person, new Map());

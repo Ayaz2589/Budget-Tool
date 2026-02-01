@@ -79,7 +79,7 @@ function AddIncomeForm({
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState(incomeCategories[0] ?? "Paycheck");
+  const [category, setCategory] = useState(""); // default: Uncategorized
   const [owner, setOwner] = useState<DebtOwner>("Ayaz");
   const [recurringChecked, setRecurringChecked] = useState(false);
   const [recurringAmount, setRecurringAmount] = useState("");
@@ -114,7 +114,7 @@ function AddIncomeForm({
       date: date.trim(),
       amount: num,
       description: description.trim() || "Income",
-      category: category || (incomeCategories[0] ?? "Paycheck"),
+      category: category || "",
       owner,
       recurringAmount:
         typeof recurringAmountNum === "number" ? recurringAmountNum : undefined,
@@ -156,11 +156,17 @@ function AddIncomeForm({
       </div>
       <div className="space-y-2">
         <Label>Category</Label>
-        <Select value={category} onValueChange={setCategory}>
+        <Select
+          value={category || "_"}
+          onValueChange={(v) => setCategory(v === "_" ? "" : v)}
+        >
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="_">
+              <CategoryOption name="Uncategorized" type="income" />
+            </SelectItem>
             {incomeCategories.map((c) => (
               <SelectItem key={c} value={c}>
                 <CategoryOption name={c} type="income" />

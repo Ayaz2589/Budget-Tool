@@ -64,7 +64,7 @@ export function EditIncomeDialog({
       setDate(income.date);
       setAmount(String(income.amount));
       setDescription(income.description ?? "");
-      setCategory(income.category ?? incomeCategories[0] ?? "Paycheck");
+      setCategory(income.category ?? ""); // default: Uncategorized
       setOwner(income.owner ?? "Ayaz");
       const hasRecurring =
         income.recurringAmount != null &&
@@ -115,7 +115,7 @@ export function EditIncomeDialog({
       date: date.trim(),
       amount: num,
       description: description.trim() || "Income",
-      category: category || (incomeCategories[0] ?? "Paycheck"),
+      category: category || "",
       owner,
       recurringAmount:
         typeof recurringAmountNum === "number" ? recurringAmountNum : undefined,
@@ -165,11 +165,17 @@ export function EditIncomeDialog({
           </div>
           <div className="space-y-2">
             <Label>Category</Label>
-            <Select value={category} onValueChange={setCategory}>
+            <Select
+              value={category || "_"}
+              onValueChange={(v) => setCategory(v === "_" ? "" : v)}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="_">
+                  <CategoryOption name="Uncategorized" type="income" />
+                </SelectItem>
                 {incomeCategories.map((c) => (
                   <SelectItem key={c} value={c}>
                     <CategoryOption name={c} type="income" />

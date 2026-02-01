@@ -69,6 +69,13 @@ function normalizeDate(value: unknown): string | null {
 
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
+/** When reading from sheet: store "" for empty or "Uncategorized" so app uses a single internal value. */
+function normalizeCategoryFromSheet(value: string): string {
+  const t = value.trim();
+  if (!t || t.toLowerCase() === "uncategorized") return "";
+  return t;
+}
+
 function looksLikeIsoDate(value: string): boolean {
   return ISO_DATE_PATTERN.test(value.trim());
 }
@@ -100,7 +107,7 @@ export async function readExpensesFromSheet(
       dateRaw = row[1];
       amount = parseAmount(row[2]);
       description = String(row[3] ?? "").trim();
-      category = String(row[4] ?? "").trim();
+      category = normalizeCategoryFromSheet(String(row[4] ?? ""));
       rawSource = String(row[5] ?? "").trim().toLowerCase();
       cardMember = String(row[6] ?? "").trim() || undefined;
     } else {
@@ -108,7 +115,7 @@ export async function readExpensesFromSheet(
       dateRaw = row[0];
       amount = parseAmount(row[1]);
       description = String(row[2] ?? "").trim();
-      category = String(row[3] ?? "").trim();
+      category = normalizeCategoryFromSheet(String(row[3] ?? ""));
       rawSource = String(row[4] ?? "").trim().toLowerCase();
       cardMember = String(row[5] ?? "").trim() || undefined;
     }
@@ -203,7 +210,7 @@ export async function readIncomeFromSheet(
     const date = normalizeDate(row[0]);
     const amount = parseAmount(row[1]);
     const description = String(row[2] ?? "").trim();
-    const category = String(row[3] ?? "").trim();
+    const category = normalizeCategoryFromSheet(String(row[3] ?? ""));
     const owner =
       row.length >= 5 && (row[4] ?? "").toString().trim()
         ? parseDebtOwner(row[4])
@@ -222,7 +229,7 @@ export async function readIncomeFromSheet(
       date,
       amount,
       description: description || "Income",
-      category: category || "Other",
+      category: category || "",
       owner,
       recurringAmount:
         recurringAmount != null && recurringAmount > 0
@@ -361,7 +368,7 @@ export async function appendExpenses(
     e.date,
     e.amount,
     e.description,
-    e.category || "",
+    e.category || "Uncategorized",
     e.source,
     e.cardMember ?? "",
   ]);
@@ -378,7 +385,7 @@ export async function appendIncome(
     i.date,
     i.amount,
     i.description,
-    i.category,
+    i.category || "Uncategorized",
     i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
     i.recurringAmount ?? "",
     i.recurringFrequency ?? "",
@@ -409,7 +416,7 @@ export async function clearAndWriteExpenses(
     e.date,
     e.amount,
     e.description,
-    e.category || "",
+    e.category || "Uncategorized",
     e.source,
     e.cardMember ?? "",
   ]);
@@ -442,7 +449,7 @@ export async function clearAndWriteMortgage(
     e.date,
     e.amount,
     e.description,
-    e.category || "",
+    e.category || "Uncategorized",
     e.source,
     e.cardMember ?? "",
   ]);
@@ -476,7 +483,7 @@ export async function clearAndWriteIncome(
     i.date,
     i.amount,
     i.description,
-    i.category,
+    i.category || "Uncategorized",
     i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
     i.recurringAmount ?? "",
     i.recurringFrequency ?? "",
@@ -579,7 +586,7 @@ export async function clearAndWritePresets(
     p.id,
     p.source,
     p.description,
-    p.category,
+    p.category || "Uncategorized",
     p.cardMember,
   ]);
   const values = [...headers, ...rows];
@@ -605,7 +612,7 @@ export async function readPresetsFromSheet(
     const id = String(row[0] ?? "").trim();
     const rawSource = String(row[1] ?? "").trim().toLowerCase();
     const description = String(row[2] ?? "").trim();
-    const category = String(row[3] ?? "").trim();
+    const category = normalizeCategoryFromSheet(String(row[3] ?? ""));
     const cardMember = String(row[4] ?? "").trim();
     if (!id) continue;
     const source: ExpenseSource = VALID_EXPENSE_SOURCES.includes(

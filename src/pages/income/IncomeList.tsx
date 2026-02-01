@@ -51,7 +51,7 @@ export function IncomeList({ sortedIncome, onIncomeTap }: IncomeListProps) {
             <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground flex-wrap">
               <span>{i.date}</span>
               <span>·</span>
-              <span>{i.category || "—"}</span>
+              <span>{i.category || "Uncategorized"}</span>
               <span>·</span>
               <span>{i.owner ?? "Ayaz"}</span>
               {recurring && (

@@ -82,13 +82,21 @@ export function IncomeActionsDialog({
           <div className="space-y-2">
             <Label>{t("common.category")}</Label>
             <Select
-              value={income.category ?? ""}
-              onValueChange={(v) => onUpdateCategory(income.id, v)}
+              value={income.category || "_"}
+              onValueChange={(v) => onUpdateCategory(income.id, v === "_" ? "" : v)}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder={t("common.category")} />
+                <SelectValue>
+                  <CategoryOption
+                    name={income.category || t("common.uncategorized")}
+                    type="income"
+                  />
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="_">
+                  <CategoryOption name={t("common.uncategorized")} type="income" />
+                </SelectItem>
                 {incomeCategories.map((c) => (
                   <SelectItem key={c} value={c}>
                     <CategoryOption name={c} type="income" />

@@ -376,9 +376,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         spreadsheetId,
         presetTransactions,
       );
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/2d169f94-ce25-47a9-9a41-3de41225c2ac',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GoogleAuthContext.tsx:syncToSheets',message:'before serializeToBlob',data:{expenseCategoriesLen:budget.expenseCategories?.length,incomeCategoriesLen:budget.incomeCategories?.length,expenseCategoriesSample:budget.expenseCategories?.slice(0,3)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-      // #endregion
       const expenseCategoriesWithColors = budget.expenseCategories.map((name) => ({
         name,
         color: getCategoryColor(name, "expense"),
@@ -387,9 +384,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         name,
         color: getCategoryColor(name, "income"),
       }));
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/2d169f94-ce25-47a9-9a41-3de41225c2ac',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GoogleAuthContext.tsx:syncToSheets',message:'categoriesWithColors built',data:{expenseWithColorsLen:expenseCategoriesWithColors.length,incomeWithColorsLen:incomeCategoriesWithColors.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
-      // #endregion
       const dataBlob = serializeToBlob({
         expenses: budget.expenses,
         income: budget.income,

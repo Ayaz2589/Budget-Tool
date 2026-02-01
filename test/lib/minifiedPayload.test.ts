@@ -1,4 +1,5 @@
 import { test, expect } from "bun:test";
+import pako from "pako";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 
 test("serializeToBlob and parseFromBlob round-trip", () => {
@@ -107,4 +108,29 @@ test("serializeToBlob with empty data produces valid blob", () => {
   expect(expanded.debtPayments).toEqual([]);
   expect(expanded.rules).toEqual([]);
   expect(expanded.presetTransactions).toEqual([]);
+  expect(expanded.expenseCategoriesWithColors).toEqual([]);
+  expect(expanded.incomeCategoriesWithColors).toEqual([]);
+});
+
+test("serializeToBlob always includes ec and ic in encoded payload (empty arrays when no categories)", () => {
+  const blob = serializeToBlob({
+    expenses: [],
+    income: [],
+    debts: [],
+    debtPayments: [],
+    rules: [],
+    presetTransactions: [],
+  });
+  const base64Part = blob.slice(2);
+  const binary = atob(base64Part);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  const decompressed = pako.ungzip(bytes, { to: "string" });
+  const raw = JSON.parse(decompressed) as Record<string, unknown>;
+  expect(raw).toHaveProperty("ec");
+  expect(raw).toHaveProperty("ic");
+  expect(Array.isArray(raw.ec)).toBe(true);
+  expect(Array.isArray(raw.ic)).toBe(true);
+  expect(raw.ec).toEqual([]);
+  expect(raw.ic).toEqual([]);
 });

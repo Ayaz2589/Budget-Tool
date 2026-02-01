@@ -1,5 +1,6 @@
 import { test, expect } from "bun:test";
 import pako from "pako";
+import { serializeToBlob } from "@/lib/minifiedPayload";
 import { parseExportedPdfData } from "@/lib/pdfExport";
 
 const DATA_START = "BUDGET_TOOL_DATA_START";
@@ -65,8 +66,8 @@ BUDGET_TOOL_DATA_END`;
   expect(result.rules).toEqual([]);
 });
 
-test("parseExportedPdfData V2 round-trip: decompresses and parses payload", () => {
-  const payload = {
+test("parseExportedPdfData V2 round-trip using serializeToBlob (export path includes categories)", () => {
+  const input = {
     expenses: [
       {
         id: "manual-e1",
@@ -128,14 +129,7 @@ test("parseExportedPdfData V2 round-trip: decompresses and parses payload", () =
     incomeCategoriesWithColors: [{ name: "Paycheck", color: "green" }],
     cardSources: ["amex", "chase", "manual"],
   };
-  const jsonString = JSON.stringify(payload);
-  const compressed = pako.gzip(new TextEncoder().encode(jsonString));
-  let binary = "";
-  for (let i = 0; i < compressed.length; i++) {
-    binary += String.fromCharCode(compressed[i]!);
-  }
-  const base64 = btoa(binary);
-  const v2Block = "V2" + base64;
+  const v2Block = serializeToBlob(input);
   const pdfText = `${DATA_START}\n${v2Block}\n${DATA_END}`;
   const result = parseExportedPdfData(pdfText);
 
@@ -251,4 +245,28 @@ test("parseExportedPdfData V2 minified (short-key) format: parses correctly", ()
   expect(result.income[0]!.amount).toBe(3000);
   expect(result.debts).toEqual([]);
   expect(result.debtPayments).toEqual([]);
+});
+
+test("parsed PDF result with categories yields names for setExpenseCategories/setIncomeCategories (app contract)", () => {
+  const parsed = {
+    expenses: [],
+    income: [],
+    debts: [],
+    debtPayments: [],
+    rules: [],
+    presetTransactions: [],
+    expenseCategoriesWithColors: [
+      { name: "50/50", color: "blue" },
+      { name: "Amazon", color: "orange" },
+    ],
+    incomeCategoriesWithColors: [{ name: "Paycheck", color: "green" }],
+  };
+  const expenseNames = Array.isArray(parsed.expenseCategoriesWithColors)
+    ? parsed.expenseCategoriesWithColors.map((x) => x.name)
+    : [];
+  const incomeNames = Array.isArray(parsed.incomeCategoriesWithColors)
+    ? parsed.incomeCategoriesWithColors.map((x) => x.name)
+    : [];
+  expect(expenseNames).toEqual(["50/50", "Amazon"]);
+  expect(incomeNames).toEqual(["Paycheck"]);
 });

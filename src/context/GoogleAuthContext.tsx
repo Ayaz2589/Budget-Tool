@@ -37,6 +37,7 @@ import {
   readRulesFromSheet,
 } from "@/lib/googleSheets";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
+import { getCategoryColor } from "@/lib/categoryColors";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
 const ACCESS_TOKEN_STORAGE_KEY = "budget-tool-google-access-token";
@@ -375,6 +376,20 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         spreadsheetId,
         presetTransactions,
       );
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/2d169f94-ce25-47a9-9a41-3de41225c2ac',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GoogleAuthContext.tsx:syncToSheets',message:'before serializeToBlob',data:{expenseCategoriesLen:budget.expenseCategories?.length,incomeCategoriesLen:budget.incomeCategories?.length,expenseCategoriesSample:budget.expenseCategories?.slice(0,3)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
+      const expenseCategoriesWithColors = budget.expenseCategories.map((name) => ({
+        name,
+        color: getCategoryColor(name, "expense"),
+      }));
+      const incomeCategoriesWithColors = budget.incomeCategories.map((name) => ({
+        name,
+        color: getCategoryColor(name, "income"),
+      }));
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/2d169f94-ce25-47a9-9a41-3de41225c2ac',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GoogleAuthContext.tsx:syncToSheets',message:'categoriesWithColors built',data:{expenseWithColorsLen:expenseCategoriesWithColors.length,incomeWithColorsLen:incomeCategoriesWithColors.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+      // #endregion
       const dataBlob = serializeToBlob({
         expenses: budget.expenses,
         income: budget.income,
@@ -382,6 +397,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         debtPayments: budget.debtPayments,
         rules: rulesContext.rules,
         presetTransactions,
+        expenseCategoriesWithColors,
+        incomeCategoriesWithColors,
         cardSources: budget.cardSources,
       });
       await writeDataBlob(accessToken, spreadsheetId, dataBlob);
@@ -415,7 +432,10 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.income,
     budget.debts,
     budget.debtPayments,
+    budget.expenseCategories,
+    budget.incomeCategories,
     budget.iOweNova,
+    budget.cardSources,
     rulesContext.rules,
     presetTransactions,
   ]);
@@ -516,8 +536,27 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         (i) => !appIncomeKeys.has(incomeKey(i)),
       );
 
-      if (newExpenses.length > 0 || newMortgage.length > 0) {
-        budget.addExpenses([...newExpenses, ...newMortgage]);
+      const expenseCatSet = new Set(budget.expenseCategories);
+      const incomeCatSet = new Set(budget.incomeCategories);
+      const normalizeExpenseCategory = (category: string) =>
+        expenseCatSet.has(category) ? category : "";
+      const normalizeIncomeCategory = (category: string) =>
+        incomeCatSet.has(category) ? category : "";
+
+      const normalizedNewExpenses = newExpenses.map((e) => ({
+        ...e,
+        category: normalizeExpenseCategory(e.category || ""),
+      }));
+      const normalizedNewMortgage = newMortgage.map((e) => ({
+        ...e,
+        category: normalizeExpenseCategory(e.category || ""),
+      }));
+
+      if (normalizedNewExpenses.length > 0 || normalizedNewMortgage.length > 0) {
+        budget.addExpenses([
+          ...normalizedNewExpenses,
+          ...normalizedNewMortgage,
+        ]);
       }
       for (const i of newIncome) {
         if (!appIncomeKeys.has(incomeKey(i))) {
@@ -526,7 +565,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
             date: i.date,
             amount: i.amount,
             description: i.description,
-            category: i.category,
+            category: normalizeIncomeCategory(i.category || ""),
           });
         }
       }

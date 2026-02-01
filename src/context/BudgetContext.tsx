@@ -67,6 +67,8 @@ function loadStoredBudget(): {
   debtPayments: DebtPayment[];
   iOweNova: Record<string, number>;
   cardSources: string[];
+  expenseCategories: string[];
+  incomeCategories: string[];
 } {
   try {
     const raw = localStorage.getItem(BUDGET_STORAGE_KEY);
@@ -78,12 +80,24 @@ function loadStoredBudget(): {
         debtPayments?: DebtPayment[];
         iOweNova?: Record<string, number>;
         cardSources?: string[];
+        expenseCategories?: string[];
+        incomeCategories?: string[];
       };
       const cardSources = Array.isArray(data.cardSources)
         ? data.cardSources.filter((s): s is ExpenseSource =>
             ALL_EXPENSE_SOURCES.includes(s as ExpenseSource),
           )
         : [...ALL_EXPENSE_SOURCES];
+      const expenseCategories =
+        Array.isArray(data.expenseCategories) &&
+        data.expenseCategories.every((c) => typeof c === "string")
+          ? data.expenseCategories
+          : [...DEFAULT_EXPENSE_CATEGORIES];
+      const incomeCategories =
+        Array.isArray(data.incomeCategories) &&
+        data.incomeCategories.every((c) => typeof c === "string")
+          ? data.incomeCategories
+          : [...DEFAULT_INCOME_CATEGORIES];
       return {
         expenses: Array.isArray(data.expenses) ? data.expenses : [],
         income: Array.isArray(data.income) ? data.income : [],
@@ -94,6 +108,8 @@ function loadStoredBudget(): {
             ? data.iOweNova
             : {},
         cardSources: cardSources.length > 0 ? cardSources : [...ALL_EXPENSE_SOURCES],
+        expenseCategories,
+        incomeCategories,
       };
     }
   } catch {
@@ -106,6 +122,8 @@ function loadStoredBudget(): {
     debtPayments: [],
     iOweNova: {},
     cardSources: [...ALL_EXPENSE_SOURCES],
+    expenseCategories: [],
+    incomeCategories: [],
   };
 }
 
@@ -117,12 +135,12 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const [debtPayments, setDebtPayments] = useState<DebtPayment[]>(
     stored.debtPayments,
   );
-  const [expenseCategories, setExpenseCategoriesState] = useState<string[]>([
-    ...DEFAULT_EXPENSE_CATEGORIES,
-  ]);
-  const [incomeCategories, setIncomeCategoriesState] = useState<string[]>([
-    ...DEFAULT_INCOME_CATEGORIES,
-  ]);
+  const [expenseCategories, setExpenseCategoriesState] = useState<string[]>(
+    stored.expenseCategories,
+  );
+  const [incomeCategories, setIncomeCategoriesState] = useState<string[]>(
+    stored.incomeCategories,
+  );
   const [cardSources, setCardSourcesState] = useState<string[]>(
     stored.cardSources,
   );
@@ -141,12 +159,23 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
           debtPayments,
           iOweNova,
           cardSources,
+          expenseCategories,
+          incomeCategories,
         }),
       );
     } catch {
       // ignore
     }
-  }, [expenses, income, debts, debtPayments, iOweNova, cardSources]);
+  }, [
+    expenses,
+    income,
+    debts,
+    debtPayments,
+    iOweNova,
+    cardSources,
+    expenseCategories,
+    incomeCategories,
+  ]);
 
   const addExpenses = useCallback((newExpenses: Expense[]) => {
     setExpenses((prev) => {

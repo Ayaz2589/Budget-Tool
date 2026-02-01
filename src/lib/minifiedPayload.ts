@@ -121,14 +121,8 @@ export function buildMinifiedPayload(
       c: x.category,
       cm: x.cardMember,
     })),
-    ec:
-      expenseCategoriesWithColors.length > 0
-        ? expenseCategoriesWithColors.map((x) => ({ n: x.name, c: x.color }))
-        : undefined,
-    ic:
-      incomeCategoriesWithColors.length > 0
-        ? incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color }))
-        : undefined,
+    ec: expenseCategoriesWithColors.map((x) => ({ n: x.name, c: x.color })),
+    ic: incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color })),
     sc: Array.isArray(cardSources) && cardSources.length > 0 ? cardSources : undefined,
   };
 }
@@ -266,6 +260,9 @@ export function serializeToBlob(input: MinifiedPayloadInput): string {
     input.incomeCategoriesWithColors ?? [],
     input.cardSources,
   );
+  // #region agent log
+  if (typeof fetch !== 'undefined') fetch('http://127.0.0.1:7243/ingest/2d169f94-ce25-47a9-9a41-3de41225c2ac',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'minifiedPayload.ts:serializeToBlob',message:'payload keys',data:{payloadKeys:Object.keys(payload),hasEc:'ec' in payload,hasIc:'ic' in payload,inputExpenseCatLen:input.expenseCategoriesWithColors?.length,inputIncomeCatLen:input.incomeCategoriesWithColors?.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+  // #endregion
   const jsonString = JSON.stringify(payload);
   const compressed = pako.gzip(new TextEncoder().encode(jsonString));
   let binary = "";

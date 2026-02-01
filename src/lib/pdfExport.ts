@@ -325,6 +325,9 @@ export function downloadTransactionsAndIncomePdf(
   // Machine-readable block for re-import (V2: minified JSON + gzip + Base64).
   const DATA_START = "BUDGET_TOOL_DATA_START";
   const DATA_END = "BUDGET_TOOL_DATA_END";
+  // #region agent log
+  if (typeof fetch !== 'undefined') fetch('http://127.0.0.1:7243/ingest/2d169f94-ce25-47a9-9a41-3de41225c2ac',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pdfExport.ts:downloadTransactionsAndIncomePdf',message:'building v2 block',data:{expenseCatLen:expenseCategoriesWithColors.length,incomeCatLen:incomeCategoriesWithColors.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
+  // #endregion
   const v2Block = serializeToBlob({
     expenses,
     income,

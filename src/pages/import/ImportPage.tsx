@@ -40,8 +40,11 @@ export function ImportPage() {
     addDebts,
     addDebtPayments,
     expenseCategories,
+    incomeCategories,
     cardSources,
     setCardSources,
+    setExpenseCategories,
+    setIncomeCategories,
   } = useBudget();
   const { rules, setRules } = useRules();
   const { setPresets } = usePresetTransactions();
@@ -141,6 +144,22 @@ export function ImportPage() {
             parsed.cardSources.length > 0
           ) {
             setCardSources(parsed.cardSources);
+          }
+          if (
+            Array.isArray(parsed.expenseCategoriesWithColors) &&
+            parsed.expenseCategoriesWithColors.length > 0
+          ) {
+            setExpenseCategories(
+              parsed.expenseCategoriesWithColors.map((x) => x.name),
+            );
+          }
+          if (
+            Array.isArray(parsed.incomeCategoriesWithColors) &&
+            parsed.incomeCategoriesWithColors.length > 0
+          ) {
+            setIncomeCategories(
+              parsed.incomeCategoriesWithColors.map((x) => x.name),
+            );
           }
           setPreviewExpenses(applyRulesForPreview(toAddExpenses));
           setPreviewIncome(toAddIncome);
@@ -242,8 +261,18 @@ export function ImportPage() {
   };
 
   const addToTransactions = () => {
-    addExpenses(previewExpenses);
-    if (previewIncome.length > 0) addIncomes(previewIncome);
+    const expenseCatSet = new Set(expenseCategories);
+    const incomeCatSet = new Set(incomeCategories);
+    const normalizedExpenses = previewExpenses.map((e) => ({
+      ...e,
+      category: expenseCatSet.has(e.category) ? e.category : "",
+    }));
+    const normalizedIncome = previewIncome.map((i) => ({
+      ...i,
+      category: incomeCatSet.has(i.category) ? i.category : "",
+    }));
+    addExpenses(normalizedExpenses);
+    if (normalizedIncome.length > 0) addIncomes(normalizedIncome);
     if (previewDebts.length > 0) addDebts(previewDebts);
     if (previewDebtPayments.length > 0) addDebtPayments(previewDebtPayments);
     setPreviewExpenses([]);

@@ -494,6 +494,16 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           if (Array.isArray(expanded.cardSources) && expanded.cardSources.length > 0) {
             budget.setCardSources(expanded.cardSources);
           }
+          if (Array.isArray(expanded.expenseCategoriesWithColors)) {
+            budget.setExpenseCategories(
+              expanded.expenseCategoriesWithColors.map((x) => x.name),
+            );
+          }
+          if (Array.isArray(expanded.incomeCategoriesWithColors)) {
+            budget.setIncomeCategories(
+              expanded.incomeCategoriesWithColors.map((x) => x.name),
+            );
+          }
         } catch {
           const [expenses, mortgage, income, debts, payments, rules, presets] =
             await Promise.all([

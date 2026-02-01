@@ -136,7 +136,7 @@ export function SettingsPage() {
       />
       </div>
 
-      <div data-tour="categories">
+      <div data-tour="categories" className="space-y-4 sm:space-y-6">
       <CardSourcesCard />
 
       <ExpenseCategoriesCard

@@ -154,7 +154,7 @@ export function ImportPreviewCard({
                         {i.description}
                       </TableCell>
                       <TableCell>{formatCurrency(i.amount)}</TableCell>
-                      <TableCell>{i.category || "—"}</TableCell>
+                      <TableCell>{i.category || "Uncategorized"}</TableCell>
                       <TableCell>{i.owner ?? "Ayaz"}</TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {i.recurringAmount != null && i.recurringAmount > 0

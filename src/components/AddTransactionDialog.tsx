@@ -58,7 +58,7 @@ function defaultRow(defaultSource: ExpenseSource = "manual"): TransactionRow {
     date: new Date().toISOString().slice(0, 10),
     amount: "",
     description: "",
-    category: "",
+    category: "", // default: Uncategorized (empty string; UI shows "_" in Select)
     source: defaultSource,
     cardMember: "",
   };

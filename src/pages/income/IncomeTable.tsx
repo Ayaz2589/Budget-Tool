@@ -84,13 +84,21 @@ export function IncomeTable({
                 <TableCell>{formatCurrency(i.amount)}</TableCell>
                 <TableCell>
                   <Select
-                    value={i.category}
-                    onValueChange={(v) => onUpdateCategory(i.id, v)}
+                    value={i.category || "_"}
+                    onValueChange={(v) => onUpdateCategory(i.id, v === "_" ? "" : v)}
                   >
                     <SelectTrigger className="w-[220px] min-w-[200px]">
-                      <SelectValue />
+                      <SelectValue>
+                        <CategoryOption
+                          name={i.category || "Uncategorized"}
+                          type="income"
+                        />
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="_">
+                        <CategoryOption name="Uncategorized" type="income" />
+                      </SelectItem>
                       {incomeCategories.map((c) => (
                         <SelectItem key={c} value={c}>
                           <CategoryOption name={c} type="income" />

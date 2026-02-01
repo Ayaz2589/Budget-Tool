@@ -379,6 +379,7 @@
     "incomeCategories": "Income categories",
     "incomeCategoriesDesc": "Comma-separated list for income entries.",
     "incomeCategoriesPlaceholder": "Rent, Paycheck, Bonus, ...",
+    "incomeCategoriesUncategorizedHint": "Removing a category sets affected income entries to uncategorized.",
     "deleteAllData": "Delete all data",
     "deleteAllDataConfirmTitle": "Delete all data?",
     "deleteAllDataConfirmDesc": "This will permanently remove all expenses, income, debts, rules, and preset transactions from this device. This cannot be undone. The page will reload."

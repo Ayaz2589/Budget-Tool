@@ -1,15 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Plus, SlidersHorizontal, RefreshCw } from "lucide-react";
+import type { TransactionsToolbarProps } from "@/types/transactions";
 
-export type TransactionsToolbarProps = {
-  onOpenFilters: () => void;
-  onAddTransaction: () => void;
-  hasActiveFilters: boolean;
-  showSync: boolean;
-  syncStatus: "idle" | "syncing" | "success" | "error";
-  onSync: () => void;
-  t: (key: string) => string;
-};
+export type { TransactionsToolbarProps };
 
 export function TransactionsToolbar({
   onOpenFilters,
@@ -67,7 +60,9 @@ export function TransactionsToolbar({
           aria-label={syncLabel}
         >
           <RefreshCw
-            className={`size-4 ${syncStatus === "syncing" ? "animate-spin" : ""}`}
+            className={`size-4 ${
+              syncStatus === "syncing" ? "animate-spin" : ""
+            }`}
           />
           <span className="hidden sm:inline">{syncLabel}</span>
         </Button>

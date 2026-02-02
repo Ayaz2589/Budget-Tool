@@ -38,6 +38,7 @@ import {
 } from "@/lib/googleSheets";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
+import type { SyncStatus } from "@/types/auth";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
 const ACCESS_TOKEN_STORAGE_KEY = "budget-tool-google-access-token";
@@ -53,10 +54,7 @@ function getStoredAccessToken(): string | null {
       access_token: string;
       expires_at?: number;
     };
-    if (
-      parsed.expires_at != null &&
-      Date.now() >= parsed.expires_at
-    ) {
+    if (parsed.expires_at != null && Date.now() >= parsed.expires_at) {
       localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
       return null;
     }
@@ -79,7 +77,7 @@ function getStoredExpiresAt(): number | null {
 
 function setStoredAccessToken(
   accessToken: string,
-  expiresInSeconds?: number,
+  expiresInSeconds?: number
 ): void {
   try {
     const payload: { access_token: string; expires_at?: number } = {
@@ -102,31 +100,15 @@ function clearStoredAccessToken(): void {
   }
 }
 
-type SyncStatus = "idle" | "syncing" | "success" | "error";
-
-export interface GoogleUserProfile {
-  name: string;
-  picture: string;
-  email: string;
-}
+import type { GoogleUserProfile, GoogleAuthContextValue } from "@/types/auth";
 
 /** Exported for tests that need to inject auth state (e.g. AuthGate, LoginPage). */
-export interface GoogleAuthContextValue {
-  isSignedIn: boolean;
-  userProfile: GoogleUserProfile | null;
-  signIn: () => void;
-  signOut: () => void;
-  spreadsheetId: string | null;
-  setSpreadsheetId: (id: string | null) => void;
-  syncToSheets: () => Promise<void>;
-  pullFromSheet: () => Promise<void>;
-  syncStatus: SyncStatus;
-  syncErrorMessage: string | null;
-}
+export type { GoogleUserProfile, GoogleAuthContextValue };
 
 /** Exported for tests that need to inject isSignedIn (e.g. AuthGate, LoginPage). */
-export const GoogleAuthContext =
-  createContext<GoogleAuthContextValue | null>(null);
+export const GoogleAuthContext = createContext<GoogleAuthContextValue | null>(
+  null
+);
 
 /**
  * Use when VITE_GOOGLE_CLIENT_ID is not set. Provides the same context interface
@@ -191,7 +173,7 @@ export function GoogleAuthProviderFallback({
       syncStatus,
       syncErrorMessage,
     }),
-    [spreadsheetId, setSpreadsheetId, syncStatus, syncErrorMessage],
+    [spreadsheetId, setSpreadsheetId, syncStatus, syncErrorMessage]
   );
 
   return (
@@ -212,11 +194,11 @@ function isUnauthorizedError(err: unknown): boolean {
 
 export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(
-    getStoredAccessToken,
+    getStoredAccessToken
   );
   const [expiresAt, setExpiresAt] = useState<number | null>(getStoredExpiresAt);
   const [userProfile, setUserProfile] = useState<GoogleUserProfile | null>(
-    null,
+    null
   );
   const [spreadsheetId, setSpreadsheetIdState] = useState<string | null>(() => {
     try {
@@ -243,10 +225,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       const expiresIn = tokenResponse.expires_in ?? 3600;
-      setStoredAccessToken(
-        tokenResponse.access_token,
-        expiresIn,
-      );
+      setStoredAccessToken(tokenResponse.access_token, expiresIn);
       setAccessToken(tokenResponse.access_token);
       setExpiresAt(Date.now() + expiresIn * 1000);
     },
@@ -270,7 +249,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       .then((res) =>
         res.ok
           ? res.json()
-          : Promise.reject(new Error("Failed to fetch profile")),
+          : Promise.reject(new Error("Failed to fetch profile"))
       )
       .then((data: { name?: string; picture?: string; email?: string }) => {
         if (
@@ -352,15 +331,15 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     try {
       await ensureSheetsExist(accessToken, spreadsheetId);
       const nonMortgageExpenses = budget.expenses.filter(
-        (e) => (e.category || "").toLowerCase() !== "mortgage",
+        (e) => (e.category || "").toLowerCase() !== "mortgage"
       );
       const mortgageExpenses = budget.expenses.filter(
-        (e) => (e.category || "").toLowerCase() === "mortgage",
+        (e) => (e.category || "").toLowerCase() === "mortgage"
       );
       await clearAndWriteExpenses(
         accessToken,
         spreadsheetId,
-        nonMortgageExpenses,
+        nonMortgageExpenses
       );
       await clearAndWriteMortgage(accessToken, spreadsheetId, mortgageExpenses);
       await clearAndWriteIncome(accessToken, spreadsheetId, budget.income);
@@ -368,22 +347,26 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       await clearAndWriteDebtPayments(
         accessToken,
         spreadsheetId,
-        budget.debtPayments,
+        budget.debtPayments
       );
       await clearAndWriteRules(accessToken, spreadsheetId, rulesContext.rules);
       await clearAndWritePresets(
         accessToken,
         spreadsheetId,
-        presetTransactions,
+        presetTransactions
       );
-      const expenseCategoriesWithColors = budget.expenseCategories.map((name) => ({
-        name,
-        color: getCategoryColor(name, "expense"),
-      }));
-      const incomeCategoriesWithColors = budget.incomeCategories.map((name) => ({
-        name,
-        color: getCategoryColor(name, "income"),
-      }));
+      const expenseCategoriesWithColors = budget.expenseCategories.map(
+        (name) => ({
+          name,
+          color: getCategoryColor(name, "expense"),
+        })
+      );
+      const incomeCategoriesWithColors = budget.incomeCategories.map(
+        (name) => ({
+          name,
+          color: getCategoryColor(name, "income"),
+        })
+      );
       const dataBlob = serializeToBlob({
         expenses: budget.expenses,
         income: budget.income,
@@ -475,27 +458,30 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           const expanded = parseFromBlob(blob);
           const allExpenses = expanded.expenses ?? [];
           sheetExpenses = allExpenses.filter(
-            (e) => (e.category || "").toLowerCase() !== "mortgage",
+            (e) => (e.category || "").toLowerCase() !== "mortgage"
           );
           sheetMortgage = allExpenses.filter(
-            (e) => (e.category || "").toLowerCase() === "mortgage",
+            (e) => (e.category || "").toLowerCase() === "mortgage"
           );
           sheetIncome = expanded.income ?? [];
           sheetDebts = expanded.debts ?? [];
           sheetPayments = expanded.debtPayments ?? [];
           sheetRules = expanded.rules ?? [];
           sheetPresets = expanded.presetTransactions ?? [];
-          if (Array.isArray(expanded.cardSources) && expanded.cardSources.length > 0) {
+          if (
+            Array.isArray(expanded.cardSources) &&
+            expanded.cardSources.length > 0
+          ) {
             budget.setCardSources(expanded.cardSources);
           }
           if (Array.isArray(expanded.expenseCategoriesWithColors)) {
             budget.setExpenseCategories(
-              expanded.expenseCategoriesWithColors.map((x) => x.name),
+              expanded.expenseCategoriesWithColors.map((x) => x.name)
             );
           }
           if (Array.isArray(expanded.incomeCategoriesWithColors)) {
             budget.setIncomeCategories(
-              expanded.incomeCategoriesWithColors.map((x) => x.name),
+              expanded.incomeCategoriesWithColors.map((x) => x.name)
             );
           }
         } catch {
@@ -518,26 +504,33 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetPresets = presets;
         }
       } else {
-        [sheetExpenses, sheetMortgage, sheetIncome, sheetDebts, sheetPayments, sheetRules, sheetPresets] =
-          await Promise.all([
-            readExpensesFromSheet(accessToken, spreadsheetId),
-            readMortgageFromSheet(accessToken, spreadsheetId),
-            readIncomeFromSheet(accessToken, spreadsheetId),
-            readDebtsFromSheet(accessToken, spreadsheetId),
-            readDebtPaymentsFromSheet(accessToken, spreadsheetId),
-            readRulesFromSheet(accessToken, spreadsheetId),
-            readPresetsFromSheet(accessToken, spreadsheetId),
-          ]);
+        [
+          sheetExpenses,
+          sheetMortgage,
+          sheetIncome,
+          sheetDebts,
+          sheetPayments,
+          sheetRules,
+          sheetPresets,
+        ] = await Promise.all([
+          readExpensesFromSheet(accessToken, spreadsheetId),
+          readMortgageFromSheet(accessToken, spreadsheetId),
+          readIncomeFromSheet(accessToken, spreadsheetId),
+          readDebtsFromSheet(accessToken, spreadsheetId),
+          readDebtPaymentsFromSheet(accessToken, spreadsheetId),
+          readRulesFromSheet(accessToken, spreadsheetId),
+          readPresetsFromSheet(accessToken, spreadsheetId),
+        ]);
       }
 
       const newExpenses = sheetExpenses.filter(
-        (e) => !appExpenseKeys.has(expenseKey(e)),
+        (e) => !appExpenseKeys.has(expenseKey(e))
       );
       const newMortgage = sheetMortgage.filter(
-        (e) => !appExpenseKeys.has(expenseKey(e)),
+        (e) => !appExpenseKeys.has(expenseKey(e))
       );
       const newIncome = sheetIncome.filter(
-        (i) => !appIncomeKeys.has(incomeKey(i)),
+        (i) => !appIncomeKeys.has(incomeKey(i))
       );
 
       const expenseCatSet = new Set(budget.expenseCategories);
@@ -556,7 +549,10 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         category: normalizeExpenseCategory(e.category || ""),
       }));
 
-      if (normalizedNewExpenses.length > 0 || normalizedNewMortgage.length > 0) {
+      if (
+        normalizedNewExpenses.length > 0 ||
+        normalizedNewMortgage.length > 0
+      ) {
         budget.addExpenses([
           ...normalizedNewExpenses,
           ...normalizedNewMortgage,
@@ -643,7 +639,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       pullFromSheet,
       syncStatus,
       syncErrorMessage,
-    ],
+    ]
   );
 
   return (

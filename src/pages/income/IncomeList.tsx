@@ -1,6 +1,7 @@
 import { formatCurrency } from "@/lib/format";
-import type { Income } from "@/lib/types";
+import type { Income } from "@/types/core";
 import { cn } from "@/lib/utils";
+import type { IncomeListProps } from "@/types/income";
 
 function formatRecurring(i: Income): string {
   if (i.recurringAmount == null || i.recurringAmount <= 0) return "";
@@ -18,10 +19,7 @@ function formatRecurring(i: Income): string {
   return "";
 }
 
-export type IncomeListProps = {
-  sortedIncome: Income[];
-  onIncomeTap: (income: Income) => void;
-};
+export type { IncomeListProps };
 
 export function IncomeList({ sortedIncome, onIncomeTap }: IncomeListProps) {
   return (
@@ -35,10 +33,12 @@ export function IncomeList({ sortedIncome, onIncomeTap }: IncomeListProps) {
             className={cn(
               "flex flex-col gap-0.5 w-full text-left px-4 py-3 min-h-[52px] rounded-none",
               "hover:bg-muted/50 active:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-              index % 2 === 1 ? "bg-muted/30" : undefined,
+              index % 2 === 1 ? "bg-muted/30" : undefined
             )}
             onClick={() => onIncomeTap(i)}
-            aria-label={`${i.description || "Income"}, ${formatCurrency(i.amount)}, ${i.date}`}
+            aria-label={`${i.description || "Income"}, ${formatCurrency(
+              i.amount
+            )}, ${i.date}`}
           >
             <div className="flex items-baseline justify-between gap-2">
               <span className="truncate text-sm font-medium text-foreground">

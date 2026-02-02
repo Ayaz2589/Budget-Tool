@@ -11,19 +11,11 @@ import { Button } from "@/components/ui/button";
 import { DollarSign, Calendar, Trash2 } from "lucide-react";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency } from "@/lib/format";
-import type { Debt, DebtPayment } from "@/lib/types";
+import type { DebtPayment } from "@/types/core";
 import { cn } from "@/lib/utils";
+import type { DebtActionsDialogProps } from "@/types/debt";
 
-export type DebtActionsDialogProps = {
-  debt: Debt | null;
-  payments: DebtPayment[];
-  onClose: () => void;
-  onAddPayment: (debtId: string) => void;
-  onEditRecurring: (debt: Debt) => void;
-  onDelete: (debtId: string) => void;
-  onRemovePayment: (paymentId: string) => void;
-  t: (key: string, options?: Record<string, unknown>) => string;
-};
+export type { DebtActionsDialogProps };
 
 export function DebtActionsDialog({
   debt,
@@ -36,7 +28,7 @@ export function DebtActionsDialog({
   t,
 }: DebtActionsDialogProps) {
   const [paymentToRemove, setPaymentToRemove] = useState<DebtPayment | null>(
-    null,
+    null
   );
 
   if (debt === null) return null;
@@ -146,7 +138,7 @@ export function DebtActionsDialog({
                   <li
                     key={p.id}
                     className={cn(
-                      "flex items-center justify-between gap-2 py-2 px-3 rounded-md bg-muted/50 text-sm",
+                      "flex items-center justify-between gap-2 py-2 px-3 rounded-md bg-muted/50 text-sm"
                     )}
                   >
                     <span className="text-muted-foreground">{p.date}</span>

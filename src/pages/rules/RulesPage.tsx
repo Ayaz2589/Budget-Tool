@@ -5,8 +5,8 @@ import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { useRules } from "@/context/RulesContext";
 import { getCategoryColor } from "@/lib/categoryColors";
-import type { ExpenseSource } from "@/lib/types";
-import type { RuleCondition, RuleAction } from "@/lib/rules";
+import type { ExpenseSource } from "@/types/core";
+import type { ConditionType, RuleCondition, RuleAction } from "@/types/rules";
 import {
   Card,
   CardContent,
@@ -38,8 +38,6 @@ import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { SOURCE_OPTIONS } from "@/lib/sourceLabels";
 import { rulesTourSteps } from "@/lib/pageTourSteps";
 
-type ConditionType = RuleCondition["type"];
-
 const AMOUNT_OPERATORS = [
   { value: "lt", label: "<" },
   { value: "gte", label: "≥" },
@@ -55,15 +53,12 @@ export function RulesPage() {
   const { t } = useTranslation();
   const { expenseCategories, cardSources } = useBudget();
   const { rules, addRule, removeRule, reorderRule, toggleRule } = useRules();
-  const {
-    presetTransactions,
-    addPreset,
-    removePreset,
-  } = usePresetTransactions();
+  const { presetTransactions, addPreset, removePreset } =
+    usePresetTransactions();
 
   const sourceOptionsFiltered = useMemo(
     () => SOURCE_OPTIONS.filter((o) => cardSources.includes(o.value)),
-    [cardSources],
+    [cardSources]
   );
   const cardMemberOptions = useMemo(() => ["AYAZ UDDIN", "TASNUVA AHMED"], []);
 
@@ -71,7 +66,7 @@ export function RulesPage() {
   const [presetSource, setPresetSource] = useState<ExpenseSource>("manual");
   const [presetDescription, setPresetDescription] = useState("");
   const [presetCategory, setPresetCategory] = useState(
-    expenseCategories[0] ?? "",
+    expenseCategories[0] ?? ""
   );
   const [presetMember, setPresetMember] = useState(cardMemberOptions[0] ?? "");
 
@@ -79,10 +74,10 @@ export function RulesPage() {
   const [conditionType, setConditionType] = useState<ConditionType>("source");
   const [sourceValue, setSourceValue] = useState<ExpenseSource>("amex");
   const [cardMemberValue, setCardMemberValue] = useState(
-    cardMemberOptions[0] ?? "",
+    cardMemberOptions[0] ?? ""
   );
   const [cardMemberMatch, setCardMemberMatch] = useState<"equals" | "contains">(
-    "contains",
+    "contains"
   );
   const [amountOperator, setAmountOperator] = useState<
     "lt" | "gte" | "between"
@@ -90,7 +85,7 @@ export function RulesPage() {
   const [amountValue, setAmountValue] = useState("");
   const [amountValueMax, setAmountValueMax] = useState("");
   const [categoryTotalCategory, setCategoryTotalCategory] = useState(
-    expenseCategories[0] ?? "",
+    expenseCategories[0] ?? ""
   );
   const [categoryTotalOperator, setCategoryTotalOperator] = useState<
     "lt" | "gte"
@@ -99,7 +94,7 @@ export function RulesPage() {
   const [actionType, setActionType] =
     useState<RuleAction["type"]>("setCategory");
   const [actionCategory, setActionCategory] = useState(
-    expenseCategories[0] ?? "",
+    expenseCategories[0] ?? ""
   );
   const [warningMessage, setWarningMessage] = useState("");
   const [ruleToDeleteId, setRuleToDeleteId] = useState<string | null>(null);
@@ -210,14 +205,19 @@ export function RulesPage() {
   const renderCondition = (condition: RuleCondition) => {
     switch (condition.type) {
       case "source":
-        return `${t("rules.ifSource")} ${SOURCE_OPTIONS.find((o) => o.value === condition.value)?.label ?? condition.value}`;
+        return `${t("rules.ifSource")} ${
+          SOURCE_OPTIONS.find((o) => o.value === condition.value)?.label ??
+          condition.value
+        }`;
       case "cardMember":
         return `${t("rules.ifCardMember")} ${
           condition.match === "equals" ? t("rules.equals") : t("rules.contains")
         } ${condition.value}`;
       case "expenseAmount":
         if (condition.operator === "between") {
-          return `${t("rules.ifAmount")} ${condition.value}–${condition.valueMax}`;
+          return `${t("rules.ifAmount")} ${condition.value}–${
+            condition.valueMax
+          }`;
         }
         return `${t("rules.ifAmount")} ${
           condition.operator === "lt" ? "<" : "≥"
@@ -259,121 +259,53 @@ export function RulesPage() {
                 {t("rules.addRule")}
               </Button>
             </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t("rules.newRule")}</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>{t("rules.conditionType")}</Label>
-                <Select
-                  value={conditionType}
-                  onValueChange={(v) => setConditionType(v as ConditionType)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="source">
-                      {t("rules.conditionSource")}
-                    </SelectItem>
-                    <SelectItem value="cardMember">
-                      {t("rules.conditionCardMember")}
-                    </SelectItem>
-                    <SelectItem value="expenseAmount">
-                      {t("rules.conditionExpenseAmount")}
-                    </SelectItem>
-                    <SelectItem value="categoryTotal">
-                      {t("rules.conditionCategoryTotal")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {conditionType === "source" && (
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t("rules.newRule")}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>{t("rules.source")}</Label>
+                  <Label>{t("rules.conditionType")}</Label>
                   <Select
-                    value={
-                      cardSources.includes(sourceValue)
-                        ? sourceValue
-                        : (cardSources[0] as ExpenseSource)
-                    }
-                    onValueChange={(v) => setSourceValue(v as ExpenseSource)}
+                    value={conditionType}
+                    onValueChange={(v) => setConditionType(v as ConditionType)}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {sourceOptionsFiltered.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="source">
+                        {t("rules.conditionSource")}
+                      </SelectItem>
+                      <SelectItem value="cardMember">
+                        {t("rules.conditionCardMember")}
+                      </SelectItem>
+                      <SelectItem value="expenseAmount">
+                        {t("rules.conditionExpenseAmount")}
+                      </SelectItem>
+                      <SelectItem value="categoryTotal">
+                        {t("rules.conditionCategoryTotal")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              )}
 
-              {conditionType === "cardMember" && (
-                <>
+                {conditionType === "source" && (
                   <div className="space-y-2">
-                    <Label>{t("rules.cardMemberMatch")}</Label>
+                    <Label>{t("rules.source")}</Label>
                     <Select
-                      value={cardMemberMatch}
-                      onValueChange={(v) =>
-                        setCardMemberMatch(v as "equals" | "contains")
+                      value={
+                        cardSources.includes(sourceValue)
+                          ? sourceValue
+                          : (cardSources[0] as ExpenseSource)
                       }
+                      onValueChange={(v) => setSourceValue(v as ExpenseSource)}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="contains">
-                          {t("rules.contains")}
-                        </SelectItem>
-                        <SelectItem value="equals">
-                          {t("rules.equals")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{t("rules.cardMember")}</Label>
-                    <Select
-                      value={cardMemberValue}
-                      onValueChange={setCardMemberValue}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cardMemberOptions.map((member) => (
-                          <SelectItem key={member} value={member}>
-                            {member}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </>
-              )}
-
-              {conditionType === "expenseAmount" && (
-                <>
-                  <div className="space-y-2">
-                    <Label>{t("rules.amountOperator")}</Label>
-                    <Select
-                      value={amountOperator}
-                      onValueChange={(v) =>
-                        setAmountOperator(v as "lt" | "gte" | "between")
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {AMOUNT_OPERATORS.map((opt) => (
+                        {sourceOptionsFiltered.map((opt) => (
                           <SelectItem key={opt.value} value={opt.value}>
                             {opt.label}
                           </SelectItem>
@@ -381,38 +313,188 @@ export function RulesPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                )}
+
+                {conditionType === "cardMember" && (
+                  <>
                     <div className="space-y-2">
-                      <Label>{t("rules.amount")}</Label>
-                      <Input
-                        inputMode="decimal"
-                        value={amountValue}
-                        onChange={(e) => setAmountValue(e.target.value)}
-                        placeholder="0.00"
-                      />
+                      <Label>{t("rules.cardMemberMatch")}</Label>
+                      <Select
+                        value={cardMemberMatch}
+                        onValueChange={(v) =>
+                          setCardMemberMatch(v as "equals" | "contains")
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="contains">
+                            {t("rules.contains")}
+                          </SelectItem>
+                          <SelectItem value="equals">
+                            {t("rules.equals")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    {amountOperator === "between" && (
+                    <div className="space-y-2">
+                      <Label>{t("rules.cardMember")}</Label>
+                      <Select
+                        value={cardMemberValue}
+                        onValueChange={setCardMemberValue}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {cardMemberOptions.map((member) => (
+                            <SelectItem key={member} value={member}>
+                              {member}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
+
+                {conditionType === "expenseAmount" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>{t("rules.amountOperator")}</Label>
+                      <Select
+                        value={amountOperator}
+                        onValueChange={(v) =>
+                          setAmountOperator(v as "lt" | "gte" | "between")
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {AMOUNT_OPERATORS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-2">
-                        <Label>{t("rules.amountMax")}</Label>
+                        <Label>{t("rules.amount")}</Label>
                         <Input
                           inputMode="decimal"
-                          value={amountValueMax}
-                          onChange={(e) => setAmountValueMax(e.target.value)}
+                          value={amountValue}
+                          onChange={(e) => setAmountValue(e.target.value)}
                           placeholder="0.00"
                         />
                       </div>
-                    )}
-                  </div>
-                </>
-              )}
+                      {amountOperator === "between" && (
+                        <div className="space-y-2">
+                          <Label>{t("rules.amountMax")}</Label>
+                          <Input
+                            inputMode="decimal"
+                            value={amountValueMax}
+                            onChange={(e) => setAmountValueMax(e.target.value)}
+                            placeholder="0.00"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
 
-              {conditionType === "categoryTotal" && (
-                <>
+                {conditionType === "categoryTotal" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>{t("rules.category")}</Label>
+                      <Select
+                        value={categoryTotalCategory}
+                        onValueChange={setCategoryTotalCategory}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {expenseCategories.map((cat) => (
+                            <SelectItem key={cat} value={cat}>
+                              {cat}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-2">
+                        <Label>{t("rules.amountOperator")}</Label>
+                        <Select
+                          value={categoryTotalOperator}
+                          onValueChange={(v) =>
+                            setCategoryTotalOperator(v as "lt" | "gte")
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {CATEGORY_TOTAL_OPERATORS.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>{t("rules.amount")}</Label>
+                        <Input
+                          inputMode="decimal"
+                          value={categoryTotalValue}
+                          onChange={(e) =>
+                            setCategoryTotalValue(e.target.value)
+                          }
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {t("rules.categoryTotalNote")}
+                    </p>
+                  </>
+                )}
+
+                <div className="space-y-2">
+                  <Label>{t("rules.actionType")}</Label>
+                  <Select
+                    value={actionType}
+                    onValueChange={(v) =>
+                      setActionType(v as RuleAction["type"])
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="setCategory">
+                        {t("rules.actionSetCategory")}
+                      </SelectItem>
+                      {conditionType === "categoryTotal" && (
+                        <SelectItem value="showWarning">
+                          {t("rules.actionShowWarning")}
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {actionType === "setCategory" && (
                   <div className="space-y-2">
-                    <Label>{t("rules.category")}</Label>
+                    <Label>{t("rules.action")}</Label>
                     <Select
-                      value={categoryTotalCategory}
-                      onValueChange={setCategoryTotalCategory}
+                      value={actionCategory}
+                      onValueChange={setActionCategory}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue />
@@ -426,104 +508,26 @@ export function RulesPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-2">
-                      <Label>{t("rules.amountOperator")}</Label>
-                      <Select
-                        value={categoryTotalOperator}
-                        onValueChange={(v) =>
-                          setCategoryTotalOperator(v as "lt" | "gte")
-                        }
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {CATEGORY_TOTAL_OPERATORS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>{t("rules.amount")}</Label>
-                      <Input
-                        inputMode="decimal"
-                        value={categoryTotalValue}
-                        onChange={(e) => setCategoryTotalValue(e.target.value)}
-                        placeholder="0.00"
-                      />
-                    </div>
+                )}
+
+                {actionType === "showWarning" && (
+                  <div className="space-y-2">
+                    <Label>{t("rules.warningMessage")}</Label>
+                    <Input
+                      value={warningMessage}
+                      onChange={(e) => setWarningMessage(e.target.value)}
+                      placeholder={t("rules.warningPlaceholder")}
+                    />
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("rules.categoryTotalNote")}
-                  </p>
-                </>
-              )}
-
-              <div className="space-y-2">
-                <Label>{t("rules.actionType")}</Label>
-                <Select
-                  value={actionType}
-                  onValueChange={(v) => setActionType(v as RuleAction["type"])}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="setCategory">
-                      {t("rules.actionSetCategory")}
-                    </SelectItem>
-                    {conditionType === "categoryTotal" && (
-                      <SelectItem value="showWarning">
-                        {t("rules.actionShowWarning")}
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {actionType === "setCategory" && (
-                <div className="space-y-2">
-                  <Label>{t("rules.action")}</Label>
-                  <Select
-                    value={actionCategory}
-                    onValueChange={setActionCategory}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {expenseCategories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                )}
+                <div className="flex items-center justify-end gap-2">
+                  <Button variant="outline" onClick={() => setOpen(false)}>
+                    {t("common.cancel")}
+                  </Button>
+                  <Button onClick={handleAddRule}>{t("common.save")}</Button>
                 </div>
-              )}
-
-              {actionType === "showWarning" && (
-                <div className="space-y-2">
-                  <Label>{t("rules.warningMessage")}</Label>
-                  <Input
-                    value={warningMessage}
-                    onChange={(e) => setWarningMessage(e.target.value)}
-                    placeholder={t("rules.warningPlaceholder")}
-                  />
-                </div>
-              )}
-              <div className="flex items-center justify-end gap-2">
-                <Button variant="outline" onClick={() => setOpen(false)}>
-                  {t("common.cancel")}
-                </Button>
-                <Button onClick={handleAddRule}>{t("common.save")}</Button>
               </div>
-            </div>
-          </DialogContent>
+            </DialogContent>
           </Dialog>
         </div>
       </div>
@@ -600,9 +604,7 @@ export function RulesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("rules.deleteRuleTitle")}</DialogTitle>
-            <DialogDescription>
-              {t("rules.deleteRuleDesc")}
-            </DialogDescription>
+            <DialogDescription>{t("rules.deleteRuleDesc")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
@@ -635,7 +637,9 @@ export function RulesPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("presetTransactions.deletePresetTitle")}</DialogTitle>
+            <DialogTitle>
+              {t("presetTransactions.deletePresetTitle")}
+            </DialogTitle>
             <DialogDescription>
               {t("presetTransactions.deletePresetDesc")}
             </DialogDescription>
@@ -753,7 +757,10 @@ export function RulesPage() {
                   </Select>
                 </div>
                 <div className="flex items-center justify-end gap-2">
-                  <Button variant="outline" onClick={() => setPresetOpen(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setPresetOpen(false)}
+                  >
                     {t("common.cancel")}
                   </Button>
                   <Button onClick={handleAddPreset}>{t("common.save")}</Button>
@@ -788,7 +795,10 @@ export function RulesPage() {
                     <span className="text-muted-foreground flex items-center gap-1.5">
                       {" · "}
                       <span
-                        className={`size-2 shrink-0 rounded-full ${getCategoryColor(preset.category, "expense")}`}
+                        className={`size-2 shrink-0 rounded-full ${getCategoryColor(
+                          preset.category,
+                          "expense"
+                        )}`}
                         aria-hidden
                       />
                       {preset.category} · {preset.cardMember}

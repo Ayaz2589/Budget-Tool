@@ -5,9 +5,10 @@ import type {
   Income,
   ExpenseSource,
   PresetTransaction,
-} from "@/lib/types";
-import type { MonthTotals } from "@/lib/totals";
-import type { Rule } from "@/lib/rules";
+} from "@/types/core";
+import type { MonthTotals } from "@/types/totals";
+import type { Rule } from "@/types/rules";
+import type { SheetIds } from "@/types/sheets";
 
 const VALID_EXPENSE_SOURCES: ExpenseSource[] = [
   "amex",
@@ -767,16 +768,7 @@ async function updateSheet(
   }
 }
 
-export interface SheetIds {
-  expenses: number;
-  income: number;
-  totals: number;
-  debts: number;
-  debtPayments: number;
-  mortgage: number;
-  rules: number;
-  presetTransactions: number;
-}
+export type { SheetIds };
 
 export async function getSheetIds(
   accessToken: string,

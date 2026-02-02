@@ -9,13 +9,16 @@ import {
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format";
-import type { Expense } from "@/lib/types";
+import type {
+  DeleteOneTransactionDialogProps,
+  DeleteSelectedTransactionsDialogProps,
+  DeleteAllTransactionsDialogProps,
+} from "@/types/transactions";
 
-export type DeleteOneTransactionDialogProps = {
-  expense: Expense | null;
-  onClose: () => void;
-  onConfirm: () => void;
-  t: (key: string, opts?: Record<string, string>) => string;
+export type {
+  DeleteOneTransactionDialogProps,
+  DeleteSelectedTransactionsDialogProps,
+  DeleteAllTransactionsDialogProps,
 };
 
 export function DeleteOneTransactionDialog({
@@ -57,14 +60,6 @@ export function DeleteOneTransactionDialog({
   );
 }
 
-export type DeleteSelectedTransactionsDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  count: number;
-  onConfirm: () => void;
-  t: (key: string, opts?: { count?: number }) => string;
-};
-
 export function DeleteSelectedTransactionsDialog({
   open,
   onOpenChange,
@@ -94,14 +89,6 @@ export function DeleteSelectedTransactionsDialog({
     </Dialog>
   );
 }
-
-export type DeleteAllTransactionsDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  count: number;
-  onConfirm: () => void;
-  t: (key: string, opts?: { count?: number }) => string;
-};
 
 export function DeleteAllTransactionsDialog({
   open,

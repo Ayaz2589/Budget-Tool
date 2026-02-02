@@ -17,39 +17,12 @@ import {
 } from "@/components/ui/select";
 import { SourceIcon } from "@/components/cards";
 import { CategoryOption } from "@/lib/categoryColors";
-import type { ExpenseSource } from "@/lib/types";
+import type { ExpenseSource } from "@/types/core";
+import type { FiltersAndActionsDialogProps } from "@/types/transactions";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
 import { FileDown, Trash2 } from "lucide-react";
 
-export type FiltersAndActionsDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  monthFilter: string;
-  onMonthFilterChange: (value: string) => void;
-  sourceFilter: string;
-  onSourceFilterChange: (value: string) => void;
-  categoryFilter: string;
-  onCategoryFilterChange: (value: string) => void;
-  cardMemberFilter: string;
-  onCardMemberFilterChange: (value: string) => void;
-  searchFilter: string;
-  onSearchFilterChange: (value: string) => void;
-  expenseCategories: string[];
-  cardMemberOptions: string[];
-  /** Enabled card sources; filter dropdown shows "all" plus these. */
-  cardSources: string[];
-  hasActiveFilters: boolean;
-  onClearFilters: () => void;
-  onCleanDescriptions: () => void;
-  onDownloadPdf: () => void;
-  someSelected: boolean;
-  selectedCount: number;
-  onDeleteSelected: () => void;
-  onClearSelection: () => void;
-  expensesCount: number;
-  onDeleteAll: () => void;
-  t: (key: string, opts?: { count?: number }) => string;
-};
+export type { FiltersAndActionsDialogProps };
 
 export function FiltersAndActionsDialog({
   open,
@@ -135,10 +108,7 @@ export function FiltersAndActionsDialog({
                     {cardSources.map((s) => (
                       <SelectItem key={s} value={s}>
                         <span className="flex items-center gap-2">
-                          <SourceIcon
-                            source={s as ExpenseSource}
-                            size={18}
-                          />
+                          <SourceIcon source={s as ExpenseSource} size={18} />
                           {t(SOURCE_LABEL_KEYS[s as ExpenseSource])}
                         </span>
                       </SelectItem>

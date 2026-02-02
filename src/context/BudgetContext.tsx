@@ -7,7 +7,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Debt, DebtPayment, Expense, Income, ExpenseSource } from "@/lib/types";
+import type {
+  Debt,
+  DebtPayment,
+  Expense,
+  Income,
+  ExpenseSource,
+} from "@/types/core";
 import {
   DEFAULT_EXPENSE_CATEGORIES,
   DEFAULT_INCOME_CATEGORIES,
@@ -17,42 +23,10 @@ import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
 
-export interface BudgetState {
-  expenses: Expense[];
-  income: Income[];
-  debts: Debt[];
-  debtPayments: DebtPayment[];
-  expenseCategories: string[];
-  incomeCategories: string[];
-  /** Enabled card/expense sources; used in transaction table and import. */
-  cardSources: string[];
-}
+import type { BudgetState } from "@/types/budget";
+import type { BudgetContextValue } from "@/types/context";
 
-interface BudgetContextValue extends BudgetState {
-  addExpenses: (expenses: Expense[]) => void;
-  addExpense: (entry: Omit<Expense, "id">) => void;
-  updateExpense: (id: string, updates: Partial<Expense>) => void;
-  removeExpense: (id: string) => void;
-  removeExpenses: (ids: string[]) => void;
-  addIncome: (entry: Omit<Income, "id">) => void;
-  addIncomes: (income: Income[]) => void;
-  updateIncome: (id: string, updates: Partial<Income>) => void;
-  removeIncome: (id: string) => void;
-  addDebt: (entry: Omit<Debt, "id">) => void;
-  updateDebt: (id: string, updates: Partial<Debt>) => void;
-  removeDebt: (id: string) => void;
-  addDebts: (debts: Debt[]) => void;
-  addDebtPayment: (entry: Omit<DebtPayment, "id">) => void;
-  updateDebtPayment: (id: string, updates: Partial<DebtPayment>) => void;
-  removeDebtPayment: (id: string) => void;
-  addDebtPayments: (payments: DebtPayment[]) => void;
-  setExpenseCategories: (categories: string[]) => void;
-  setIncomeCategories: (categories: string[]) => void;
-  setCardSources: (sources: string[]) => void;
-  setIOweNova: (monthKey: string, amount: number) => void;
-  iOweNova: Record<string, number>;
-  repairCorruptedDates: () => { fixedExpenses: number; fixedIncome: number };
-}
+export type { BudgetState };
 
 const BudgetContext = createContext<BudgetContextValue | null>(null);
 
@@ -85,7 +59,7 @@ function loadStoredBudget(): {
       };
       const cardSources = Array.isArray(data.cardSources)
         ? data.cardSources.filter((s): s is ExpenseSource =>
-            ALL_EXPENSE_SOURCES.includes(s as ExpenseSource),
+            ALL_EXPENSE_SOURCES.includes(s as ExpenseSource)
           )
         : [...ALL_EXPENSE_SOURCES];
       const expenseCategories =
@@ -107,7 +81,8 @@ function loadStoredBudget(): {
           data.iOweNova && typeof data.iOweNova === "object"
             ? data.iOweNova
             : {},
-        cardSources: cardSources.length > 0 ? cardSources : [...ALL_EXPENSE_SOURCES],
+        cardSources:
+          cardSources.length > 0 ? cardSources : [...ALL_EXPENSE_SOURCES],
         expenseCategories,
         incomeCategories,
       };
@@ -133,19 +108,19 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const [income, setIncome] = useState<Income[]>(stored.income);
   const [debts, setDebts] = useState<Debt[]>(stored.debts);
   const [debtPayments, setDebtPayments] = useState<DebtPayment[]>(
-    stored.debtPayments,
+    stored.debtPayments
   );
   const [expenseCategories, setExpenseCategoriesState] = useState<string[]>(
-    stored.expenseCategories,
+    stored.expenseCategories
   );
   const [incomeCategories, setIncomeCategoriesState] = useState<string[]>(
-    stored.incomeCategories,
+    stored.incomeCategories
   );
   const [cardSources, setCardSourcesState] = useState<string[]>(
-    stored.cardSources,
+    stored.cardSources
   );
   const [iOweNova, setIOweNovaState] = useState<Record<string, number>>(
-    stored.iOweNova,
+    stored.iOweNova
   );
 
   useEffect(() => {
@@ -161,7 +136,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
           cardSources,
           expenseCategories,
           incomeCategories,
-        }),
+        })
       );
     } catch {
       // ignore
@@ -184,7 +159,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         if (!byId.has(e.id)) byId.set(e.id, e);
       }
       return Array.from(byId.values()).sort((a, b) =>
-        b.date.localeCompare(a.date),
+        b.date.localeCompare(a.date)
       );
     });
   }, []);
@@ -192,13 +167,13 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const addExpense = useCallback((entry: Omit<Expense, "id">) => {
     const newExpense: Expense = { ...entry, id: generateId() };
     setExpenses((prev) =>
-      [...prev, newExpense].sort((a, b) => b.date.localeCompare(a.date)),
+      [...prev, newExpense].sort((a, b) => b.date.localeCompare(a.date))
     );
   }, []);
 
   const updateExpense = useCallback((id: string, updates: Partial<Expense>) => {
     setExpenses((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...updates } : e)),
+      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
     );
   }, []);
 
@@ -214,7 +189,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const addIncome = useCallback((entry: Omit<Income, "id">) => {
     const newEntry: Income = { ...entry, id: generateId() };
     setIncome((prev) =>
-      [...prev, newEntry].sort((a, b) => b.date.localeCompare(a.date)),
+      [...prev, newEntry].sort((a, b) => b.date.localeCompare(a.date))
     );
   }, []);
 
@@ -225,14 +200,14 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         if (!byId.has(i.id)) byId.set(i.id, i);
       }
       return Array.from(byId.values()).sort((a, b) =>
-        b.date.localeCompare(a.date),
+        b.date.localeCompare(a.date)
       );
     });
   }, []);
 
   const updateIncome = useCallback((id: string, updates: Partial<Income>) => {
     setIncome((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, ...updates } : i)),
+      prev.map((i) => (i.id === id ? { ...i, ...updates } : i))
     );
   }, []);
 
@@ -257,7 +232,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
 
   const updateDebt = useCallback((id: string, updates: Partial<Debt>) => {
     setDebts((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, ...updates } : d)),
+      prev.map((d) => (d.id === id ? { ...d, ...updates } : d))
     );
   }, []);
 
@@ -269,7 +244,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const addDebtPayment = useCallback((entry: Omit<DebtPayment, "id">) => {
     const newPayment: DebtPayment = { ...entry, id: generateId() };
     setDebtPayments((prev) =>
-      [...prev, newPayment].sort((a, b) => b.date.localeCompare(a.date)),
+      [...prev, newPayment].sort((a, b) => b.date.localeCompare(a.date))
     );
   }, []);
 
@@ -280,7 +255,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         if (!byId.has(p.id)) byId.set(p.id, p);
       }
       return Array.from(byId.values()).sort((a, b) =>
-        b.date.localeCompare(a.date),
+        b.date.localeCompare(a.date)
       );
     });
   }, []);
@@ -288,10 +263,10 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const updateDebtPayment = useCallback(
     (id: string, updates: Partial<DebtPayment>) => {
       setDebtPayments((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+        prev.map((p) => (p.id === id ? { ...p, ...updates } : p))
       );
     },
-    [],
+    []
   );
 
   const removeDebtPayment = useCallback((id: string) => {
@@ -303,8 +278,8 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       prev.map((e) =>
         e.category && !categories.includes(e.category)
           ? { ...e, category: "" }
-          : e,
-      ),
+          : e
+      )
     );
     setExpenseCategoriesState(categories);
   }, []);
@@ -314,8 +289,8 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       prev.map((i) =>
         i.category && !categories.includes(i.category)
           ? { ...i, category: "" }
-          : i,
-      ),
+          : i
+      )
     );
     setIncomeCategoriesState(categories);
   }, []);
@@ -325,8 +300,8 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     const fallback = (sources[0] as ExpenseSource) ?? "manual";
     setExpenses((prev) =>
       prev.map((e) =>
-        sources.includes(e.source) ? e : { ...e, source: fallback },
-      ),
+        sources.includes(e.source) ? e : { ...e, source: fallback }
+      )
     );
     setCardSourcesState(sources);
   }, []);
@@ -357,7 +332,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       return i;
     });
     setExpenses(
-      [...repairedExpenses].sort((a, b) => b.date.localeCompare(a.date)),
+      [...repairedExpenses].sort((a, b) => b.date.localeCompare(a.date))
     );
     setIncome([...repairedIncome].sort((a, b) => b.date.localeCompare(a.date)));
     return { fixedExpenses, fixedIncome };
@@ -427,7 +402,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       setCardSources,
       setIOweNova,
       repairCorruptedDates,
-    ],
+    ]
   );
 
   return (

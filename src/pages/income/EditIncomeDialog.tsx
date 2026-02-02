@@ -19,27 +19,13 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CategoryOption } from "@/lib/categoryColors";
-import type { DebtOwner, Income } from "@/lib/types";
-import type { RecurringFrequency } from "./AddIncomeDialog";
+import type { DebtOwner, RecurringFrequency } from "@/types/core";
+import type {
+  EditIncomeFormPayload,
+  EditIncomeDialogProps,
+} from "@/types/income";
 
-export type EditIncomeFormPayload = {
-  date: string;
-  amount: number;
-  description: string;
-  category: string;
-  owner: DebtOwner;
-  recurringAmount?: number;
-  recurringFrequency?: RecurringFrequency;
-  recurringDayOfMonth?: number;
-  recurringStartDate?: string;
-};
-
-export type EditIncomeDialogProps = {
-  income: Income | null;
-  onClose: () => void;
-  incomeCategories: string[];
-  onSubmit: (id: string, payload: EditIncomeFormPayload) => void;
-};
+export type { EditIncomeFormPayload, EditIncomeDialogProps };
 
 export function EditIncomeDialog({
   income,
@@ -74,15 +60,15 @@ export function EditIncomeDialog({
           : !!income.recurringStartDate);
       setRecurringChecked(!!hasRecurring);
       setRecurringAmount(
-        income.recurringAmount != null ? String(income.recurringAmount) : "",
+        income.recurringAmount != null ? String(income.recurringAmount) : ""
       );
       setRecurringFrequency(
-        income.recurringFrequency === "biweekly" ? "biweekly" : "monthly",
+        income.recurringFrequency === "biweekly" ? "biweekly" : "monthly"
       );
       setRecurringDay(
         income.recurringDayOfMonth != null
           ? String(income.recurringDayOfMonth)
-          : "15",
+          : "15"
       );
       setRecurringStartDate(income.recurringStartDate ?? "");
     }

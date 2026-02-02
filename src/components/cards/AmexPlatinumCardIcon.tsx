@@ -1,7 +1,4 @@
-interface AmexPlatinumCardIconProps {
-  className?: string;
-  size?: number;
-}
+import type { AmexPlatinumCardIconProps } from "@/types/cards";
 
 const PLATINUM_BLUE = "#6B7280";
 

@@ -10,16 +10,9 @@ import { Button } from "@/components/ui/button";
 import { DollarSign, Calendar, Trash2 } from "lucide-react";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency } from "@/lib/format";
-import type { Debt, DebtPayment } from "@/lib/types";
+import type { DebtListProps } from "@/types/debt";
 
-export type DebtListProps = {
-  debts: Debt[];
-  paymentsByDebt: Map<string, DebtPayment[]>;
-  onAddPayment: (debtId: string) => void;
-  onEditRecurring: (debt: Debt) => void;
-  onDelete: (debtId: string) => void;
-  onRemovePayment: (paymentId: string) => void;
-};
+export type { DebtListProps };
 
 export function DebtList({
   debts,
@@ -84,8 +77,12 @@ export function DebtList({
                         {formatCurrency(debt.recurringAmount)}{" "}
                         <span className="text-muted-foreground font-normal">
                           {debt.recurringFrequency === "biweekly"
-                            ? `bi-weekly from ${debt.recurringStartDate ?? debt.startDate ?? "—"}`
-                            : `monthly on day ${debt.recurringDayOfMonth ?? "—"}`}
+                            ? `bi-weekly from ${
+                                debt.recurringStartDate ?? debt.startDate ?? "—"
+                              }`
+                            : `monthly on day ${
+                                debt.recurringDayOfMonth ?? "—"
+                              }`}
                         </span>
                       </>
                     ) : (

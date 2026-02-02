@@ -8,18 +8,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SourceIcon } from "@/components/cards";
 import { formatCurrency } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
-import type { Expense } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import type { ExpensesByMonthListProps } from "@/types/transactions";
 
-export type ExpensesByMonthListProps = {
-  byMonth: [string, Expense[]][];
-  defaultOpenMonth: string;
-  selectedIds: Set<string>;
-  onToggleSelect: (id: string) => void;
-  onToggleMonthSelection: (monthExpenses: Expense[]) => void;
-  onExpenseTap: (expense: Expense) => void;
-  t: (key: string, opts?: { count?: number }) => string;
-};
+export type { ExpensesByMonthListProps };
 
 export function ExpensesByMonthList({
   byMonth,
@@ -58,7 +50,7 @@ export function ExpensesByMonthList({
                   key={e.id}
                   className={cn(
                     "flex items-start gap-3 px-4 py-3 min-h-[52px]",
-                    index % 2 === 1 ? "bg-muted/30" : undefined,
+                    index % 2 === 1 ? "bg-muted/30" : undefined
                   )}
                 >
                   <div className="pt-0.5 shrink-0">
@@ -73,7 +65,9 @@ export function ExpensesByMonthList({
                     type="button"
                     className="flex-1 min-w-0 text-left rounded-md -mx-2 px-2 py-1 -my-1 hover:bg-muted/50 active:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     onClick={() => onExpenseTap(e)}
-                    aria-label={`${e.description}, ${formatCurrency(e.amount)}, ${e.date}`}
+                    aria-label={`${e.description}, ${formatCurrency(
+                      e.amount
+                    )}, ${e.date}`}
                   >
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="truncate text-sm font-medium text-foreground">

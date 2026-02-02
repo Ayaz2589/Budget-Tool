@@ -18,26 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { DebtOwner } from "@/lib/types";
+import type { DebtOwner, RecurringFrequency } from "@/types/core";
+import type { AddDebtPayload, AddDebtDialogProps } from "@/types/debt";
 
-type RecurringFrequency = "monthly" | "biweekly";
-
-export type AddDebtPayload = {
-  name: string;
-  initialAmount: number;
-  startDate?: string;
-  owner: DebtOwner;
-  recurringAmount?: number;
-  recurringFrequency?: RecurringFrequency;
-  recurringDayOfMonth?: number;
-  recurringStartDate?: string;
-};
-
-export type AddDebtDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (payload: AddDebtPayload) => void;
-};
+export type { AddDebtPayload, AddDebtDialogProps };
 
 export function AddDebtDialog({
   open,

@@ -10,12 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
-import type { Expense } from "@/lib/types";
+import type { MortgagePaymentsTableProps } from "@/types/mortgage";
 
-export type MortgagePaymentsTableProps = {
-  payments: Expense[];
-  onRemove: (expense: Expense) => void;
-};
+export type { MortgagePaymentsTableProps };
 
 export function MortgagePaymentsTable({
   payments,

@@ -19,7 +19,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { formatCurrency, formatPercent } from "@/lib/format";
-import type { MonthTotals } from "@/lib/totals";
+import type { ByMonthSectionProps } from "@/types/dashboard";
 
 function getChartConfig(t: (key: string) => string) {
   return {
@@ -38,12 +38,6 @@ function getChartConfig(t: (key: string) => string) {
       },
     },
   } satisfies ChartConfig;
-}
-
-interface ByMonthSectionProps {
-  chartData: { month: string; earned: number; spent: number }[];
-  months: MonthTotals[];
-  currentMonthKey: string;
 }
 
 export function ByMonthSection({

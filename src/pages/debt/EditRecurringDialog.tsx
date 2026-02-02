@@ -17,24 +17,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Debt } from "@/lib/types";
+import type { RecurringFrequency } from "@/types/core";
+import type {
+  EditRecurringPayload,
+  EditRecurringDialogProps,
+} from "@/types/debt";
 
-type RecurringFrequency = "monthly" | "biweekly";
-
-export type EditRecurringPayload = {
-  recurringAmount: number;
-  recurringFrequency: RecurringFrequency;
-  recurringDayOfMonth?: number;
-  recurringStartDate?: string;
-};
-
-export type EditRecurringDialogProps = {
-  open: boolean;
-  debt: Debt | null;
-  onClose: () => void;
-  onSave: (payload: EditRecurringPayload) => void;
-  onClear: () => void;
-};
+export type { EditRecurringPayload, EditRecurringDialogProps };
 
 export function EditRecurringDialog({
   open,
@@ -51,15 +40,15 @@ export function EditRecurringDialog({
   useEffect(() => {
     if (debt) {
       setAmount(
-        debt.recurringAmount != null ? String(debt.recurringAmount) : "",
+        debt.recurringAmount != null ? String(debt.recurringAmount) : ""
       );
       setFrequency(
-        debt.recurringFrequency === "biweekly" ? "biweekly" : "monthly",
+        debt.recurringFrequency === "biweekly" ? "biweekly" : "monthly"
       );
       setDay(
         debt.recurringDayOfMonth != null
           ? String(debt.recurringDayOfMonth)
-          : "1",
+          : "1"
       );
       setStartDate(debt.recurringStartDate ?? "");
     }

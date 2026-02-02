@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,12 +12,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { IncomeCategoriesCardProps } from "@/types/settings";
 
-export type IncomeCategoriesCardProps = {
-  categories: string[];
-  onRemove: (category: string) => void;
-  onAdd: (name: string) => void;
-};
+export type { IncomeCategoriesCardProps };
 
 export function IncomeCategoriesCard({
   categories,
@@ -103,12 +95,19 @@ export function IncomeCategoriesCard({
         </div>
       </CardContent>
 
-      <Dialog open={!!categoryToRemove} onOpenChange={(open) => !open && setCategoryToRemove(null)}>
+      <Dialog
+        open={!!categoryToRemove}
+        onOpenChange={(open) => !open && setCategoryToRemove(null)}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("settings.removeIncomeCategoryConfirmTitle")}</DialogTitle>
+            <DialogTitle>
+              {t("settings.removeIncomeCategoryConfirmTitle")}
+            </DialogTitle>
             <DialogDescription>
-              {t("settings.removeIncomeCategoryConfirmDesc", { category: categoryToRemove ?? "" })}
+              {t("settings.removeIncomeCategoryConfirmDesc", {
+                category: categoryToRemove ?? "",
+              })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -117,7 +116,9 @@ export function IncomeCategoriesCard({
             </Button>
             <Button variant="destructive" onClick={handleConfirmRemove}>
               <Trash2 className="size-4" />
-              {t("settings.removeCategory", { category: categoryToRemove ?? "" })}
+              {t("settings.removeCategory", {
+                category: categoryToRemove ?? "",
+              })}
             </Button>
           </DialogFooter>
         </DialogContent>

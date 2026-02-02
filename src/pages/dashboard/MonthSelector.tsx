@@ -7,15 +7,9 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { getMonthLabel } from "@/lib/totals";
+import type { MonthSelectorProps } from "@/types/dashboard";
 
-export type MonthSelectorProps = {
-  value: string;
-  onChange: (value: string) => void;
-  options: string[];
-  currentMonthKey: string;
-  isCurrentMonth: boolean;
-  t: (key: string, opts?: { month?: string }) => string;
-};
+export type { MonthSelectorProps };
 
 export function MonthSelector({
   value,

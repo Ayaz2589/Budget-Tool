@@ -25,13 +25,9 @@ import {
 } from "@/components/cards";
 import { EXPENSE_SOURCE_DISPLAY_LABELS } from "@/lib/sourceLabels";
 import { cn } from "@/lib/utils";
+import type { SourceChoice, ImportSourceCardProps } from "@/types/import";
 
-export type SourceChoice =
-  | "amex"
-  | "amex-gold"
-  | "apple"
-  | "chase"
-  | "pdf-export";
+export type { ImportSourceCardProps };
 
 const ALL_SOURCE_OPTIONS: {
   value: SourceChoice;
@@ -58,29 +54,12 @@ const ALL_SOURCE_OPTIONS: {
     label: EXPENSE_SOURCE_DISPLAY_LABELS.chase,
     icon: ChaseCardIcon,
   },
-  { value: "pdf-export", label: "Exported PDF (re-import)", icon: PdfExportIcon },
+  {
+    value: "pdf-export",
+    label: "Exported PDF (re-import)",
+    icon: PdfExportIcon,
+  },
 ];
-
-export type ImportSourceCardProps = {
-  selectedSource: SourceChoice;
-  onSourceChange: (value: SourceChoice) => void;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
-  accept: string;
-  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  importError: string;
-  lastDetected: string;
-  sourceLabel: string;
-  previewExpensesCount: number;
-  previewIncomeCount: number;
-  previewDebtsCount: number;
-  previewDebtPaymentsCount: number;
-  skippedDuplicates: number;
-  onAddToTransactions: () => void;
-  isPdfExport: boolean;
-  /** Enabled card sources; only these (plus pdf-export) are shown. */
-  cardSources: string[];
-  t: (key: string) => string;
-};
 
 export function ImportSourceCard({
   selectedSource,
@@ -102,8 +81,7 @@ export function ImportSourceCard({
   t,
 }: ImportSourceCardProps) {
   const sourceOptions = ALL_SOURCE_OPTIONS.filter(
-    (opt) =>
-      opt.value === "pdf-export" || cardSources.includes(opt.value),
+    (opt) => opt.value === "pdf-export" || cardSources.includes(opt.value)
   );
   const hasPreview =
     previewExpensesCount > 0 ||
@@ -160,20 +138,28 @@ export function ImportSourceCard({
           {selectedSource === "pdf-export"
             ? "Choose exported PDF"
             : selectedSource === "chase"
-              ? "Choose PDF statement"
-              : "Choose CSV/PDF file"}
+            ? "Choose PDF statement"
+            : "Choose CSV/PDF file"}
         </Button>
         {importError && (
-          <span className="text-sm text-destructive block">
-            {importError}
-          </span>
+          <span className="text-sm text-destructive block">{importError}</span>
         )}
         {lastDetected && !importError && (
           <span className="text-sm text-muted-foreground block">
             {sourceLabel}
             {isPdfExport
-              ? ` · ${previewExpensesCount} expenses, ${previewIncomeCount} income${previewDebtsCount > 0 ? `, ${previewDebtsCount} debts` : ""}${previewDebtPaymentsCount > 0 ? `, ${previewDebtPaymentsCount} debt payments` : ""} to add (existing IDs omitted)`
-              : ` · ${previewExpensesCount} rows${skippedDuplicates > 0 ? ` (${skippedDuplicates} duplicates skipped)` : ""}`}
+              ? ` · ${previewExpensesCount} expenses, ${previewIncomeCount} income${
+                  previewDebtsCount > 0 ? `, ${previewDebtsCount} debts` : ""
+                }${
+                  previewDebtPaymentsCount > 0
+                    ? `, ${previewDebtPaymentsCount} debt payments`
+                    : ""
+                } to add (existing IDs omitted)`
+              : ` · ${previewExpensesCount} rows${
+                  skippedDuplicates > 0
+                    ? ` (${skippedDuplicates} duplicates skipped)`
+                    : ""
+                }`}
           </span>
         )}
         {hasPreview && (

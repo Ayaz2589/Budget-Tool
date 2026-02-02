@@ -7,13 +7,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import type { SyncConfirmDialogProps } from "@/types/transactions";
 
-export type SyncConfirmDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
-  t: (key: string) => string;
-};
+export type { SyncConfirmDialogProps };
 
 export function SyncConfirmDialog({
   open,

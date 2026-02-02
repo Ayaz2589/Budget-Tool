@@ -6,7 +6,8 @@ import {
   useState,
 } from "react";
 import type { ReactNode } from "react";
-import type { PresetTransaction } from "@/lib/types";
+import type { PresetTransaction } from "@/types/core";
+import type { PresetTransactionsContextValue } from "@/types/context";
 
 const PRESET_STORAGE_KEY = "budget-tool-preset-transactions";
 
@@ -14,17 +15,14 @@ function generatePresetId(): string {
   return `preset-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-interface PresetTransactionsContextValue {
-  presetTransactions: PresetTransaction[];
-  addPreset: (preset: Omit<PresetTransaction, "id">) => void;
-  removePreset: (id: string) => void;
-  setPresets: (presets: PresetTransaction[]) => void;
-}
-
 const PresetTransactionsContext =
   createContext<PresetTransactionsContextValue | null>(null);
 
-export function PresetTransactionsProvider({ children }: { children: ReactNode }) {
+export function PresetTransactionsProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [presetTransactions, setPresetTransactions] = useState<
     PresetTransaction[]
   >(() => {
@@ -46,26 +44,23 @@ export function PresetTransactionsProvider({ children }: { children: ReactNode }
 
   const addPreset = useCallback(
     (preset: Omit<PresetTransaction, "id">) => {
-      persist([
-        ...presetTransactions,
-        { ...preset, id: generatePresetId() },
-      ]);
+      persist([...presetTransactions, { ...preset, id: generatePresetId() }]);
     },
-    [persist, presetTransactions],
+    [persist, presetTransactions]
   );
 
   const removePreset = useCallback(
     (id: string) => {
       persist(presetTransactions.filter((p) => p.id !== id));
     },
-    [persist, presetTransactions],
+    [persist, presetTransactions]
   );
 
   const setPresets = useCallback(
     (presets: PresetTransaction[]) => {
       persist(presets);
     },
-    [persist],
+    [persist]
   );
 
   const value = useMemo<PresetTransactionsContextValue>(
@@ -75,7 +70,7 @@ export function PresetTransactionsProvider({ children }: { children: ReactNode }
       removePreset,
       setPresets,
     }),
-    [presetTransactions, addPreset, removePreset, setPresets],
+    [presetTransactions, addPreset, removePreset, setPresets]
   );
 
   return (
@@ -89,7 +84,7 @@ export function usePresetTransactions() {
   const ctx = useContext(PresetTransactionsContext);
   if (!ctx)
     throw new Error(
-      "usePresetTransactions must be used within PresetTransactionsProvider",
+      "usePresetTransactions must be used within PresetTransactionsProvider"
     );
   return ctx;
 }

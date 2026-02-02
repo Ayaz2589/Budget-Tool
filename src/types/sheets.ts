@@ -1,0 +1,10 @@
+export interface SheetIds {
+  expenses: number;
+  income: number;
+  totals: number;
+  debts: number;
+  debtPayments: number;
+  mortgage: number;
+  rules: number;
+  presetTransactions: number;
+}

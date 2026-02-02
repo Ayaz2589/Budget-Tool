@@ -11,16 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
+import type { AddMortgagePaymentDialogProps } from "@/types/mortgage";
 
-export type AddMortgagePaymentDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  date: string;
-  onDateChange: (value: string) => void;
-  amount: string;
-  onAmountChange: (value: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
-};
+export type { AddMortgagePaymentDialogProps };
 
 export function AddMortgagePaymentDialog({
   open,

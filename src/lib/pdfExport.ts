@@ -7,15 +7,13 @@ import type {
   Income,
   ExpenseSource,
   PresetTransaction,
-} from "@/lib/types";
-import type { Rule } from "@/lib/rules";
+} from "@/types/core";
+import type { Rule } from "@/types/rules";
+import type { CategoryWithColorPayload } from "@/types/payload";
+import type { ParsedExportedPdf } from "@/types/pdf";
 import { getMonthLabel, computeMonthTotals } from "@/lib/totals";
 import { formatCurrency, formatPercent } from "@/lib/format";
-import {
-  serializeToBlob,
-  parseFromBlob,
-  type CategoryWithColorPayload,
-} from "@/lib/minifiedPayload";
+import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { EXPENSE_SOURCE_DISPLAY_LABELS } from "@/lib/sourceLabels";
 
 const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
@@ -367,17 +365,7 @@ export function downloadTransactionsAndIncomePdf(
 const DATA_START_MARKER = "BUDGET_TOOL_DATA_START";
 const DATA_END_MARKER = "BUDGET_TOOL_DATA_END";
 
-export interface ParsedExportedPdf {
-  expenses: Expense[];
-  income: Income[];
-  debts: Debt[];
-  debtPayments: DebtPayment[];
-  rules: Rule[];
-  presetTransactions: PresetTransaction[];
-  expenseCategoriesWithColors?: CategoryWithColorPayload[];
-  incomeCategoriesWithColors?: CategoryWithColorPayload[];
-  cardSources?: string[];
-}
+export type { ParsedExportedPdf };
 
 function emptyParsed(): ParsedExportedPdf {
   return {

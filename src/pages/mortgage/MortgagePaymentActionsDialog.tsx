@@ -8,14 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
-import type { Expense } from "@/lib/types";
+import type { MortgagePaymentActionsDialogProps } from "@/types/mortgage";
 
-export type MortgagePaymentActionsDialogProps = {
-  payment: Expense | null;
-  onClose: () => void;
-  onRemove: (expense: Expense) => void;
-  t: (key: string) => string;
-};
+export type { MortgagePaymentActionsDialogProps };
 
 export function MortgagePaymentActionsDialog({
   payment,

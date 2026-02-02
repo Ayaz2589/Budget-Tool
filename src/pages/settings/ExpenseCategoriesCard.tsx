@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,12 +12,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { ExpenseCategoriesCardProps } from "@/types/settings";
 
-export type ExpenseCategoriesCardProps = {
-  categories: string[];
-  onRemove: (category: string) => void;
-  onAdd: (name: string) => void;
-};
+export type { ExpenseCategoriesCardProps };
 
 export function ExpenseCategoriesCard({
   categories,
@@ -84,7 +76,9 @@ export function ExpenseCategoriesCard({
             aria-label={t("settings.addCategory")}
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAdd())}
+            onKeyDown={(e) =>
+              e.key === "Enter" && (e.preventDefault(), handleAdd())
+            }
             placeholder={t("settings.addCategoryPlaceholder")}
             className="min-w-0 flex-1"
           />
@@ -101,12 +95,19 @@ export function ExpenseCategoriesCard({
         </div>
       </CardContent>
 
-      <Dialog open={!!categoryToRemove} onOpenChange={(open) => !open && setCategoryToRemove(null)}>
+      <Dialog
+        open={!!categoryToRemove}
+        onOpenChange={(open) => !open && setCategoryToRemove(null)}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("settings.removeExpenseCategoryConfirmTitle")}</DialogTitle>
+            <DialogTitle>
+              {t("settings.removeExpenseCategoryConfirmTitle")}
+            </DialogTitle>
             <DialogDescription>
-              {t("settings.removeExpenseCategoryConfirmDesc", { category: categoryToRemove ?? "" })}
+              {t("settings.removeExpenseCategoryConfirmDesc", {
+                category: categoryToRemove ?? "",
+              })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -115,7 +116,9 @@ export function ExpenseCategoriesCard({
             </Button>
             <Button variant="destructive" onClick={handleConfirmRemove}>
               <Trash2 className="size-4" />
-              {t("settings.removeCategory", { category: categoryToRemove ?? "" })}
+              {t("settings.removeCategory", {
+                category: categoryToRemove ?? "",
+              })}
             </Button>
           </DialogFooter>
         </DialogContent>

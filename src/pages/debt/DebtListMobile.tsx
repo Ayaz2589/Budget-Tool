@@ -1,13 +1,9 @@
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency } from "@/lib/format";
-import type { Debt, DebtPayment } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import type { DebtListMobileProps } from "@/types/debt";
 
-export type DebtListMobileProps = {
-  debts: Debt[];
-  paymentsByDebt: Map<string, DebtPayment[]>;
-  onDebtTap: (debt: Debt) => void;
-};
+export type { DebtListMobileProps };
 
 export function DebtListMobile({
   debts,
@@ -26,7 +22,7 @@ export function DebtListMobile({
             className={cn(
               "flex flex-col gap-0.5 w-full text-left px-4 py-3 min-h-[52px] rounded-none",
               "hover:bg-muted/50 active:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-              index % 2 === 1 ? "bg-muted/30" : undefined,
+              index % 2 === 1 ? "bg-muted/30" : undefined
             )}
             onClick={() => onDebtTap(debt)}
             aria-label={`${debt.name}, balance ${formatCurrency(balance)}`}

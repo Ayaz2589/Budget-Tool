@@ -1,7 +1,4 @@
-interface AmexGoldCardIconProps {
-  className?: string;
-  size?: number;
-}
+import type { AmexGoldCardIconProps } from "@/types/cards";
 
 const GOLD_COLOR = "#C9A227";
 

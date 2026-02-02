@@ -10,20 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { AddPaymentPayload, AddPaymentDialogProps } from "@/types/debt";
 
-export type AddPaymentPayload = {
-  debtId: string;
-  date: string;
-  amount: number;
-  note?: string;
-};
-
-export type AddPaymentDialogProps = {
-  open: boolean;
-  debtId: string | null;
-  onClose: () => void;
-  onSubmit: (payload: AddPaymentPayload) => void;
-};
+export type { AddPaymentPayload, AddPaymentDialogProps };
 
 export function AddPaymentDialog({
   open,

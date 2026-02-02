@@ -16,16 +16,9 @@ import {
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
-import type { Expense } from "@/lib/types";
+import type { ExpenseActionsDialogProps } from "@/types/transactions";
 
-export type ExpenseActionsDialogProps = {
-  expense: Expense | null;
-  onClose: () => void;
-  onUpdateCategory: (id: string, category: string) => void;
-  onDelete: (expense: Expense) => void;
-  expenseCategories: string[];
-  t: (key: string) => string;
-};
+export type { ExpenseActionsDialogProps };
 
 export function ExpenseActionsDialog({
   expense,

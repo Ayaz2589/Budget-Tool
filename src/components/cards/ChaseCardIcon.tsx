@@ -1,7 +1,4 @@
-interface ChaseCardIconProps {
-  className?: string;
-  size?: number;
-}
+import type { ChaseCardIconProps } from "@/types/cards";
 
 export function ChaseCardIcon({
   className = "",

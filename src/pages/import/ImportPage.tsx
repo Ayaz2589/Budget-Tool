@@ -14,7 +14,8 @@ import { useRules } from "@/context/RulesContext";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
 import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { importTourSteps } from "@/lib/pageTourSteps";
-import { ImportSourceCard, type SourceChoice } from "./ImportSourceCard";
+import { ImportSourceCard } from "./ImportSourceCard";
+import type { SourceChoice } from "@/types/import";
 import { ImportPreviewCard } from "./ImportPreviewCard";
 
 export function ImportPage() {
@@ -24,7 +25,7 @@ export function ImportPage() {
   const [previewIncome, setPreviewIncome] = useState<Income[]>([]);
   const [previewDebts, setPreviewDebts] = useState<Debt[]>([]);
   const [previewDebtPayments, setPreviewDebtPayments] = useState<DebtPayment[]>(
-    [],
+    []
   );
   const [sourceLabel, setSourceLabel] = useState<string>("");
   const [lastDetected, setLastDetected] = useState<string>("");
@@ -59,12 +60,12 @@ export function ImportPage() {
       const firstValid = cardSources.includes("amex")
         ? "amex"
         : cardSources.includes("amex-gold")
-          ? "amex-gold"
-          : cardSources.includes("apple")
-            ? "apple"
-            : cardSources.includes("chase")
-              ? "chase"
-              : "pdf-export";
+        ? "amex-gold"
+        : cardSources.includes("apple")
+        ? "apple"
+        : cardSources.includes("chase")
+        ? "chase"
+        : "pdf-export";
       setSelectedSource(firstValid as SourceChoice);
     }
   }, [cardSources, selectedSource]);
@@ -73,7 +74,7 @@ export function ImportPage() {
     if (rules.length === 0) return incoming;
     const totals = computeTotalsByCategoryForMonth(
       [...expenses, ...incoming],
-      currentMonthKey,
+      currentMonthKey
     );
     return applyRulesToExpenses(incoming, rules, {
       totalsByCategory: totals,
@@ -94,7 +95,7 @@ export function ImportPage() {
           const parsed = parseExportedPdfData(text);
           const existingExpenseIds = new Set(expenses.map((ex) => ex.id));
           const toAddExpenses = parsed.expenses.filter(
-            (ex) => !existingExpenseIds.has(ex.id),
+            (ex) => !existingExpenseIds.has(ex.id)
           );
           const toAddIncome = parsed.income.filter((i) => {
             if (income.some((existing) => existing.id === i.id)) return false;
@@ -103,17 +104,17 @@ export function ImportPage() {
                 existing.date === i.date &&
                 Math.abs(existing.amount - i.amount) < 0.01 &&
                 (existing.category || "").toLowerCase() ===
-                  (i.category || "").toLowerCase(),
+                  (i.category || "").toLowerCase()
             );
             return !sameEntry;
           });
           const existingDebtIds = new Set(debts.map((d) => d.id));
           const existingPaymentIds = new Set(debtPayments.map((p) => p.id));
           const toAddDebts = parsed.debts.filter(
-            (d) => !existingDebtIds.has(d.id),
+            (d) => !existingDebtIds.has(d.id)
           );
           const toAddDebtPayments = parsed.debtPayments.filter(
-            (p) => !existingPaymentIds.has(p.id),
+            (p) => !existingPaymentIds.has(p.id)
           );
           if (
             parsed.expenses.length === 0 &&
@@ -125,7 +126,7 @@ export function ImportPage() {
             text.trim().length > 0
           ) {
             setImportError(
-              "This doesn't look like an exported transactions PDF.",
+              "This doesn't look like an exported transactions PDF."
             );
             setPreviewExpenses([]);
             setPreviewIncome([]);
@@ -150,7 +151,7 @@ export function ImportPage() {
             parsed.expenseCategoriesWithColors.length > 0
           ) {
             setExpenseCategories(
-              parsed.expenseCategoriesWithColors.map((x) => x.name),
+              parsed.expenseCategoriesWithColors.map((x) => x.name)
             );
           }
           if (
@@ -158,7 +159,7 @@ export function ImportPage() {
             parsed.incomeCategoriesWithColors.length > 0
           ) {
             setIncomeCategories(
-              parsed.incomeCategoriesWithColors.map((x) => x.name),
+              parsed.incomeCategoriesWithColors.map((x) => x.name)
             );
           }
           setPreviewExpenses(applyRulesForPreview(toAddExpenses));
@@ -170,7 +171,7 @@ export function ImportPage() {
           setSkippedDuplicates(0);
         } catch (err) {
           setImportError(
-            err instanceof Error ? err.message : "PDF import failed",
+            err instanceof Error ? err.message : "PDF import failed"
           );
           setPreviewExpenses([]);
           setPreviewIncome([]);
@@ -197,7 +198,7 @@ export function ImportPage() {
           setLastDetected("chase");
         } catch (err) {
           setImportError(
-            err instanceof Error ? err.message : "PDF import failed",
+            err instanceof Error ? err.message : "PDF import failed"
           );
           setPreviewExpenses([]);
           setPreviewIncome([]);
@@ -234,10 +235,10 @@ export function ImportPage() {
             selectedSource === "amex"
               ? "Amex Platinum Card"
               : selectedSource === "amex-gold"
-                ? "Amex Gold Card"
-                : selectedSource === "apple"
-                  ? "Apple Card"
-                  : "Chase";
+              ? "Amex Gold Card"
+              : selectedSource === "apple"
+              ? "Apple Card"
+              : "Chase";
           setSourceLabel(label);
           setLastDetected(selectedSource);
         } catch (err) {
@@ -256,7 +257,7 @@ export function ImportPage() {
 
   const updatePreviewCategory = (id: string, category: string) => {
     setPreviewExpenses((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, category } : e)),
+      prev.map((e) => (e.id === id ? { ...e, category } : e))
     );
   };
 
@@ -299,46 +300,48 @@ export function ImportPage() {
             <h1 className="text-2xl font-semibold">{t("import.title")}</h1>
             <PageTourTrigger pageId="import" steps={importTourSteps} />
           </div>
-          <p className="text-sm text-muted-foreground">{t("import.subtitle")}</p>
+          <p className="text-sm text-muted-foreground">
+            {t("import.subtitle")}
+          </p>
         </div>
       </div>
       <div data-tour="uploadCard">
         <ImportSourceCard
-        selectedSource={selectedSource}
-        onSourceChange={setSelectedSource}
-        fileInputRef={fileInputRef}
-        accept={
-          selectedSource === "chase" || selectedSource === "pdf-export"
-            ? ".pdf"
-            : ".csv"
-        }
-        onFileChange={handleFileChange}
-        importError={importError}
-        lastDetected={lastDetected}
-        sourceLabel={sourceLabel}
-        previewExpensesCount={previewExpenses.length}
-        previewIncomeCount={previewIncome.length}
-        previewDebtsCount={previewDebts.length}
-        previewDebtPaymentsCount={previewDebtPayments.length}
-        skippedDuplicates={skippedDuplicates}
-        onAddToTransactions={addToTransactions}
-        isPdfExport={lastDetected === "pdf-export"}
-        cardSources={cardSources}
-        t={t}
-      />
+          selectedSource={selectedSource}
+          onSourceChange={setSelectedSource}
+          fileInputRef={fileInputRef}
+          accept={
+            selectedSource === "chase" || selectedSource === "pdf-export"
+              ? ".pdf"
+              : ".csv"
+          }
+          onFileChange={handleFileChange}
+          importError={importError}
+          lastDetected={lastDetected}
+          sourceLabel={sourceLabel}
+          previewExpensesCount={previewExpenses.length}
+          previewIncomeCount={previewIncome.length}
+          previewDebtsCount={previewDebts.length}
+          previewDebtPaymentsCount={previewDebtPayments.length}
+          skippedDuplicates={skippedDuplicates}
+          onAddToTransactions={addToTransactions}
+          isPdfExport={lastDetected === "pdf-export"}
+          cardSources={cardSources}
+          t={t}
+        />
       </div>
       {hasPreview && (
         <div data-tour="previewCard">
-        <ImportPreviewCard
-          previewExpenses={previewExpenses}
-          previewIncome={previewIncome}
-          previewDebts={previewDebts}
-          previewDebtPayments={previewDebtPayments}
-          expenseCategories={expenseCategories}
-          onUpdateCategory={updatePreviewCategory}
-          lastDetected={lastDetected}
-          t={t}
-        />
+          <ImportPreviewCard
+            previewExpenses={previewExpenses}
+            previewIncome={previewIncome}
+            previewDebts={previewDebts}
+            previewDebtPayments={previewDebtPayments}
+            expenseCategories={expenseCategories}
+            onUpdateCategory={updatePreviewCategory}
+            lastDetected={lastDetected}
+            t={t}
+          />
         </div>
       )}
     </div>

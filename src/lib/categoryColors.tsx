@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import type { CategoryType } from "@/types/category";
 
 const EXPENSE_COLORS: Record<string, string> = {
   "My Purchase": "bg-blue-500",
@@ -17,7 +18,7 @@ const INCOME_COLORS: Record<string, string> = {
 
 const DEFAULT_COLOR = "bg-gray-400";
 
-export type CategoryType = "expense" | "income";
+export type { CategoryType } from "@/types/category";
 
 export function getCategoryColor(name: string, type?: CategoryType): string {
   if (type === "expense") return EXPENSE_COLORS[name] ?? DEFAULT_COLOR;

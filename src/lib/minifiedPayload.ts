@@ -6,38 +6,15 @@ import type {
   Income,
   ExpenseSource,
   PresetTransaction,
-} from "@/lib/types";
-import type { Rule } from "@/lib/rules";
+} from "@/types/core";
+import type { Rule } from "@/types/rules";
+import type {
+  CategoryWithColorPayload,
+  MinifiedPayloadInput,
+  ExpandedPayload,
+} from "@/types/payload";
 
-/** Category name + color for payload (used in PDF and Sheets). */
-export interface CategoryWithColorPayload {
-  name: string;
-  color: string;
-}
-
-export interface MinifiedPayloadInput {
-  expenses: Expense[];
-  income: Income[];
-  debts: Debt[];
-  debtPayments: DebtPayment[];
-  rules: Rule[];
-  presetTransactions: PresetTransaction[];
-  expenseCategoriesWithColors?: CategoryWithColorPayload[];
-  incomeCategoriesWithColors?: CategoryWithColorPayload[];
-  cardSources?: string[];
-}
-
-export interface ExpandedPayload {
-  expenses: Expense[];
-  income: Income[];
-  debts: Debt[];
-  debtPayments: DebtPayment[];
-  rules: Rule[];
-  presetTransactions: PresetTransaction[];
-  expenseCategoriesWithColors?: CategoryWithColorPayload[];
-  incomeCategoriesWithColors?: CategoryWithColorPayload[];
-  cardSources?: string[];
-}
+export type { CategoryWithColorPayload, MinifiedPayloadInput, ExpandedPayload };
 
 /** Omit undefined, null, and empty string from objects for smaller payload. */
 function omitEmpty<T extends Record<string, unknown>>(obj: T): Record<string, unknown> {

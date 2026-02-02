@@ -1,9 +1,10 @@
-import type { ParseResult } from "@/lib/types";
+import type { ParseResult } from "@/types/core";
+import type { CsvSource } from "@/types/import";
 import { parseAmexCsv } from "./amex";
 import { parseChaseCsv } from "./chase";
 import { parseAppleCsv } from "./apple";
 
-export type CsvSource = "amex" | "chase" | "apple" | "unknown";
+export type { CsvSource } from "@/types/import";
 
 const STRIP_BOM = /^\uFEFF/;
 

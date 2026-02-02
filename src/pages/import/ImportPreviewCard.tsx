@@ -22,18 +22,9 @@ import {
 } from "@/components/ui/select";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
-import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
+import type { ImportPreviewCardProps } from "@/types/import";
 
-export type ImportPreviewCardProps = {
-  previewExpenses: Expense[];
-  previewIncome: Income[];
-  previewDebts: Debt[];
-  previewDebtPayments: DebtPayment[];
-  expenseCategories: string[];
-  onUpdateCategory: (id: string, category: string) => void;
-  lastDetected: string;
-  t: (key: string) => string;
-};
+export type { ImportPreviewCardProps };
 
 export function ImportPreviewCard({
   previewExpenses,
@@ -162,9 +153,9 @@ export function ImportPreviewCard({
                             i.recurringStartDate
                             ? `Biweekly from ${i.recurringStartDate}`
                             : i.recurringFrequency === "monthly" &&
-                                i.recurringDayOfMonth != null
-                              ? `Monthly on ${i.recurringDayOfMonth}`
-                              : "—"
+                              i.recurringDayOfMonth != null
+                            ? `Monthly on ${i.recurringDayOfMonth}`
+                            : "—"
                           : "—"}
                       </TableCell>
                     </TableRow>

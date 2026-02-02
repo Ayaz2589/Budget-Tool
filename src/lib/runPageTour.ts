@@ -1,11 +1,9 @@
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
-export type TourStepInput = {
-  target?: string;
-  titleKey: string;
-  contentKey: string;
-};
+import type { TourStepInput } from "@/types/tour";
+
+export type { TourStepInput };
 
 /**
  * Runs a multi-step page tour using driver.js.

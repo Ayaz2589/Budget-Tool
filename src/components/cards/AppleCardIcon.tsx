@@ -1,7 +1,4 @@
-interface AppleCardIconProps {
-  className?: string;
-  size?: number;
-}
+import type { AppleCardIconProps } from "@/types/cards";
 
 export function AppleCardIcon({
   className = "",

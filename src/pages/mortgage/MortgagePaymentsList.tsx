@@ -1,11 +1,8 @@
 import { formatCurrency } from "@/lib/format";
-import type { Expense } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import type { MortgagePaymentsListProps } from "@/types/mortgage";
 
-export type MortgagePaymentsListProps = {
-  payments: Expense[];
-  onPaymentTap: (expense: Expense) => void;
-};
+export type { MortgagePaymentsListProps };
 
 export function MortgagePaymentsList({
   payments,
@@ -20,7 +17,7 @@ export function MortgagePaymentsList({
           className={cn(
             "flex flex-col gap-0.5 w-full text-left px-4 py-3 min-h-[52px] rounded-none",
             "hover:bg-muted/50 active:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-            index % 2 === 1 ? "bg-muted/30" : undefined,
+            index % 2 === 1 ? "bg-muted/30" : undefined
           )}
           onClick={() => onPaymentTap(e)}
           aria-label={`${e.date}, ${formatCurrency(e.amount)}`}

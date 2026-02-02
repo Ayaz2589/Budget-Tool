@@ -1,11 +1,7 @@
 import { useTranslation } from "react-i18next";
-import type { MonthTotals } from "@/lib/totals";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface SummaryCardsProps {
-  selectedMonth: MonthTotals;
-}
+import type { SummaryCardsProps } from "@/types/dashboard";
 
 export function SummaryCards({ selectedMonth }: SummaryCardsProps) {
   const { t } = useTranslation();

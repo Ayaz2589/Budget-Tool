@@ -1,12 +1,8 @@
 import { formatCurrency, formatPercent } from "@/lib/format";
-import type { MonthTotals } from "@/lib/totals";
 import { cn } from "@/lib/utils";
+import type { ByMonthListProps } from "@/types/dashboard";
 
-export type ByMonthListProps = {
-  months: MonthTotals[];
-  currentMonthKey: string;
-  t: (key: string) => string;
-};
+export type { ByMonthListProps };
 
 export function ByMonthList({ months, currentMonthKey, t }: ByMonthListProps) {
   return (
@@ -19,7 +15,7 @@ export function ByMonthList({ months, currentMonthKey, t }: ByMonthListProps) {
             className={cn(
               "px-4 py-3 min-h-[52px] space-y-1",
               isCurrent && "bg-primary/10 font-medium",
-              index % 2 === 1 && !isCurrent && "bg-muted/30",
+              index % 2 === 1 && !isCurrent && "bg-muted/30"
             )}
           >
             <div className="flex items-baseline justify-between gap-2">

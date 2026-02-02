@@ -16,27 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { GoogleSheetsCardProps } from "@/types/settings";
 
-export type GoogleSheetsCardProps = {
-  isSignedIn: boolean;
-  signIn: () => void;
-  signOut: () => void;
-  spreadsheetId: string | undefined;
-  sheetIdInput: string;
-  onSheetIdChange: (value: string) => void;
-  onSetSheetId: () => void;
-  syncToSheets: () => void;
-  pullFromSheet: () => void;
-  syncStatus: "idle" | "syncing" | "success" | "error";
-  syncErrorMessage: string | undefined;
-  onRepairDates: () => void;
-  repairResult: string | null;
-  syncConfirmOpen: boolean;
-  setSyncConfirmOpen: (open: boolean) => void;
-  restoreConfirmOpen: boolean;
-  setRestoreConfirmOpen: (open: boolean) => void;
-  t: (key: string) => string;
-};
+export type { GoogleSheetsCardProps };
 
 export function GoogleSheetsCard({
   isSignedIn,

@@ -17,7 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
-import type { Income, DebtOwner } from "@/lib/types";
+import type { Income, DebtOwner } from "@/types/core";
+import type { IncomeTableProps } from "@/types/income";
 
 function formatRecurring(i: Income): string {
   if (i.recurringAmount == null || i.recurringAmount <= 0) return "—";
@@ -35,14 +36,7 @@ function formatRecurring(i: Income): string {
   return "—";
 }
 
-export type IncomeTableProps = {
-  sortedIncome: Income[];
-  incomeCategories: string[];
-  onEdit: (income: Income) => void;
-  onDelete: (id: string) => void;
-  onUpdateCategory: (id: string, category: string) => void;
-  onUpdateOwner: (id: string, owner: DebtOwner) => void;
-};
+export type { IncomeTableProps };
 
 export function IncomeTable({
   sortedIncome,
@@ -85,7 +79,9 @@ export function IncomeTable({
                 <TableCell>
                   <Select
                     value={i.category || "_"}
-                    onValueChange={(v) => onUpdateCategory(i.id, v === "_" ? "" : v)}
+                    onValueChange={(v) =>
+                      onUpdateCategory(i.id, v === "_" ? "" : v)
+                    }
                   >
                     <SelectTrigger className="w-[220px] min-w-[200px]">
                       <SelectValue>

@@ -15,7 +15,6 @@ import {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
-  type ChartConfig,
 } from "@/components/ui/chart";
 import {
   AccordionContent,
@@ -38,19 +37,16 @@ const INCOME_CATEGORY_COLORS: Record<string, string> = {
   Other: "oklch(0.6 0.15 280)",
 };
 
-export type SummaryBarDatum = { metric: string; value: number; fill: string };
-export type SpendingPieDatum = { name: string; value: number };
-export type IncomeStackedRow = { name: string; [cat: string]: string | number };
+import type {
+  SummaryBarDatum,
+  SpendingPieDatum,
+  IncomeStackedRow,
+  OverviewSectionProps,
+} from "@/types/dashboard";
 
-export type OverviewSectionProps = {
-  summaryBarData: SummaryBarDatum[];
-  summaryBarConfig: ChartConfig;
-  spendingPieData: SpendingPieDatum[];
-  incomeStackedBarData: IncomeStackedRow[];
-  incomeStackedBarConfig: ChartConfig;
-  incomeCategoryKeys: string[];
-  t: (key: string) => string;
-};
+export type { SummaryBarDatum, SpendingPieDatum, IncomeStackedRow };
+
+export type { OverviewSectionProps };
 
 export function OverviewSection({
   summaryBarData,

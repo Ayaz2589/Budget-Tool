@@ -3,13 +3,14 @@ import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { useRules } from "@/context/RulesContext";
-import type { ExpenseSource } from "@/lib/types";
+import type { ExpenseSource } from "@/types/core";
+import type {
+  TransactionRow,
+  AddTransactionDialogProps,
+} from "@/types/transactions";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { SourceIcon } from "@/components/cards";
-import {
-  CategoryOption,
-  getCategoryColor,
-} from "@/lib/categoryColors";
+import { CategoryOption, getCategoryColor } from "@/lib/categoryColors";
 import {
   applyRulesToExpenses,
   computeTotalsByCategoryForMonth,
@@ -41,17 +42,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface TransactionRow {
-  id: string;
-  date: string;
-  amount: string;
-  description: string;
-  category: string;
-  source: ExpenseSource;
-  cardMember: string;
-  presetId?: string;
-}
-
 function defaultRow(defaultSource: ExpenseSource = "manual"): TransactionRow {
   return {
     id: crypto.randomUUID(),
@@ -62,11 +52,6 @@ function defaultRow(defaultSource: ExpenseSource = "manual"): TransactionRow {
     source: defaultSource,
     cardMember: "",
   };
-}
-
-interface AddTransactionDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
 }
 
 export function AddTransactionDialog({
@@ -92,7 +77,7 @@ export function AddTransactionDialog({
   const cardMemberOptions = useMemo(() => {
     const fromExpenses = [
       ...new Set(
-        expenses.map((e) => e.cardMember).filter((m): m is string => !!m),
+        expenses.map((e) => e.cardMember).filter((m): m is string => !!m)
       ),
     ].sort();
     if (fromExpenses.length > 0) return fromExpenses;
@@ -101,7 +86,7 @@ export function AddTransactionDialog({
 
   const updateRow = (index: number, updates: Partial<TransactionRow>) => {
     setRows((prev) =>
-      prev.map((r, i) => (i === index ? { ...r, ...updates } : r)),
+      prev.map((r, i) => (i === index ? { ...r, ...updates } : r))
     );
   };
 
@@ -135,7 +120,7 @@ export function AddTransactionDialog({
           amount: num,
           description:
             row.description.trim() ||
-                t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS.manual}`),
+            t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS.manual}`),
           category: row.category || "",
           source: row.source,
           cardMember: row.cardMember.trim() || undefined,
@@ -145,7 +130,7 @@ export function AddTransactionDialog({
     const currentMonthKey = new Date().toISOString().slice(0, 7);
     const totals = computeTotalsByCategoryForMonth(
       [...expenses, ...toAdd],
-      currentMonthKey,
+      currentMonthKey
     );
     const withRules =
       rules.length > 0
@@ -245,57 +230,58 @@ export function AddTransactionDialog({
                     {presetTransactions.length > 0 &&
                       expenseCategories.length > 0 && (
                         <TableCell className="p-1 align-middle">
-                        <Select
-                          value={row.presetId ?? PRESET_NONE_VALUE}
-                          onValueChange={(v) =>
-                            handlePresetChange(index, v)
-                          }
-                        >
-                          <SelectTrigger
-                            className={`${compactSelectTrigger} border-0 bg-transparent shadow-none focus-visible:ring-2`}
+                          <Select
+                            value={row.presetId ?? PRESET_NONE_VALUE}
+                            onValueChange={(v) => handlePresetChange(index, v)}
                           >
-                            <SelectValue
-                              placeholder={t("addTransaction.presetNone")}
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value={PRESET_NONE_VALUE}>
-                              {t("addTransaction.presetNone")}
-                            </SelectItem>
-                            {presetTransactions.map((preset) => {
-                              const sourceLabel = t(
-                                `addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[preset.source]}`,
-                              );
-                              const descPart =
-                                preset.description.trim().length > 0
-                                  ? `${preset.description.slice(0, 30)}${preset.description.length > 30 ? "…" : ""}`
-                                  : "";
-                              const label = descPart
-                                ? `${sourceLabel} – ${descPart} · ${preset.category}`
-                                : `${sourceLabel} · ${preset.category}`;
-                              const dotColor = getCategoryColor(
-                                preset.category,
-                                "expense",
-                              );
-                              return (
-                                <SelectItem
-                                  key={preset.id}
-                                  value={preset.id}
-                                >
-                                  <span className="flex items-center gap-2">
-                                    <span
-                                      className={`size-2 shrink-0 rounded-full ${dotColor}`}
-                                      aria-hidden
-                                    />
-                                    {label}
-                                  </span>
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                    )}
+                            <SelectTrigger
+                              className={`${compactSelectTrigger} border-0 bg-transparent shadow-none focus-visible:ring-2`}
+                            >
+                              <SelectValue
+                                placeholder={t("addTransaction.presetNone")}
+                              />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={PRESET_NONE_VALUE}>
+                                {t("addTransaction.presetNone")}
+                              </SelectItem>
+                              {presetTransactions.map((preset) => {
+                                const sourceLabel = t(
+                                  `addTransaction.${
+                                    EXPENSE_SOURCE_LOCALE_KEYS[preset.source]
+                                  }`
+                                );
+                                const descPart =
+                                  preset.description.trim().length > 0
+                                    ? `${preset.description.slice(0, 30)}${
+                                        preset.description.length > 30
+                                          ? "…"
+                                          : ""
+                                      }`
+                                    : "";
+                                const label = descPart
+                                  ? `${sourceLabel} – ${descPart} · ${preset.category}`
+                                  : `${sourceLabel} · ${preset.category}`;
+                                const dotColor = getCategoryColor(
+                                  preset.category,
+                                  "expense"
+                                );
+                                return (
+                                  <SelectItem key={preset.id} value={preset.id}>
+                                    <span className="flex items-center gap-2">
+                                      <span
+                                        className={`size-2 shrink-0 rounded-full ${dotColor}`}
+                                        aria-hidden
+                                      />
+                                      {label}
+                                    </span>
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                      )}
                     <TableCell className="p-1 align-middle">
                       <Select
                         value={
@@ -316,8 +302,17 @@ export function AddTransactionDialog({
                           {cardSources.map((s) => (
                             <SelectItem key={s} value={s}>
                               <span className="flex items-center gap-2">
-                                <SourceIcon source={s as ExpenseSource} size={18} />
-                                {t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[s as ExpenseSource]}`)}
+                                <SourceIcon
+                                  source={s as ExpenseSource}
+                                  size={18}
+                                />
+                                {t(
+                                  `addTransaction.${
+                                    EXPENSE_SOURCE_LOCALE_KEYS[
+                                      s as ExpenseSource
+                                    ]
+                                  }`
+                                )}
                               </span>
                             </SelectItem>
                           ))}
@@ -465,10 +460,10 @@ export function AddTransactionDialog({
                 {validCount === 0
                   ? t("addTransaction.addTransaction")
                   : validCount === 1
-                    ? t("addTransaction.addTransaction")
-                    : t("addTransaction.addTransactions", {
-                        count: validCount,
-                      })}
+                  ? t("addTransaction.addTransaction")
+                  : t("addTransaction.addTransactions", {
+                      count: validCount,
+                    })}
               </Button>
             </DialogFooter>
           </div>

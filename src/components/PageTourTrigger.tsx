@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { runPageTour, type TourStepInput } from "@/lib/runPageTour";
+import { runPageTour } from "@/lib/runPageTour";
+import type { PageTourTriggerProps } from "@/types/tour";
 
 const TOUR_SEEN_KEY = "budget-tool-tour-seen";
 
@@ -11,15 +12,15 @@ function getTourSeenKey(pageId: string): string {
   return `${TOUR_SEEN_KEY}-${pageId}`;
 }
 
-export type PageTourTriggerProps = {
-  pageId: string;
-  steps: TourStepInput[];
-};
+export type { PageTourTriggerProps };
 
 export function PageTourTrigger({ pageId, steps }: PageTourTriggerProps) {
   const { t } = useTranslation();
   const [seen, setSeen] = useState(() =>
-    Boolean(typeof window !== "undefined" && localStorage.getItem(getTourSeenKey(pageId))),
+    Boolean(
+      typeof window !== "undefined" &&
+        localStorage.getItem(getTourSeenKey(pageId))
+    )
   );
 
   const handleClick = useCallback(() => {
@@ -36,7 +37,11 @@ export function PageTourTrigger({ pageId, steps }: PageTourTriggerProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={cn("size-9", !seen && "animate-help-pulse-scale text-yellow-500 dark:text-yellow-400")}
+        className={cn(
+          "size-9",
+          !seen &&
+            "animate-help-pulse-scale text-yellow-500 dark:text-yellow-400"
+        )}
         onClick={handleClick}
         aria-label={t("tour.ariaLabel")}
       >

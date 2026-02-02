@@ -4,7 +4,6 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  type ChartConfig,
 } from "@/components/ui/chart";
 import {
   AccordionContent,
@@ -13,17 +12,12 @@ import {
 } from "@/components/ui/accordion";
 import { formatCurrency } from "@/lib/format";
 
-export type SpendingByTypeDatum = { name: string; amount: number };
+import type {
+  SpendingByTypeDatum,
+  SpendingByTypeSectionProps,
+} from "@/types/dashboard";
 
-export type SpendingByTypeSectionProps = {
-  fiftyFiftyByType: SpendingByTypeDatum[];
-  mySpendingByType: SpendingByTypeDatum[];
-  tasnuvasSpendingByType: SpendingByTypeDatum[];
-  fiftyFiftyChartConfig: ChartConfig;
-  mySpendingChartConfig: ChartConfig;
-  tasnuvasSpendingChartConfig: ChartConfig;
-  t: (key: string) => string;
-};
+export type { SpendingByTypeDatum };
 
 export function SpendingByTypeSection({
   fiftyFiftyByType,

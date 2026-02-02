@@ -10,12 +10,9 @@ import {
 } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/format";
 
-export interface DebtSummaryData {
-  totalRemaining: number;
-  totalPaidOff: number;
-  chartData: { metric: string; value: number; fill: string }[];
-  hasDebtData: boolean;
-}
+import type { DebtSummaryData, DebtSectionProps } from "@/types/dashboard";
+
+export type { DebtSummaryData };
 
 function getDebtChartConfig(t: (key: string) => string) {
   return {
@@ -36,10 +33,6 @@ function getDebtChartConfig(t: (key: string) => string) {
   } satisfies ChartConfig;
 }
 
-interface DebtSectionProps {
-  debtSummary: DebtSummaryData;
-}
-
 export function DebtSection({ debtSummary }: DebtSectionProps) {
   const { t } = useTranslation();
   const DEBT_CHART_CONFIG = getDebtChartConfig(t);
@@ -51,7 +44,10 @@ export function DebtSection({ debtSummary }: DebtSectionProps) {
         </CardTitle>
         <p className="text-xs text-muted-foreground">
           {t("dashboardDebt.remainingAndPaidOff")}{" "}
-          <Link to="/dashboard/debt" className="font-medium text-primary hover:underline">
+          <Link
+            to="/dashboard/debt"
+            className="font-medium text-primary hover:underline"
+          >
             {t("dashboardDebt.viewManageDebt")}
           </Link>
         </p>

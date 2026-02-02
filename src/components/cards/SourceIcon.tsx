@@ -1,4 +1,5 @@
-import type { ExpenseSource } from "@/lib/types";
+import type { ExpenseSource } from "@/types/core";
+import type { SourceIconProps } from "@/types/cards";
 import { AmexPlatinumCardIcon } from "./AmexPlatinumCardIcon";
 import { AmexGoldCardIcon } from "./AmexGoldCardIcon";
 import { AppleCardIcon } from "./AppleCardIcon";
@@ -15,12 +16,6 @@ const SOURCE_ICONS: Record<
   manual: () => null,
   td: () => null,
 };
-
-interface SourceIconProps {
-  source: ExpenseSource;
-  size?: number;
-  className?: string;
-}
 
 export function SourceIcon({
   source,

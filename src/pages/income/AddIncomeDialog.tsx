@@ -19,28 +19,13 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CategoryOption } from "@/lib/categoryColors";
-import type { DebtOwner } from "@/lib/types";
+import type { DebtOwner, RecurringFrequency } from "@/types/core";
+import type {
+  AddIncomeFormPayload,
+  AddIncomeDialogProps,
+} from "@/types/income";
 
-export type RecurringFrequency = "monthly" | "biweekly";
-
-export type AddIncomeFormPayload = {
-  date: string;
-  amount: number;
-  description: string;
-  category: string;
-  owner: DebtOwner;
-  recurringAmount?: number;
-  recurringFrequency?: RecurringFrequency;
-  recurringDayOfMonth?: number;
-  recurringStartDate?: string;
-};
-
-export type AddIncomeDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  incomeCategories: string[];
-  onSubmit: (payload: AddIncomeFormPayload) => void;
-};
+export type { AddIncomeFormPayload, AddIncomeDialogProps };
 
 export function AddIncomeDialog({
   open,

@@ -6,20 +6,11 @@ import {
   useState,
 } from "react";
 import type { ReactNode } from "react";
-import type { Rule } from "@/lib/rules";
+import type { Rule } from "@/types/rules";
 import { generateRuleId } from "@/lib/rules";
+import type { RulesContextValue } from "@/types/context";
 
 const RULES_STORAGE_KEY = "budget-tool-rules";
-
-interface RulesContextValue {
-  rules: Rule[];
-  addRule: (rule: Omit<Rule, "id">) => void;
-  updateRule: (id: string, updates: Partial<Rule>) => void;
-  removeRule: (id: string) => void;
-  reorderRule: (id: string, direction: "up" | "down") => void;
-  toggleRule: (id: string) => void;
-  setRules: (rules: Rule[]) => void;
-}
 
 const RulesContext = createContext<RulesContextValue | null>(null);
 
@@ -45,24 +36,24 @@ export function RulesProvider({ children }: { children: ReactNode }) {
     (rule: Omit<Rule, "id">) => {
       persist([...rules, { ...rule, id: generateRuleId() }]);
     },
-    [persist, rules],
+    [persist, rules]
   );
 
   const updateRule = useCallback(
     (id: string, updates: Partial<Rule>) => {
       const next = rules.map((rule) =>
-        rule.id === id ? { ...rule, ...updates } : rule,
+        rule.id === id ? { ...rule, ...updates } : rule
       );
       persist(next);
     },
-    [persist, rules],
+    [persist, rules]
   );
 
   const removeRule = useCallback(
     (id: string) => {
       persist(rules.filter((rule) => rule.id !== id));
     },
-    [persist, rules],
+    [persist, rules]
   );
 
   const reorderRule = useCallback(
@@ -76,24 +67,24 @@ export function RulesProvider({ children }: { children: ReactNode }) {
       next.splice(targetIndex, 0, moved!);
       persist(next);
     },
-    [persist, rules],
+    [persist, rules]
   );
 
   const toggleRule = useCallback(
     (id: string) => {
       const next = rules.map((rule) =>
-        rule.id === id ? { ...rule, enabled: !rule.enabled } : rule,
+        rule.id === id ? { ...rule, enabled: !rule.enabled } : rule
       );
       persist(next);
     },
-    [persist, rules],
+    [persist, rules]
   );
 
   const setRules = useCallback(
     (nextRules: Rule[]) => {
       persist(nextRules);
     },
-    [persist],
+    [persist]
   );
 
   const value = useMemo<RulesContextValue>(
@@ -106,7 +97,7 @@ export function RulesProvider({ children }: { children: ReactNode }) {
       toggleRule,
       setRules,
     }),
-    [rules, addRule, updateRule, removeRule, reorderRule, toggleRule, setRules],
+    [rules, addRule, updateRule, removeRule, reorderRule, toggleRule, setRules]
   );
 
   return (

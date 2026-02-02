@@ -19,18 +19,10 @@ import {
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
-import type { DebtOwner, Income } from "@/lib/types";
+import type { DebtOwner } from "@/types/core";
+import type { IncomeActionsDialogProps } from "@/types/income";
 
-export type IncomeActionsDialogProps = {
-  income: Income | null;
-  onClose: () => void;
-  onUpdateCategory: (id: string, category: string) => void;
-  onUpdateOwner: (id: string, owner: DebtOwner) => void;
-  onEdit: (income: Income) => void;
-  onDelete: (id: string) => void;
-  incomeCategories: string[];
-  t: (key: string) => string;
-};
+export type { IncomeActionsDialogProps };
 
 export function IncomeActionsDialog({
   income,
@@ -83,7 +75,9 @@ export function IncomeActionsDialog({
             <Label>{t("common.category")}</Label>
             <Select
               value={income.category || "_"}
-              onValueChange={(v) => onUpdateCategory(income.id, v === "_" ? "" : v)}
+              onValueChange={(v) =>
+                onUpdateCategory(income.id, v === "_" ? "" : v)
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue>
@@ -95,7 +89,10 @@ export function IncomeActionsDialog({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="_">
-                  <CategoryOption name={t("common.uncategorized")} type="income" />
+                  <CategoryOption
+                    name={t("common.uncategorized")}
+                    type="income"
+                  />
                 </SelectItem>
                 {incomeCategories.map((c) => (
                   <SelectItem key={c} value={c}>

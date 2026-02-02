@@ -26,32 +26,13 @@ import { CategoryOption } from "@/lib/categoryColors";
 import { SourceIcon } from "@/components/cards";
 import { formatCurrency } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
-import type { Expense } from "@/lib/types";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import type {
+  SortColumn,
+  ExpensesByMonthTableProps,
+} from "@/types/transactions";
 
-export type SortColumn =
-  | "date"
-  | "amount"
-  | "description"
-  | "source"
-  | "category"
-  | "cardMember";
-
-export type ExpensesByMonthTableProps = {
-  byMonth: [string, Expense[]][];
-  defaultOpenMonth: string;
-  selectedIds: Set<string>;
-  onToggleSelect: (id: string) => void;
-  onToggleMonthSelection: (monthExpenses: Expense[]) => void;
-  sortBy: SortColumn;
-  sortDir: "asc" | "desc";
-  onSort: (col: SortColumn) => void;
-  onUpdateCategory: (id: string, category: string) => void;
-  expenseCategories: string[];
-  onDeleteOne: (expense: Expense) => void;
-  sourceLabelKeys: Record<string, string>;
-  t: (key: string, opts?: { count?: number }) => string;
-};
+export type { SortColumn, ExpensesByMonthTableProps };
 
 function SortIcon({
   column,

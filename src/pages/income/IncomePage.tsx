@@ -19,11 +19,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileDown, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { incomeTourSteps } from "@/lib/pageTourSteps";
-import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
-import { getCategoryColor } from "@/lib/categoryColors";
 import { AddIncomeDialog } from "./AddIncomeDialog";
 import { EditIncomeDialog } from "./EditIncomeDialog";
 import { IncomeTable } from "./IncomeTable";
@@ -96,34 +94,6 @@ export function IncomePage() {
         <CardHeader>
           <CardTitle>Income entries</CardTitle>
           <CardDescription>Edit or delete entries below.</CardDescription>
-          <div className="pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const expenseCategoriesWithColors = expenseCategories.map(
-                  (name) => ({ name, color: getCategoryColor(name, "expense") }),
-                );
-                const incomeCategoriesWithColors = incomeCategories.map(
-                  (name) => ({ name, color: getCategoryColor(name, "income") }),
-                );
-                downloadTransactionsAndIncomePdf(
-                  expenses,
-                  income,
-                  debts,
-                  debtPayments,
-                  presetTransactions,
-                  expenseCategoriesWithColors,
-                  incomeCategoriesWithColors,
-                  owners,
-                  cardSources,
-                );
-              }}
-            >
-              <FileDown className="size-4" />
-              Download PDF (transactions & income)
-            </Button>
-          </div>
         </CardHeader>
         <CardContent>
           {sortedIncome.length === 0 ? (

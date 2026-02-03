@@ -20,7 +20,7 @@ import { CategoryOption } from "@/lib/categoryColors";
 import type { ExpenseSource } from "@/types/core";
 import type { FiltersAndActionsDialogProps } from "@/types/transactions";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
-import { FileDown, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 export type { FiltersAndActionsDialogProps };
 
@@ -43,7 +43,6 @@ export function FiltersAndActionsDialog({
   hasActiveFilters,
   onClearFilters,
   onCleanDescriptions,
-  onDownloadPdf,
   someSelected,
   selectedCount,
   onDeleteSelected,
@@ -193,15 +192,6 @@ export function FiltersAndActionsDialog({
                 className="justify-start"
               >
                 {t("transactions.cleanDescriptions")}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onDownloadPdf}
-                className="justify-start"
-              >
-                <FileDown className="size-4" />
-                {t("transactions.downloadPdf")}
               </Button>
               {someSelected && (
                 <Button

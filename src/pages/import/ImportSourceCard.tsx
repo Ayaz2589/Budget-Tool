@@ -21,7 +21,6 @@ import {
   AmexPlatinumCardIcon,
   AmexGoldCardIcon,
   AppleCardIcon,
-  ChaseCardIcon,
 } from "@/components/cards";
 import { EXPENSE_SOURCE_DISPLAY_LABELS } from "@/lib/sourceLabels";
 import { cn } from "@/lib/utils";
@@ -50,13 +49,8 @@ const ALL_SOURCE_OPTIONS: {
     icon: AppleCardIcon,
   },
   {
-    value: "chase",
-    label: EXPENSE_SOURCE_DISPLAY_LABELS.chase,
-    icon: ChaseCardIcon,
-  },
-  {
     value: "pdf-export",
-    label: "Exported PDF (re-import)",
+    label: "Exported Data (PDF)",
     icon: PdfExportIcon,
   },
 ];
@@ -136,10 +130,8 @@ export function ImportSourceCard({
         <Button onClick={() => fileInputRef.current?.click()}>
           <Upload className="size-4" />
           {selectedSource === "pdf-export"
-            ? "Choose exported PDF"
-            : selectedSource === "chase"
-            ? "Choose PDF statement"
-            : "Choose CSV/PDF file"}
+            ? t("import.chooseExportedPdf")
+            : t("import.chooseCsvFile")}
         </Button>
         {importError && (
           <span className="text-sm text-destructive block">{importError}</span>

@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
-import { parseCsv, parseChasePdfFromText, type CsvSource } from "@/lib/parsers";
+import { parseCsv, type CsvSource } from "@/lib/parsers";
 import { extractTextFromPdf } from "@/lib/pdfText";
 import { parseExportedPdfData } from "@/lib/pdfExport";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
@@ -23,9 +23,25 @@ import {
 import { Button } from "@/components/ui/button";
 import type { PresetTransaction } from "@/types/core";
 import { collectMissingImportMeta, normalizeImportedData } from "@/lib/importNormalize";
+import { parseFromBlob } from "@/lib/minifiedPayload";
+import { parseBudgetJson } from "@/lib/jsonExport";
+import type { ExpandedPayload } from "@/types/payload";
+import type { ParsedExportedPdf } from "@/types/pdf";
+import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
+import { getCategoryColor } from "@/lib/categoryColors";
+import { buildExpandedPayload, downloadBudgetJson } from "@/lib/jsonExport";
+import { buildExportString, downloadExportString } from "@/lib/exportString";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function ImportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const jsonInputRef = useRef<HTMLInputElement>(null);
   const [selectedSource, setSelectedSource] = useState<SourceChoice>("amex");
   const [previewExpenses, setPreviewExpenses] = useState<Expense[]>([]);
   const [previewIncome, setPreviewIncome] = useState<Income[]>([]);
@@ -37,6 +53,9 @@ export function ImportPage() {
   const [lastDetected, setLastDetected] = useState<string>("");
   const [skippedDuplicates, setSkippedDuplicates] = useState<number>(0);
   const [importError, setImportError] = useState<string>("");
+  const [exportString, setExportString] = useState<string>("");
+  const [exportStringError, setExportStringError] = useState<string>("");
+  const [jsonImportError, setJsonImportError] = useState<string>("");
   const [missingMetaOpen, setMissingMetaOpen] = useState(false);
   const [missingExpenseCategories, setMissingExpenseCategories] = useState<string[]>([]);
   const [missingIncomeCategories, setMissingIncomeCategories] = useState<string[]>([]);
@@ -48,6 +67,7 @@ export function ImportPage() {
     debtPayments: DebtPayment[];
     presetTransactions: PresetTransaction[];
     cardSources: string[];
+    sourceLabel: string;
   } | null>(null);
   const {
     expenses,
@@ -67,7 +87,7 @@ export function ImportPage() {
     setOwners,
     owners,
   } = useBudget();
-  const { setPresets } = usePresetTransactions();
+  const { setPresets, presetTransactions } = usePresetTransactions();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -81,12 +101,110 @@ export function ImportPage() {
         ? "amex-gold"
         : cardSources.includes("apple")
         ? "apple"
-        : cardSources.includes("chase")
-        ? "chase"
         : "pdf-export";
       setSelectedSource(firstValid as SourceChoice);
     }
   }, [cardSources, selectedSource]);
+
+  const expandedToParsed = (expanded: ExpandedPayload): ParsedExportedPdf => ({
+    expenses: Array.isArray(expanded.expenses) ? expanded.expenses : [],
+    income: Array.isArray(expanded.income) ? expanded.income : [],
+    debts: Array.isArray(expanded.debts) ? expanded.debts : [],
+    debtPayments: Array.isArray(expanded.debtPayments) ? expanded.debtPayments : [],
+    presetTransactions: Array.isArray(expanded.presetTransactions)
+      ? expanded.presetTransactions
+      : [],
+    expenseCategoriesWithColors: expanded.expenseCategoriesWithColors,
+    incomeCategoriesWithColors: expanded.incomeCategoriesWithColors,
+    owners: expanded.owners,
+    cardSources: expanded.cardSources,
+  });
+
+  const handleParsedExport = (
+    parsed: ParsedExportedPdf,
+    label: string
+  ) => {
+    const existingExpenseIds = new Set(expenses.map((ex) => ex.id));
+    const toAddExpenses = parsed.expenses.filter(
+      (ex) => !existingExpenseIds.has(ex.id)
+    );
+    const toAddIncome = parsed.income.filter((i) => {
+      if (income.some((existing) => existing.id === i.id)) return false;
+      const sameEntry = income.some(
+        (existing) =>
+          existing.date === i.date &&
+          Math.abs(existing.amount - i.amount) < 0.01 &&
+          (existing.category || "").toLowerCase() ===
+            (i.category || "").toLowerCase()
+      );
+      return !sameEntry;
+    });
+    const existingDebtIds = new Set(debts.map((d) => d.id));
+    const existingPaymentIds = new Set(debtPayments.map((p) => p.id));
+    const toAddDebts = parsed.debts.filter((d) => !existingDebtIds.has(d.id));
+    const toAddDebtPayments = parsed.debtPayments.filter(
+      (p) => !existingPaymentIds.has(p.id)
+    );
+    const missingMeta = collectMissingImportMeta(
+      parsed,
+      expenseCategories,
+      incomeCategories,
+      owners
+    );
+    if (
+      missingMeta.missingExpenseCategories.length > 0 ||
+      missingMeta.missingIncomeCategories.length > 0 ||
+      missingMeta.missingOwners.length > 0
+    ) {
+      setMissingExpenseCategories(missingMeta.missingExpenseCategories);
+      setMissingIncomeCategories(missingMeta.missingIncomeCategories);
+      setMissingOwners(missingMeta.missingOwners);
+      setPendingParsed({
+        expenses: toAddExpenses,
+        income: toAddIncome,
+        debts: toAddDebts,
+        debtPayments: toAddDebtPayments,
+        presetTransactions: parsed.presetTransactions,
+        cardSources: parsed.cardSources ?? [],
+        sourceLabel: label,
+      });
+      setMissingMetaOpen(true);
+      return;
+    }
+
+    if (parsed.presetTransactions.length > 0) {
+      setPresets(parsed.presetTransactions);
+    }
+    if (Array.isArray(parsed.cardSources) && parsed.cardSources.length > 0) {
+      setCardSources(parsed.cardSources);
+    }
+    if (
+      Array.isArray(parsed.expenseCategoriesWithColors) &&
+      parsed.expenseCategoriesWithColors.length > 0
+    ) {
+      setExpenseCategories(
+        parsed.expenseCategoriesWithColors.map((x) => x.name)
+      );
+    }
+    if (
+      Array.isArray(parsed.incomeCategoriesWithColors) &&
+      parsed.incomeCategoriesWithColors.length > 0
+    ) {
+      setIncomeCategories(
+        parsed.incomeCategoriesWithColors.map((x) => x.name)
+      );
+    }
+    if (Array.isArray(parsed.owners) && parsed.owners.length > 0) {
+      setOwners(parsed.owners);
+    }
+    setPreviewExpenses(toAddExpenses);
+    setPreviewIncome(toAddIncome);
+    setPreviewDebts(toAddDebts);
+    setPreviewDebtPayments(toAddDebtPayments);
+    setSourceLabel(label);
+    setLastDetected("pdf-export");
+    setSkippedDuplicates(0);
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -99,35 +217,6 @@ export function ImportPage() {
           const buffer = reader.result as ArrayBuffer;
           const text = await extractTextFromPdf(buffer);
           const parsed = parseExportedPdfData(text);
-          const existingExpenseIds = new Set(expenses.map((ex) => ex.id));
-          const toAddExpenses = parsed.expenses.filter(
-            (ex) => !existingExpenseIds.has(ex.id)
-          );
-          const toAddIncome = parsed.income.filter((i) => {
-            if (income.some((existing) => existing.id === i.id)) return false;
-            const sameEntry = income.some(
-              (existing) =>
-                existing.date === i.date &&
-                Math.abs(existing.amount - i.amount) < 0.01 &&
-                (existing.category || "").toLowerCase() ===
-                  (i.category || "").toLowerCase()
-            );
-            return !sameEntry;
-          });
-          const existingDebtIds = new Set(debts.map((d) => d.id));
-          const existingPaymentIds = new Set(debtPayments.map((p) => p.id));
-          const toAddDebts = parsed.debts.filter(
-            (d) => !existingDebtIds.has(d.id)
-          );
-          const toAddDebtPayments = parsed.debtPayments.filter(
-            (p) => !existingPaymentIds.has(p.id)
-          );
-          const missingMeta = collectMissingImportMeta(
-            parsed,
-            expenseCategories,
-            incomeCategories,
-            owners
-          );
           if (
             parsed.expenses.length === 0 &&
             parsed.income.length === 0 &&
@@ -145,60 +234,7 @@ export function ImportPage() {
             setSourceLabel("");
             return;
           }
-          if (
-            missingMeta.missingExpenseCategories.length > 0 ||
-            missingMeta.missingIncomeCategories.length > 0 ||
-            missingMeta.missingOwners.length > 0
-          ) {
-            setMissingExpenseCategories(missingMeta.missingExpenseCategories);
-            setMissingIncomeCategories(missingMeta.missingIncomeCategories);
-            setMissingOwners(missingMeta.missingOwners);
-            setPendingParsed({
-              expenses: toAddExpenses,
-              income: toAddIncome,
-              debts: toAddDebts,
-              debtPayments: toAddDebtPayments,
-              presetTransactions: parsed.presetTransactions,
-              cardSources: parsed.cardSources ?? [],
-            });
-            setMissingMetaOpen(true);
-            return;
-          }
-          if (parsed.presetTransactions.length > 0) {
-            setPresets(parsed.presetTransactions);
-          }
-          if (
-            Array.isArray(parsed.cardSources) &&
-            parsed.cardSources.length > 0
-          ) {
-            setCardSources(parsed.cardSources);
-          }
-          if (
-            Array.isArray(parsed.expenseCategoriesWithColors) &&
-            parsed.expenseCategoriesWithColors.length > 0
-          ) {
-            setExpenseCategories(
-              parsed.expenseCategoriesWithColors.map((x) => x.name)
-            );
-          }
-          if (
-            Array.isArray(parsed.incomeCategoriesWithColors) &&
-            parsed.incomeCategoriesWithColors.length > 0
-          ) {
-            setIncomeCategories(
-              parsed.incomeCategoriesWithColors.map((x) => x.name)
-            );
-          }
-          if (Array.isArray(parsed.owners) && parsed.owners.length > 0) {
-            setOwners(parsed.owners);
-          }
-          setPreviewExpenses(toAddExpenses);
-          setPreviewIncome(toAddIncome);
-          setPreviewDebts(toAddDebts);
-          setPreviewDebtPayments(toAddDebtPayments);
-          setSourceLabel("Exported PDF");
-          setLastDetected("pdf-export");
-          setSkippedDuplicates(0);
+          handleParsedExport(parsed, "Exported Data (PDF)");
         } catch (err) {
           setImportError(
             err instanceof Error ? err.message : "PDF import failed"
@@ -207,31 +243,6 @@ export function ImportPage() {
           setPreviewIncome([]);
           setPreviewDebts([]);
           setPreviewDebtPayments([]);
-          setLastDetected("");
-          setSourceLabel("");
-          setSkippedDuplicates(0);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    } else if (selectedSource === "chase") {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const buffer = reader.result as ArrayBuffer;
-          const text = await extractTextFromPdf(buffer);
-          const result = parseChasePdfFromText(text);
-          const toAdd = filterOutExistingExpenses(result.expenses, expenses);
-          setSkippedDuplicates(result.expenses.length - toAdd.length);
-          setPreviewExpenses(toAdd);
-          setPreviewIncome([]);
-          setSourceLabel("Chase");
-          setLastDetected("chase");
-        } catch (err) {
-          setImportError(
-            err instanceof Error ? err.message : "PDF import failed"
-          );
-          setPreviewExpenses([]);
-          setPreviewIncome([]);
           setLastDetected("");
           setSourceLabel("");
           setSkippedDuplicates(0);
@@ -268,7 +279,7 @@ export function ImportPage() {
               ? "Amex Gold Card"
               : selectedSource === "apple"
               ? "Apple Card"
-              : "Chase";
+              : "CSV Import";
           setSourceLabel(label);
           setLastDetected(selectedSource);
         } catch (err) {
@@ -282,6 +293,72 @@ export function ImportPage() {
       };
       reader.readAsText(file, "UTF-8");
     }
+    e.target.value = "";
+  };
+
+  const handleExportStringImport = () => {
+    setExportStringError("");
+    setImportError("");
+    const raw = exportString.trim();
+    if (!raw) {
+      setExportStringError("Paste an export string first.");
+      return;
+    }
+    try {
+      let parsed: ParsedExportedPdf | null = null;
+      if (raw.includes("BUDGET_TOOL_DATA_START")) {
+        parsed = parseExportedPdfData(raw);
+      } else if (raw.replace(/\s/g, "").startsWith("V2")) {
+        const expanded = parseFromBlob(raw);
+        parsed = expandedToParsed(expanded);
+      }
+      if (
+        !parsed ||
+        (parsed.expenses.length === 0 &&
+          parsed.income.length === 0 &&
+          parsed.debts.length === 0 &&
+          parsed.debtPayments.length === 0 &&
+          parsed.presetTransactions.length === 0)
+      ) {
+        setExportStringError("Export string not recognized.");
+        return;
+      }
+      handleParsedExport(parsed, "Exported Data (String)");
+    } catch (err) {
+      setExportStringError(
+        err instanceof Error ? err.message : "Export string import failed"
+      );
+    }
+  };
+
+  const handleJsonFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setJsonImportError("");
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const text = String(reader.result);
+        const expanded = parseBudgetJson(text);
+        const parsed = expandedToParsed(expanded);
+        if (
+          parsed.expenses.length === 0 &&
+          parsed.income.length === 0 &&
+          parsed.debts.length === 0 &&
+          parsed.debtPayments.length === 0 &&
+          parsed.presetTransactions.length === 0
+        ) {
+          setJsonImportError("JSON export contained no data.");
+          return;
+        }
+        handleParsedExport(parsed, "Exported Data (JSON)");
+      } catch (err) {
+        setJsonImportError(
+          err instanceof Error ? err.message : "JSON import failed"
+        );
+      }
+    };
+    reader.readAsText(file, "UTF-8");
     e.target.value = "";
   };
 
@@ -314,6 +391,74 @@ export function ImportPage() {
     setLastDetected("");
     setSkippedDuplicates(0);
     setImportError("");
+  };
+
+  const handleDownloadPdf = () => {
+    const expenseCategoriesWithColors = expenseCategories.map((name) => ({
+      name,
+      color: getCategoryColor(name, "expense"),
+    }));
+    const incomeCategoriesWithColors = incomeCategories.map((name) => ({
+      name,
+      color: getCategoryColor(name, "income"),
+    }));
+    downloadTransactionsAndIncomePdf(
+      expenses,
+      income,
+      debts,
+      debtPayments,
+      presetTransactions,
+      expenseCategoriesWithColors,
+      incomeCategoriesWithColors,
+      owners,
+      cardSources,
+    );
+  };
+
+  const handleDownloadJson = () => {
+    const expenseCategoriesWithColors = expenseCategories.map((name) => ({
+      name,
+      color: getCategoryColor(name, "expense"),
+    }));
+    const incomeCategoriesWithColors = incomeCategories.map((name) => ({
+      name,
+      color: getCategoryColor(name, "income"),
+    }));
+    const payload = buildExpandedPayload(
+      expenses,
+      income,
+      debts,
+      debtPayments,
+      presetTransactions,
+      expenseCategoriesWithColors,
+      incomeCategoriesWithColors,
+      owners,
+      cardSources,
+    );
+    downloadBudgetJson(payload);
+  };
+
+  const handleDownloadExportString = () => {
+    const expenseCategoriesWithColors = expenseCategories.map((name) => ({
+      name,
+      color: getCategoryColor(name, "expense"),
+    }));
+    const incomeCategoriesWithColors = incomeCategories.map((name) => ({
+      name,
+      color: getCategoryColor(name, "income"),
+    }));
+    const exportString = buildExportString(
+      expenses,
+      income,
+      debts,
+      debtPayments,
+      presetTransactions,
+      expenseCategoriesWithColors,
+      incomeCategoriesWithColors,
+      owners,
+      cardSources,
+    );
+    downloadExportString(exportString);
   };
 
   const applyPendingImport = (normalize: boolean) => {
@@ -355,7 +500,7 @@ export function ImportPage() {
     setPreviewIncome(normalized.income);
     setPreviewDebts(normalized.debts);
     setPreviewDebtPayments(pendingParsed.debtPayments);
-    setSourceLabel("Exported PDF");
+    setSourceLabel(pendingParsed.sourceLabel);
     setLastDetected("pdf-export");
     setSkippedDuplicates(0);
     setMissingMetaOpen(false);
@@ -386,11 +531,7 @@ export function ImportPage() {
           selectedSource={selectedSource}
           onSourceChange={setSelectedSource}
           fileInputRef={fileInputRef}
-          accept={
-            selectedSource === "chase" || selectedSource === "pdf-export"
-              ? ".pdf"
-              : ".csv"
-          }
+          accept={selectedSource === "pdf-export" ? ".pdf" : ".csv"}
           onFileChange={handleFileChange}
           importError={importError}
           lastDetected={lastDetected}
@@ -406,6 +547,68 @@ export function ImportPage() {
           t={t}
         />
       </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("import.exportStringTitle")}</CardTitle>
+          <CardDescription>{t("import.exportStringDesc")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <textarea
+            value={exportString}
+            onChange={(e) => setExportString(e.target.value)}
+            placeholder={t("import.exportStringPlaceholder")}
+            className="min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+          {exportStringError && (
+            <span className="text-sm text-destructive block">
+              {exportStringError}
+            </span>
+          )}
+          <Button onClick={handleExportStringImport}>
+            {t("import.importExportString")}
+          </Button>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("import.jsonImportTitle")}</CardTitle>
+          <CardDescription>{t("import.jsonImportDesc")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <input
+            ref={jsonInputRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={handleJsonFileChange}
+          />
+          <Button onClick={() => jsonInputRef.current?.click()}>
+            {t("import.importJson")}
+          </Button>
+          {jsonImportError && (
+            <span className="text-sm text-destructive block">
+              {jsonImportError}
+            </span>
+          )}
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("import.exportTitle")}</CardTitle>
+          <CardDescription>{t("import.exportDesc")}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={handleDownloadPdf}>
+            {t("import.downloadPdf")}
+          </Button>
+          <Button variant="outline" onClick={handleDownloadJson}>
+            {t("import.downloadJson")}
+          </Button>
+          <Button variant="outline" onClick={handleDownloadExportString}>
+            {t("import.downloadExportString")}
+          </Button>
+        </CardContent>
+      </Card>
       {hasPreview && (
         <div data-tour="previewCard">
           <ImportPreviewCard

@@ -206,7 +206,7 @@ export function TransactionsPage() {
           <p className="text-sm text-muted-foreground">{t("transactions.subtitle")}</p>
         </div>
       </div>
-      <div className="md:hidden mb-3 px-4 pt-4">
+      <div className="md:hidden mb-3 px-4 pt-4 sticky top-0 z-20 bg-background/95 backdrop-blur">
         <div className="px-0 py-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
             <h1 className="text-xl font-semibold">{t("transactions.title")}</h1>
@@ -362,10 +362,10 @@ export function TransactionsPage() {
         t={t}
       />
 
-          <DeleteAllTransactionsDialog
-            open={deleteAllOpen}
-            onOpenChange={setDeleteAllOpen}
-            count={expenses.length}
+      <DeleteAllTransactionsDialog
+        open={deleteAllOpen}
+        onOpenChange={setDeleteAllOpen}
+        count={expenses.length}
         onConfirm={handleDeleteAll}
         t={t}
       />

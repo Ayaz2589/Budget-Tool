@@ -12,6 +12,17 @@ import { importTourSteps } from "@/lib/pageTourSteps";
 import { ImportSourceCard } from "./ImportSourceCard";
 import type { SourceChoice } from "@/types/import";
 import { ImportPreviewCard } from "./ImportPreviewCard";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import type { PresetTransaction } from "@/types/core";
+import { collectMissingImportMeta, normalizeImportedData } from "@/lib/importNormalize";
 
 export function ImportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -26,6 +37,18 @@ export function ImportPage() {
   const [lastDetected, setLastDetected] = useState<string>("");
   const [skippedDuplicates, setSkippedDuplicates] = useState<number>(0);
   const [importError, setImportError] = useState<string>("");
+  const [missingMetaOpen, setMissingMetaOpen] = useState(false);
+  const [missingExpenseCategories, setMissingExpenseCategories] = useState<string[]>([]);
+  const [missingIncomeCategories, setMissingIncomeCategories] = useState<string[]>([]);
+  const [missingOwners, setMissingOwners] = useState<string[]>([]);
+  const [pendingParsed, setPendingParsed] = useState<{
+    expenses: Expense[];
+    income: Income[];
+    debts: Debt[];
+    debtPayments: DebtPayment[];
+    presetTransactions: PresetTransaction[];
+    cardSources: string[];
+  } | null>(null);
   const {
     expenses,
     income,
@@ -42,6 +65,7 @@ export function ImportPage() {
     setExpenseCategories,
     setIncomeCategories,
     setOwners,
+    owners,
   } = useBudget();
   const { setPresets } = usePresetTransactions();
   const { t } = useTranslation();
@@ -98,6 +122,12 @@ export function ImportPage() {
           const toAddDebtPayments = parsed.debtPayments.filter(
             (p) => !existingPaymentIds.has(p.id)
           );
+          const missingMeta = collectMissingImportMeta(
+            parsed,
+            expenseCategories,
+            incomeCategories,
+            owners
+          );
           if (
             parsed.expenses.length === 0 &&
             parsed.income.length === 0 &&
@@ -113,6 +143,25 @@ export function ImportPage() {
             setPreviewIncome([]);
             setLastDetected("");
             setSourceLabel("");
+            return;
+          }
+          if (
+            missingMeta.missingExpenseCategories.length > 0 ||
+            missingMeta.missingIncomeCategories.length > 0 ||
+            missingMeta.missingOwners.length > 0
+          ) {
+            setMissingExpenseCategories(missingMeta.missingExpenseCategories);
+            setMissingIncomeCategories(missingMeta.missingIncomeCategories);
+            setMissingOwners(missingMeta.missingOwners);
+            setPendingParsed({
+              expenses: toAddExpenses,
+              income: toAddIncome,
+              debts: toAddDebts,
+              debtPayments: toAddDebtPayments,
+              presetTransactions: parsed.presetTransactions,
+              cardSources: parsed.cardSources ?? [],
+            });
+            setMissingMetaOpen(true);
             return;
           }
           if (parsed.presetTransactions.length > 0) {
@@ -267,6 +316,52 @@ export function ImportPage() {
     setImportError("");
   };
 
+  const applyPendingImport = (normalize: boolean) => {
+    if (!pendingParsed) return;
+    const normalized = normalize
+      ? normalizeImportedData(
+          pendingParsed,
+          expenseCategories,
+          incomeCategories,
+          owners
+        )
+      : {
+          expenses: pendingParsed.expenses,
+          income: pendingParsed.income,
+          debts: pendingParsed.debts,
+          presetTransactions: pendingParsed.presetTransactions,
+        };
+
+    if (!normalize) {
+      if (missingExpenseCategories.length > 0) {
+        setExpenseCategories([...expenseCategories, ...missingExpenseCategories]);
+      }
+      if (missingIncomeCategories.length > 0) {
+        setIncomeCategories([...incomeCategories, ...missingIncomeCategories]);
+      }
+      if (missingOwners.length > 0) {
+        setOwners([...owners, ...missingOwners]);
+      }
+    }
+
+    if (pendingParsed.presetTransactions.length > 0) {
+      setPresets(normalized.presetTransactions);
+    }
+    if (pendingParsed.cardSources.length > 0) {
+      setCardSources(pendingParsed.cardSources);
+    }
+
+    setPreviewExpenses(normalized.expenses);
+    setPreviewIncome(normalized.income);
+    setPreviewDebts(normalized.debts);
+    setPreviewDebtPayments(pendingParsed.debtPayments);
+    setSourceLabel("Exported PDF");
+    setLastDetected("pdf-export");
+    setSkippedDuplicates(0);
+    setMissingMetaOpen(false);
+    setPendingParsed(null);
+  };
+
   const hasPreview =
     previewExpenses.length > 0 ||
     previewIncome.length > 0 ||
@@ -325,6 +420,49 @@ export function ImportPage() {
           />
         </div>
       )}
+
+      <Dialog open={missingMetaOpen} onOpenChange={setMissingMetaOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("import.missingMetaTitle")}</DialogTitle>
+            <DialogDescription>{t("import.missingMetaDesc")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            {missingExpenseCategories.length > 0 && (
+              <div>
+                <div className="text-xs font-medium text-muted-foreground">
+                  {t("import.missingExpenseCategories")}
+                </div>
+                <div>{missingExpenseCategories.join(", ")}</div>
+              </div>
+            )}
+            {missingIncomeCategories.length > 0 && (
+              <div>
+                <div className="text-xs font-medium text-muted-foreground">
+                  {t("import.missingIncomeCategories")}
+                </div>
+                <div>{missingIncomeCategories.join(", ")}</div>
+              </div>
+            )}
+            {missingOwners.length > 0 && (
+              <div>
+                <div className="text-xs font-medium text-muted-foreground">
+                  {t("import.missingOwners")}
+                </div>
+                <div>{missingOwners.join(", ")}</div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => applyPendingImport(true)}>
+              {t("import.skipMissing")}
+            </Button>
+            <Button onClick={() => applyPendingImport(false)}>
+              {t("import.addMissing")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

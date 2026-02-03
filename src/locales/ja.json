@@ -314,7 +314,14 @@
     "debtPaymentsToAdd": "追加する債務支払い",
     "initialAmount": "初期金額",
     "startDate": "開始日",
-    "debtId": "債務ID"
+    "debtId": "債務ID",
+    "missingMetaTitle": "Add missing categories and owners?",
+    "missingMetaDesc": "This import includes categories/owners not in your settings.",
+    "missingExpenseCategories": "Expense categories",
+    "missingIncomeCategories": "Income categories",
+    "missingOwners": "Owners",
+    "addMissing": "Add to settings",
+    "skipMissing": "Don't add (use defaults)"
   },
   "presetTransactions": {
     "title": "Preset Transactions",

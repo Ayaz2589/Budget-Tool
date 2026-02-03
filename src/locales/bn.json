@@ -314,7 +314,14 @@
     "debtPaymentsToAdd": "যোগ করার ঋণ পেমেন্ট",
     "initialAmount": "প্রাথমিক পরিমাণ",
     "startDate": "শুরুর তারিখ",
-    "debtId": "ঋণ আইডি"
+    "debtId": "ঋণ আইডি",
+    "missingMetaTitle": "Add missing categories and owners?",
+    "missingMetaDesc": "This import includes categories/owners not in your settings.",
+    "missingExpenseCategories": "Expense categories",
+    "missingIncomeCategories": "Income categories",
+    "missingOwners": "Owners",
+    "addMissing": "Add to settings",
+    "skipMissing": "Don't add (use defaults)"
   },
   "presetTransactions": {
     "title": "Preset Transactions",

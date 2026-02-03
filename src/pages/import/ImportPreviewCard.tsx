@@ -82,7 +82,7 @@ export function ImportPreviewCard({
                       </TableCell>
                       <TableCell>
                         {isPdfExport ? (
-                          e.category || "—"
+                          e.category || "Uncategorized"
                         ) : (
                           <Select
                             value={e.category || "_"}

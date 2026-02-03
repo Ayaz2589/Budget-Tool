@@ -312,7 +312,14 @@
     "debtPaymentsToAdd": "待添加债务还款",
     "initialAmount": "初始金额",
     "startDate": "开始日期",
-    "debtId": "债务 ID"
+    "debtId": "债务 ID",
+    "missingMetaTitle": "Add missing categories and owners?",
+    "missingMetaDesc": "This import includes categories/owners not in your settings.",
+    "missingExpenseCategories": "Expense categories",
+    "missingIncomeCategories": "Income categories",
+    "missingOwners": "Owners",
+    "addMissing": "Add to settings",
+    "skipMissing": "Don't add (use defaults)"
   },
   "presetTransactions": {
     "title": "Preset Transactions",

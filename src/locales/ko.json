@@ -314,7 +314,14 @@
     "debtPaymentsToAdd": "추가할 부채 결제",
     "initialAmount": "초기 금액",
     "startDate": "시작일",
-    "debtId": "부채 ID"
+    "debtId": "부채 ID",
+    "missingMetaTitle": "Add missing categories and owners?",
+    "missingMetaDesc": "This import includes categories/owners not in your settings.",
+    "missingExpenseCategories": "Expense categories",
+    "missingIncomeCategories": "Income categories",
+    "missingOwners": "Owners",
+    "addMissing": "Add to settings",
+    "skipMissing": "Don't add (use defaults)"
   },
   "presetTransactions": {
     "title": "Preset Transactions",

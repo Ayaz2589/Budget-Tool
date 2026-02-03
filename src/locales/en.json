@@ -319,7 +319,14 @@
     "debtPaymentsToAdd": "Debt payments to add",
     "initialAmount": "Initial Amount",
     "startDate": "Start Date",
-    "debtId": "Debt Id"
+    "debtId": "Debt Id",
+    "missingMetaTitle": "Add missing categories and owners?",
+    "missingMetaDesc": "This import includes categories/owners not in your settings.",
+    "missingExpenseCategories": "Expense categories",
+    "missingIncomeCategories": "Income categories",
+    "missingOwners": "Owners",
+    "addMissing": "Add to settings",
+    "skipMissing": "Don't add (use defaults)"
   },
   "presetTransactions": {
     "title": "Preset Transactions",

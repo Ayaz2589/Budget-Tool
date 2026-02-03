@@ -17,24 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
-import type { Income } from "@/types/core";
 import type { IncomeTableProps } from "@/types/income";
-
-function formatRecurring(i: Income): string {
-  if (i.recurringAmount == null || i.recurringAmount <= 0) return "—";
-  if (i.recurringFrequency === "biweekly" && i.recurringStartDate) {
-    return `Biweekly from ${i.recurringStartDate}`;
-  }
-  if (
-    i.recurringFrequency === "monthly" &&
-    i.recurringDayOfMonth != null &&
-    i.recurringDayOfMonth >= 1 &&
-    i.recurringDayOfMonth <= 31
-  ) {
-    return `Monthly on ${i.recurringDayOfMonth}`;
-  }
-  return "—";
-}
 
 export type { IncomeTableProps };
 
@@ -57,7 +40,6 @@ export function IncomeTable({
             <TableHead>Amount</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Owner</TableHead>
-            <TableHead className="min-w-[140px]">Recurring</TableHead>
             <TableHead className="w-[120px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -65,7 +47,7 @@ export function IncomeTable({
           {sortedIncome.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={7}
+                colSpan={6}
                 className="text-center text-muted-foreground py-8"
               >
                 No income entries. Add one above.
@@ -123,9 +105,6 @@ export function IncomeTable({
                       ))}
                     </SelectContent>
                   </Select>
-                </TableCell>
-                <TableCell className="text-muted-foreground text-sm">
-                  {formatRecurring(i)}
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center gap-1">

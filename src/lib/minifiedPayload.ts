@@ -58,10 +58,6 @@ export function buildMinifiedPayload(
         desc: x.description || undefined,
         c: x.category || undefined,
         o: x.owner,
-        ra: x.recurringAmount,
-        rf: x.recurringFrequency,
-        rdom: x.recurringDayOfMonth,
-        rs: x.recurringStartDate,
       }),
     ),
     d: debts.map((x) =>
@@ -71,10 +67,6 @@ export function buildMinifiedPayload(
         ia: x.initialAmount,
         sd: x.startDate,
         o: x.owner,
-        ra: x.recurringAmount,
-        rd: x.recurringDayOfMonth,
-        rf: x.recurringFrequency,
-        rs: x.recurringStartDate,
       }),
     ),
     dp: debtPayments.map((x) =>
@@ -138,10 +130,6 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
       description: String(get("description", "desc", "Income")),
       category: String(get("category", "c", "")),
       owner: get("owner", "o", undefined) as string | undefined,
-      recurringAmount: get("recurringAmount", "ra", undefined) as number | undefined,
-      recurringFrequency: get("recurringFrequency", "rf", undefined) as "monthly" | "biweekly" | undefined,
-      recurringDayOfMonth: get("recurringDayOfMonth", "rdom", undefined) as number | undefined,
-      recurringStartDate: get("recurringStartDate", "rs", undefined) as string | undefined,
     } as Income;
   });
 
@@ -154,10 +142,6 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
       initialAmount: Number(get("initialAmount", "ia", 0)),
       startDate: get("startDate", "sd", undefined) as string | undefined,
       owner: get("owner", "o", undefined) as string | undefined,
-      recurringAmount: get("recurringAmount", "ra", undefined) as number | undefined,
-      recurringDayOfMonth: get("recurringDayOfMonth", "rd", undefined) as number | undefined,
-      recurringFrequency: get("recurringFrequency", "rf", undefined) as "monthly" | "biweekly" | undefined,
-      recurringStartDate: get("recurringStartDate", "rs", undefined) as string | undefined,
     } as Debt;
   });
 

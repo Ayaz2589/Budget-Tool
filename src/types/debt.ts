@@ -1,11 +1,9 @@
 import type { Debt, DebtPayment, Owner } from "./core";
-import type { RecurringFrequency } from "./core";
 
 export interface DebtListProps {
   debts: Debt[];
   paymentsByDebt: Map<string, DebtPayment[]>;
   onAddPayment: (debtId: string) => void;
-  onEditRecurring: (debt: Debt) => void;
   onUpdateOwner: (debtId: string, owner: Owner) => void;
   ownerOptions: string[];
   onDelete: (debtId: string) => void;
@@ -23,10 +21,6 @@ export interface AddDebtPayload {
   initialAmount: number;
   startDate?: string;
   owner: Owner;
-  recurringAmount?: number;
-  recurringFrequency?: RecurringFrequency;
-  recurringDayOfMonth?: number;
-  recurringStartDate?: string;
 }
 
 export interface AddDebtDialogProps {
@@ -55,25 +49,9 @@ export interface DebtActionsDialogProps {
   payments: DebtPayment[];
   onClose: () => void;
   onAddPayment: (debtId: string) => void;
-  onEditRecurring: (debt: Debt) => void;
   onUpdateOwner: (debtId: string, owner: Owner) => void;
   ownerOptions: string[];
   onDelete: (debtId: string) => void;
   onRemovePayment: (paymentId: string) => void;
   t: (key: string, options?: Record<string, unknown>) => string;
-}
-
-export interface EditRecurringPayload {
-  recurringAmount: number;
-  recurringFrequency: RecurringFrequency;
-  recurringDayOfMonth?: number;
-  recurringStartDate?: string;
-}
-
-export interface EditRecurringDialogProps {
-  open: boolean;
-  debt: Debt | null;
-  onClose: () => void;
-  onSave: (payload: EditRecurringPayload) => void;
-  onClear: () => void;
 }

@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { countRecurringDeductions, getDebtBalance } from "@/lib/debtUtils";
+import { getDebtBalance } from "@/lib/debtUtils";
 import type { Debt, DebtPayment } from "@/lib/types";
 
 function debt(overrides: Partial<Debt>): Debt {
@@ -10,36 +10,6 @@ function debt(overrides: Partial<Debt>): Debt {
     ...overrides,
   };
 }
-
-test("countRecurringDeductions returns 0 when no recurring amount", () => {
-  expect(countRecurringDeductions(debt({ recurringAmount: 0 }))).toBe(0);
-  expect(
-    countRecurringDeductions(debt({}), new Date("2025-06-15")),
-  ).toBe(0);
-});
-
-test("countRecurringDeductions monthly: one month by asOfDate", () => {
-  const d = debt({
-    startDate: "2025-01-01",
-    recurringAmount: 100,
-    recurringFrequency: "monthly",
-    recurringDayOfMonth: 15,
-  });
-  const asOf = new Date("2025-02-20");
-  expect(countRecurringDeductions(d, asOf)).toBe(2);
-});
-
-test("countRecurringDeductions biweekly: fixed asOfDate", () => {
-  const d = debt({
-    startDate: "2025-01-01",
-    recurringAmount: 50,
-    recurringFrequency: "biweekly",
-    recurringStartDate: "2025-01-01",
-  });
-  const asOf = new Date("2025-01-20");
-  const count = countRecurringDeductions(d, asOf);
-  expect(count).toBeGreaterThanOrEqual(1);
-});
 
 test("getDebtBalance subtracts payments", () => {
   const d = debt({ id: "d1", initialAmount: 1000 });

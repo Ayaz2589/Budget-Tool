@@ -1,23 +1,6 @@
 import { formatCurrency } from "@/lib/format";
-import type { Income } from "@/types/core";
 import { cn } from "@/lib/utils";
 import type { IncomeListProps } from "@/types/income";
-
-function formatRecurring(i: Income): string {
-  if (i.recurringAmount == null || i.recurringAmount <= 0) return "";
-  if (i.recurringFrequency === "biweekly" && i.recurringStartDate) {
-    return `Biweekly from ${i.recurringStartDate}`;
-  }
-  if (
-    i.recurringFrequency === "monthly" &&
-    i.recurringDayOfMonth != null &&
-    i.recurringDayOfMonth >= 1 &&
-    i.recurringDayOfMonth <= 31
-  ) {
-    return `Monthly on ${i.recurringDayOfMonth}`;
-  }
-  return "";
-}
 
 export type { IncomeListProps };
 
@@ -25,7 +8,6 @@ export function IncomeList({ sortedIncome, onIncomeTap }: IncomeListProps) {
   return (
     <div className="divide-y border-t">
       {sortedIncome.map((i, index) => {
-        const recurring = formatRecurring(i);
         return (
           <button
             key={i.id}
@@ -54,12 +36,6 @@ export function IncomeList({ sortedIncome, onIncomeTap }: IncomeListProps) {
               <span>{i.category || "Uncategorized"}</span>
               <span>·</span>
               <span>{i.owner ?? "Ayaz"}</span>
-              {recurring && (
-                <>
-                  <span>·</span>
-                  <span className="truncate">{recurring}</span>
-                </>
-              )}
             </div>
           </button>
         );

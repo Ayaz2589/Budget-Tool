@@ -129,7 +129,6 @@ export function ImportPreviewCard({
                     <TableHead>Amount</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Owner</TableHead>
-                    <TableHead>Recurring</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -147,17 +146,6 @@ export function ImportPreviewCard({
                       <TableCell>{formatCurrency(i.amount)}</TableCell>
                       <TableCell>{i.category || "Uncategorized"}</TableCell>
                       <TableCell>{i.owner ?? "No Owner"}</TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {i.recurringAmount != null && i.recurringAmount > 0
-                          ? i.recurringFrequency === "biweekly" &&
-                            i.recurringStartDate
-                            ? `Biweekly from ${i.recurringStartDate}`
-                            : i.recurringFrequency === "monthly" &&
-                              i.recurringDayOfMonth != null
-                            ? `Monthly on ${i.recurringDayOfMonth}`
-                            : "—"
-                          : "—"}
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

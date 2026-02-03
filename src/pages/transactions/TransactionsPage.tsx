@@ -197,116 +197,124 @@ export function TransactionsPage() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
-        <div className="space-y-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">{t("transactions.title")}</h1>
-            <PageTourTrigger pageId="transactions" steps={transactionsTourSteps} />
-          </div>
-          <p className="text-sm text-muted-foreground">{t("transactions.subtitle")}</p>
-        </div>
-      </div>
-      <div className="md:hidden mb-3 px-4 pt-4 sticky top-0 z-20 bg-background/95 backdrop-blur">
-        <div className="px-0 py-3 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold">{t("transactions.title")}</h1>
-            <p className="text-xs text-muted-foreground">
+      <div className="flex-1 min-h-0 overflow-auto pb-24 md:pb-0">
+        <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
+          <div className="space-y-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold">
+                {t("transactions.title")}
+              </h1>
+              <PageTourTrigger
+                pageId="transactions"
+                steps={transactionsTourSteps}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
               {t("transactions.subtitle")}
             </p>
           </div>
-          <PageTourTrigger pageId="transactions" steps={transactionsTourSteps} />
         </div>
-      </div>
-      <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
-        <div
-          className="hidden md:flex items-center justify-end px-6 pb-4"
-          data-tour="toolbar"
-        >
-          <TransactionsToolbar
-            onOpenFilters={() => setFiltersPopupOpen(true)}
-            onAddTransaction={() => setAddTransactionOpen(true)}
-            hasActiveFilters={hasActiveFilters}
-            showSync={!!(isSignedIn && spreadsheetId)}
-            syncStatus={syncStatus}
-            onSync={() => setSyncConfirmOpen(true)}
-            t={t}
-          />
-        </div>
-        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 md:px-0 md:gap-4 transactions-card-content">
-          <SyncConfirmDialog
-            open={syncConfirmOpen}
-            onOpenChange={setSyncConfirmOpen}
-            onConfirm={syncToSheets}
-            t={t}
-          />
-
-          <FiltersAndActionsDialog
-            open={filtersPopupOpen}
-            onOpenChange={setFiltersPopupOpen}
-            monthFilter={monthFilter}
-            onMonthFilterChange={setMonthFilter}
-            sourceFilter={sourceFilter}
-            onSourceFilterChange={setSourceFilter}
-            categoryFilter={categoryFilter}
-            onCategoryFilterChange={setCategoryFilter}
-            ownerFilter={ownerFilter}
-            onOwnerFilterChange={setOwnerFilter}
-            searchFilter={searchFilter}
-            onSearchFilterChange={setSearchFilter}
-            expenseCategories={expenseCategories}
-            ownerOptions={ownerOptions}
-            cardSources={cardSources}
-            hasActiveFilters={hasActiveFilters}
-            onClearFilters={clearFilters}
-            onCleanDescriptions={cleanAllDescriptions}
-            expensesCount={expenses.length}
-            onDeleteAll={() => setDeleteAllOpen(true)}
-            t={t}
-          />
-
-          <div
-            className="flex-1 min-h-0 overflow-auto pb-24 md:pb-0 md:border md:rounded-md"
-            data-tour="expensesList"
-          >
-            {filtered.length === 0 ? (
-              <div className="text-center text-muted-foreground py-12 px-4">
-                {t("transactions.noTransactions")}
-              </div>
-            ) : (
-              <>
-                <div className="hidden md:block">
-                  <ExpensesByMonthTable
-                    byMonth={byMonth}
-                    defaultOpenMonth={defaultOpenMonth}
-                    sortBy={sortBy}
-                    sortDir={sortDir}
-                    onSort={toggleSort}
-                    onUpdateCategory={(id, category) =>
-                      updateExpense(id, { category })
-                    }
-                    onUpdateOwner={(id, owner) =>
-                      updateExpense(id, { owner: owner || undefined })
-                    }
-                    expenseCategories={expenseCategories}
-                    ownerOptions={ownerOptions}
-                    onDeleteOne={setDeleteOneExpense}
-                    sourceLabelKeys={SOURCE_LABEL_KEYS}
-                    t={t}
-                  />
-                </div>
-                <div className="md:hidden">
-                  <ExpensesByMonthList
-                    byMonth={byMonth}
-                    defaultOpenMonth={defaultOpenMonth}
-                    onExpenseTap={setExpenseForActions}
-                    t={t}
-                  />
-                </div>
-              </>
-            )}
+        <div className="md:hidden mb-3 px-4 pt-4 sticky top-0 z-20 bg-background/95 backdrop-blur">
+          <div className="px-0 py-3 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="text-xl font-semibold">
+                {t("transactions.title")}
+              </h1>
+              <p className="text-xs text-muted-foreground">
+                {t("transactions.subtitle")}
+              </p>
+            </div>
+            <PageTourTrigger pageId="transactions" steps={transactionsTourSteps} />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
+          <div
+            className="hidden md:flex items-center justify-end px-6 pb-4"
+            data-tour="toolbar"
+          >
+            <TransactionsToolbar
+              onOpenFilters={() => setFiltersPopupOpen(true)}
+              onAddTransaction={() => setAddTransactionOpen(true)}
+              hasActiveFilters={hasActiveFilters}
+              showSync={!!(isSignedIn && spreadsheetId)}
+              syncStatus={syncStatus}
+              onSync={() => setSyncConfirmOpen(true)}
+              t={t}
+            />
+          </div>
+          <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 md:px-0 md:gap-4 transactions-card-content">
+            <SyncConfirmDialog
+              open={syncConfirmOpen}
+              onOpenChange={setSyncConfirmOpen}
+              onConfirm={syncToSheets}
+              t={t}
+            />
+
+            <FiltersAndActionsDialog
+              open={filtersPopupOpen}
+              onOpenChange={setFiltersPopupOpen}
+              monthFilter={monthFilter}
+              onMonthFilterChange={setMonthFilter}
+              sourceFilter={sourceFilter}
+              onSourceFilterChange={setSourceFilter}
+              categoryFilter={categoryFilter}
+              onCategoryFilterChange={setCategoryFilter}
+              ownerFilter={ownerFilter}
+              onOwnerFilterChange={setOwnerFilter}
+              searchFilter={searchFilter}
+              onSearchFilterChange={setSearchFilter}
+              expenseCategories={expenseCategories}
+              ownerOptions={ownerOptions}
+              cardSources={cardSources}
+              hasActiveFilters={hasActiveFilters}
+              onClearFilters={clearFilters}
+              onCleanDescriptions={cleanAllDescriptions}
+              expensesCount={expenses.length}
+              onDeleteAll={() => setDeleteAllOpen(true)}
+              t={t}
+            />
+
+            <div className="flex-1 min-h-0 md:border md:rounded-md" data-tour="expensesList">
+              {filtered.length === 0 ? (
+                <div className="text-center text-muted-foreground py-12 px-4">
+                  {t("transactions.noTransactions")}
+                </div>
+              ) : (
+                <>
+                  <div className="hidden md:block">
+                    <ExpensesByMonthTable
+                      byMonth={byMonth}
+                      defaultOpenMonth={defaultOpenMonth}
+                      sortBy={sortBy}
+                      sortDir={sortDir}
+                      onSort={toggleSort}
+                      onUpdateCategory={(id, category) =>
+                        updateExpense(id, { category })
+                      }
+                      onUpdateOwner={(id, owner) =>
+                        updateExpense(id, { owner: owner || undefined })
+                      }
+                      expenseCategories={expenseCategories}
+                      ownerOptions={ownerOptions}
+                      onDeleteOne={setDeleteOneExpense}
+                      sourceLabelKeys={SOURCE_LABEL_KEYS}
+                      t={t}
+                    />
+                  </div>
+                  <div className="md:hidden">
+                    <ExpensesByMonthList
+                      byMonth={byMonth}
+                      defaultOpenMonth={defaultOpenMonth}
+                      onExpenseTap={setExpenseForActions}
+                      t={t}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="md:hidden fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-30 px-4 pb-3 pointer-events-none">
         <div className="pointer-events-auto flex items-center justify-end">

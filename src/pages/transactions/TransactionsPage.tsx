@@ -237,7 +237,7 @@ export function TransactionsPage() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
+      <div className="flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4 sticky top-0 z-20 bg-background/95 backdrop-blur md:static md:bg-transparent md:backdrop-blur-0">
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{t("transactions.title")}</h1>

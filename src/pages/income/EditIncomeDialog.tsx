@@ -103,7 +103,7 @@ export function EditIncomeDialog({
       amount: num,
       description: description.trim() || "Income",
       category: category || "",
-      owner: owner || undefined,
+      owner: owner || "",
       recurringAmount:
         typeof recurringAmountNum === "number" ? recurringAmountNum : undefined,
       recurringFrequency: recurringAmountNum != null ? freq : undefined,

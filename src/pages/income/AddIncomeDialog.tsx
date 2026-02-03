@@ -45,6 +45,7 @@ export function AddIncomeDialog({
         </DialogHeader>
         <AddIncomeForm
           incomeCategories={incomeCategories}
+          owners={owners}
           onSubmit={onSubmit}
           onCancel={() => onOpenChange(false)}
         />
@@ -105,7 +106,7 @@ function AddIncomeForm({
       amount: num,
       description: description.trim() || "Income",
       category: category || "",
-      owner: owner || undefined,
+      owner: owner || "",
       recurringAmount:
         typeof recurringAmountNum === "number" ? recurringAmountNum : undefined,
       recurringFrequency: recurringAmountNum != null ? freq : undefined,

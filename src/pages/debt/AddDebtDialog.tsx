@@ -66,7 +66,7 @@ export function AddDebtDialog({
       name: name.trim() || "Debt",
       initialAmount: num,
       startDate: startDate.trim() || undefined,
-      owner: owner || undefined,
+      owner: owner || "",
       recurringAmount:
         typeof recurringAmountNum === "number" ? recurringAmountNum : undefined,
       recurringFrequency: recurringAmountNum != null ? freq : undefined,

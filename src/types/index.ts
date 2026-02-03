@@ -10,7 +10,6 @@ export * from "./budget";
 export * from "./import";
 export * from "./category";
 export * from "./tour";
-export * from "./dashboard";
 export * from "./context";
 export * from "./ui";
 export * from "./debt";

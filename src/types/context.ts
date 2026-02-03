@@ -1,9 +1,4 @@
-import type {
-  Debt,
-  DebtPayment,
-  Expense,
-  Income,
-} from "./core";
+import type { Debt, DebtPayment, Expense, Income } from "./core";
 import type { BudgetState } from "./budget";
 import type { PresetTransaction } from "./core";
 
@@ -32,6 +27,8 @@ export interface BudgetContextValue extends BudgetState {
   setIOweNova: (monthKey: string, amount: number) => void;
   iOweNova: Record<string, number>;
   repairCorruptedDates: () => { fixedExpenses: number; fixedIncome: number };
+  useDummyData: boolean;
+  setUseDummyData: (value: boolean) => void;
 }
 
 export interface PresetTransactionsContextValue {

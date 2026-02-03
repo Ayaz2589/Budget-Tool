@@ -27,5 +27,5 @@ test("Dashboard renders without throwing", () => {
   expect(
     screen.getByRole("heading", { name: "Dashboard" }),
   ).toBeInTheDocument();
-  expect(screen.getByText("Summary")).toBeInTheDocument();
+  expect(screen.getByText("Total income")).toBeInTheDocument();
 });

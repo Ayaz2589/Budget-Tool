@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { SourceIcon } from "@/components/cards";
@@ -54,9 +53,6 @@ function SortIcon({
 export function ExpensesByMonthTable({
   byMonth,
   defaultOpenMonth,
-  selectedIds,
-  onToggleSelect,
-  onToggleMonthSelection,
   sortBy,
   sortDir,
   onSort,
@@ -93,18 +89,6 @@ export function ExpensesByMonthTable({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40px] px-2">
-                    <Checkbox
-                      checked={
-                        monthExpenses.length > 0 &&
-                        monthExpenses.every((e) => selectedIds.has(e.id))
-                      }
-                      onCheckedChange={() =>
-                        onToggleMonthSelection(monthExpenses)
-                      }
-                      aria-label={t("common.selectAllInMonth")}
-                    />
-                  </TableHead>
                   <TableHead className="w-[100px]">{t("common.id")}</TableHead>
                   <TableHead>
                     <button
@@ -201,13 +185,6 @@ export function ExpensesByMonthTable({
                     key={e.id}
                     className={index % 2 === 1 ? "bg-muted/30" : undefined}
                   >
-                    <TableCell className="w-[40px]">
-                      <Checkbox
-                        checked={selectedIds.has(e.id)}
-                        onCheckedChange={() => onToggleSelect(e.id)}
-                        aria-label={`Select ${e.description}`}
-                      />
-                    </TableCell>
                     <TableCell
                       className="font-mono text-xs max-w-[100px] truncate"
                       title={e.id}

@@ -24,6 +24,8 @@
   "common": {
     "save": "保存",
     "cancel": "キャンセル",
+    "select": "Select",
+    "done": "Done",
     "delete": "削除",
     "loading": "読み込み中",
     "add": "追加",
@@ -408,6 +410,7 @@
     "newTransaction": "新規取引",
     "newTransactions": "新規取引",
     "dialogDesc": "1取引1行。行をコピーして複製し編集。有効な金額の行は送信時に追加。",
+    "transaction": "Transaction",
     "source": "ソース",
     "date": "日付",
     "amount": "金額",

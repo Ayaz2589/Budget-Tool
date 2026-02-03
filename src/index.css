@@ -183,4 +183,8 @@
     padding-left: 1rem;
     padding-right: 1rem;
   }
+  .flatten-mobile-cards .transactions-card-content {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }

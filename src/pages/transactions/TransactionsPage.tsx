@@ -8,14 +8,9 @@ import { cleanDescription } from "@/lib/parsers";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { transactionsTourSteps } from "@/lib/pageTourSteps";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus, SlidersHorizontal } from "lucide-react";
 import { SyncConfirmDialog } from "./SyncConfirmDialog";
 import { TransactionsToolbar } from "./TransactionsToolbar";
 import { FiltersAndActionsDialog } from "./FiltersAndActionsDialog";
@@ -25,7 +20,6 @@ import { ExpensesByMonthList } from "./ExpensesByMonthList";
 import { ExpenseActionsDialog } from "./ExpenseActionsDialog";
 import {
   DeleteOneTransactionDialog,
-  DeleteSelectedTransactionsDialog,
   DeleteAllTransactionsDialog,
 } from "./DeleteTransactionDialogs";
 
@@ -49,9 +43,7 @@ export function TransactionsPage() {
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<SortColumn>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
-  const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
   const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
     null,
   );
@@ -163,31 +155,6 @@ export function TransactionsPage() {
     });
   }, [expenses, updateExpense]);
 
-  const toggleSelect = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const toggleMonthSelection = useCallback((monthExpenses: Expense[]) => {
-    setSelectedIds((prev) => {
-      const ids = new Set(monthExpenses.map((e) => e.id));
-      const allSelected =
-        ids.size > 0 && [...ids].every((id: string) => prev.has(id));
-      const next = new Set(prev);
-      if (allSelected) ids.forEach((id) => next.delete(id));
-      else ids.forEach((id) => next.add(id));
-      return next;
-    });
-  }, []);
-
-  const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
-
-  const someSelected = selectedIds.size > 0;
-
   const hasActiveFilters = Boolean(
     monthFilter ||
     sourceFilter !== "all" ||
@@ -216,17 +183,10 @@ export function TransactionsPage() {
     [sortBy],
   );
 
-  const handleDeleteSelected = useCallback(() => {
-    removeExpenses(Array.from(selectedIds));
-    clearSelection();
-    setDeleteSelectedOpen(false);
-  }, [selectedIds, removeExpenses, clearSelection]);
-
   const handleDeleteAll = useCallback(() => {
     removeExpenses(expenses.map((e) => e.id));
-    clearSelection();
     setDeleteAllOpen(false);
-  }, [expenses, removeExpenses, clearSelection]);
+  }, [expenses, removeExpenses]);
 
   const handleDeleteOne = useCallback(() => {
     if (deleteOneExpense) {
@@ -237,7 +197,7 @@ export function TransactionsPage() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
+      <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{t("transactions.title")}</h1>
@@ -246,23 +206,33 @@ export function TransactionsPage() {
           <p className="text-sm text-muted-foreground">{t("transactions.subtitle")}</p>
         </div>
       </div>
+      <div className="md:hidden mb-3 px-4 pt-4">
+        <div className="px-0 py-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold">{t("transactions.title")}</h1>
+            <p className="text-xs text-muted-foreground">
+              {t("transactions.subtitle")}
+            </p>
+          </div>
+          <PageTourTrigger pageId="transactions" steps={transactionsTourSteps} />
+        </div>
+      </div>
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
-        <CardHeader className="shrink-0">
-          <CardTitle>{t("transactions.expenses")}</CardTitle>
-          <CardDescription>{t("transactions.filterAndEdit")}</CardDescription>
-          <CardAction data-tour="toolbar">
-            <TransactionsToolbar
-              onOpenFilters={() => setFiltersPopupOpen(true)}
-              onAddTransaction={() => setAddTransactionOpen(true)}
-              hasActiveFilters={hasActiveFilters}
-              showSync={!!(isSignedIn && spreadsheetId)}
-              syncStatus={syncStatus}
-              onSync={() => setSyncConfirmOpen(true)}
-              t={t}
-            />
-          </CardAction>
-        </CardHeader>
-        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-4">
+        <div
+          className="hidden md:flex items-center justify-end px-6 pb-4"
+          data-tour="toolbar"
+        >
+          <TransactionsToolbar
+            onOpenFilters={() => setFiltersPopupOpen(true)}
+            onAddTransaction={() => setAddTransactionOpen(true)}
+            hasActiveFilters={hasActiveFilters}
+            showSync={!!(isSignedIn && spreadsheetId)}
+            syncStatus={syncStatus}
+            onSync={() => setSyncConfirmOpen(true)}
+            t={t}
+          />
+        </div>
+        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 md:px-0 md:gap-4 transactions-card-content">
           <SyncConfirmDialog
             open={syncConfirmOpen}
             onOpenChange={setSyncConfirmOpen}
@@ -289,16 +259,15 @@ export function TransactionsPage() {
             hasActiveFilters={hasActiveFilters}
             onClearFilters={clearFilters}
             onCleanDescriptions={cleanAllDescriptions}
-            someSelected={someSelected}
-            selectedCount={selectedIds.size}
-            onDeleteSelected={() => setDeleteSelectedOpen(true)}
-            onClearSelection={clearSelection}
             expensesCount={expenses.length}
             onDeleteAll={() => setDeleteAllOpen(true)}
             t={t}
           />
 
-          <div className="flex-1 min-h-0 overflow-auto border rounded-md" data-tour="expensesList">
+          <div
+            className="flex-1 min-h-0 overflow-auto pb-24 md:pb-0 md:border md:rounded-md"
+            data-tour="expensesList"
+          >
             {filtered.length === 0 ? (
               <div className="text-center text-muted-foreground py-12 px-4">
                 {t("transactions.noTransactions")}
@@ -309,9 +278,6 @@ export function TransactionsPage() {
                   <ExpensesByMonthTable
                     byMonth={byMonth}
                     defaultOpenMonth={defaultOpenMonth}
-                    selectedIds={selectedIds}
-                    onToggleSelect={toggleSelect}
-                    onToggleMonthSelection={toggleMonthSelection}
                     sortBy={sortBy}
                     sortDir={sortDir}
                     onSort={toggleSort}
@@ -332,9 +298,6 @@ export function TransactionsPage() {
                   <ExpensesByMonthList
                     byMonth={byMonth}
                     defaultOpenMonth={defaultOpenMonth}
-                    selectedIds={selectedIds}
-                    onToggleSelect={toggleSelect}
-                    onToggleMonthSelection={toggleMonthSelection}
                     onExpenseTap={setExpenseForActions}
                     t={t}
                   />
@@ -344,6 +307,32 @@ export function TransactionsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <div className="md:hidden fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-30 px-4 pb-3 pointer-events-none">
+        <div className="pointer-events-auto flex items-center justify-end">
+          <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
+            <Button
+              variant="secondary"
+              onClick={() => setFiltersPopupOpen(true)}
+              className="h-11 w-11 rounded-full p-0"
+              aria-label={
+                hasActiveFilters
+                  ? `${t("common.filtersAndActions")} (${t("common.active")})`
+                  : t("common.filtersAndActions")
+              }
+            >
+              <SlidersHorizontal className="size-4" />
+            </Button>
+            <Button
+              onClick={() => setAddTransactionOpen(true)}
+              className="h-11 w-11 rounded-full p-0"
+              aria-label={t("common.add")}
+            >
+              <Plus className="size-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <AddTransactionDialog
         open={addTransactionOpen}
@@ -373,18 +362,10 @@ export function TransactionsPage() {
         t={t}
       />
 
-      <DeleteSelectedTransactionsDialog
-        open={deleteSelectedOpen}
-        onOpenChange={setDeleteSelectedOpen}
-        count={selectedIds.size}
-        onConfirm={handleDeleteSelected}
-        t={t}
-      />
-
-      <DeleteAllTransactionsDialog
-        open={deleteAllOpen}
-        onOpenChange={setDeleteAllOpen}
-        count={expenses.length}
+          <DeleteAllTransactionsDialog
+            open={deleteAllOpen}
+            onOpenChange={setDeleteAllOpen}
+            count={expenses.length}
         onConfirm={handleDeleteAll}
         t={t}
       />

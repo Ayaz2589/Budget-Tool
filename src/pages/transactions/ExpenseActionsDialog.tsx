@@ -37,34 +37,47 @@ export function ExpenseActionsDialog({
     onClose();
   };
 
+  const fieldClass = "h-11 w-full";
+  const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
+
   return (
     <Sheet open={expense !== null} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
-        side="bottom"
+        side="right"
         showCloseButton={true}
-        className="w-full max-w-full max-h-[92vh] rounded-t-2xl border-t p-0 gap-0"
+        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
       >
-        <SheetHeader className="p-5 pb-3">
+        <SheetHeader className="px-4 pt-5 pb-3">
           <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
-            {expense.description || t("transactions.transaction")}
+            {expense.description || t("addTransaction.transaction")}
           </SheetTitle>
         </SheetHeader>
-        <div className="overflow-y-auto overscroll-contain px-5 pb-10 flex flex-col gap-5">
-          <div className="text-base text-muted-foreground space-y-1">
-            <p>{expense.date}</p>
-            <p className="font-semibold text-foreground text-lg">
-              {formatCurrency(expense.amount)}
-            </p>
+        <div className="grid gap-5 px-4 pb-8 overflow-y-auto overscroll-contain">
+          <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
+            <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
+              <span>{t("common.date")}</span>
+              <span>{expense.date}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                {t("common.amount")}
+              </span>
+              <span className="text-lg font-semibold text-foreground">
+                {formatCurrency(expense.amount)}
+              </span>
+            </div>
           </div>
           <div className="space-y-2">
-            <Label className="text-sm">{t("common.category")}</Label>
+            <Label className="text-sm text-muted-foreground">
+              {t("common.category")}
+            </Label>
             <Select
               value={expense.category || "_"}
               onValueChange={(v) =>
                 onUpdateCategory(expense.id, v === "_" ? "" : v)
               }
             >
-              <SelectTrigger className="w-full h-12 text-base">
+              <SelectTrigger className={selectTriggerClass}>
                 <SelectValue placeholder={t("common.category")} />
               </SelectTrigger>
               <SelectContent>
@@ -83,14 +96,16 @@ export function ExpenseActionsDialog({
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="text-sm">{t("common.owner")}</Label>
+            <Label className="text-sm text-muted-foreground">
+              {t("common.owner")}
+            </Label>
             <Select
               value={expense.owner || "_none"}
               onValueChange={(v) =>
                 onUpdateOwner(expense.id, v === "_none" ? "" : v)
               }
             >
-              <SelectTrigger className="w-full h-12 text-base">
+              <SelectTrigger className={selectTriggerClass}>
                 <SelectValue placeholder={t("common.noOwner")} />
               </SelectTrigger>
               <SelectContent>
@@ -105,7 +120,7 @@ export function ExpenseActionsDialog({
           </div>
           <Button
             variant="destructive"
-            className="w-full h-12 text-base"
+            className={fieldClass}
             onClick={handleDelete}
           >
             <Trash2 className="size-4" />

@@ -213,19 +213,6 @@ export function TransactionsPage() {
           </p>
         </div>
       </div>
-      <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
-        <div className="px-0 py-3 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold">
-              {t("transactions.title")}
-            </h1>
-            <p className="text-xs text-muted-foreground">
-              {t("transactions.subtitle")}
-            </p>
-          </div>
-          <PageTourTrigger pageId="transactions" steps={transactionsTourSteps} />
-        </div>
-      </div>
       <div className="flex-1 min-h-0 overflow-auto pb-24 md:pb-0">
         <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
           <div

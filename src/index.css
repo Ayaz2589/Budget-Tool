@@ -17,6 +17,12 @@
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
+    overflow: hidden;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
   }
 }
 

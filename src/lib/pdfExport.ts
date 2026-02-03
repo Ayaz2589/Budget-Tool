@@ -203,26 +203,12 @@ export function downloadTransactionsAndIncomePdf(
         doc.addPage();
         y = 20;
       }
-      const incomeRecurringLabel = (i: Income): string => {
-        if (i.recurringAmount == null || i.recurringAmount <= 0) return "—";
-        if (i.recurringFrequency === "biweekly" && i.recurringStartDate)
-          return `Biweekly from ${i.recurringStartDate}`;
-        if (
-          i.recurringFrequency === "monthly" &&
-          i.recurringDayOfMonth != null &&
-          i.recurringDayOfMonth >= 1 &&
-          i.recurringDayOfMonth <= 31
-        )
-          return `Monthly on ${i.recurringDayOfMonth}`;
-        return "—";
-      };
       const incomeHead = [
         "Date",
         "Description",
         "Amount",
         "Category",
         "Owner",
-        "Recurring",
       ];
       const incomeBody = monthIncome.map((i) => [
         i.date,
@@ -231,7 +217,6 @@ export function downloadTransactionsAndIncomePdf(
         formatCurrency(i.amount),
         i.category || "Uncategorized",
         i.owner ?? "No Owner",
-        incomeRecurringLabel(i),
       ]);
       autoTable(doc, {
         startY: y,
@@ -258,27 +243,13 @@ export function downloadTransactionsAndIncomePdf(
     doc.setFontSize(14);
     doc.text("Debts", margin, y);
     y += 8;
-    const debtHead = [
-      "Id",
-      "Name",
-      "Initial Amount",
-      "Start Date",
-      "Owner",
-      "Recurring Amount",
-      "Recurring Day",
-      "Recurring Frequency",
-      "Recurring Start Date",
-    ];
+    const debtHead = ["Id", "Name", "Initial Amount", "Start Date", "Owner"];
     const debtBody = debts.map((d) => [
       d.id,
       d.name.slice(0, 25) + (d.name.length > 25 ? "…" : ""),
       formatCurrency(d.initialAmount),
       d.startDate ?? "—",
       d.owner ?? "No Owner",
-      d.recurringAmount != null ? formatCurrency(d.recurringAmount) : "—",
-      d.recurringDayOfMonth ?? "—",
-      d.recurringFrequency ?? "—",
-      d.recurringStartDate ?? "—",
     ]);
     autoTable(doc, {
       startY: y,

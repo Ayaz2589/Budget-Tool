@@ -203,7 +203,7 @@ export async function readIncomeFromSheet(
   const rows = await getSheetValues(
     accessToken,
     spreadsheetId,
-    "Income!A2:I",
+    "Income!A2:E",
     "UNFORMATTED_VALUE",
   );
   const income: Income[] = [];
@@ -216,14 +216,6 @@ export async function readIncomeFromSheet(
       row.length >= 5 && (row[4] ?? "").toString().trim()
         ? parseOwner(row[4])
         : undefined;
-    const recurringAmount =
-      row.length >= 6 ? parseAmount(row[5]) : undefined;
-    const recurringFreq =
-      row.length >= 7 ? parseRecurringFrequency(row[6]) : undefined;
-    const recurringDay =
-      row.length >= 8 ? parseRecurringDay(row[7]) : undefined;
-    const recurringStart =
-      row.length >= 9 ? normalizeDate(row[8]) : undefined;
     if (!date || amount == null || amount <= 0) continue;
     income.push({
       id: generateId(),
@@ -232,13 +224,6 @@ export async function readIncomeFromSheet(
       description: description || "Income",
       category: category || "",
       owner,
-      recurringAmount:
-        recurringAmount != null && recurringAmount > 0
-          ? recurringAmount
-          : undefined,
-      recurringFrequency: recurringFreq,
-      recurringDayOfMonth: recurringDay,
-      recurringStartDate: recurringStart ?? undefined,
     });
   }
   return income;
@@ -249,20 +234,6 @@ function parseOwner(value: unknown): string {
   return s;
 }
 
-function parseRecurringDay(value: unknown): number | undefined {
-  const n = Number(value);
-  if (Number.isInteger(n) && n >= 1 && n <= 31) return n;
-  return undefined;
-}
-
-function parseRecurringFrequency(
-  value: unknown,
-): "monthly" | "biweekly" {
-  const s = String(value ?? "").trim().toLowerCase();
-  if (s === "biweekly" || s === "bi-weekly") return "biweekly";
-  return "monthly";
-}
-
 export async function readDebtsFromSheet(
   accessToken: string,
   spreadsheetId: string
@@ -270,7 +241,7 @@ export async function readDebtsFromSheet(
   const rows = await getSheetValues(
     accessToken,
     spreadsheetId,
-    "Debts!A2:I",
+    "Debts!A2:E",
     "UNFORMATTED_VALUE",
   );
   const debts: Debt[] = [];
@@ -280,10 +251,6 @@ export async function readDebtsFromSheet(
     const initialAmount = parseAmount(row[2]);
     const startDate = normalizeDate(row[3]);
     const owner = row[4] != null ? parseOwner(row[4]) : undefined;
-    const recurringAmount = parseAmount(row[5]);
-    const recurringDay = parseRecurringDay(row[6]);
-    const recurringFrequency = parseRecurringFrequency(row[7]);
-    const recurringStartDate = normalizeDate(row[8]);
     if (!name || initialAmount == null || initialAmount < 0) continue;
     debts.push({
       id: id || generateId(),
@@ -291,13 +258,6 @@ export async function readDebtsFromSheet(
       initialAmount,
       startDate: startDate ?? undefined,
       owner: owner || undefined,
-      recurringAmount:
-        recurringAmount != null && recurringAmount > 0
-          ? recurringAmount
-          : undefined,
-      recurringFrequency,
-      recurringDayOfMonth: recurringDay,
-      recurringStartDate: recurringStartDate ?? undefined,
     });
   }
   return debts;
@@ -380,17 +340,13 @@ export async function appendIncome(
   spreadsheetId: string,
   income: Income[]
 ): Promise<void> {
-  const range = "Income!A:I";
+  const range = "Income!A:E";
   const values = income.map((i) => [
     i.date,
     i.amount,
     i.description,
     i.category || "Uncategorized",
     i.owner ?? "",
-    i.recurringAmount ?? "",
-    i.recurringFrequency ?? "",
-    i.recurringDayOfMonth ?? "",
-    i.recurringStartDate ?? "",
   ]);
   await updateSheet(accessToken, spreadsheetId, range, values, false);
 }
@@ -467,17 +423,7 @@ export async function clearAndWriteIncome(
   income: Income[]
 ): Promise<void> {
   const headers = [
-    [
-      "Date",
-      "Amount",
-      "Description",
-      "Category",
-      "Owner",
-      "Recurring Amount",
-      "Recurring Frequency",
-      "Recurring Day",
-      "Recurring Start Date",
-    ],
+    ["Date", "Amount", "Description", "Category", "Owner"],
   ];
   const rows = income.map((i) => [
     i.date,
@@ -485,13 +431,9 @@ export async function clearAndWriteIncome(
     i.description,
     i.category || "Uncategorized",
     i.owner ?? "",
-    i.recurringAmount ?? "",
-    i.recurringFrequency ?? "",
-    i.recurringDayOfMonth ?? "",
-    i.recurringStartDate ?? "",
   ]);
   const values = [...headers, ...rows];
-  const range = "Income!A1:I";
+  const range = "Income!A1:E";
   await clearRange(accessToken, spreadsheetId, "Income!A1:I10000");
   if (values.length > 0) {
     await updateSheet(accessToken, spreadsheetId, range, values, false);
@@ -504,17 +446,7 @@ export async function clearAndWriteDebts(
   debts: Debt[]
 ): Promise<void> {
   const headers = [
-    [
-      "Id",
-      "Name",
-      "Initial Amount",
-      "Start Date",
-      "Owner",
-      "Recurring Amount",
-      "Recurring Day",
-      "Recurring Frequency",
-      "Recurring Start Date",
-    ],
+    ["Id", "Name", "Initial Amount", "Start Date", "Owner"],
   ];
   const rows = debts.map((d) => [
     d.id,
@@ -522,13 +454,9 @@ export async function clearAndWriteDebts(
     d.initialAmount,
     d.startDate ?? "",
     d.owner ?? "",
-    d.recurringAmount ?? "",
-    d.recurringDayOfMonth ?? "",
-    d.recurringFrequency === "biweekly" ? "biweekly" : d.recurringFrequency ?? "",
-    d.recurringStartDate ?? "",
   ]);
   const values = [...headers, ...rows];
-  const range = "Debts!A1:I";
+  const range = "Debts!A1:E";
   await clearRange(accessToken, spreadsheetId, "Debts!A1:I10000");
   if (values.length > 0) {
     await updateSheet(accessToken, spreadsheetId, range, values, false);

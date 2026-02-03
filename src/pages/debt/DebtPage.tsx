@@ -24,7 +24,6 @@ import { Plus, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
-import { EditRecurringDialog } from "./EditRecurringDialog";
 import { DebtList } from "./DebtList";
 import { DebtListMobile } from "./DebtListMobile";
 import { DebtActionsDialog } from "./DebtActionsDialog";
@@ -42,7 +41,6 @@ export function DebtPage() {
   } = useBudget();
   const [addDebtOpen, setAddDebtOpen] = useState(false);
   const [paymentDebtId, setPaymentDebtId] = useState<string | null>(null);
-  const [recurringDebtId, setRecurringDebtId] = useState<string | null>(null);
   const [deleteConfirmDebtId, setDeleteConfirmDebtId] = useState<string | null>(
     null,
   );
@@ -63,11 +61,6 @@ export function DebtPage() {
     }
     return map;
   }, [debtPayments]);
-
-  const recurringDebt =
-    recurringDebtId != null
-      ? (debts.find((d) => d.id === recurringDebtId) ?? null)
-      : null;
 
   const { t } = useTranslation();
   return (
@@ -118,7 +111,6 @@ export function DebtPage() {
                   debts={debts}
                   paymentsByDebt={paymentsByDebt}
                   onAddPayment={setPaymentDebtId}
-                  onEditRecurring={(debt) => setRecurringDebtId(debt.id)}
                   onUpdateOwner={(id, owner) =>
                     updateDebt(id, { owner: owner || undefined })
                   }
@@ -148,10 +140,6 @@ export function DebtPage() {
         onAddPayment={(id) => {
           setDebtForActions(null);
           setPaymentDebtId(id);
-        }}
-        onEditRecurring={(debt) => {
-          setDebtForActions(null);
-          setRecurringDebtId(debt.id);
         }}
         onUpdateOwner={(id, owner) =>
           updateDebt(id, { owner: owner || undefined })
@@ -252,26 +240,6 @@ export function DebtPage() {
         onSubmit={(payload) => {
           addDebtPayment(payload);
           setPaymentDebtId(null);
-        }}
-      />
-
-      <EditRecurringDialog
-        open={recurringDebtId !== null}
-        debt={recurringDebt}
-        onClose={() => setRecurringDebtId(null)}
-        onSave={(payload) => {
-          if (recurringDebtId) updateDebt(recurringDebtId, payload);
-          setRecurringDebtId(null);
-        }}
-        onClear={() => {
-          if (recurringDebtId)
-            updateDebt(recurringDebtId, {
-              recurringAmount: undefined,
-              recurringFrequency: undefined,
-              recurringDayOfMonth: undefined,
-              recurringStartDate: undefined,
-            });
-          setRecurringDebtId(null);
         }}
       />
     </div>

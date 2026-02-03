@@ -34,19 +34,9 @@ export interface Income {
   category: string;
   /** Owner label from settings */
   owner?: Owner;
-  /** Recurring amount (e.g. same as amount for paycheck) */
-  recurringAmount?: number;
-  /** "monthly" = each month on recurringDayOfMonth; "biweekly" = every 14 days from recurringStartDate */
-  recurringFrequency?: RecurringFrequency;
-  /** Day of month (1–31) when recurring (monthly only) */
-  recurringDayOfMonth?: number;
-  /** First payment date for bi-weekly schedule (YYYY-MM-DD) */
-  recurringStartDate?: string;
 }
 
 export type Owner = string;
-
-export type RecurringFrequency = "monthly" | "biweekly";
 
 export interface Debt {
   id: string;
@@ -54,14 +44,6 @@ export interface Debt {
   initialAmount: number;
   startDate?: string; // ISO date YYYY-MM-DD
   owner?: Owner;
-  /** Recurring payment amount */
-  recurringAmount?: number;
-  /** "monthly" = each month on recurringDayOfMonth; "biweekly" = every 14 days from recurringStartDate */
-  recurringFrequency?: RecurringFrequency;
-  /** Day of month (1–31) when recurring payment is applied (monthly only) */
-  recurringDayOfMonth?: number;
-  /** First payment date for bi-weekly schedule (YYYY-MM-DD) */
-  recurringStartDate?: string;
 }
 
 export interface DebtPayment {

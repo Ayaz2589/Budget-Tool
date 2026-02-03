@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { DollarSign, Calendar, Trash2 } from "lucide-react";
+import { DollarSign, Trash2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -30,7 +30,6 @@ export function DebtActionsDialog({
   payments,
   onClose,
   onAddPayment,
-  onEditRecurring,
   onUpdateOwner,
   ownerOptions = [],
   onDelete,
@@ -44,15 +43,9 @@ export function DebtActionsDialog({
   if (debt === null) return null;
 
   const balance = getDebtBalance(debt, payments);
-  const hasRecurring = debt.recurringAmount != null && debt.recurringAmount > 0;
 
   const handleAddPayment = () => {
     onAddPayment(debt.id);
-    onClose();
-  };
-
-  const handleEditRecurring = () => {
-    onEditRecurring(debt);
     onClose();
   };
 
@@ -60,14 +53,6 @@ export function DebtActionsDialog({
     onDelete(debt.id);
     onClose();
   };
-
-  const recurringLabel = hasRecurring
-    ? `${formatCurrency(debt.recurringAmount!)} ${
-        debt.recurringFrequency === "biweekly"
-          ? `bi-weekly from ${debt.recurringStartDate ?? debt.startDate ?? "—"}`
-          : `monthly on day ${debt.recurringDayOfMonth ?? "—"}`
-      }`
-    : "—";
 
   return (
     <Dialog open={debt !== null} onOpenChange={(open) => !open && onClose()}>
@@ -98,14 +83,6 @@ export function DebtActionsDialog({
                 {formatCurrency(balance)}
               </p>
             </div>
-            <div className="col-span-2">
-              <p className="text-muted-foreground text-xs uppercase tracking-wide">
-                Recurring
-              </p>
-              <p className="text-sm font-medium mt-0.5 text-muted-foreground">
-                {recurringLabel}
-              </p>
-            </div>
           </div>
 
           <div className="space-y-2">
@@ -131,15 +108,6 @@ export function DebtActionsDialog({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-start"
-              onClick={handleEditRecurring}
-            >
-              <Calendar className="size-4" />
-              {hasRecurring ? "Edit recurring" : "Set recurring"}
-            </Button>
             <Button
               size="sm"
               className="w-full justify-start"

@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DollarSign, Calendar, Trash2 } from "lucide-react";
+import { DollarSign, Trash2 } from "lucide-react";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency } from "@/lib/format";
 import type { DebtListProps } from "@/types/debt";
@@ -25,7 +25,6 @@ export function DebtList({
   debts,
   paymentsByDebt,
   onAddPayment,
-  onEditRecurring,
   onUpdateOwner,
   ownerOptions = [],
   onDelete,
@@ -77,7 +76,7 @@ export function DebtList({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
                     Initial
@@ -94,44 +93,9 @@ export function DebtList({
                     {formatCurrency(balance)}
                   </p>
                 </div>
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
-                    Recurring
-                  </p>
-                  <p className="text-sm font-medium mt-0.5">
-                    {debt.recurringAmount != null &&
-                    debt.recurringAmount > 0 ? (
-                      <>
-                        {formatCurrency(debt.recurringAmount)}{" "}
-                        <span className="text-muted-foreground font-normal">
-                          {debt.recurringFrequency === "biweekly"
-                            ? `bi-weekly from ${
-                                debt.recurringStartDate ?? debt.startDate ?? "—"
-                              }`
-                            : `monthly on day ${
-                                debt.recurringDayOfMonth ?? "—"
-                              }`}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </p>
-                </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onEditRecurring(debt)}
-                >
-                  <Calendar className="size-4" />
-                  {debt.recurringAmount != null && debt.recurringAmount > 0
-                    ? "Edit recurring"
-                    : "Set recurring"}
-                </Button>
                 <Button
                   type="button"
                   size="sm"

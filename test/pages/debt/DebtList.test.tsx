@@ -8,7 +8,8 @@ test("DebtList shows empty state when no debts", () => {
       debts={[]}
       paymentsByDebt={new Map()}
       onAddPayment={() => {}}
-      onEditRecurring={() => {}}
+      onUpdateOwner={() => {}}
+      ownerOptions={[]}
       onDelete={() => {}}
       onRemovePayment={() => {}}
     />,

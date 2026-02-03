@@ -1,5 +1,4 @@
 import type { Owner, Income } from "./core";
-import type { RecurringFrequency } from "./core";
 
 export interface AddIncomeFormPayload {
   date: string;
@@ -7,10 +6,6 @@ export interface AddIncomeFormPayload {
   description: string;
   category: string;
   owner: Owner;
-  recurringAmount?: number;
-  recurringFrequency?: RecurringFrequency;
-  recurringDayOfMonth?: number;
-  recurringStartDate?: string;
 }
 
 export interface AddIncomeDialogProps {
@@ -27,10 +22,6 @@ export interface EditIncomeFormPayload {
   description: string;
   category: string;
   owner: Owner;
-  recurringAmount?: number;
-  recurringFrequency?: RecurringFrequency;
-  recurringDayOfMonth?: number;
-  recurringStartDate?: string;
 }
 
 export interface EditIncomeDialogProps {

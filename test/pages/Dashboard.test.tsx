@@ -28,4 +28,10 @@ test("Dashboard renders without throwing", () => {
     screen.getByRole("heading", { name: "Dashboard" }),
   ).toBeInTheDocument();
   expect(screen.getByText("Total income")).toBeInTheDocument();
+  expect(screen.getByText("Avg daily spend")).toBeInTheDocument();
+  expect(screen.getByText("Largest expense")).toBeInTheDocument();
+  expect(screen.getByText("Income coverage")).toBeInTheDocument();
+  expect(screen.getByText("Category trend")).toBeInTheDocument();
+  expect(screen.getByText("Owner trend")).toBeInTheDocument();
+  expect(screen.getByText("Insights")).toBeInTheDocument();
 });

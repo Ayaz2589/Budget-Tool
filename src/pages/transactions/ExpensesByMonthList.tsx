@@ -43,7 +43,7 @@ export function ExpensesByMonthList({
             <button
               type="button"
               onClick={() => setOpenMonth(isOpen ? "" : monthKey)}
-              className="w-full px-4 py-3 flex items-center justify-between text-left text-sm font-medium bg-muted/20"
+              className="sticky top-0 z-10 w-full px-4 py-3 flex items-center justify-between text-left text-sm font-medium bg-background/90 backdrop-blur border-b border-border/60"
               aria-expanded={isOpen}
             >
               <span>{getMonthLabel(monthKey)}</span>

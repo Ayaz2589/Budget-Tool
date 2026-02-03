@@ -309,26 +309,28 @@ export function TransactionsPage() {
       </Card>
 
       <div className="md:hidden fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-30 px-4 pb-3 pointer-events-none">
-        <div className="pointer-events-auto flex items-center justify-end gap-2">
-          <Button
-            variant="secondary"
-            onClick={() => setFiltersPopupOpen(true)}
-            className="h-12 w-12 rounded-full p-0 shadow-lg shadow-black/30"
-            aria-label={
-              hasActiveFilters
-                ? `${t("common.filtersAndActions")} (${t("common.active")})`
-                : t("common.filtersAndActions")
-            }
-          >
-            <SlidersHorizontal className="size-4" />
-          </Button>
-          <Button
-            onClick={() => setAddTransactionOpen(true)}
-            className="h-12 w-12 rounded-full p-0 shadow-lg shadow-black/30"
-            aria-label={t("common.add")}
-          >
-            <Plus className="size-4" />
-          </Button>
+        <div className="pointer-events-auto flex items-center justify-end">
+          <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
+            <Button
+              variant="secondary"
+              onClick={() => setFiltersPopupOpen(true)}
+              className="h-11 w-11 rounded-full p-0"
+              aria-label={
+                hasActiveFilters
+                  ? `${t("common.filtersAndActions")} (${t("common.active")})`
+                  : t("common.filtersAndActions")
+              }
+            >
+              <SlidersHorizontal className="size-4" />
+            </Button>
+            <Button
+              onClick={() => setAddTransactionOpen(true)}
+              className="h-11 w-11 rounded-full p-0"
+              aria-label={t("common.add")}
+            >
+              <Plus className="size-4" />
+            </Button>
+          </div>
         </div>
       </div>
 

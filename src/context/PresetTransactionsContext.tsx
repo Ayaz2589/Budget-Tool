@@ -29,7 +29,14 @@ export function PresetTransactionsProvider({
     const raw = localStorage.getItem(PRESET_STORAGE_KEY);
     if (raw) {
       try {
-        return JSON.parse(raw) as PresetTransaction[];
+        const parsed = JSON.parse(raw) as PresetTransaction[];
+        return parsed.map((p) => ({
+          ...p,
+          owner:
+            (p as PresetTransaction & { cardMember?: string }).owner ??
+            (p as PresetTransaction & { cardMember?: string }).cardMember ??
+            "",
+        }));
       } catch {
         return [];
       }

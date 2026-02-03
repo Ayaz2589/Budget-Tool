@@ -42,6 +42,7 @@ export function IncomePage() {
     removeIncome,
     expenseCategories,
     incomeCategories,
+    owners,
     cardSources,
   } = useBudget();
   const { rules } = useRules();
@@ -89,6 +90,7 @@ export function IncomePage() {
         open={addOpen}
         onOpenChange={setAddOpen}
         incomeCategories={incomeCategories}
+        owners={owners}
         onSubmit={handleAdd}
       />
 
@@ -116,6 +118,7 @@ export function IncomePage() {
                   presetTransactions,
                   expenseCategoriesWithColors,
                   incomeCategoriesWithColors,
+                  owners,
                   cardSources,
                 );
               }}
@@ -136,12 +139,15 @@ export function IncomePage() {
                 <IncomeTable
                   sortedIncome={sortedIncome}
                   incomeCategories={incomeCategories}
+                  ownerOptions={owners}
                   onEdit={setEditIncome}
                   onDelete={setIncomeToDeleteId}
                   onUpdateCategory={(id, category) =>
                     updateIncome(id, { category })
                   }
-                  onUpdateOwner={(id, owner) => updateIncome(id, { owner })}
+                  onUpdateOwner={(id, owner) =>
+                    updateIncome(id, { owner: owner || undefined })
+                  }
                 />
               </div>
               <div className="md:hidden max-h-[50vh] overflow-y-auto border rounded-md">
@@ -159,13 +165,16 @@ export function IncomePage() {
         income={incomeForActions}
         onClose={() => setIncomeForActions(null)}
         onUpdateCategory={(id, category) => updateIncome(id, { category })}
-        onUpdateOwner={(id, owner) => updateIncome(id, { owner })}
+        onUpdateOwner={(id, owner) =>
+          updateIncome(id, { owner: owner || undefined })
+        }
         onEdit={(i) => {
           setIncomeForActions(null);
           setEditIncome(i);
         }}
         onDelete={removeIncome}
         incomeCategories={incomeCategories}
+        ownerOptions={owners}
         t={t}
       />
 
@@ -209,6 +218,7 @@ export function IncomePage() {
         income={editIncome}
         onClose={() => setEditIncome(null)}
         incomeCategories={incomeCategories}
+        owners={owners}
         onSubmit={handleEdit}
       />
     </div>

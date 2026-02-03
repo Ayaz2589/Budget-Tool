@@ -38,6 +38,7 @@ export function DebtPage() {
     removeDebt,
     addDebtPayment,
     removeDebtPayment,
+    owners,
   } = useBudget();
   const [addDebtOpen, setAddDebtOpen] = useState(false);
   const [paymentDebtId, setPaymentDebtId] = useState<string | null>(null);
@@ -90,6 +91,7 @@ export function DebtPage() {
       <AddDebtDialog
         open={addDebtOpen}
         onOpenChange={setAddDebtOpen}
+        owners={owners}
         onSubmit={(payload) => {
           addDebt(payload);
           setAddDebtOpen(false);
@@ -117,6 +119,10 @@ export function DebtPage() {
                   paymentsByDebt={paymentsByDebt}
                   onAddPayment={setPaymentDebtId}
                   onEditRecurring={(debt) => setRecurringDebtId(debt.id)}
+                  onUpdateOwner={(id, owner) =>
+                    updateDebt(id, { owner: owner || undefined })
+                  }
+                  ownerOptions={owners}
                   onDelete={setDeleteConfirmDebtId}
                   onRemovePayment={setPaymentToRemoveId}
                 />
@@ -147,6 +153,10 @@ export function DebtPage() {
           setDebtForActions(null);
           setRecurringDebtId(debt.id);
         }}
+        onUpdateOwner={(id, owner) =>
+          updateDebt(id, { owner: owner || undefined })
+        }
+        ownerOptions={owners}
         onDelete={(id) => {
           setDebtForActions(null);
           setDeleteConfirmDebtId(id);

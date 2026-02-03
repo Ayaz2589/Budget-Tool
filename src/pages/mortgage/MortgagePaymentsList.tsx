@@ -31,7 +31,7 @@ export function MortgagePaymentsList({
             </span>
           </div>
           <div className="text-xs text-muted-foreground">
-            {e.category ?? "Mortgage"}
+            {e.category ?? "Mortgage"} · {e.owner || "No Owner"}
           </div>
         </button>
       ))}

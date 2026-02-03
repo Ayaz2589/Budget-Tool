@@ -5,9 +5,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { MortgagePaymentActionsDialogProps } from "@/types/mortgage";
 
 export type { MortgagePaymentActionsDialogProps };
@@ -16,6 +24,8 @@ export function MortgagePaymentActionsDialog({
   payment,
   onClose,
   onRemove,
+  onUpdateOwner,
+  ownerOptions = [],
   t,
 }: MortgagePaymentActionsDialogProps) {
   if (payment === null) return null;
@@ -44,6 +54,27 @@ export function MortgagePaymentActionsDialog({
                 type="expense"
               />
             </p>
+          </div>
+          <div className="space-y-2">
+            <Label>{t("common.owner")}</Label>
+            <Select
+              value={payment.owner || "_none"}
+              onValueChange={(v) =>
+                onUpdateOwner(payment.id, v === "_none" ? "" : v)
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("common.noOwner")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                {ownerOptions.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <Button
             variant="destructive"

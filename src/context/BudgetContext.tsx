@@ -43,6 +43,7 @@ function loadStoredBudget(): {
   cardSources: string[];
   expenseCategories: string[];
   incomeCategories: string[];
+  owners: string[];
 } {
   try {
     const raw = localStorage.getItem(BUDGET_STORAGE_KEY);
@@ -56,6 +57,7 @@ function loadStoredBudget(): {
         cardSources?: string[];
         expenseCategories?: string[];
         incomeCategories?: string[];
+        owners?: string[];
       };
       const cardSources = Array.isArray(data.cardSources)
         ? data.cardSources.filter((s): s is ExpenseSource =>
@@ -72,8 +74,21 @@ function loadStoredBudget(): {
         data.incomeCategories.every((c) => typeof c === "string")
           ? data.incomeCategories
           : [...DEFAULT_INCOME_CATEGORIES];
+      const owners =
+        Array.isArray(data.owners) &&
+        data.owners.every((o) => typeof o === "string")
+          ? data.owners
+          : [];
       return {
-        expenses: Array.isArray(data.expenses) ? data.expenses : [],
+        expenses: Array.isArray(data.expenses)
+          ? data.expenses.map((e) => ({
+              ...e,
+              owner:
+                (e as Expense & { cardMember?: string }).owner ??
+                (e as Expense & { cardMember?: string }).cardMember ??
+                undefined,
+            }))
+          : [],
         income: Array.isArray(data.income) ? data.income : [],
         debts: Array.isArray(data.debts) ? data.debts : [],
         debtPayments: Array.isArray(data.debtPayments) ? data.debtPayments : [],
@@ -85,6 +100,7 @@ function loadStoredBudget(): {
           cardSources.length > 0 ? cardSources : [...ALL_EXPENSE_SOURCES],
         expenseCategories,
         incomeCategories,
+        owners,
       };
     }
   } catch {
@@ -99,6 +115,7 @@ function loadStoredBudget(): {
     cardSources: [...ALL_EXPENSE_SOURCES],
     expenseCategories: [],
     incomeCategories: [],
+    owners: [],
   };
 }
 
@@ -116,6 +133,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const [incomeCategories, setIncomeCategoriesState] = useState<string[]>(
     stored.incomeCategories
   );
+  const [owners, setOwnersState] = useState<string[]>(stored.owners);
   const [cardSources, setCardSourcesState] = useState<string[]>(
     stored.cardSources
   );
@@ -131,14 +149,15 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
           expenses,
           income,
           debts,
-          debtPayments,
-          iOweNova,
-          cardSources,
-          expenseCategories,
-          incomeCategories,
-        })
-      );
-    } catch {
+        debtPayments,
+        iOweNova,
+        cardSources,
+        expenseCategories,
+        incomeCategories,
+        owners,
+      })
+    );
+  } catch {
       // ignore
     }
   }, [
@@ -150,6 +169,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     cardSources,
     expenseCategories,
     incomeCategories,
+    owners,
   ]);
 
   const addExpenses = useCallback((newExpenses: Expense[]) => {
@@ -295,6 +315,26 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     setIncomeCategoriesState(categories);
   }, []);
 
+  const setOwners = useCallback((nextOwners: string[]) => {
+    const normalized = nextOwners.map((o) => o.trim()).filter(Boolean);
+    setExpenses((prev) =>
+      prev.map((e) =>
+        e.owner && !normalized.includes(e.owner) ? { ...e, owner: undefined } : e
+      )
+    );
+    setIncome((prev) =>
+      prev.map((i) =>
+        i.owner && !normalized.includes(i.owner) ? { ...i, owner: undefined } : i
+      )
+    );
+    setDebts((prev) =>
+      prev.map((d) =>
+        d.owner && !normalized.includes(d.owner) ? { ...d, owner: undefined } : d
+      )
+    );
+    setOwnersState(normalized);
+  }, []);
+
   const setCardSources = useCallback((sources: string[]) => {
     if (sources.length === 0) return;
     const fallback = (sources[0] as ExpenseSource) ?? "manual";
@@ -346,6 +386,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       debtPayments,
       expenseCategories,
       incomeCategories,
+      owners,
       cardSources,
       addExpenses,
       addExpense,
@@ -366,6 +407,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       removeDebtPayment,
       setExpenseCategories,
       setIncomeCategories,
+      setOwners,
       setCardSources,
       setIOweNova,
       iOweNova,
@@ -378,6 +420,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       debtPayments,
       expenseCategories,
       incomeCategories,
+      owners,
       cardSources,
       iOweNova,
       addExpenses,
@@ -399,6 +442,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       removeDebtPayment,
       setExpenseCategories,
       setIncomeCategories,
+      setOwners,
       setCardSources,
       setIOweNova,
       repairCorruptedDates,

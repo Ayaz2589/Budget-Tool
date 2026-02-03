@@ -35,6 +35,7 @@ export function buildMinifiedPayload(
   presetTransactions: PresetTransaction[],
   expenseCategoriesWithColors: CategoryWithColorPayload[],
   incomeCategoriesWithColors: CategoryWithColorPayload[],
+  owners?: string[],
   cardSources?: string[],
 ): Record<string, unknown> {
   return {
@@ -46,7 +47,7 @@ export function buildMinifiedPayload(
         desc: x.description,
         c: x.category || undefined,
         s: x.source,
-        cm: x.cardMember,
+        o: x.owner,
       }),
     ),
     i: income.map((x) =>
@@ -96,10 +97,11 @@ export function buildMinifiedPayload(
       s: x.source,
       desc: x.description,
       c: x.category,
-      cm: x.cardMember,
+      o: x.owner,
     })),
     ec: expenseCategoriesWithColors.map((x) => ({ n: x.name, c: x.color })),
     ic: incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color })),
+    o: Array.isArray(owners) && owners.length > 0 ? owners : undefined,
     sc: Array.isArray(cardSources) && cardSources.length > 0 ? cardSources : undefined,
   };
 }
@@ -119,7 +121,10 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
       description: String(get("description", "desc", "")),
       category: String(get("category", "c", "")),
       source: (get("source", "s", "manual") as ExpenseSource) || "manual",
-      cardMember: (get("cardMember", "cm", undefined) as string | undefined) ?? undefined,
+      owner:
+        (get("owner", "o", undefined) as string | undefined) ??
+        (get("cardMember", "cm", undefined) as string | undefined) ??
+        undefined,
     } as Expense;
   });
 
@@ -132,7 +137,7 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
       amount: Number(get("amount", "a", 0)),
       description: String(get("description", "desc", "Income")),
       category: String(get("category", "c", "")),
-      owner: get("owner", "o", undefined) as "Ayaz" | "Tasnuva" | undefined,
+      owner: get("owner", "o", undefined) as string | undefined,
       recurringAmount: get("recurringAmount", "ra", undefined) as number | undefined,
       recurringFrequency: get("recurringFrequency", "rf", undefined) as "monthly" | "biweekly" | undefined,
       recurringDayOfMonth: get("recurringDayOfMonth", "rdom", undefined) as number | undefined,
@@ -148,7 +153,7 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
       name: String(get("name", "n", "")),
       initialAmount: Number(get("initialAmount", "ia", 0)),
       startDate: get("startDate", "sd", undefined) as string | undefined,
-      owner: get("owner", "o", undefined) as "Ayaz" | "Tasnuva" | undefined,
+      owner: get("owner", "o", undefined) as string | undefined,
       recurringAmount: get("recurringAmount", "ra", undefined) as number | undefined,
       recurringDayOfMonth: get("recurringDayOfMonth", "rd", undefined) as number | undefined,
       recurringFrequency: get("recurringFrequency", "rf", undefined) as "monthly" | "biweekly" | undefined,
@@ -187,7 +192,9 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
       source: (get("source", "s", "manual") as ExpenseSource) || "manual",
       description: String(get("description", "desc", "")),
       category: String(get("category", "c", "")),
-      cardMember: String(get("cardMember", "cm", "")),
+      owner:
+        String(get("owner", "o", "")) ||
+        String(get("cardMember", "cm", "")),
     } as PresetTransaction;
   });
 
@@ -210,6 +217,9 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
   const cardSources = Array.isArray(raw.cardSources ?? raw.sc)
     ? (raw.cardSources ?? raw.sc) as string[]
     : undefined;
+  const owners = Array.isArray(raw.owners ?? raw.o)
+    ? (raw.owners ?? raw.o) as string[]
+    : undefined;
 
   return {
     expenses,
@@ -220,6 +230,7 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,
+    owners,
     cardSources,
   };
 }
@@ -235,6 +246,7 @@ export function serializeToBlob(input: MinifiedPayloadInput): string {
     input.presetTransactions,
     input.expenseCategoriesWithColors ?? [],
     input.incomeCategoriesWithColors ?? [],
+    input.owners,
     input.cardSources,
   );
   const jsonString = JSON.stringify(payload);

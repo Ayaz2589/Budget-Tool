@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { AddMortgagePaymentDialogProps } from "@/types/mortgage";
 
 export type { AddMortgagePaymentDialogProps };
@@ -22,6 +29,9 @@ export function AddMortgagePaymentDialog({
   onDateChange,
   amount,
   onAmountChange,
+  owner,
+  onOwnerChange,
+  ownerOptions = [],
   onSubmit,
 }: AddMortgagePaymentDialogProps) {
   return (
@@ -58,6 +68,25 @@ export function AddMortgagePaymentDialog({
               onChange={(e) => onAmountChange(e.target.value)}
               required
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Owner</Label>
+            <Select
+              value={owner || "_none"}
+              onValueChange={(v) => onOwnerChange(v === "_none" ? "" : v)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="No Owner" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_none">No Owner</SelectItem>
+                {ownerOptions.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter>
             <Button

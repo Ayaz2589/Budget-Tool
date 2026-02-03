@@ -22,12 +22,13 @@ const MORTGAGE_CATEGORY = "Mortgage";
 const DEFAULT_MORTGAGE_AMOUNT = 5400;
 
 export function MortgagePage() {
-  const { expenses, addExpense, removeExpense } = useBudget();
+  const { expenses, addExpense, updateExpense, removeExpense, owners } = useBudget();
   const [addOpen, setAddOpen] = useState(false);
   const [addDate, setAddDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   );
   const [addAmount, setAddAmount] = useState(String(DEFAULT_MORTGAGE_AMOUNT));
+  const [addOwner, setAddOwner] = useState(() => owners[0] ?? "");
   const [deleteConfirm, setDeleteConfirm] = useState<Expense | null>(null);
   const [paymentForActions, setPaymentForActions] = useState<Expense | null>(
     null,
@@ -61,6 +62,7 @@ export function MortgagePage() {
       description: MORTGAGE_CATEGORY,
       category: MORTGAGE_CATEGORY,
       source: "manual",
+      owner: addOwner || undefined,
     });
     setAddDate(new Date().toISOString().slice(0, 10));
     setAddAmount(String(DEFAULT_MORTGAGE_AMOUNT));
@@ -100,6 +102,9 @@ export function MortgagePage() {
               onDateChange={setAddDate}
               amount={addAmount}
               onAmountChange={setAddAmount}
+              owner={addOwner}
+              onOwnerChange={setAddOwner}
+              ownerOptions={owners}
               onSubmit={handleAdd}
             />
             <span className="text-sm text-muted-foreground">
@@ -117,6 +122,10 @@ export function MortgagePage() {
                 <MortgagePaymentsTable
                   payments={mortgagePayments}
                   onRemove={setDeleteConfirm}
+                  onUpdateOwner={(id, owner) =>
+                    updateExpense(id, { owner: owner || undefined })
+                  }
+                  ownerOptions={owners}
                 />
               </div>
               <div className="md:hidden max-h-[50vh] overflow-y-auto">
@@ -137,6 +146,10 @@ export function MortgagePage() {
           setPaymentForActions(null);
           setDeleteConfirm(exp);
         }}
+        onUpdateOwner={(id, owner) =>
+          updateExpense(id, { owner: owner || undefined })
+        }
+        ownerOptions={owners}
         t={t}
       />
 

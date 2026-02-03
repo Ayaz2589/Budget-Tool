@@ -41,9 +41,9 @@ test("isSameExpense rejects amount outside tolerance", () => {
   expect(isSameExpense(a, b)).toBe(false);
 });
 
-test("isSameExpense rejects different cardMember when both set", () => {
-  const a = expense({ cardMember: "Ayaz" });
-  const b = expense({ cardMember: "Tasnuva" });
+test("isSameExpense rejects different owner when both set", () => {
+  const a = expense({ owner: "Ayaz" });
+  const b = expense({ owner: "Tasnuva" });
   expect(isSameExpense(a, b)).toBe(false);
 });
 

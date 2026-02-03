@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CategoryOption } from "@/lib/categoryColors";
-import type { DebtOwner, RecurringFrequency } from "@/types/core";
+import type { Owner, RecurringFrequency } from "@/types/core";
 import type {
   EditIncomeFormPayload,
   EditIncomeDialogProps,
@@ -31,13 +31,14 @@ export function EditIncomeDialog({
   income,
   onClose,
   incomeCategories,
+  owners = [],
   onSubmit,
 }: EditIncomeDialogProps) {
   const [date, setDate] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [owner, setOwner] = useState<DebtOwner>("Ayaz");
+  const [owner, setOwner] = useState<Owner>("");
   const [recurringChecked, setRecurringChecked] = useState(false);
   const [recurringAmount, setRecurringAmount] = useState("");
   const [recurringFrequency, setRecurringFrequency] =
@@ -51,7 +52,7 @@ export function EditIncomeDialog({
       setAmount(String(income.amount));
       setDescription(income.description ?? "");
       setCategory(income.category ?? ""); // default: Uncategorized
-      setOwner(income.owner ?? "Ayaz");
+      setOwner(income.owner ?? "");
       const hasRecurring =
         income.recurringAmount != null &&
         income.recurringAmount > 0 &&
@@ -72,7 +73,7 @@ export function EditIncomeDialog({
       );
       setRecurringStartDate(income.recurringStartDate ?? "");
     }
-  }, [income, incomeCategories]);
+  }, [income, incomeCategories, owners]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +103,7 @@ export function EditIncomeDialog({
       amount: num,
       description: description.trim() || "Income",
       category: category || "",
-      owner,
+      owner: owner || "",
       recurringAmount:
         typeof recurringAmountNum === "number" ? recurringAmountNum : undefined,
       recurringFrequency: recurringAmountNum != null ? freq : undefined,
@@ -173,15 +174,19 @@ export function EditIncomeDialog({
           <div className="space-y-2">
             <Label>Owner</Label>
             <Select
-              value={owner}
-              onValueChange={(v) => setOwner(v as DebtOwner)}
+              value={owner || "_none"}
+              onValueChange={(v) => setOwner(v === "_none" ? "" : v)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Ayaz">Ayaz</SelectItem>
-                <SelectItem value="Tasnuva">Tasnuva</SelectItem>
+                <SelectItem value="_none">No Owner</SelectItem>
+                {owners.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

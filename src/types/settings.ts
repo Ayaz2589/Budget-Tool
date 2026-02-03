@@ -10,6 +10,12 @@ export interface IncomeCategoriesCardProps {
   onAdd: (name: string) => void;
 }
 
+export interface OwnersCardProps {
+  owners: string[];
+  onRemove: (owner: string) => void;
+  onAdd: (name: string) => void;
+}
+
 export interface GoogleSheetsCardProps {
   isSignedIn: boolean;
   signIn: () => void;

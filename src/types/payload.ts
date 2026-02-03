@@ -22,6 +22,7 @@ export interface MinifiedPayloadInput {
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
+  owners?: string[];
   cardSources?: string[];
 }
 
@@ -34,5 +35,6 @@ export interface ExpandedPayload {
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
+  owners?: string[];
   cardSources?: string[];
 }

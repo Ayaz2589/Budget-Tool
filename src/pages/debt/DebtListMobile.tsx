@@ -37,7 +37,7 @@ export function DebtListMobile({
             </div>
             <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
               <span>
-                {debt.owner === "Tasnuva" ? "Tasnuva" : "Ayaz"}
+                {debt.owner || "No Owner"}
                 {debt.startDate ? ` · ${debt.startDate}` : ""}
               </span>
             </div>

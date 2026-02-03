@@ -3,12 +3,16 @@ import type { Expense } from "./core";
 export interface MortgagePaymentsTableProps {
   payments: Expense[];
   onRemove: (expense: Expense) => void;
+  onUpdateOwner: (id: string, owner: string) => void;
+  ownerOptions: string[];
 }
 
 export interface MortgagePaymentActionsDialogProps {
   payment: Expense | null;
   onClose: () => void;
   onRemove: (expense: Expense) => void;
+  onUpdateOwner: (id: string, owner: string) => void;
+  ownerOptions: string[];
   t: (key: string) => string;
 }
 
@@ -30,5 +34,8 @@ export interface AddMortgagePaymentDialogProps {
   onDateChange: (value: string) => void;
   amount: string;
   onAmountChange: (value: string) => void;
+  owner: string;
+  onOwnerChange: (value: string) => void;
+  ownerOptions: string[];
   onSubmit: (e: import("react").FormEvent) => void;
 }

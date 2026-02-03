@@ -19,7 +19,6 @@ import {
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
-import type { DebtOwner } from "@/types/core";
 import type { IncomeActionsDialogProps } from "@/types/income";
 
 export type { IncomeActionsDialogProps };
@@ -32,6 +31,7 @@ export function IncomeActionsDialog({
   onEdit,
   onDelete,
   incomeCategories,
+  ownerOptions = [],
   t,
 }: IncomeActionsDialogProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -105,15 +105,21 @@ export function IncomeActionsDialog({
           <div className="space-y-2">
             <Label>{t("common.owner")}</Label>
             <Select
-              value={income.owner ?? "Ayaz"}
-              onValueChange={(v) => onUpdateOwner(income.id, v as DebtOwner)}
+              value={income.owner || "_none"}
+              onValueChange={(v) =>
+                onUpdateOwner(income.id, v === "_none" ? "" : v)
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Ayaz">Ayaz</SelectItem>
-                <SelectItem value="Tasnuva">Tasnuva</SelectItem>
+                <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                {ownerOptions.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

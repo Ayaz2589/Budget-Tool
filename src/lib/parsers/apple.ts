@@ -105,7 +105,7 @@ export function parseAppleCsv(csvText: string): ParseResult {
       description,
       category: "",
       source: "apple",
-      cardMember: purchasedBy || undefined,
+      owner: purchasedBy || undefined,
     });
   }
 

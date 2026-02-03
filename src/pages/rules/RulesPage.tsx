@@ -51,7 +51,7 @@ const CATEGORY_TOTAL_OPERATORS = [
 
 export function RulesPage() {
   const { t } = useTranslation();
-  const { expenseCategories, cardSources } = useBudget();
+  const { expenseCategories, cardSources, owners } = useBudget();
   const { rules, addRule, removeRule, reorderRule, toggleRule } = useRules();
   const { presetTransactions, addPreset, removePreset } =
     usePresetTransactions();
@@ -60,7 +60,7 @@ export function RulesPage() {
     () => SOURCE_OPTIONS.filter((o) => cardSources.includes(o.value)),
     [cardSources]
   );
-  const cardMemberOptions = useMemo(() => ["AYAZ UDDIN", "TASNUVA AHMED"], []);
+  const ownerOptions = useMemo(() => owners, [owners]);
 
   const [presetOpen, setPresetOpen] = useState(false);
   const [presetSource, setPresetSource] = useState<ExpenseSource>("manual");
@@ -68,14 +68,12 @@ export function RulesPage() {
   const [presetCategory, setPresetCategory] = useState(
     expenseCategories[0] ?? ""
   );
-  const [presetMember, setPresetMember] = useState(cardMemberOptions[0] ?? "");
+  const [presetMember, setPresetMember] = useState(ownerOptions[0] ?? "");
 
   const [open, setOpen] = useState(false);
   const [conditionType, setConditionType] = useState<ConditionType>("source");
   const [sourceValue, setSourceValue] = useState<ExpenseSource>("amex");
-  const [cardMemberValue, setCardMemberValue] = useState(
-    cardMemberOptions[0] ?? ""
-  );
+  const [cardMemberValue, setCardMemberValue] = useState(ownerOptions[0] ?? "");
   const [cardMemberMatch, setCardMemberMatch] = useState<"equals" | "contains">(
     "contains"
   );
@@ -112,19 +110,19 @@ export function RulesPage() {
       source: presetSource,
       description: presetDescription.trim(),
       category: presetCategory,
-      cardMember: presetMember,
+      owner: presetMember,
     });
     setPresetSource("manual");
     setPresetDescription("");
     setPresetCategory(expenseCategories[0] ?? "");
-    setPresetMember(cardMemberOptions[0] ?? "");
+    setPresetMember(ownerOptions[0] ?? "");
     setPresetOpen(false);
   };
 
   const resetForm = () => {
     setConditionType("source");
     setSourceValue("amex");
-    setCardMemberValue(cardMemberOptions[0] ?? "");
+    setCardMemberValue(ownerOptions[0] ?? "");
     setCardMemberMatch("contains");
     setAmountOperator("lt");
     setAmountValue("");
@@ -141,10 +139,11 @@ export function RulesPage() {
     switch (conditionType) {
       case "source":
         return { type: "source", value: sourceValue };
+      case "owner":
       case "cardMember":
         if (!cardMemberValue.trim()) return null;
         return {
-          type: "cardMember",
+          type: conditionType,
           value: cardMemberValue.trim(),
           match: cardMemberMatch,
         };
@@ -209,6 +208,7 @@ export function RulesPage() {
           SOURCE_OPTIONS.find((o) => o.value === condition.value)?.label ??
           condition.value
         }`;
+      case "owner":
       case "cardMember":
         return `${t("rules.ifCardMember")} ${
           condition.match === "equals" ? t("rules.equals") : t("rules.contains")
@@ -277,7 +277,7 @@ export function RulesPage() {
                       <SelectItem value="source">
                         {t("rules.conditionSource")}
                       </SelectItem>
-                      <SelectItem value="cardMember">
+                      <SelectItem value="owner">
                         {t("rules.conditionCardMember")}
                       </SelectItem>
                       <SelectItem value="expenseAmount">
@@ -315,7 +315,7 @@ export function RulesPage() {
                   </div>
                 )}
 
-                {conditionType === "cardMember" && (
+                {conditionType === "owner" && (
                   <>
                     <div className="space-y-2">
                       <Label>{t("rules.cardMemberMatch")}</Label>
@@ -348,7 +348,7 @@ export function RulesPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {cardMemberOptions.map((member) => (
+                          {ownerOptions.map((member) => (
                             <SelectItem key={member} value={member}>
                               {member}
                             </SelectItem>
@@ -742,13 +742,21 @@ export function RulesPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("presetTransactions.member")}</Label>
-                  <Select value={presetMember} onValueChange={setPresetMember}>
+                  <Label>{t("common.owner")}</Label>
+                  <Select
+                    value={presetMember || "_none"}
+                    onValueChange={(v) =>
+                      setPresetMember(v === "_none" ? "" : v)
+                    }
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {cardMemberOptions.map((member) => (
+                      <SelectItem value="_none">
+                        {t("common.noOwner")}
+                      </SelectItem>
+                      {ownerOptions.map((member) => (
                         <SelectItem key={member} value={member}>
                           {member}
                         </SelectItem>
@@ -801,7 +809,7 @@ export function RulesPage() {
                         )}`}
                         aria-hidden
                       />
-                      {preset.category} · {preset.cardMember}
+                      {preset.category} · {preset.owner || t("common.noOwner")}
                     </span>
                   </div>
                   <Button

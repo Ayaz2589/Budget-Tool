@@ -28,6 +28,7 @@ export interface BudgetContextValue extends BudgetState {
   addDebtPayments: (payments: DebtPayment[]) => void;
   setExpenseCategories: (categories: string[]) => void;
   setIncomeCategories: (categories: string[]) => void;
+  setOwners: (owners: string[]) => void;
   setCardSources: (sources: string[]) => void;
   setIOweNova: (monthKey: string, amount: number) => void;
   iOweNova: Record<string, number>;

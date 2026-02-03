@@ -71,7 +71,6 @@ export interface FiltersAndActionsDialogProps {
   hasActiveFilters: boolean;
   onClearFilters: () => void;
   onCleanDescriptions: () => void;
-  onDownloadPdf: () => void;
   someSelected: boolean;
   selectedCount: number;
   onDeleteSelected: () => void;

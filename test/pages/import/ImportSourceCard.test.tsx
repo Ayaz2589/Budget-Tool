@@ -12,7 +12,7 @@ test("ImportSourceCard shows upload card title and file choose button", () => {
       selectedSource="amex"
       onSourceChange={() => {}}
       fileInputRef={fileInputRef}
-      accept=".csv,.pdf"
+      accept=".csv"
       onFileChange={() => {}}
       importError=""
       lastDetected=""
@@ -30,6 +30,6 @@ test("ImportSourceCard shows upload card title and file choose button", () => {
   );
   expect(screen.getByText("import.uploadStatement")).toBeInTheDocument();
   expect(
-    screen.getByRole("button", { name: /choose csv\/pdf file/i }),
+    screen.getByRole("button", { name: /import\.choosecsvfile/i }),
   ).toBeInTheDocument();
 });

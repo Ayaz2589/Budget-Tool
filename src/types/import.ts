@@ -1,12 +1,11 @@
 import type * as React from "react";
 import type { Debt, DebtPayment, Expense, Income } from "./core";
 
-export type CsvSource = "amex" | "chase" | "apple" | "unknown";
+export type CsvSource = "amex" | "apple" | "unknown";
 
 export type SourceChoice =
   | "amex"
   | "amex-gold"
-  | "chase"
   | "apple"
   | "pdf-export";
 

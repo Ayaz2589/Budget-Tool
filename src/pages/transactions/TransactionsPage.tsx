@@ -6,8 +6,6 @@ import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
-import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
-import { getCategoryColor } from "@/lib/categoryColors";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { transactionsTourSteps } from "@/lib/pageTourSteps";
@@ -243,38 +241,6 @@ export function TransactionsPage() {
     }
   }, [deleteOneExpense, removeExpense]);
 
-  const handleDownloadPdf = useCallback(() => {
-    const expenseCategoriesWithColors = expenseCategories.map((name) => ({
-      name,
-      color: getCategoryColor(name, "expense"),
-    }));
-    const incomeCategoriesWithColors = incomeCategories.map((name) => ({
-      name,
-      color: getCategoryColor(name, "income"),
-    }));
-    downloadTransactionsAndIncomePdf(
-      expenses,
-      income,
-      debts,
-      debtPayments,
-      presetTransactions,
-      expenseCategoriesWithColors,
-      incomeCategoriesWithColors,
-      owners,
-      cardSources,
-    );
-  }, [
-    expenses,
-    income,
-    debts,
-    debtPayments,
-    presetTransactions,
-    expenseCategories,
-    incomeCategories,
-    owners,
-    cardSources,
-  ]);
-
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
@@ -329,7 +295,6 @@ export function TransactionsPage() {
             hasActiveFilters={hasActiveFilters}
             onClearFilters={clearFilters}
             onCleanDescriptions={cleanAllDescriptions}
-            onDownloadPdf={handleDownloadPdf}
             someSelected={someSelected}
             selectedCount={selectedIds.size}
             onDeleteSelected={() => setDeleteSelectedOpen(true)}

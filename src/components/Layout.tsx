@@ -4,7 +4,7 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
-  Upload,
+  Database,
   List,
   Wallet,
   CreditCard,
@@ -74,7 +74,7 @@ const nav = [
   { to: "/dashboard/income", labelKey: "nav.income", icon: Wallet },
   { to: "/dashboard/debt", labelKey: "nav.debt", icon: CreditCard },
   { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
-  { to: "/dashboard/import", labelKey: "nav.import", icon: Upload },
+  { to: "/dashboard/import", labelKey: "nav.import", icon: Database },
   { to: "/dashboard/presets", labelKey: "nav.presets", icon: ListOrdered },
   { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
@@ -90,7 +90,7 @@ const bottomNavItems = [
 const moreNavItems = [
   { to: "/dashboard/debt", labelKey: "nav.debt", icon: CreditCard },
   { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
-  { to: "/dashboard/import", labelKey: "nav.import", icon: Upload },
+  { to: "/dashboard/import", labelKey: "nav.import", icon: Database },
   { to: "/dashboard/presets", labelKey: "nav.presets", icon: ListOrdered },
   { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];

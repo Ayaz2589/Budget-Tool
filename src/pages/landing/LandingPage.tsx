@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Landmark, Upload, ListOrdered, FileSpreadsheet, FileText } from "lucide-react";
+import { Landmark, Database, ListOrdered, FileSpreadsheet, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -42,7 +42,7 @@ export function LandingPage() {
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
                 <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <Upload className="size-5 text-primary" />
+                  <Database className="size-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">

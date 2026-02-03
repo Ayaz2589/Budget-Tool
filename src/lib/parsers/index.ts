@@ -1,7 +1,6 @@
 import type { ParseResult } from "@/types/core";
 import type { CsvSource } from "@/types/import";
 import { parseAmexCsv } from "./amex";
-import { parseChaseCsv } from "./chase";
 import { parseAppleCsv } from "./apple";
 
 export type { CsvSource } from "@/types/import";
@@ -15,7 +14,6 @@ export function detectCsvSource(csvText: string): CsvSource {
   if (lower.includes("card member") && lower.includes("amount") && lower.includes("description")) {
     return "amex";
   }
-  if (lower.includes("chase")) return "chase";
   // Apple Card: Transaction Date, Clearing Date, Amount (USD), Purchased By
   if (
     lower.includes("transaction date") &&
@@ -33,8 +31,6 @@ export function parseCsv(csvText: string, source?: CsvSource): ParseResult {
   switch (detected) {
     case "amex":
       return parseAmexCsv(cleanText);
-    case "chase":
-      return parseChaseCsv(cleanText);
     case "apple":
       return parseAppleCsv(cleanText);
     default:
@@ -43,5 +39,5 @@ export function parseCsv(csvText: string, source?: CsvSource): ParseResult {
 }
 
 export { parseAmexCsv, cleanDescription } from "./amex";
-export { parseChaseCsv, parseChasePdfFromText } from "./chase";
+export { parseChasePdfFromText } from "./chase";
 export { parseAppleCsv } from "./apple";

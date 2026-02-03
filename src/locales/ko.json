@@ -24,6 +24,8 @@
   "common": {
     "save": "저장",
     "cancel": "취소",
+    "select": "Select",
+    "done": "Done",
     "delete": "삭제",
     "loading": "로딩 중",
     "add": "추가",

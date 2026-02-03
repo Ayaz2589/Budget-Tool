@@ -8,7 +8,7 @@ const mockT = (key: string, opts?: { count?: number }) =>
   opts?.count != null ? `${key}:${opts.count}` : key;
 
 test("ExpensesByMonthTable shows Date and Category headers when has data", () => {
-  const byMonth: [string, Expense][] = [
+  const byMonth: [string, Expense[]][] = [
     [
       "2025-01",
       [
@@ -27,13 +27,11 @@ test("ExpensesByMonthTable shows Date and Category headers when has data", () =>
     <ExpensesByMonthTable
       byMonth={byMonth}
       defaultOpenMonth="2025-01"
-      selectedIds={new Set()}
-      onToggleSelect={() => {}}
-      onToggleMonthSelection={() => {}}
       sortBy="date"
       sortDir="desc"
       onSort={() => {}}
       onUpdateCategory={() => {}}
+      onUpdateOwner={() => {}}
       expenseCategories={["My Purchase"]}
       onDeleteOne={() => {}}
       sourceLabelKeys={SOURCE_LABEL_KEYS}

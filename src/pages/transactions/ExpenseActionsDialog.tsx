@@ -41,29 +41,29 @@ export function ExpenseActionsDialog({
     <Dialog open={expense !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         showCloseButton={true}
-        className="fixed bottom-0 left-0 right-0 top-auto z-50 w-full max-w-full max-h-[85vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
+        className="fixed bottom-0 left-0 right-0 top-auto z-50 w-full max-w-full max-h-[92vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
       >
-        <DialogHeader className="p-4 pb-2">
-          <DialogTitle className="text-left truncate pr-8">
+        <DialogHeader className="p-5 pb-3">
+          <DialogTitle className="text-left pr-8 break-words text-xl leading-snug">
             {expense.description || t("transactions.transaction")}
           </DialogTitle>
         </DialogHeader>
-        <div className="overflow-y-auto overscroll-contain px-4 pb-8 flex flex-col gap-4">
-          <div className="text-sm text-muted-foreground space-y-1">
+        <div className="overflow-y-auto overscroll-contain px-5 pb-10 flex flex-col gap-5">
+          <div className="text-base text-muted-foreground space-y-1">
             <p>{expense.date}</p>
-            <p className="font-medium text-foreground">
+            <p className="font-semibold text-foreground text-lg">
               {formatCurrency(expense.amount)}
             </p>
           </div>
           <div className="space-y-2">
-            <Label>{t("common.category")}</Label>
+            <Label className="text-sm">{t("common.category")}</Label>
             <Select
               value={expense.category || "_"}
               onValueChange={(v) =>
                 onUpdateCategory(expense.id, v === "_" ? "" : v)
               }
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full h-12 text-base">
                 <SelectValue placeholder={t("common.category")} />
               </SelectTrigger>
               <SelectContent>
@@ -82,14 +82,14 @@ export function ExpenseActionsDialog({
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>{t("common.owner")}</Label>
+            <Label className="text-sm">{t("common.owner")}</Label>
             <Select
               value={expense.owner || "_none"}
               onValueChange={(v) =>
                 onUpdateOwner(expense.id, v === "_none" ? "" : v)
               }
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full h-12 text-base">
                 <SelectValue placeholder={t("common.noOwner")} />
               </SelectTrigger>
               <SelectContent>
@@ -104,7 +104,7 @@ export function ExpenseActionsDialog({
           </div>
           <Button
             variant="destructive"
-            className="w-full"
+            className="w-full h-12 text-base"
             onClick={handleDelete}
           >
             <Trash2 className="size-4" />

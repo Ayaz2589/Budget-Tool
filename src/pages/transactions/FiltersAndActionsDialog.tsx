@@ -43,10 +43,6 @@ export function FiltersAndActionsDialog({
   hasActiveFilters,
   onClearFilters,
   onCleanDescriptions,
-  someSelected,
-  selectedCount,
-  onDeleteSelected,
-  onClearSelection,
   expensesCount,
   onDeleteAll,
   t,
@@ -193,30 +189,10 @@ export function FiltersAndActionsDialog({
               >
                 {t("transactions.cleanDescriptions")}
               </Button>
-              {someSelected && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onClearSelection}
-                  className="justify-start"
-                >
-                  {t("common.clearSelection")}
-                </Button>
-              )}
             </div>
 
-            {(someSelected || expensesCount > 0) && (
+            {expensesCount > 0 && (
               <div className="flex flex-wrap gap-2 pt-1">
-                {someSelected && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={onDeleteSelected}
-                  >
-                    <Trash2 className="size-4" />
-                    {t("transactions.deleteSelected", { count: selectedCount })}
-                  </Button>
-                )}
                 {expensesCount > 0 && (
                   <Button variant="destructive" size="sm" onClick={onDeleteAll}>
                     <Trash2 className="size-4" />

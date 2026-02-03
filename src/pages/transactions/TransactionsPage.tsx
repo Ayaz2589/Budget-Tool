@@ -25,7 +25,6 @@ import { ExpensesByMonthList } from "./ExpensesByMonthList";
 import { ExpenseActionsDialog } from "./ExpenseActionsDialog";
 import {
   DeleteOneTransactionDialog,
-  DeleteSelectedTransactionsDialog,
   DeleteAllTransactionsDialog,
 } from "./DeleteTransactionDialogs";
 
@@ -49,9 +48,7 @@ export function TransactionsPage() {
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<SortColumn>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
-  const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
   const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
     null,
   );
@@ -163,31 +160,6 @@ export function TransactionsPage() {
     });
   }, [expenses, updateExpense]);
 
-  const toggleSelect = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const toggleMonthSelection = useCallback((monthExpenses: Expense[]) => {
-    setSelectedIds((prev) => {
-      const ids = new Set(monthExpenses.map((e) => e.id));
-      const allSelected =
-        ids.size > 0 && [...ids].every((id: string) => prev.has(id));
-      const next = new Set(prev);
-      if (allSelected) ids.forEach((id) => next.delete(id));
-      else ids.forEach((id) => next.add(id));
-      return next;
-    });
-  }, []);
-
-  const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
-
-  const someSelected = selectedIds.size > 0;
-
   const hasActiveFilters = Boolean(
     monthFilter ||
     sourceFilter !== "all" ||
@@ -216,17 +188,10 @@ export function TransactionsPage() {
     [sortBy],
   );
 
-  const handleDeleteSelected = useCallback(() => {
-    removeExpenses(Array.from(selectedIds));
-    clearSelection();
-    setDeleteSelectedOpen(false);
-  }, [selectedIds, removeExpenses, clearSelection]);
-
   const handleDeleteAll = useCallback(() => {
     removeExpenses(expenses.map((e) => e.id));
-    clearSelection();
     setDeleteAllOpen(false);
-  }, [expenses, removeExpenses, clearSelection]);
+  }, [expenses, removeExpenses]);
 
   const handleDeleteOne = useCallback(() => {
     if (deleteOneExpense) {
@@ -237,13 +202,24 @@ export function TransactionsPage() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
+      <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{t("transactions.title")}</h1>
             <PageTourTrigger pageId="transactions" steps={transactionsTourSteps} />
           </div>
           <p className="text-sm text-muted-foreground">{t("transactions.subtitle")}</p>
+        </div>
+      </div>
+      <div className="md:hidden -mx-4 -mt-4 mb-3 px-4">
+        <div className="px-0 py-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold">{t("transactions.title")}</h1>
+            <p className="text-xs text-muted-foreground">
+              {t("transactions.subtitle")}
+            </p>
+          </div>
+          <PageTourTrigger pageId="transactions" steps={transactionsTourSteps} />
         </div>
       </div>
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
@@ -262,7 +238,7 @@ export function TransactionsPage() {
             />
           </CardAction>
         </CardHeader>
-        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-4">
+        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 md:px-0 md:gap-4 transactions-card-content">
           <SyncConfirmDialog
             open={syncConfirmOpen}
             onOpenChange={setSyncConfirmOpen}
@@ -289,16 +265,12 @@ export function TransactionsPage() {
             hasActiveFilters={hasActiveFilters}
             onClearFilters={clearFilters}
             onCleanDescriptions={cleanAllDescriptions}
-            someSelected={someSelected}
-            selectedCount={selectedIds.size}
-            onDeleteSelected={() => setDeleteSelectedOpen(true)}
-            onClearSelection={clearSelection}
             expensesCount={expenses.length}
             onDeleteAll={() => setDeleteAllOpen(true)}
             t={t}
           />
 
-          <div className="flex-1 min-h-0 overflow-auto border rounded-md" data-tour="expensesList">
+          <div className="flex-1 min-h-0 overflow-auto md:border md:rounded-md" data-tour="expensesList">
             {filtered.length === 0 ? (
               <div className="text-center text-muted-foreground py-12 px-4">
                 {t("transactions.noTransactions")}
@@ -309,9 +281,6 @@ export function TransactionsPage() {
                   <ExpensesByMonthTable
                     byMonth={byMonth}
                     defaultOpenMonth={defaultOpenMonth}
-                    selectedIds={selectedIds}
-                    onToggleSelect={toggleSelect}
-                    onToggleMonthSelection={toggleMonthSelection}
                     sortBy={sortBy}
                     sortDir={sortDir}
                     onSort={toggleSort}
@@ -332,9 +301,6 @@ export function TransactionsPage() {
                   <ExpensesByMonthList
                     byMonth={byMonth}
                     defaultOpenMonth={defaultOpenMonth}
-                    selectedIds={selectedIds}
-                    onToggleSelect={toggleSelect}
-                    onToggleMonthSelection={toggleMonthSelection}
                     onExpenseTap={setExpenseForActions}
                     t={t}
                   />
@@ -373,18 +339,10 @@ export function TransactionsPage() {
         t={t}
       />
 
-      <DeleteSelectedTransactionsDialog
-        open={deleteSelectedOpen}
-        onOpenChange={setDeleteSelectedOpen}
-        count={selectedIds.size}
-        onConfirm={handleDeleteSelected}
-        t={t}
-      />
-
-      <DeleteAllTransactionsDialog
-        open={deleteAllOpen}
-        onOpenChange={setDeleteAllOpen}
-        count={expenses.length}
+          <DeleteAllTransactionsDialog
+            open={deleteAllOpen}
+            onOpenChange={setDeleteAllOpen}
+            count={expenses.length}
         onConfirm={handleDeleteAll}
         t={t}
       />

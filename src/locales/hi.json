@@ -24,6 +24,8 @@
   "common": {
     "save": "सहेजें",
     "cancel": "रद्द करें",
+    "select": "Select",
+    "done": "Done",
     "delete": "हटाएं",
     "loading": "लोड हो रहा है",
     "add": "जोड़ें",

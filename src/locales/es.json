@@ -24,6 +24,8 @@
   "common": {
     "save": "Guardar",
     "cancel": "Cancelar",
+    "select": "Select",
+    "done": "Done",
     "delete": "Eliminar",
     "loading": "Cargando",
     "add": "Añadir",

@@ -28,6 +28,6 @@ function TestWrapper() {
 test("TransactionsPage renders without throwing", () => {
   render(<TestWrapper />);
   expect(
-    screen.getByRole("heading", { name: "Transactions" }),
-  ).toBeInTheDocument();
+    screen.getAllByRole("heading", { name: "Transactions" }).length,
+  ).toBeGreaterThan(0);
 });

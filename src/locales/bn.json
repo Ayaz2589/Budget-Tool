@@ -24,6 +24,8 @@
   "common": {
     "save": "সংরক্ষণ",
     "cancel": "বাতিল",
+    "select": "Select",
+    "done": "Done",
     "delete": "মুছুন",
     "loading": "লোড হচ্ছে",
     "add": "যোগ করুন",

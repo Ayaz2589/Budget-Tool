@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
-import { useRules } from "@/context/RulesContext";
 import type { ExpenseSource } from "@/types/core";
 import type {
   TransactionRow,
@@ -11,10 +10,6 @@ import type {
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { SourceIcon } from "@/components/cards";
 import { CategoryOption, getCategoryColor } from "@/lib/categoryColors";
-import {
-  applyRulesToExpenses,
-  computeTotalsByCategoryForMonth,
-} from "@/lib/rules";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -60,7 +55,6 @@ export function AddTransactionDialog({
 }: AddTransactionDialogProps) {
   const { t } = useTranslation();
   const { expenses, addExpense, expenseCategories, cardSources, owners } = useBudget();
-  const { rules } = useRules();
   const { presetTransactions } = usePresetTransactions();
   const defaultSource = (cardSources[0] as ExpenseSource) ?? "manual";
   const [rows, setRows] = useState<TransactionRow[]>(() => [
@@ -127,20 +121,8 @@ export function AddTransactionDialog({
         },
       ];
     });
-    const currentMonthKey = new Date().toISOString().slice(0, 7);
-    const totals = computeTotalsByCategoryForMonth(
-      [...expenses, ...toAdd],
-      currentMonthKey
-    );
-    const withRules =
-      rules.length > 0
-        ? applyRulesToExpenses(toAdd, rules, {
-            totalsByCategory: totals,
-            currentMonthKey,
-          })
-        : toAdd;
-    withRules.forEach((expense) => addExpense(expense));
-    const added = withRules.length;
+    toAdd.forEach((expense) => addExpense(expense));
+    const added = toAdd.length;
     if (added > 0) {
       setRows([defaultRow()]);
       onOpenChange(false);

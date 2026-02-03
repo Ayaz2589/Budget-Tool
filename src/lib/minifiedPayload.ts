@@ -7,7 +7,6 @@ import type {
   ExpenseSource,
   PresetTransaction,
 } from "@/types/core";
-import type { Rule } from "@/types/rules";
 import type {
   CategoryWithColorPayload,
   MinifiedPayloadInput,
@@ -31,7 +30,6 @@ export function buildMinifiedPayload(
   income: Income[],
   debts: Debt[],
   debtPayments: DebtPayment[],
-  rules: Rule[],
   presetTransactions: PresetTransaction[],
   expenseCategoriesWithColors: CategoryWithColorPayload[],
   incomeCategoriesWithColors: CategoryWithColorPayload[],
@@ -78,12 +76,6 @@ export function buildMinifiedPayload(
         n: x.note,
       }),
     ),
-    r: rules.map((x) => ({
-      i: x.id,
-      e: x.enabled,
-      co: x.condition,
-      ac: x.action,
-    })),
     pt: presetTransactions.map((x) => ({
       i: x.id,
       s: x.source,
@@ -157,17 +149,6 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
     } as DebtPayment;
   });
 
-  const rules = arr("rules", "r").map((x) => {
-    const o = x as Record<string, unknown>;
-    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
-    return {
-      id: String(get("id", "i", "")),
-      enabled: Boolean(get("enabled", "e", true)),
-      condition: get("condition", "co", {}) as Rule["condition"],
-      action: get("action", "ac", { type: "setCategory", value: "" }) as Rule["action"],
-    } as Rule;
-  });
-
   const presetTransactions = arr("presetTransactions", "pt").map((x) => {
     const o = x as Record<string, unknown>;
     const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
@@ -210,7 +191,6 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
     income,
     debts,
     debtPayments,
-    rules,
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,
@@ -226,7 +206,6 @@ export function serializeToBlob(input: MinifiedPayloadInput): string {
     input.income,
     input.debts,
     input.debtPayments,
-    input.rules,
     input.presetTransactions,
     input.expenseCategoriesWithColors ?? [],
     input.incomeCategoriesWithColors ?? [],

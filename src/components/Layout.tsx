@@ -75,7 +75,7 @@ const nav = [
   { to: "/dashboard/debt", labelKey: "nav.debt", icon: CreditCard },
   { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
   { to: "/dashboard/import", labelKey: "nav.import", icon: Upload },
-  { to: "/dashboard/rules", labelKey: "nav.rules", icon: ListOrdered },
+  { to: "/dashboard/presets", labelKey: "nav.presets", icon: ListOrdered },
   { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
@@ -91,7 +91,7 @@ const moreNavItems = [
   { to: "/dashboard/debt", labelKey: "nav.debt", icon: CreditCard },
   { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
   { to: "/dashboard/import", labelKey: "nav.import", icon: Upload },
-  { to: "/dashboard/rules", labelKey: "nav.rules", icon: ListOrdered },
+  { to: "/dashboard/presets", labelKey: "nav.presets", icon: ListOrdered },
   { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
 

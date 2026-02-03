@@ -5,7 +5,6 @@ import type {
   Income,
   PresetTransaction,
 } from "./core";
-import type { Rule } from "./rules";
 
 /** Category name + color for payload (used in PDF and Sheets). */
 export interface CategoryWithColorPayload {
@@ -18,7 +17,6 @@ export interface MinifiedPayloadInput {
   income: Income[];
   debts: Debt[];
   debtPayments: DebtPayment[];
-  rules: Rule[];
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
@@ -31,7 +29,6 @@ export interface ExpandedPayload {
   income: Income[];
   debts: Debt[];
   debtPayments: DebtPayment[];
-  rules: Rule[];
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];

@@ -39,12 +39,6 @@ export const mortgageTourSteps: TourStepInput[] = [
   { target: "[data-tour=\"paymentsList\"]", titleKey: "tour.mortgage.paymentsListTitle", contentKey: "tour.mortgage.paymentsListContent" },
 ];
 
-export const rulesTourSteps: TourStepInput[] = [
-  { titleKey: "tour.rules.introTitle", contentKey: "tour.rules.introContent" },
-  { target: "[data-tour=\"rulesList\"]", titleKey: "tour.rules.rulesListTitle", contentKey: "tour.rules.rulesListContent" },
-  { target: "[data-tour=\"presets\"]", titleKey: "tour.rules.presetsTitle", contentKey: "tour.rules.presetsContent" },
-];
-
 export const settingsTourSteps: TourStepInput[] = [
   { titleKey: "tour.settings.introTitle", contentKey: "tour.settings.introContent" },
   { target: "[data-tour=\"googleSheets\"]", titleKey: "tour.settings.googleSheetsTitle", contentKey: "tour.settings.googleSheetsContent" },

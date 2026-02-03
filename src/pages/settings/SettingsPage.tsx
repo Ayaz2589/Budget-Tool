@@ -23,7 +23,6 @@ import { IncomeCategoriesCard } from "./IncomeCategoriesCard";
 import { OwnersCard } from "./OwnersCard";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
-const RULES_STORAGE_KEY = "budget-tool-rules";
 const PRESET_STORAGE_KEY = "budget-tool-preset-transactions";
 
 export function SettingsPage() {
@@ -124,7 +123,6 @@ export function SettingsPage() {
 
   const handleDeleteAllData = () => {
     localStorage.removeItem(BUDGET_STORAGE_KEY);
-    localStorage.removeItem(RULES_STORAGE_KEY);
     localStorage.removeItem(PRESET_STORAGE_KEY);
     setDeleteAllConfirmOpen(false);
     window.location.reload();

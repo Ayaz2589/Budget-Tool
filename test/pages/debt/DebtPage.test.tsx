@@ -2,7 +2,6 @@ import { test, expect } from "bun:test";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { DebtPage } from "@/pages/debt/DebtPage";
 import { BudgetProvider } from "@/context/BudgetContext";
-import { RulesProvider } from "@/context/RulesContext";
 import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
@@ -37,11 +36,9 @@ test("DebtPage shows remove payment confirmation dialog when Remove is clicked",
 
   render(
     <BudgetProvider>
-      <RulesProvider>
-        <PresetTransactionsProvider>
-          <DebtPage />
-        </PresetTransactionsProvider>
-      </RulesProvider>
+      <PresetTransactionsProvider>
+        <DebtPage />
+      </PresetTransactionsProvider>
     </BudgetProvider>,
   );
 
@@ -78,11 +75,9 @@ test("DebtPage shows delete debt confirmation dialog when Delete debt is clicked
 
   render(
     <BudgetProvider>
-      <RulesProvider>
-        <PresetTransactionsProvider>
-          <DebtPage />
-        </PresetTransactionsProvider>
-      </RulesProvider>
+      <PresetTransactionsProvider>
+        <DebtPage />
+      </PresetTransactionsProvider>
     </BudgetProvider>,
   );
 

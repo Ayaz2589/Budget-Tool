@@ -7,7 +7,6 @@ import type {
   PresetTransaction,
 } from "@/types/core";
 import type { MonthTotals } from "@/types/totals";
-import type { Rule } from "@/types/rules";
 import type { SheetIds } from "@/types/sheets";
 
 const VALID_EXPENSE_SOURCES: ExpenseSource[] = [
@@ -292,31 +291,6 @@ export async function readDebtPaymentsFromSheet(
   return payments;
 }
 
-export async function readRulesFromSheet(
-  accessToken: string,
-  spreadsheetId: string
-): Promise<Rule[]> {
-  const rows = await getSheetValues(accessToken, spreadsheetId, "Rules!A2:D");
-  const rules: Rule[] = [];
-  for (const row of rows) {
-    if (!row || row.length < 4) continue;
-    const [idRaw, enabledRaw, conditionRaw, actionRaw] = row;
-    const id = String(idRaw ?? "").trim();
-    if (!id) continue;
-    try {
-      const enabled =
-        String(enabledRaw ?? "").toLowerCase() === "true" ||
-        String(enabledRaw ?? "") === "1";
-      const condition = JSON.parse(String(conditionRaw ?? "{}"));
-      const action = JSON.parse(String(actionRaw ?? "{}"));
-      rules.push({ id, enabled, condition, action });
-    } catch {
-      // ignore malformed rows
-    }
-  }
-  return rules;
-}
-
 export async function appendExpenses(
   accessToken: string,
   spreadsheetId: string,
@@ -479,26 +453,6 @@ export async function clearAndWriteDebtPayments(
   const values = [...headers, ...rows];
   const range = "DebtPayments!A1:E";
   await clearRange(accessToken, spreadsheetId, "DebtPayments!A1:E10000");
-  if (values.length > 0) {
-    await updateSheet(accessToken, spreadsheetId, range, values, false);
-  }
-}
-
-export async function clearAndWriteRules(
-  accessToken: string,
-  spreadsheetId: string,
-  rules: Rule[]
-): Promise<void> {
-  const headers = [["Id", "Enabled", "Condition", "Action"]];
-  const rows = rules.map((rule) => [
-    rule.id,
-    rule.enabled ? "TRUE" : "FALSE",
-    JSON.stringify(rule.condition),
-    JSON.stringify(rule.action),
-  ]);
-  const values = [...headers, ...rows];
-  const range = "Rules!A1:D";
-  await clearRange(accessToken, spreadsheetId, "Rules!A1:D10000");
   if (values.length > 0) {
     await updateSheet(accessToken, spreadsheetId, range, values, false);
   }
@@ -719,7 +673,6 @@ export async function getSheetIds(
   const debts = byTitle["Debts"];
   const debtPayments = byTitle["DebtPayments"];
   const mortgage = byTitle["Mortgage"];
-  const rules = byTitle["Rules"];
   const presetTransactions = byTitle["PresetTransactions"];
   if (
     expenses == null ||
@@ -728,11 +681,10 @@ export async function getSheetIds(
     debts == null ||
     debtPayments == null ||
     mortgage == null ||
-    rules == null ||
     presetTransactions == null
   )
     return null;
-  return { expenses, income, totals, debts, debtPayments, mortgage, rules, presetTransactions };
+  return { expenses, income, totals, debts, debtPayments, mortgage, presetTransactions };
 }
 
 export async function ensureSheetsExist(
@@ -755,7 +707,6 @@ export async function ensureSheetsExist(
     "Debts",
     "DebtPayments",
     "Mortgage",
-    "Rules",
     "PresetTransactions",
     "Data",
   ];
@@ -1093,30 +1044,6 @@ export async function applySheetsFormatting(
       );
     }
   }
-
-  // Rules: header row bold + larger, all left align (A–D)
-  requests.push(
-    repeatCellRequest(
-      sheetIds.rules,
-      0,
-      1,
-      0,
-      4,
-      { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
-      headerFields
-    )
-  );
-  requests.push(
-    repeatCellRequest(
-      sheetIds.rules,
-      0,
-      10000,
-      0,
-      4,
-      { horizontalAlignment: "LEFT" },
-      leftAlignFields
-    )
-  );
 
   // PresetTransactions: header row bold + larger, all left align (A–E)
   requests.push(

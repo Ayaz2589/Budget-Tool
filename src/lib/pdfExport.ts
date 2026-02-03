@@ -8,7 +8,6 @@ import type {
   ExpenseSource,
   PresetTransaction,
 } from "@/types/core";
-import type { Rule } from "@/types/rules";
 import type { CategoryWithColorPayload } from "@/types/payload";
 import type { ParsedExportedPdf } from "@/types/pdf";
 import { getMonthLabel, computeMonthTotals } from "@/lib/totals";
@@ -42,7 +41,6 @@ export function downloadTransactionsAndIncomePdf(
   income: Income[],
   debts: Debt[] = [],
   debtPayments: DebtPayment[] = [],
-  rules: Rule[] = [],
   presetTransactions: PresetTransaction[] = [],
   expenseCategoriesWithColors: CategoryWithColorPayload[] = [],
   incomeCategoriesWithColors: CategoryWithColorPayload[] = [],
@@ -302,7 +300,6 @@ export function downloadTransactionsAndIncomePdf(
     income,
     debts,
     debtPayments,
-    rules,
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,
@@ -348,7 +345,6 @@ function emptyParsed(): ParsedExportedPdf {
     income: [],
     debts: [],
     debtPayments: [],
-    rules: [],
     presetTransactions: [],
     owners: [],
   };
@@ -399,7 +395,6 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
           debtPayments: Array.isArray(expanded.debtPayments)
             ? expanded.debtPayments
             : [],
-          rules: Array.isArray(expanded.rules) ? expanded.rules : [],
           presetTransactions: Array.isArray(expanded.presetTransactions)
             ? expanded.presetTransactions
             : [],
@@ -418,7 +413,6 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
     ...fallback,
     debts: [],
     debtPayments: [],
-    rules: [],
     presetTransactions: [],
   };
 }
@@ -519,7 +513,6 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
     income,
     debts: [],
     debtPayments: [],
-    rules: [],
     presetTransactions: [],
     owners: [],
   };

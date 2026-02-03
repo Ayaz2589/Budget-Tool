@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { BudgetProvider } from "@/context/BudgetContext";
 import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
-import { RulesProvider } from "@/context/RulesContext";
 import {
   GoogleAuthProvider,
   GoogleAuthProviderFallback,
@@ -16,7 +15,7 @@ import { MortgagePage } from "@/pages/mortgage/MortgagePage";
 import { ImportPage } from "@/pages/import/ImportPage";
 import { TransactionsPage } from "@/pages/transactions/TransactionsPage";
 import { IncomePage } from "@/pages/income/IncomePage";
-import { RulesPage } from "@/pages/rules/RulesPage";
+import { PresetsPage } from "@/pages/presets/PresetsPage";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
@@ -35,7 +34,7 @@ function AppContent() {
             <Route path="income" element={<IncomePage />} />
             <Route path="debt" element={<DebtPage />} />
             <Route path="mortgage" element={<MortgagePage />} />
-            <Route path="rules" element={<RulesPage />} />
+            <Route path="presets" element={<PresetsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Route>
@@ -48,7 +47,6 @@ function App() {
   return (
     <BudgetProvider>
       <PresetTransactionsProvider>
-        <RulesProvider>
         {googleClientId ? (
           <GoogleOAuthProvider clientId={googleClientId}>
             <GoogleAuthProvider>
@@ -60,7 +58,6 @@ function App() {
             <AppContent />
           </GoogleAuthProviderFallback>
         )}
-        </RulesProvider>
       </PresetTransactionsProvider>
     </BudgetProvider>
   );

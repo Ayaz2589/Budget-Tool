@@ -10,7 +10,6 @@ test("parseExportedPdfData returns empty when no block", () => {
   const result = parseExportedPdfData("random text");
   expect(result.expenses).toEqual([]);
   expect(result.income).toEqual([]);
-  expect(result.rules).toEqual([]);
 });
 
 test("parseExportedPdfData returns empty for legacy EXPENSE block (V2 only)", () => {
@@ -20,7 +19,6 @@ BUDGET_TOOL_DATA_END`;
   const result = parseExportedPdfData(block);
   expect(result.expenses).toEqual([]);
   expect(result.income).toEqual([]);
-  expect(result.rules).toEqual([]);
 });
 
 test("parseExportedPdfData returns empty for legacy INCOME block (V2 only)", () => {
@@ -30,7 +28,6 @@ BUDGET_TOOL_DATA_END`;
   const result = parseExportedPdfData(block);
   expect(result.expenses).toEqual([]);
   expect(result.income).toEqual([]);
-  expect(result.rules).toEqual([]);
 });
 
 test("parseExportedPdfData returns empty for block that does not start with V2", () => {
@@ -38,32 +35,6 @@ test("parseExportedPdfData returns empty for block that does not start with V2",
   const result = parseExportedPdfData(block);
   expect(result.expenses).toEqual([]);
   expect(result.income).toEqual([]);
-  expect(result.rules).toEqual([]);
-});
-
-test("parseExportedPdfData returns empty for legacy RULE block (V2 only)", () => {
-  const condition = encodeURIComponent(
-    JSON.stringify({
-      type: "categoryTotal",
-      category: "50/50",
-      operator: "gte",
-      value: 2000,
-      period: "current_month",
-    }),
-  );
-  const action = encodeURIComponent(
-    JSON.stringify({
-      type: "showWarning",
-      message: "Over limit",
-    }),
-  );
-  const block = `BUDGET_TOOL_DATA_START
-RULE@@r1@@1@@${condition}@@${action}
-BUDGET_TOOL_DATA_END`;
-  const result = parseExportedPdfData(block);
-  expect(result.expenses).toEqual([]);
-  expect(result.income).toEqual([]);
-  expect(result.rules).toEqual([]);
 });
 
 test("parseExportedPdfData V2 round-trip using serializeToBlob (export path includes categories)", () => {
@@ -99,27 +70,13 @@ test("parseExportedPdfData V2 round-trip using serializeToBlob (export path incl
     debtPayments: [
       { id: "dp1", debtId: "d1", date: "2025-01-15", amount: 200 },
     ],
-    rules: [
-      {
-        id: "r1",
-        enabled: true,
-        condition: {
-          type: "categoryTotal",
-          category: "50/50",
-          operator: "gte",
-          value: 2000,
-          period: "current_month",
-        },
-        action: { type: "showWarning", message: "Over limit" },
-      },
-    ],
     presetTransactions: [
       {
         id: "preset-1",
         source: "manual" as const,
         description: "Preset",
         category: "50/50",
-        cardMember: "Ayaz",
+        owner: "Ayaz",
       },
     ],
     expenseCategoriesWithColors: [
@@ -157,14 +114,6 @@ test("parseExportedPdfData V2 round-trip using serializeToBlob (export path incl
   expect(result.debtPayments[0]!.debtId).toBe("d1");
   expect(result.debtPayments[0]!.amount).toBe(200);
 
-  expect(result.rules).toHaveLength(1);
-  expect(result.rules[0]!.id).toBe("r1");
-  expect(result.rules[0]!.enabled).toBe(true);
-  expect(result.rules[0]!.action).toEqual({
-    type: "showWarning",
-    message: "Over limit",
-  });
-
   expect(result.presetTransactions).toHaveLength(1);
   expect(result.presetTransactions[0]!.id).toBe("preset-1");
   expect(result.presetTransactions[0]!.source).toBe("manual");
@@ -180,7 +129,7 @@ test("parseExportedPdfData V2 round-trip using serializeToBlob (export path incl
 });
 
 test("parseExportedPdfData V2 with whitespace in Base64: strips and decodes", () => {
-  const payload = { expenses: [], income: [], debts: [], debtPayments: [], rules: [], presetTransactions: [] };
+  const payload = { expenses: [], income: [], debts: [], debtPayments: [], presetTransactions: [] };
   const jsonString = JSON.stringify(payload);
   const compressed = pako.gzip(new TextEncoder().encode(jsonString));
   let binary = "";
@@ -195,7 +144,6 @@ test("parseExportedPdfData V2 with whitespace in Base64: strips and decodes", ()
   expect(result.income).toEqual([]);
   expect(result.debts).toEqual([]);
   expect(result.debtPayments).toEqual([]);
-  expect(result.rules).toEqual([]);
   expect(result.presetTransactions).toEqual([]);
 });
 
@@ -215,7 +163,6 @@ test("parseExportedPdfData table fallback when no data block: parses expense and
   expect(result.income[0]!.amount).toBe(4178.4);
   expect(result.debts).toEqual([]);
   expect(result.debtPayments).toEqual([]);
-  expect(result.rules).toEqual([]);
   expect(result.presetTransactions).toEqual([]);
 });
 
@@ -225,7 +172,6 @@ test("parseExportedPdfData V2 minified (short-key) format: parses correctly", ()
     i: [{ i: "inc-1", d: "2025-02-01", a: 3000, desc: "Paycheck", c: "Paycheck" }],
     d: [],
     dp: [],
-    r: [],
     pt: [],
   };
   const jsonString = JSON.stringify(payload);
@@ -253,7 +199,6 @@ test("parsed PDF result with categories yields names for setExpenseCategories/se
     income: [],
     debts: [],
     debtPayments: [],
-    rules: [],
     presetTransactions: [],
     expenseCategoriesWithColors: [
       { name: "50/50", color: "blue" },

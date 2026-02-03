@@ -2,7 +2,6 @@ import { test, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { BudgetProvider } from "@/context/BudgetContext";
-import { RulesProvider } from "@/context/RulesContext";
 import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
 import { GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
 import { Layout } from "@/components/Layout";
@@ -11,9 +10,8 @@ import { SettingsPage } from "@/pages/settings/SettingsPage";
 function TestWrapper() {
   return (
     <BudgetProvider>
-      <RulesProvider>
-        <PresetTransactionsProvider>
-          <GoogleAuthProviderFallback>
+      <PresetTransactionsProvider>
+        <GoogleAuthProviderFallback>
           <MemoryRouter initialEntries={["/settings"]}>
             <Routes>
               <Route path="/settings" element={<Layout />}>
@@ -22,8 +20,7 @@ function TestWrapper() {
             </Routes>
           </MemoryRouter>
         </GoogleAuthProviderFallback>
-        </PresetTransactionsProvider>
-      </RulesProvider>
+      </PresetTransactionsProvider>
     </BudgetProvider>
   );
 }

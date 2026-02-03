@@ -35,27 +35,13 @@ test("serializeToBlob and parseFromBlob round-trip", () => {
     debtPayments: [
       { id: "dp1", debtId: "d1", date: "2025-01-15", amount: 200 },
     ],
-    rules: [
-      {
-        id: "r1",
-        enabled: true,
-        condition: {
-          type: "categoryTotal",
-          category: "50/50",
-          operator: "gte",
-          value: 2000,
-          period: "current_month",
-        },
-        action: { type: "showWarning", message: "Over limit" },
-      },
-    ],
     presetTransactions: [
       {
         id: "preset-1",
         source: "manual" as const,
         description: "Preset",
         category: "50/50",
-        cardMember: "Ayaz",
+        owner: "Ayaz",
       },
     ],
     expenseCategoriesWithColors: [
@@ -79,7 +65,6 @@ test("serializeToBlob and parseFromBlob round-trip", () => {
   expect(expanded.debts).toHaveLength(1);
   expect(expanded.debts[0]!.name).toBe("Loan");
   expect(expanded.debtPayments).toHaveLength(1);
-  expect(expanded.rules).toHaveLength(1);
   expect(expanded.presetTransactions).toHaveLength(1);
   expect(expanded.expenseCategoriesWithColors).toHaveLength(2);
   expect(expanded.incomeCategoriesWithColors).toHaveLength(1);
@@ -97,7 +82,6 @@ test("serializeToBlob with empty data produces valid blob", () => {
     income: [],
     debts: [],
     debtPayments: [],
-    rules: [],
     presetTransactions: [],
   });
   expect(blob.startsWith("V2")).toBe(true);
@@ -106,7 +90,6 @@ test("serializeToBlob with empty data produces valid blob", () => {
   expect(expanded.income).toEqual([]);
   expect(expanded.debts).toEqual([]);
   expect(expanded.debtPayments).toEqual([]);
-  expect(expanded.rules).toEqual([]);
   expect(expanded.presetTransactions).toEqual([]);
   expect(expanded.expenseCategoriesWithColors).toEqual([]);
   expect(expanded.incomeCategoriesWithColors).toEqual([]);
@@ -118,7 +101,6 @@ test("serializeToBlob always includes ec and ic in encoded payload (empty arrays
     income: [],
     debts: [],
     debtPayments: [],
-    rules: [],
     presetTransactions: [],
   });
   const base64Part = blob.slice(2);

@@ -1,5 +1,4 @@
 import type { Debt, DebtPayment, Expense, Income, PresetTransaction } from "./core";
-import type { Rule } from "./rules";
 import type { CategoryWithColorPayload } from "./payload";
 
 export interface ParsedExportedPdf {
@@ -7,7 +6,6 @@ export interface ParsedExportedPdf {
   income: Income[];
   debts: Debt[];
   debtPayments: DebtPayment[];
-  rules: Rule[];
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];

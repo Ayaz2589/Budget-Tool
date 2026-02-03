@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
-import { useRules } from "@/context/RulesContext";
 import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
@@ -50,7 +49,6 @@ export function TransactionsPage() {
   } = useBudget();
   const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
     useGoogleAuth();
-  const { rules } = useRules();
   const { presetTransactions } = usePresetTransactions();
   const [monthFilter, setMonthFilter] = useState<string>("");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
@@ -259,7 +257,6 @@ export function TransactionsPage() {
       income,
       debts,
       debtPayments,
-      rules,
       presetTransactions,
       expenseCategoriesWithColors,
       incomeCategoriesWithColors,
@@ -271,7 +268,6 @@ export function TransactionsPage() {
     income,
     debts,
     debtPayments,
-    rules,
     presetTransactions,
     expenseCategories,
     incomeCategories,

@@ -1,14 +1,12 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
-import { useRules } from "@/context/RulesContext";
 import { getDebtBalance } from "@/lib/debtUtils";
 import {
   computeAllTotals,
   computeMonthTotals,
   type MonthTotals,
 } from "@/lib/totals";
-import { getDashboardWarnings } from "@/lib/rules";
 import { DEFAULT_INCOME_CATEGORIES } from "@/lib/types";
 import {
   Accordion,
@@ -29,17 +27,12 @@ import { SpendingByTypeSection } from "./SpendingByTypeSection";
 export function Dashboard() {
   const { t } = useTranslation();
   const { expenses, income, iOweNova, debts, debtPayments } = useBudget();
-  const { rules } = useRules();
   const months = computeAllTotals({
     expenses,
     income,
     iOweNovaByMonth: iOweNova,
   });
   const currentMonthKey = new Date().toISOString().slice(0, 7);
-  const warnings = useMemo(
-    () => getDashboardWarnings(expenses, rules, currentMonthKey),
-    [expenses, rules, currentMonthKey],
-  );
 
   const monthOptions = useMemo(() => {
     const keys = new Set<string>([
@@ -357,19 +350,6 @@ export function Dashboard() {
         t={t}
       />
       </div>
-
-      {warnings.length > 0 && (
-        <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 space-y-2">
-          <div className="text-sm font-semibold text-destructive">
-            {t("dashboard.warningsTitle")}
-          </div>
-          <ul className="text-sm text-destructive space-y-1">
-            {warnings.map((warning, index) => (
-              <li key={`${warning}-${index}`}>{warning}</li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <Accordion
         type="multiple"

@@ -2,20 +2,17 @@ import { test, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { CardSourcesCard } from "@/pages/settings/CardSourcesCard";
 import { BudgetProvider } from "@/context/BudgetContext";
-import { RulesProvider } from "@/context/RulesContext";
 import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
 import { GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
 
 function TestWrapper() {
   return (
     <BudgetProvider>
-      <RulesProvider>
-        <PresetTransactionsProvider>
-          <GoogleAuthProviderFallback>
-            <CardSourcesCard />
-          </GoogleAuthProviderFallback>
-        </PresetTransactionsProvider>
-      </RulesProvider>
+      <PresetTransactionsProvider>
+        <GoogleAuthProviderFallback>
+          <CardSourcesCard />
+        </GoogleAuthProviderFallback>
+      </PresetTransactionsProvider>
     </BudgetProvider>
   );
 }

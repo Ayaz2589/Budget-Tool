@@ -1,7 +1,6 @@
 /** Unified types - re-export all type modules. */
 
 export * from "./core";
-export * from "./rules";
 export * from "./totals";
 export * from "./sheets";
 export * from "./payload";

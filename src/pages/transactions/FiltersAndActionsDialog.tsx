@@ -47,6 +47,9 @@ export function FiltersAndActionsDialog({
   onDeleteAll,
   t,
 }: FiltersAndActionsDialogProps) {
+  const fieldClass = "h-11 w-full";
+  const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -54,13 +57,13 @@ export function FiltersAndActionsDialog({
         showCloseButton={true}
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
       >
-        <SheetHeader className="px-4 pt-4 pb-2 md:px-0 md:pt-0 md:pb-0">
+        <SheetHeader className="px-4 pt-5 pb-3">
           <SheetTitle>{t("transactions.filtersActionsTitle")}</SheetTitle>
           <SheetDescription>
             {t("transactions.filtersActionsDesc")}
           </SheetDescription>
         </SheetHeader>
-        <div className="grid gap-6 py-4 px-4 pb-8 overflow-y-auto overscroll-contain md:px-0 md:pb-0 md:overflow-visible">
+        <div className="grid gap-6 px-4 pb-8 overflow-y-auto overscroll-contain">
           {/* Filters */}
           <section className="space-y-4">
             <div className="flex items-center justify-between gap-2">
@@ -68,15 +71,14 @@ export function FiltersAndActionsDialog({
               {hasActiveFilters && (
                 <Button
                   variant="ghost"
-                  size="sm"
                   onClick={onClearFilters}
-                  className="shrink-0"
+                  className="h-9 px-3 shrink-0"
                 >
                   {t("common.clearFilters")}
                 </Button>
               )}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-3">
               <div className="space-y-2">
                 <Label className="text-muted-foreground">
                   {t("transactions.month")}
@@ -85,7 +87,7 @@ export function FiltersAndActionsDialog({
                   type="month"
                   value={monthFilter}
                   onChange={(e) => onMonthFilterChange(e.target.value)}
-                  className="w-full min-w-0"
+                  className={fieldClass}
                 />
               </div>
               <div className="space-y-2">
@@ -94,7 +96,7 @@ export function FiltersAndActionsDialog({
                   value={sourceFilter}
                   onValueChange={onSourceFilterChange}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className={selectTriggerClass}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -122,7 +124,7 @@ export function FiltersAndActionsDialog({
                     onCategoryFilterChange(v === "_" ? "" : v)
                   }
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className={selectTriggerClass}>
                     <SelectValue placeholder={t("common.all")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -141,7 +143,7 @@ export function FiltersAndActionsDialog({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 sm:col-span-2 lg:col-span-1">
+              <div className="space-y-2">
                 <Label className="text-muted-foreground">
                   {t("common.owner")}
                 </Label>
@@ -149,7 +151,7 @@ export function FiltersAndActionsDialog({
                   value={ownerFilter}
                   onValueChange={onOwnerFilterChange}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className={selectTriggerClass}>
                     <SelectValue placeholder={t("common.all")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -163,7 +165,7 @@ export function FiltersAndActionsDialog({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 sm:col-span-2 lg:col-span-2">
+              <div className="space-y-2">
                 <Label className="text-muted-foreground">
                   {t("transactions.searchDescription")}
                 </Label>
@@ -171,7 +173,7 @@ export function FiltersAndActionsDialog({
                   placeholder={t("transactions.filterByDescription")}
                   value={searchFilter}
                   onChange={(e) => onSearchFilterChange(e.target.value)}
-                  className="w-full"
+                  className={fieldClass}
                 />
               </div>
             </div>
@@ -181,25 +183,26 @@ export function FiltersAndActionsDialog({
           <section className="space-y-4 border-t pt-6">
             <h3 className="text-sm font-semibold">{t("common.actions")}</h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2">
               <Button
                 variant="outline"
-                size="sm"
                 onClick={onCleanDescriptions}
-                className="justify-start"
+                className="h-11 w-full justify-start"
               >
                 {t("transactions.cleanDescriptions")}
               </Button>
             </div>
 
             {expensesCount > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {expensesCount > 0 && (
-                  <Button variant="destructive" size="sm" onClick={onDeleteAll}>
-                    <Trash2 className="size-4" />
-                    {t("transactions.deleteAll")}
-                  </Button>
-                )}
+              <div className="pt-1">
+                <Button
+                  variant="destructive"
+                  className="h-11 w-full"
+                  onClick={onDeleteAll}
+                >
+                  <Trash2 className="size-4" />
+                  {t("transactions.deleteAll")}
+                </Button>
               </div>
             )}
           </section>

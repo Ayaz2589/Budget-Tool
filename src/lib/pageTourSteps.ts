@@ -1,14 +1,5 @@
 import type { TourStepInput } from "./runPageTour";
 
-export const dashboardTourSteps: TourStepInput[] = [
-  { titleKey: "tour.dashboard.introTitle", contentKey: "tour.dashboard.introContent" },
-  { target: "[data-tour=\"monthSelector\"]", titleKey: "tour.dashboard.monthSelectorTitle", contentKey: "tour.dashboard.monthSelectorContent" },
-  { target: "[data-tour=\"summary\"]", titleKey: "tour.dashboard.summaryTitle", contentKey: "tour.dashboard.summaryContent" },
-  { target: "[data-tour=\"overview\"]", titleKey: "tour.dashboard.overviewTitle", contentKey: "tour.dashboard.overviewContent" },
-  { target: "[data-tour=\"debt\"]", titleKey: "tour.dashboard.debtTitle", contentKey: "tour.dashboard.debtContent" },
-  { target: "[data-tour=\"byMonth\"]", titleKey: "tour.dashboard.byMonthTitle", contentKey: "tour.dashboard.byMonthContent" },
-];
-
 export const transactionsTourSteps: TourStepInput[] = [
   { titleKey: "tour.transactions.introTitle", contentKey: "tour.transactions.introContent" },
   { target: "[data-tour=\"toolbar\"]", titleKey: "tour.transactions.toolbarTitle", contentKey: "tour.transactions.toolbarContent" },

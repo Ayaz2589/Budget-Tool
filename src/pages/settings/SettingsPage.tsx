@@ -6,6 +6,8 @@ import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { extractSpreadsheetId } from "@/lib/googleSheets";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +36,8 @@ export function SettingsPage() {
     setIncomeCategories,
     setOwners,
     repairCorruptedDates,
+    useDummyData,
+    setUseDummyData,
   } = useBudget();
   const {
     isSignedIn,
@@ -141,48 +145,69 @@ export function SettingsPage() {
       </div>
 
       <div data-tour="googleSheets">
-      <GoogleSheetsCard
-        isSignedIn={isSignedIn}
-        signIn={signIn}
-        signOut={signOut}
-        spreadsheetId={spreadsheetId ?? undefined}
-        sheetIdInput={sheetIdInput}
-        onSheetIdChange={setSheetIdInput}
-        onSetSheetId={handleSetSpreadsheetId}
-        syncToSheets={syncToSheets}
-        pullFromSheet={pullFromSheet}
-        syncStatus={syncStatus}
-        syncErrorMessage={syncErrorMessage ?? undefined}
-        onRepairDates={handleRepairDates}
-        repairResult={repairResult}
-        syncConfirmOpen={syncConfirmOpen}
-        setSyncConfirmOpen={setSyncConfirmOpen}
-        restoreConfirmOpen={restoreConfirmOpen}
-        setRestoreConfirmOpen={setRestoreConfirmOpen}
-        t={t}
-      />
+        <GoogleSheetsCard
+          isSignedIn={isSignedIn}
+          signIn={signIn}
+          signOut={signOut}
+          spreadsheetId={spreadsheetId ?? undefined}
+          sheetIdInput={sheetIdInput}
+          onSheetIdChange={setSheetIdInput}
+          onSetSheetId={handleSetSpreadsheetId}
+          syncToSheets={syncToSheets}
+          pullFromSheet={pullFromSheet}
+          syncStatus={syncStatus}
+          syncErrorMessage={syncErrorMessage ?? undefined}
+          onRepairDates={handleRepairDates}
+          repairResult={repairResult}
+          syncConfirmOpen={syncConfirmOpen}
+          setSyncConfirmOpen={setSyncConfirmOpen}
+          restoreConfirmOpen={restoreConfirmOpen}
+          setRestoreConfirmOpen={setRestoreConfirmOpen}
+          t={t}
+        />
       </div>
 
+      {import.meta.env.DEV && (
+        <div className="rounded-lg border border-border/60 p-4">
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="dummy-data"
+              checked={useDummyData}
+              onCheckedChange={(checked) => setUseDummyData(checked === true)}
+            />
+            <div className="space-y-1">
+              <Label htmlFor="dummy-data" className="text-sm font-medium">
+                Use dummy data (dev only)
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Loads sample data across the entire app without touching your real
+                storage.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div data-tour="categories" className="space-y-4 sm:space-y-6">
-      <CardSourcesCard />
+        <CardSourcesCard />
 
-      <ExpenseCategoriesCard
-        categories={expenseCategories}
-        onRemove={handleRemoveExpenseCategory}
-        onAdd={handleAddExpenseCategory}
-      />
+        <ExpenseCategoriesCard
+          categories={expenseCategories}
+          onRemove={handleRemoveExpenseCategory}
+          onAdd={handleAddExpenseCategory}
+        />
 
-      <IncomeCategoriesCard
-        categories={incomeCategories}
-        onRemove={handleRemoveIncomeCategory}
-        onAdd={handleAddIncomeCategory}
-      />
+        <IncomeCategoriesCard
+          categories={incomeCategories}
+          onRemove={handleRemoveIncomeCategory}
+          onAdd={handleAddIncomeCategory}
+        />
 
-      <OwnersCard
-        owners={owners}
-        onRemove={handleRemoveOwner}
-        onAdd={handleAddOwner}
-      />
+        <OwnersCard
+          owners={owners}
+          onRemove={handleRemoveOwner}
+          onAdd={handleAddOwner}
+        />
       </div>
 
       <div className="pt-4 border-t sm:pt-6" data-tour="deleteAll">

@@ -5,6 +5,5 @@ export interface SheetIds {
   debts: number;
   debtPayments: number;
   mortgage: number;
-  rules: number;
   presetTransactions: number;
 }

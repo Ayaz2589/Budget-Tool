@@ -15,7 +15,7 @@ export const EXPENSE_SOURCE_LOCALE_KEYS: Record<ExpenseSource, string> = {
   td: "sourceTd",
 };
 
-/** English display names for PDF export and Rules page labels. */
+/** English display names for PDF export and presets labels. */
 export const EXPENSE_SOURCE_DISPLAY_LABELS: Record<ExpenseSource, string> = {
   amex: "Amex Platinum Card",
   "amex-gold": "Amex Gold Card",
@@ -36,7 +36,7 @@ export const SOURCE_LABEL_KEYS: Record<ExpenseSource | "all", string> = {
   td: "transactions.sourceTd",
 };
 
-/** Options for Rules page: value + display label. */
+/** Options for Presets page: value + display label. */
 export const SOURCE_OPTIONS: { value: ExpenseSource; label: string }[] =
   ALL_EXPENSE_SOURCES.map((value) => ({
     value,

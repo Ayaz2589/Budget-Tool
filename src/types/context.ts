@@ -5,7 +5,6 @@ import type {
   Income,
 } from "./core";
 import type { BudgetState } from "./budget";
-import type { Rule } from "./rules";
 import type { PresetTransaction } from "./core";
 
 export interface BudgetContextValue extends BudgetState {
@@ -33,16 +32,6 @@ export interface BudgetContextValue extends BudgetState {
   setIOweNova: (monthKey: string, amount: number) => void;
   iOweNova: Record<string, number>;
   repairCorruptedDates: () => { fixedExpenses: number; fixedIncome: number };
-}
-
-export interface RulesContextValue {
-  rules: Rule[];
-  addRule: (rule: Omit<Rule, "id">) => void;
-  updateRule: (id: string, updates: Partial<Rule>) => void;
-  removeRule: (id: string) => void;
-  reorderRule: (id: string, direction: "up" | "down") => void;
-  toggleRule: (id: string) => void;
-  setRules: (rules: Rule[]) => void;
 }
 
 export interface PresetTransactionsContextValue {

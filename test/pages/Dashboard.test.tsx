@@ -2,7 +2,6 @@ import { test, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { BudgetProvider } from "@/context/BudgetContext";
-import { RulesProvider } from "@/context/RulesContext";
 import { GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
 import { Layout } from "@/components/Layout";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
@@ -10,17 +9,15 @@ import { Dashboard } from "@/pages/dashboard/Dashboard";
 function TestWrapper() {
   return (
     <BudgetProvider>
-      <RulesProvider>
-        <GoogleAuthProviderFallback>
-          <MemoryRouter initialEntries={["/dashboard"]}>
-            <Routes>
-              <Route path="/dashboard" element={<Layout />}>
-                <Route index element={<Dashboard />} />
-              </Route>
-            </Routes>
-          </MemoryRouter>
-        </GoogleAuthProviderFallback>
-      </RulesProvider>
+      <GoogleAuthProviderFallback>
+        <MemoryRouter initialEntries={["/dashboard"]}>
+          <Routes>
+            <Route path="/dashboard" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </GoogleAuthProviderFallback>
     </BudgetProvider>
   );
 }

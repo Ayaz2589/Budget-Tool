@@ -6,9 +6,8 @@
     "debt": "Debt",
     "mortgage": "Mortgage",
     "import": "Import",
-    "categoryRules": "Category Rules",
-    "rules": "Rules",
-    "settings": "Settings"
+    "settings": "Settings",
+    "presets": "Presets"
   },
   "layout": {
     "appName": "Ortho",
@@ -150,7 +149,6 @@
     "searchDescription": "Search description",
     "filterByDescription": "Filter by description...",
     "addTransaction": "Add transaction",
-    "reapplyRules": "Re-apply rules ({{count}} uncategorized)",
     "cleanDescriptions": "Clean descriptions",
     "downloadPdf": "Download PDF",
     "deleteSelected": "Delete selected ({{count}})",
@@ -271,7 +269,6 @@
     "chooseExportedPdf": "Choose exported PDF",
     "choosePdfStatement": "Choose PDF statement",
     "chooseCsvFile": "Choose CSV file",
-    "applyRules": "Apply rules",
     "addToTransactions": "Add to transactions",
     "addAll": "Add all",
     "preview": "Preview",
@@ -284,47 +281,6 @@
     "initialAmount": "Initial Amount",
     "startDate": "Start Date",
     "debtId": "Debt Id"
-  },
-  "rules": {
-    "title": "Rules",
-    "subtitle": "Auto-categorize expenses and manage preset transaction templates.",
-    "addRule": "Add rule",
-    "newRule": "New rule",
-    "conditionType": "Condition type",
-    "conditionSource": "Card source",
-    "conditionCardMember": "Owner",
-    "conditionExpenseAmount": "Expense amount threshold",
-    "conditionCategoryTotal": "Category total threshold",
-    "source": "Source",
-    "cardMemberMatch": "Match",
-    "contains": "Contains",
-    "equals": "Equals",
-    "cardMember": "Owner",
-    "amountOperator": "Operator",
-    "amount": "Amount",
-    "amountMax": "Max amount",
-    "category": "Category",
-    "action": "Action",
-    "actionType": "Action type",
-    "actionSetCategory": "Set category",
-    "actionShowWarning": "Show warning",
-    "warningMessage": "Warning message",
-    "warningPlaceholder": "You are over your allotted threshold.",
-    "categoryTotalNote": "Uses current month totals.",
-    "priorityTitle": "Priority order",
-    "priorityDesc": "Rules are evaluated top to bottom. First match wins.",
-    "empty": "No rules yet. Add one to auto-categorize expenses.",
-    "toggleRule": "Toggle rule",
-    "moveUp": "Move rule up",
-    "moveDown": "Move rule down",
-    "ifSource": "If source is",
-    "ifCardMember": "If owner",
-    "ifAmount": "If amount",
-    "ifCategoryTotal": "If category total",
-    "thenSetCategory": "Then set category to",
-    "thenShowWarning": "Then show warning:",
-    "deleteRuleTitle": "Delete this rule?",
-    "deleteRuleDesc": "This rule will be removed. This cannot be undone."
   },
   "presetTransactions": {
     "title": "Preset Transactions",
@@ -368,7 +324,7 @@
     "cardSourcesDesc": "Enable or disable card sources. Only enabled sources appear in the transaction table and import.",
     "cardSourcesOneRequired": "At least one source must be enabled.",
     "expenseCategories": "Expense categories",
-    "expenseCategoriesDesc": "Comma-separated list. Used in dropdowns and rules.",
+    "expenseCategoriesDesc": "Comma-separated list. Used in dropdowns and presets.",
     "expenseCategoriesPlaceholder": "My Purchase, Tasnuva's Purchases, 50/50, Amazon",
     "expenseCategoriesUncategorizedHint": "Removing a category sets affected transactions to uncategorized.",
     "addCategory": "Add",
@@ -391,7 +347,7 @@
     "removeOwnerConfirmDesc": "This will set any entries owned by {{owner}} to No Owner.",
     "deleteAllData": "Delete all data",
     "deleteAllDataConfirmTitle": "Delete all data?",
-    "deleteAllDataConfirmDesc": "This will permanently remove all expenses, income, debts, rules, and preset transactions from this device. This cannot be undone. The page will reload."
+    "deleteAllDataConfirmDesc": "This will permanently remove all expenses, income, debts and preset transactions from this device. This cannot be undone. The page will reload."
   },
   "addTransaction": {
     "sourceAmexPlatinum": "Amex Platinum Card",
@@ -489,23 +445,15 @@
       "paymentsListTitle": "Payments list",
       "paymentsListContent": "View all mortgage payments. Remove a payment if entered by mistake."
     },
-    "rules": {
-      "introTitle": "Rules",
-      "introContent": "Auto-categorize expenses and manage preset transaction templates. Rules are evaluated top to bottom.",
-      "rulesListTitle": "Rules",
-      "rulesListContent": "Add rules to set category by source, card member, amount, or category total. Toggle or reorder as needed.",
-      "presetsTitle": "Presets",
-      "presetsContent": "Preset transactions appear when adding a transaction for quick-fill description and category."
-    },
     "settings": {
       "introTitle": "Settings",
       "introContent": "Connect Google Sheets, manage expense and income categories, and delete all data if needed.",
       "googleSheetsTitle": "Google Sheets",
       "googleSheetsContent": "Connect your account and set a spreadsheet ID to sync or restore data.",
       "categoriesTitle": "Categories",
-      "categoriesContent": "Edit expense and income categories. They appear in dropdowns and rules.",
+      "categoriesContent": "Edit expense and income categories. They appear in dropdowns and presets.",
       "deleteAllTitle": "Delete all data",
-      "deleteAllContent": "Permanently remove all expenses, income, debts, rules, and presets from this device."
+      "deleteAllContent": "Permanently remove all expenses, income, debts, and presets from this device."
     }
   },
   "landing": {
@@ -515,8 +463,8 @@
     "valueProp": "Import from Amex, Apple Card, and Chase. Categorize spending, sync with Google Sheets, and view your dashboard by month.",
     "featureImport": "Import transactions",
     "featureImportDesc": "CSV and PDF from Amex, Apple Card, Chase.",
-    "featureRules": "Category rules",
-    "featureRulesDesc": "Auto-categorize and set thresholds.",
+    "featureRules": "Presets",
+    "featureRulesDesc": "Create reusable transaction templates for quick-fill.",
     "featureSheets": "Google Sheets sync",
     "featureSheetsDesc": "Push and pull data to a spreadsheet.",
     "featurePdf": "PDF export",

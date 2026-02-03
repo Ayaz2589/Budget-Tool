@@ -2,7 +2,6 @@ import { test, expect } from "bun:test";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { IncomePage } from "@/pages/income/IncomePage";
 import { BudgetProvider } from "@/context/BudgetContext";
-import { RulesProvider } from "@/context/RulesContext";
 import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
@@ -30,11 +29,9 @@ test("IncomePage shows delete income confirmation dialog when delete is clicked"
 
   render(
     <BudgetProvider>
-      <RulesProvider>
-        <PresetTransactionsProvider>
-          <IncomePage />
-        </PresetTransactionsProvider>
-      </RulesProvider>
+      <PresetTransactionsProvider>
+        <IncomePage />
+      </PresetTransactionsProvider>
     </BudgetProvider>,
   );
 

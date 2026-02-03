@@ -11,7 +11,6 @@ import { useGoogleLogin } from "@react-oauth/google";
 import i18n from "@/i18n";
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
-import { useRules } from "@/context/RulesContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
 import {
   ensureSheetsExist,
@@ -20,7 +19,6 @@ import {
   clearAndWriteIncome,
   clearAndWriteDebts,
   clearAndWriteDebtPayments,
-  clearAndWriteRules,
   clearAndWritePresets,
   writeTotalsSheet,
   writeDataBlob,
@@ -34,7 +32,6 @@ import {
   readDebtsFromSheet,
   readPresetsFromSheet,
   readDebtPaymentsFromSheet,
-  readRulesFromSheet,
 } from "@/lib/googleSheets";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
@@ -317,7 +314,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const budget = useBudget();
-  const rulesContext = useRules();
   const { presetTransactions, setPresets } = usePresetTransactions();
 
   const syncToSheets = useCallback(async () => {
@@ -349,7 +345,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         spreadsheetId,
         budget.debtPayments
       );
-      await clearAndWriteRules(accessToken, spreadsheetId, rulesContext.rules);
       await clearAndWritePresets(
         accessToken,
         spreadsheetId,
@@ -372,7 +367,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         income: budget.income,
         debts: budget.debts,
         debtPayments: budget.debtPayments,
-        rules: rulesContext.rules,
         presetTransactions,
         expenseCategoriesWithColors,
         incomeCategoriesWithColors,
@@ -415,7 +409,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.owners,
     budget.iOweNova,
     budget.cardSources,
-    rulesContext.rules,
     presetTransactions,
   ]);
 
@@ -451,7 +444,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       let sheetIncome: typeof budget.income;
       let sheetDebts: typeof budget.debts;
       let sheetPayments: typeof budget.debtPayments;
-      let sheetRules: typeof rulesContext.rules;
       let sheetPresets: typeof presetTransactions;
 
       const blob = await readDataBlob(accessToken, spreadsheetId);
@@ -468,7 +460,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetIncome = expanded.income ?? [];
           sheetDebts = expanded.debts ?? [];
           sheetPayments = expanded.debtPayments ?? [];
-          sheetRules = expanded.rules ?? [];
           sheetPresets = expanded.presetTransactions ?? [];
           if (
             Array.isArray(expanded.cardSources) &&
@@ -490,14 +481,13 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
             budget.setOwners(expanded.owners);
           }
         } catch {
-          const [expenses, mortgage, income, debts, payments, rules, presets] =
+          const [expenses, mortgage, income, debts, payments, presets] =
             await Promise.all([
               readExpensesFromSheet(accessToken, spreadsheetId),
               readMortgageFromSheet(accessToken, spreadsheetId),
               readIncomeFromSheet(accessToken, spreadsheetId),
               readDebtsFromSheet(accessToken, spreadsheetId),
               readDebtPaymentsFromSheet(accessToken, spreadsheetId),
-              readRulesFromSheet(accessToken, spreadsheetId),
               readPresetsFromSheet(accessToken, spreadsheetId),
             ]);
           sheetExpenses = expenses;
@@ -505,7 +495,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetIncome = income;
           sheetDebts = debts;
           sheetPayments = payments;
-          sheetRules = rules;
           sheetPresets = presets;
           const derivedOwners = [
             ...new Set(
@@ -527,7 +516,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetIncome,
           sheetDebts,
           sheetPayments,
-          sheetRules,
           sheetPresets,
         ] = await Promise.all([
           readExpensesFromSheet(accessToken, spreadsheetId),
@@ -535,7 +523,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           readIncomeFromSheet(accessToken, spreadsheetId),
           readDebtsFromSheet(accessToken, spreadsheetId),
           readDebtPaymentsFromSheet(accessToken, spreadsheetId),
-          readRulesFromSheet(accessToken, spreadsheetId),
           readPresetsFromSheet(accessToken, spreadsheetId),
         ]);
         const derivedOwners = [
@@ -608,9 +595,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         budget.addDebtPayments(newPayments);
       }
 
-      if (sheetRules.length > 0) {
-        rulesContext.setRules(sheetRules);
-      }
       if (sheetPresets.length > 0) {
         setPresets(sheetPresets);
       }
@@ -634,8 +618,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.income,
     budget.debts,
     budget.debtPayments,
-    rulesContext.rules,
-    rulesContext.setRules,
     setPresets,
     budget.addExpenses,
     budget.addIncome,

@@ -5,12 +5,7 @@ import { parseCsv, parseChasePdfFromText, type CsvSource } from "@/lib/parsers";
 import { extractTextFromPdf } from "@/lib/pdfText";
 import { parseExportedPdfData } from "@/lib/pdfExport";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
-import {
-  applyRulesToExpenses,
-  computeTotalsByCategoryForMonth,
-} from "@/lib/rules";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
-import { useRules } from "@/context/RulesContext";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
 import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { importTourSteps } from "@/lib/pageTourSteps";
@@ -48,10 +43,8 @@ export function ImportPage() {
     setIncomeCategories,
     setOwners,
   } = useBudget();
-  const { rules, setRules } = useRules();
   const { setPresets } = usePresetTransactions();
   const { t } = useTranslation();
-  const currentMonthKey = new Date().toISOString().slice(0, 7);
 
   useEffect(() => {
     if (
@@ -70,18 +63,6 @@ export function ImportPage() {
       setSelectedSource(firstValid as SourceChoice);
     }
   }, [cardSources, selectedSource]);
-
-  const applyRulesForPreview = (incoming: Expense[]) => {
-    if (rules.length === 0) return incoming;
-    const totals = computeTotalsByCategoryForMonth(
-      [...expenses, ...incoming],
-      currentMonthKey
-    );
-    return applyRulesToExpenses(incoming, rules, {
-      totalsByCategory: totals,
-      currentMonthKey,
-    });
-  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -122,7 +103,6 @@ export function ImportPage() {
             parsed.income.length === 0 &&
             parsed.debts.length === 0 &&
             parsed.debtPayments.length === 0 &&
-            parsed.rules.length === 0 &&
             parsed.presetTransactions.length === 0 &&
             text.trim().length > 0
           ) {
@@ -134,9 +114,6 @@ export function ImportPage() {
             setLastDetected("");
             setSourceLabel("");
             return;
-          }
-          if (parsed.rules.length > 0) {
-            setRules(parsed.rules);
           }
           if (parsed.presetTransactions.length > 0) {
             setPresets(parsed.presetTransactions);
@@ -166,7 +143,7 @@ export function ImportPage() {
           if (Array.isArray(parsed.owners) && parsed.owners.length > 0) {
             setOwners(parsed.owners);
           }
-          setPreviewExpenses(applyRulesForPreview(toAddExpenses));
+          setPreviewExpenses(toAddExpenses);
           setPreviewIncome(toAddIncome);
           setPreviewDebts(toAddDebts);
           setPreviewDebtPayments(toAddDebtPayments);
@@ -196,7 +173,7 @@ export function ImportPage() {
           const result = parseChasePdfFromText(text);
           const toAdd = filterOutExistingExpenses(result.expenses, expenses);
           setSkippedDuplicates(result.expenses.length - toAdd.length);
-          setPreviewExpenses(applyRulesForPreview(toAdd));
+          setPreviewExpenses(toAdd);
           setPreviewIncome([]);
           setSourceLabel("Chase");
           setLastDetected("chase");
@@ -233,7 +210,7 @@ export function ImportPage() {
             toAdd = toAdd.map((e) => ({ ...e, source: "amex" as const }));
           }
           setSkippedDuplicates(result.expenses.length - toAdd.length);
-          setPreviewExpenses(applyRulesForPreview(toAdd));
+          setPreviewExpenses(toAdd);
           setPreviewIncome([]);
           const label =
             selectedSource === "amex"

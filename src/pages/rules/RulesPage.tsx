@@ -743,12 +743,19 @@ export function RulesPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>{t("common.owner")}</Label>
-                  <Select value={presetMember} onValueChange={setPresetMember}>
+                  <Select
+                    value={presetMember || "_none"}
+                    onValueChange={(v) =>
+                      setPresetMember(v === "_none" ? "" : v)
+                    }
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">{t("common.noOwner")}</SelectItem>
+                      <SelectItem value="_none">
+                        {t("common.noOwner")}
+                      </SelectItem>
                       {ownerOptions.map((member) => (
                         <SelectItem key={member} value={member}>
                           {member}

@@ -408,6 +408,7 @@
     "newTransaction": "新交易",
     "newTransactions": "新交易",
     "dialogDesc": "每笔交易一行。复制行以重复，再编辑。带有效金额的行在提交时添加。",
+    "transaction": "Transaction",
     "source": "来源",
     "date": "日期",
     "amount": "金额",

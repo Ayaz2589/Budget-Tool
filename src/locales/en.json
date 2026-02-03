@@ -418,6 +418,7 @@
     "newTransaction": "New transaction",
     "newTransactions": "New transactions",
     "dialogDesc": "One row per transaction. Copy a row to duplicate, then edit. Rows with a valid amount are added on submit.",
+    "transaction": "Transaction",
     "source": "Source",
     "date": "Date",
     "amount": "Amount",

@@ -1,9 +1,9 @@
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -38,16 +38,17 @@ export function ExpenseActionsDialog({
   };
 
   return (
-    <Dialog open={expense !== null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent
+    <Sheet open={expense !== null} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent
+        side="bottom"
         showCloseButton={true}
-        className="fixed bottom-0 left-0 right-0 top-auto z-50 w-full max-w-full max-h-[92vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
+        className="w-full max-w-full max-h-[92vh] rounded-t-2xl border-t p-0 gap-0"
       >
-        <DialogHeader className="p-5 pb-3">
-          <DialogTitle className="text-left pr-8 break-words text-xl leading-snug">
+        <SheetHeader className="p-5 pb-3">
+          <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
             {expense.description || t("transactions.transaction")}
-          </DialogTitle>
-        </DialogHeader>
+          </SheetTitle>
+        </SheetHeader>
         <div className="overflow-y-auto overscroll-contain px-5 pb-10 flex flex-col gap-5">
           <div className="text-base text-muted-foreground space-y-1">
             <p>{expense.date}</p>
@@ -111,7 +112,7 @@ export function ExpenseActionsDialog({
             {t("common.delete")}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }

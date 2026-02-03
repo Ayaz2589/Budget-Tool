@@ -408,6 +408,7 @@
     "newTransaction": "Nueva transacción",
     "newTransactions": "Nuevas transacciones",
     "dialogDesc": "Una fila por transacción. Copia una fila para duplicar y editar. Las filas con importe válido se añaden al enviar.",
+    "transaction": "Transaction",
     "source": "Origen",
     "date": "Fecha",
     "amount": "Importe",

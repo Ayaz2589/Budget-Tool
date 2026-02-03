@@ -12,13 +12,13 @@ import { SourceIcon } from "@/components/cards";
 import { CategoryOption, getCategoryColor } from "@/lib/categoryColors";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   Select,
   SelectContent,
@@ -28,14 +28,6 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Copy, Plus, Trash2 } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 function defaultRow(defaultSource: ExpenseSource = "manual"): TransactionRow {
   return {
@@ -134,9 +126,6 @@ export function AddTransactionDialog({
     return !Number.isNaN(n) && n > 0;
   }).length;
 
-  const compactInput = "h-8 px-2 text-sm min-w-0";
-  const compactSelectTrigger = "h-8 min-w-0 max-w-full";
-
   const PRESET_NONE_VALUE = "_none";
 
   const handlePresetChange = (index: number, presetId: string) => {
@@ -156,270 +145,264 @@ export function AddTransactionDialog({
     }
   };
 
+  const fieldClass = "h-11 w-full";
+  const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex flex-col w-[94vw] max-w-[94vw]! h-[92vh] max-h-[92vh] p-4 gap-3 overflow-hidden">
-        <DialogHeader className="shrink-0 gap-1">
-          <DialogTitle className="text-lg">
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="flex flex-col h-full w-[90vw] max-w-md border-l p-4 gap-3 overflow-hidden rounded-l-2xl md:w-[720px] md:max-w-[720px]"
+      >
+        <SheetHeader className="shrink-0 gap-2">
+          <SheetTitle className="text-xl">
             {rows.length > 1
               ? t("addTransaction.newTransactions")
               : t("addTransaction.newTransaction")}
-          </DialogTitle>
-          <DialogDescription className="text-xs">
+          </SheetTitle>
+          <SheetDescription className="text-sm">
             {t("addTransaction.dialogDesc")}
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
         <form
           onSubmit={handleSubmit}
           className="flex flex-col flex-1 min-h-0 gap-3 overflow-hidden"
         >
-          <div className="flex-1 min-h-0 overflow-auto rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
+          <div className="flex-1 min-h-0 overflow-auto space-y-4">
+            {rows.map((row, index) => (
+              <div key={row.id} className="rounded-xl border p-4 space-y-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-base font-medium">
+                    {t("addTransaction.transaction")} {index + 1}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-9"
+                      onClick={() => copyRow(index)}
+                      title={t("addTransaction.copyRow")}
+                    >
+                      <Copy className="size-4" />
+                    </Button>
+                    {rows.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="size-9 text-destructive hover:text-destructive"
+                        onClick={() => removeRow(index)}
+                        title={t("addTransaction.removeRow")}
+                      >
+                        <Trash2 className="size-4 text-destructive" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {presetTransactions.length > 0 &&
                     expenseCategories.length > 0 && (
-                      <TableHead className="w-32 py-1.5 text-xs font-medium">
-                        {t("addTransaction.preset")}
-                      </TableHead>
-                    )}
-                  <TableHead className="w-20 py-1.5 text-xs font-medium">
-                    {t("addTransaction.source")}
-                  </TableHead>
-                  <TableHead className="w-28 py-1.5 text-xs font-medium">
-                    {t("addTransaction.date")}
-                  </TableHead>
-                  <TableHead className="w-24 py-1.5 text-xs font-medium">
-                    {t("addTransaction.amount")}
-                  </TableHead>
-                  <TableHead className="min-w-[140px] py-1.5 text-xs font-medium">
-                    {t("addTransaction.description")}
-                  </TableHead>
-                  <TableHead className="w-36 py-1.5 text-xs font-medium">
-                    {t("addTransaction.category")}
-                  </TableHead>
-                  <TableHead className="w-28 py-1.5 text-xs font-medium">
-                    {t("common.owner")}
-                  </TableHead>
-                  <TableHead className="w-20 py-1.5 text-right text-xs font-medium">
-                    {t("addTransaction.actions")}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((row, index) => (
-                  <TableRow key={row.id} className="align-middle">
-                    {presetTransactions.length > 0 &&
-                      expenseCategories.length > 0 && (
-                        <TableCell className="p-1 align-middle">
-                          <Select
-                            value={row.presetId ?? PRESET_NONE_VALUE}
-                            onValueChange={(v) => handlePresetChange(index, v)}
-                          >
-                            <SelectTrigger
-                              className={`${compactSelectTrigger} border-0 bg-transparent shadow-none focus-visible:ring-2`}
-                            >
-                              <SelectValue
-                                placeholder={t("addTransaction.presetNone")}
-                              />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value={PRESET_NONE_VALUE}>
-                                {t("addTransaction.presetNone")}
-                              </SelectItem>
-                              {presetTransactions.map((preset) => {
-                                const sourceLabel = t(
-                                  `addTransaction.${
-                                    EXPENSE_SOURCE_LOCALE_KEYS[preset.source]
-                                  }`
-                                );
-                                const descPart =
-                                  preset.description.trim().length > 0
-                                    ? `${preset.description.slice(0, 30)}${
-                                        preset.description.length > 30
-                                          ? "…"
-                                          : ""
-                                      }`
-                                    : "";
-                                const label = descPart
-                                  ? `${sourceLabel} – ${descPart} · ${preset.category}`
-                                  : `${sourceLabel} · ${preset.category}`;
-                                const dotColor = getCategoryColor(
-                                  preset.category,
-                                  "expense"
-                                );
-                                return (
-                                  <SelectItem key={preset.id} value={preset.id}>
-                                    <span className="flex items-center gap-2">
-                                      <span
-                                        className={`size-2 shrink-0 rounded-full ${dotColor}`}
-                                        aria-hidden
-                                      />
-                                      {label}
-                                    </span>
-                                  </SelectItem>
-                                );
-                              })}
-                            </SelectContent>
-                          </Select>
-                        </TableCell>
-                      )}
-                    <TableCell className="p-1 align-middle">
-                      <Select
-                        value={
-                          cardSources.includes(row.source)
-                            ? row.source
-                            : defaultSource
-                        }
-                        onValueChange={(v) =>
-                          updateRow(index, { source: v as ExpenseSource })
-                        }
-                      >
-                        <SelectTrigger
-                          className={`${compactSelectTrigger} border-0 bg-transparent shadow-none focus-visible:ring-2`}
+                      <div className="space-y-1 md:col-span-2">
+                        <div className="text-xs text-muted-foreground">
+                          {t("addTransaction.preset")}
+                        </div>
+                        <Select
+                          value={row.presetId ?? PRESET_NONE_VALUE}
+                          onValueChange={(v) => handlePresetChange(index, v)}
                         >
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {cardSources.map((s) => (
-                            <SelectItem key={s} value={s}>
-                              <span className="flex items-center gap-2">
-                                <SourceIcon
-                                  source={s as ExpenseSource}
-                                  size={18}
-                                />
-                                {t(
-                                  `addTransaction.${
-                                    EXPENSE_SOURCE_LOCALE_KEYS[
-                                      s as ExpenseSource
-                                    ]
-                                  }`
-                                )}
-                              </span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="p-1 align-middle">
-                      <Input
-                        type="date"
-                        className={compactInput}
-                        value={row.date}
-                        onChange={(e) =>
-                          updateRow(index, { date: e.target.value })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="p-1 align-middle">
-                      <Input
-                        type="text"
-                        placeholder={t("addTransaction.placeholderAmount")}
-                        className={compactInput}
-                        value={row.amount}
-                        onChange={(e) =>
-                          updateRow(index, { amount: e.target.value })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="p-1 align-middle min-w-[140px]">
-                      <Input
-                        placeholder={t("addTransaction.placeholderDescription")}
-                        className={compactInput}
-                        value={row.description}
-                        onChange={(e) =>
-                          updateRow(index, { description: e.target.value })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="p-1 align-middle">
-                      <Select
-                        value={row.category || "_"}
-                        onValueChange={(v) =>
-                          updateRow(index, { category: v === "_" ? "" : v })
-                        }
-                      >
-                        <SelectTrigger
-                          className={`${compactSelectTrigger} border-0 bg-transparent shadow-none focus-visible:ring-2`}
-                        >
-                          <SelectValue placeholder="—" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="_">
-                            <CategoryOption
-                              name={t("addTransaction.uncategorized")}
-                              type="expense"
+                          <SelectTrigger className={selectTriggerClass}>
+                            <SelectValue
+                              placeholder={t("addTransaction.presetNone")}
                             />
-                          </SelectItem>
-                          {expenseCategories.map((c) => (
-                            <SelectItem key={c} value={c}>
-                              <CategoryOption name={c} type="expense" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={PRESET_NONE_VALUE}>
+                              {t("addTransaction.presetNone")}
                             </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="p-1 align-middle">
-                      <Select
-                        value={row.owner || "_none"}
-                        onValueChange={(v) =>
-                          updateRow(index, {
-                            owner: v === "_none" ? "" : v,
-                          })
-                        }
-                      >
-                        <SelectTrigger
-                          className={`${compactSelectTrigger} border-0 bg-transparent shadow-none focus-visible:ring-2`}
-                        >
-                          <SelectValue placeholder={t("common.noOwner")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
-                          {ownerOptions.map((name) => (
-                            <SelectItem key={name} value={name}>
-                              {name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="p-1 align-middle text-right">
-                      <div className="flex items-center justify-end gap-0.5">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="size-7"
-                          onClick={() => copyRow(index)}
-                          title={t("addTransaction.copyRow")}
-                        >
-                          <Copy className="size-3.5" />
-                        </Button>
-                        {rows.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="size-7 text-destructive hover:text-destructive"
-                            onClick={() => removeRow(index)}
-                            title={t("addTransaction.removeRow")}
-                          >
-                            <Trash2 className="size-3.5 text-destructive" />
-                          </Button>
-                        )}
+                            {presetTransactions.map((preset) => {
+                              const sourceLabel = t(
+                                `addTransaction.${
+                                  EXPENSE_SOURCE_LOCALE_KEYS[preset.source]
+                                }`
+                              );
+                              const descPart =
+                                preset.description.trim().length > 0
+                                  ? `${preset.description.slice(0, 30)}${
+                                      preset.description.length > 30 ? "…" : ""
+                                    }`
+                                  : "";
+                              const label = descPart
+                                ? `${sourceLabel} – ${descPart} · ${preset.category}`
+                                : `${sourceLabel} · ${preset.category}`;
+                              const dotColor = getCategoryColor(
+                                preset.category,
+                                "expense"
+                              );
+                              return (
+                                <SelectItem key={preset.id} value={preset.id}>
+                                  <span className="flex items-center gap-2">
+                                    <span
+                                      className={`size-2 shrink-0 rounded-full ${dotColor}`}
+                                      aria-hidden
+                                    />
+                                    {label}
+                                  </span>
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    )}
+
+                  <div className="space-y-1">
+                    <div className="text-xs text-muted-foreground">
+                      {t("addTransaction.source")}
+                    </div>
+                    <Select
+                      value={
+                        cardSources.includes(row.source)
+                          ? row.source
+                          : defaultSource
+                      }
+                      onValueChange={(v) =>
+                        updateRow(index, { source: v as ExpenseSource })
+                      }
+                    >
+                      <SelectTrigger className={selectTriggerClass}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {cardSources.map((s) => (
+                          <SelectItem key={s} value={s}>
+                            <span className="flex items-center gap-2">
+                              <SourceIcon
+                                source={s as ExpenseSource}
+                                size={18}
+                              />
+                              {t(
+                                `addTransaction.${
+                                  EXPENSE_SOURCE_LOCALE_KEYS[
+                                    s as ExpenseSource
+                                  ]
+                                }`
+                              )}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="text-xs text-muted-foreground">
+                      {t("addTransaction.date")}
+                    </div>
+                    <Input
+                      type="date"
+                      className={fieldClass}
+                      value={row.date}
+                      onChange={(e) =>
+                        updateRow(index, { date: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="text-xs text-muted-foreground">
+                      {t("addTransaction.amount")}
+                    </div>
+                    <Input
+                      type="text"
+                      placeholder={t("addTransaction.placeholderAmount")}
+                      className={fieldClass}
+                      value={row.amount}
+                      onChange={(e) =>
+                        updateRow(index, { amount: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="text-xs text-muted-foreground">
+                      {t("addTransaction.category")}
+                    </div>
+                    <Select
+                      value={row.category || "_"}
+                      onValueChange={(v) =>
+                        updateRow(index, { category: v === "_" ? "" : v })
+                      }
+                    >
+                      <SelectTrigger className={selectTriggerClass}>
+                        <SelectValue placeholder="—" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_">
+                          <CategoryOption
+                            name={t("addTransaction.uncategorized")}
+                            type="expense"
+                          />
+                        </SelectItem>
+                        {expenseCategories.map((c) => (
+                          <SelectItem key={c} value={c}>
+                            <CategoryOption name={c} type="expense" />
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1 md:col-span-2">
+                    <div className="text-xs text-muted-foreground">
+                      {t("addTransaction.description")}
+                    </div>
+                    <Input
+                      placeholder={t("addTransaction.placeholderDescription")}
+                      className={fieldClass}
+                      value={row.description}
+                      onChange={(e) =>
+                        updateRow(index, { description: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-1 md:col-span-2">
+                    <div className="text-xs text-muted-foreground">
+                      {t("common.owner")}
+                    </div>
+                    <Select
+                      value={row.owner || "_none"}
+                      onValueChange={(v) =>
+                        updateRow(index, { owner: v === "_none" ? "" : v })
+                      }
+                    >
+                      <SelectTrigger className={selectTriggerClass}>
+                        <SelectValue placeholder={t("common.noOwner")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_none">
+                          {t("common.noOwner")}
+                        </SelectItem>
+                        {ownerOptions.map((name) => (
+                          <SelectItem key={name} value={name}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 pt-2 border-t">
-            <div className="flex items-center gap-2">
+          <div className="shrink-0 flex flex-col gap-3 pt-3 border-t">
+            <div className="flex items-center justify-between gap-2">
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                className="h-11"
                 onClick={addRow}
               >
                 <Plus className="size-4" />
@@ -429,16 +412,16 @@ export function AddTransactionDialog({
                 {t("addTransaction.withValidAmount", { count: validCount })}
               </span>
             </div>
-            <DialogFooter className="flex-row gap-2 p-0">
+            <SheetFooter className="flex-row gap-2 p-0">
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                className="h-11 flex-1"
                 onClick={() => onOpenChange(false)}
               >
                 {t("common.cancel")}
               </Button>
-              <Button type="submit" size="sm" disabled={validCount === 0}>
+              <Button type="submit" className="h-11 flex-1" disabled={validCount === 0}>
                 {validCount === 0
                   ? t("addTransaction.addTransaction")
                   : validCount === 1
@@ -447,10 +430,10 @@ export function AddTransactionDialog({
                       count: validCount,
                     })}
               </Button>
-            </DialogFooter>
+            </SheetFooter>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }

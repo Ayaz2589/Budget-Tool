@@ -11,7 +11,6 @@ export function ExpensesByMonthList({
   byMonth,
   defaultOpenMonth,
   onExpenseTap,
-  t,
 }: ExpensesByMonthListProps) {
   const [openMonth, setOpenMonth] = useState<string>(defaultOpenMonth);
 
@@ -30,7 +29,7 @@ export function ExpensesByMonthList({
       case "chase":
         return "CHASE";
       default:
-        return source.toUpperCase();
+        return String(source).toUpperCase();
     }
   };
 

@@ -21,6 +21,7 @@ import type { ExpenseSource } from "@/types/core";
 import type { FiltersAndActionsDialogProps } from "@/types/transactions";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
 import { Trash2 } from "lucide-react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export type { FiltersAndActionsDialogProps };
 
@@ -47,15 +48,21 @@ export function FiltersAndActionsDialog({
   onDeleteAll,
   t,
 }: FiltersAndActionsDialogProps) {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const sheetSide = isDesktop ? "right" : "top";
   const fieldClass = "h-11 w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        side="right"
+        side={sheetSide}
         showCloseButton={true}
-        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
+        className={
+          isDesktop
+            ? "h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
+            : "w-full max-w-full h-[calc(100vh-56px-env(safe-area-inset-bottom))] border-b p-0 gap-0 rounded-none overflow-y-auto"
+        }
       >
         <SheetHeader className="px-4 pt-5 pb-3">
           <SheetTitle>{t("transactions.filtersActionsTitle")}</SheetTitle>

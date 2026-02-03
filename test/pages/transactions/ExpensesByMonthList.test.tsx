@@ -28,9 +28,6 @@ test("ExpensesByMonthList shows month header and expense when has one month and 
     <ExpensesByMonthList
       byMonth={byMonth}
       defaultOpenMonth="2025-01"
-      selectedIds={new Set()}
-      onToggleSelect={() => {}}
-      onToggleMonthSelection={() => {}}
       onExpenseTap={() => {}}
       t={mockT}
     />,
@@ -40,7 +37,7 @@ test("ExpensesByMonthList shows month header and expense when has one month and 
   expect(screen.getByText("$50.00")).toBeInTheDocument();
 });
 
-test("ExpensesByMonthList has checkbox and tap target for each expense", () => {
+test("ExpensesByMonthList has tap target for each expense", () => {
   const byMonth: [string, Expense[]][] = [
     [
       "2025-01",
@@ -60,17 +57,10 @@ test("ExpensesByMonthList has checkbox and tap target for each expense", () => {
     <ExpensesByMonthList
       byMonth={byMonth}
       defaultOpenMonth="2025-01"
-      selectedIds={new Set()}
-      onToggleSelect={() => {}}
-      onToggleMonthSelection={() => {}}
       onExpenseTap={() => {}}
       t={mockT}
     />,
   );
-  const checkbox = screen.getByRole("checkbox", {
-    name: /select test purchase/i,
-  });
-  expect(checkbox).toBeInTheDocument();
   const tapTarget = screen.getByRole("button", {
     name: /test purchase.*\$50\.00.*2025-01-15/i,
   });

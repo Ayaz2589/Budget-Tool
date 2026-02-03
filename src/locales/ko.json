@@ -24,6 +24,8 @@
   "common": {
     "save": "저장",
     "cancel": "취소",
+    "select": "Select",
+    "done": "Done",
     "delete": "삭제",
     "loading": "로딩 중",
     "add": "추가",
@@ -408,6 +410,7 @@
     "newTransaction": "새 거래",
     "newTransactions": "새 거래",
     "dialogDesc": "거래당 한 행. 행을 복사하여 복제한 다음 편집하세요. 유효한 금액이 있는 행은 제출 시 추가됩니다.",
+    "transaction": "Transaction",
     "source": "출처",
     "date": "날짜",
     "amount": "금액",

@@ -26,10 +26,6 @@ test("FiltersAndActionsDialog shows title and Filters section when open", () => 
       hasActiveFilters={false}
       onClearFilters={() => {}}
       onCleanDescriptions={() => {}}
-      someSelected={false}
-      selectedCount={0}
-      onDeleteSelected={() => {}}
-      onClearSelection={() => {}}
       expensesCount={0}
       onDeleteAll={() => {}}
       t={mockT}

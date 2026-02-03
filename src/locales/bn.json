@@ -24,6 +24,8 @@
   "common": {
     "save": "সংরক্ষণ",
     "cancel": "বাতিল",
+    "select": "Select",
+    "done": "Done",
     "delete": "মুছুন",
     "loading": "লোড হচ্ছে",
     "add": "যোগ করুন",
@@ -408,6 +410,7 @@
     "newTransaction": "নতুন লেনদেন",
     "newTransactions": "নতুন লেনদেন",
     "dialogDesc": "প্রতি লেনদেনে এক সারি। নকল করতে একটি সারি কপি করুন, তারপর সম্পাদনা। বৈধ পরিমাণযুক্ত সারি জমা দিলে যোগ হয়।",
+    "transaction": "Transaction",
     "source": "উৎস",
     "date": "তারিখ",
     "amount": "পরিমাণ",

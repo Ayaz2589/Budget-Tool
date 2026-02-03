@@ -27,9 +27,6 @@ export type SortColumn =
 export interface ExpensesByMonthTableProps {
   byMonth: [string, Expense[]][];
   defaultOpenMonth: string;
-  selectedIds: Set<string>;
-  onToggleSelect: (id: string) => void;
-  onToggleMonthSelection: (monthExpenses: Expense[]) => void;
   sortBy: SortColumn;
   sortDir: "asc" | "desc";
   onSort: (col: SortColumn) => void;
@@ -45,9 +42,6 @@ export interface ExpensesByMonthTableProps {
 export interface ExpensesByMonthListProps {
   byMonth: [string, Expense[]][];
   defaultOpenMonth: string;
-  selectedIds: Set<string>;
-  onToggleSelect: (id: string) => void;
-  onToggleMonthSelection: (monthExpenses: Expense[]) => void;
   onExpenseTap: (expense: Expense) => void;
   t: (key: string, opts?: { count?: number }) => string;
 }
@@ -71,10 +65,6 @@ export interface FiltersAndActionsDialogProps {
   hasActiveFilters: boolean;
   onClearFilters: () => void;
   onCleanDescriptions: () => void;
-  someSelected: boolean;
-  selectedCount: number;
-  onDeleteSelected: () => void;
-  onClearSelection: () => void;
   expensesCount: number;
   onDeleteAll: () => void;
   t: (key: string, opts?: { count?: number }) => string;

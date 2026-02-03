@@ -264,7 +264,10 @@ export function Layout() {
       </nav>
       <main
         className={cn(
-          "flex-1 min-h-0 flex flex-col overflow-hidden p-4 md:p-6 pb-20 md:pb-6",
+          "flex-1 min-h-0 flex flex-col overflow-hidden pb-20 md:pb-6",
+          location.pathname === "/dashboard/transactions"
+            ? "p-0 md:p-6"
+            : "p-4 md:p-6",
           location.pathname !== "/dashboard" && "flatten-mobile-cards",
         )}
       >

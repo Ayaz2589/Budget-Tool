@@ -102,7 +102,7 @@ export async function readExpensesFromSheet(
     let description: string;
     let category: string;
     let rawSource: string;
-    let cardMember: string | undefined;
+    let owner: string | undefined;
     if (hasIdColumn) {
       id = first;
       dateRaw = row[1];
@@ -110,7 +110,7 @@ export async function readExpensesFromSheet(
       description = String(row[3] ?? "").trim();
       category = normalizeCategoryFromSheet(String(row[4] ?? ""));
       rawSource = String(row[5] ?? "").trim().toLowerCase();
-      cardMember = String(row[6] ?? "").trim() || undefined;
+      owner = String(row[6] ?? "").trim() || undefined;
     } else {
       id = generateId();
       dateRaw = row[0];
@@ -118,7 +118,7 @@ export async function readExpensesFromSheet(
       description = String(row[2] ?? "").trim();
       category = normalizeCategoryFromSheet(String(row[3] ?? ""));
       rawSource = String(row[4] ?? "").trim().toLowerCase();
-      cardMember = String(row[5] ?? "").trim() || undefined;
+      owner = String(row[5] ?? "").trim() || undefined;
     }
     const date = normalizeDate(dateRaw);
     const source: ExpenseSource = VALID_EXPENSE_SOURCES.includes(
@@ -134,7 +134,7 @@ export async function readExpensesFromSheet(
       description: description || "Expense",
       category,
       source,
-      cardMember,
+      owner,
     });
   }
   return expenses;
@@ -160,21 +160,21 @@ export async function readMortgageFromSheet(
     let amount: number | null;
     let description: string;
     let rawSource: string;
-    let cardMember: string | undefined;
+    let owner: string | undefined;
     if (hasIdColumn) {
       id = first;
       dateRaw = row[1];
       amount = parseAmount(row[2]);
       description = String(row[3] ?? "").trim();
       rawSource = String(row[5] ?? "").trim().toLowerCase();
-      cardMember = String(row[6] ?? "").trim() || undefined;
+      owner = String(row[6] ?? "").trim() || undefined;
     } else {
       id = generateId();
       dateRaw = row[0];
       amount = parseAmount(row[1]);
       description = String(row[2] ?? "").trim();
       rawSource = String(row[4] ?? "").trim().toLowerCase();
-      cardMember = String(row[5] ?? "").trim() || undefined;
+      owner = String(row[5] ?? "").trim() || undefined;
     }
     const date = normalizeDate(dateRaw);
     const source: ExpenseSource = VALID_EXPENSE_SOURCES.includes(
@@ -190,7 +190,7 @@ export async function readMortgageFromSheet(
       description: description || "Mortgage",
       category: "Mortgage",
       source,
-      cardMember,
+      owner,
     });
   }
   return expenses;
@@ -214,7 +214,7 @@ export async function readIncomeFromSheet(
     const category = normalizeCategoryFromSheet(String(row[3] ?? ""));
     const owner =
       row.length >= 5 && (row[4] ?? "").toString().trim()
-        ? parseDebtOwner(row[4])
+        ? parseOwner(row[4])
         : undefined;
     const recurringAmount =
       row.length >= 6 ? parseAmount(row[5]) : undefined;
@@ -244,10 +244,9 @@ export async function readIncomeFromSheet(
   return income;
 }
 
-function parseDebtOwner(value: unknown): "Ayaz" | "Tasnuva" {
+function parseOwner(value: unknown): string {
   const s = String(value ?? "").trim();
-  if (s === "Tasnuva") return "Tasnuva";
-  return "Ayaz";
+  return s;
 }
 
 function parseRecurringDay(value: unknown): number | undefined {
@@ -280,7 +279,7 @@ export async function readDebtsFromSheet(
     const name = String(row[1] ?? "").trim();
     const initialAmount = parseAmount(row[2]);
     const startDate = normalizeDate(row[3]);
-    const owner = parseDebtOwner(row[4]);
+    const owner = row[4] != null ? parseOwner(row[4]) : undefined;
     const recurringAmount = parseAmount(row[5]);
     const recurringDay = parseRecurringDay(row[6]);
     const recurringFrequency = parseRecurringFrequency(row[7]);
@@ -291,7 +290,7 @@ export async function readDebtsFromSheet(
       name,
       initialAmount,
       startDate: startDate ?? undefined,
-      owner,
+      owner: owner || undefined,
       recurringAmount:
         recurringAmount != null && recurringAmount > 0
           ? recurringAmount
@@ -371,7 +370,7 @@ export async function appendExpenses(
     e.description,
     e.category || "Uncategorized",
     e.source,
-    e.cardMember ?? "",
+    e.owner ?? "",
   ]);
   await updateSheet(accessToken, spreadsheetId, range, values, false);
 }
@@ -387,7 +386,7 @@ export async function appendIncome(
     i.amount,
     i.description,
     i.category || "Uncategorized",
-    i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+    i.owner ?? "",
     i.recurringAmount ?? "",
     i.recurringFrequency ?? "",
     i.recurringDayOfMonth ?? "",
@@ -409,7 +408,7 @@ export async function clearAndWriteExpenses(
       "Description",
       "Category",
       "Source",
-      "Card Member",
+      "Owner",
     ],
   ];
   const rows = expenses.map((e) => [
@@ -419,7 +418,7 @@ export async function clearAndWriteExpenses(
     e.description,
     e.category || "Uncategorized",
     e.source,
-    e.cardMember ?? "",
+    e.owner ?? "",
   ]);
   const values = [...headers, ...rows];
   const range = "Expenses!A1:G";
@@ -442,7 +441,7 @@ export async function clearAndWriteMortgage(
       "Description",
       "Category",
       "Source",
-      "Card Member",
+      "Owner",
     ],
   ];
   const rows = expenses.map((e) => [
@@ -452,7 +451,7 @@ export async function clearAndWriteMortgage(
     e.description,
     e.category || "Uncategorized",
     e.source,
-    e.cardMember ?? "",
+    e.owner ?? "",
   ]);
   const values = [...headers, ...rows];
   const range = "Mortgage!A1:G";
@@ -485,7 +484,7 @@ export async function clearAndWriteIncome(
     i.amount,
     i.description,
     i.category || "Uncategorized",
-    i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+    i.owner ?? "",
     i.recurringAmount ?? "",
     i.recurringFrequency ?? "",
     i.recurringDayOfMonth ?? "",
@@ -522,7 +521,7 @@ export async function clearAndWriteDebts(
     d.name,
     d.initialAmount,
     d.startDate ?? "",
-    d.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+    d.owner ?? "",
     d.recurringAmount ?? "",
     d.recurringDayOfMonth ?? "",
     d.recurringFrequency === "biweekly" ? "biweekly" : d.recurringFrequency ?? "",
@@ -582,13 +581,13 @@ export async function clearAndWritePresets(
   spreadsheetId: string,
   presetTransactions: PresetTransaction[]
 ): Promise<void> {
-  const headers = [["Id", "Source", "Description", "Category", "Card Member"]];
+  const headers = [["Id", "Source", "Description", "Category", "Owner"]];
   const rows = presetTransactions.map((p) => [
     p.id,
     p.source,
     p.description,
     p.category || "Uncategorized",
-    p.cardMember,
+    p.owner,
   ]);
   const values = [...headers, ...rows];
   const range = "PresetTransactions!A1:E";
@@ -614,7 +613,7 @@ export async function readPresetsFromSheet(
     const rawSource = String(row[1] ?? "").trim().toLowerCase();
     const description = String(row[2] ?? "").trim();
     const category = normalizeCategoryFromSheet(String(row[3] ?? ""));
-    const cardMember = String(row[4] ?? "").trim();
+    const owner = String(row[4] ?? "").trim();
     if (!id) continue;
     const source: ExpenseSource = VALID_EXPENSE_SOURCES.includes(
       rawSource as ExpenseSource,
@@ -626,7 +625,7 @@ export async function readPresetsFromSheet(
       source,
       description,
       category,
-      cardMember,
+      owner,
     });
   }
   return presets;
@@ -943,7 +942,7 @@ export async function applySheetsFormatting(
     )
   );
 
-  // Mortgage: same layout as Expenses (ID, Date, Amount, Description, Category, Source, Card Member), column C currency
+  // Mortgage: same layout as Expenses (ID, Date, Amount, Description, Category, Source, Owner), column C currency
   requests.push(
     repeatCellRequest(
       sheetIds.mortgage,

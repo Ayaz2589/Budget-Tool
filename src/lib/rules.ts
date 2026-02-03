@@ -42,9 +42,11 @@ export function evaluateCondition(
   switch (condition.type) {
     case "source":
       return expense.source === condition.value;
+    case "owner":
     case "cardMember": {
-      if (!expense.cardMember) return false;
-      const haystack = normalize(expense.cardMember);
+      const value = expense.owner;
+      if (!value) return false;
+      const haystack = normalize(value);
       const needle = normalize(condition.value);
       const match = condition.match ?? DEFAULT_MATCH;
       return match === "equals" ? haystack === needle : haystack.includes(needle);

@@ -50,7 +50,7 @@ function defaultRow(defaultSource: ExpenseSource = "manual"): TransactionRow {
     description: "",
     category: "", // default: Uncategorized (empty string; UI shows "_" in Select)
     source: defaultSource,
-    cardMember: "",
+    owner: "",
   };
 }
 
@@ -59,7 +59,7 @@ export function AddTransactionDialog({
   onOpenChange,
 }: AddTransactionDialogProps) {
   const { t } = useTranslation();
-  const { expenses, addExpense, expenseCategories, cardSources } = useBudget();
+  const { expenses, addExpense, expenseCategories, cardSources, owners } = useBudget();
   const { rules } = useRules();
   const { presetTransactions } = usePresetTransactions();
   const defaultSource = (cardSources[0] as ExpenseSource) ?? "manual";
@@ -74,15 +74,15 @@ export function AddTransactionDialog({
     }
   }, [open, cardSources]);
 
-  const cardMemberOptions = useMemo(() => {
+  const ownerOptions = useMemo(() => {
+    if (owners.length > 0) return owners;
     const fromExpenses = [
       ...new Set(
-        expenses.map((e) => e.cardMember).filter((m): m is string => !!m)
+        expenses.map((e) => e.owner).filter((m): m is string => !!m)
       ),
     ].sort();
-    if (fromExpenses.length > 0) return fromExpenses;
-    return ["AYAZ UDDIN", "TASNUVA AHMED"];
-  }, [expenses]);
+    return fromExpenses;
+  }, [owners, expenses]);
 
   const updateRow = (index: number, updates: Partial<TransactionRow>) => {
     setRows((prev) =>
@@ -123,7 +123,7 @@ export function AddTransactionDialog({
             t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS.manual}`),
           category: row.category || "",
           source: row.source,
-          cardMember: row.cardMember.trim() || undefined,
+          owner: row.owner.trim() || undefined,
         },
       ];
     });
@@ -168,7 +168,7 @@ export function AddTransactionDialog({
         source: preset.source,
         description: preset.description,
         category: preset.category,
-        cardMember: preset.cardMember,
+        owner: preset.owner,
         presetId: preset.id,
       });
     }
@@ -217,7 +217,7 @@ export function AddTransactionDialog({
                     {t("addTransaction.category")}
                   </TableHead>
                   <TableHead className="w-28 py-1.5 text-xs font-medium">
-                    {t("addTransaction.member")}
+                    {t("common.owner")}
                   </TableHead>
                   <TableHead className="w-20 py-1.5 text-right text-xs font-medium">
                     {t("addTransaction.actions")}
@@ -379,21 +379,21 @@ export function AddTransactionDialog({
                     </TableCell>
                     <TableCell className="p-1 align-middle">
                       <Select
-                        value={row.cardMember || "_none"}
+                        value={row.owner || "_none"}
                         onValueChange={(v) =>
                           updateRow(index, {
-                            cardMember: v === "_none" ? "" : v,
+                            owner: v === "_none" ? "" : v,
                           })
                         }
                       >
                         <SelectTrigger
                           className={`${compactSelectTrigger} border-0 bg-transparent shadow-none focus-visible:ring-2`}
                         >
-                          <SelectValue placeholder="—" />
+                          <SelectValue placeholder={t("common.noOwner")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="_none">—</SelectItem>
-                          {cardMemberOptions.map((name) => (
+                          <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                          {ownerOptions.map((name) => (
                             <SelectItem key={name} value={name}>
                               {name}
                             </SelectItem>

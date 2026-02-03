@@ -17,8 +17,10 @@ test("ExpenseActionsDialog shows description, amount, category select, and delet
       }}
       onClose={() => {}}
       onUpdateCategory={() => {}}
+      onUpdateOwner={() => {}}
       onDelete={() => {}}
       expenseCategories={["Food", "Transport"]}
+      ownerOptions={["Alex", "Sam"]}
       t={mockT}
     />,
   );
@@ -29,7 +31,8 @@ test("ExpenseActionsDialog shows description, amount, category select, and delet
   expect(withinDialog.getByText("$100.00")).toBeInTheDocument();
   expect(withinDialog.getByText("2025-01-15")).toBeInTheDocument();
   expect(withinDialog.getByText("common.category")).toBeInTheDocument();
-  expect(withinDialog.getByRole("combobox")).toBeInTheDocument();
+  expect(withinDialog.getByText("common.owner")).toBeInTheDocument();
+  expect(withinDialog.getAllByRole("combobox")).toHaveLength(2);
   expect(
     withinDialog.getByRole("button", { name: /common\.delete/i }),
   ).toBeInTheDocument();

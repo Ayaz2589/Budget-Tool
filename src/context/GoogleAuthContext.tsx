@@ -376,6 +376,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         presetTransactions,
         expenseCategoriesWithColors,
         incomeCategoriesWithColors,
+        owners: budget.owners,
         cardSources: budget.cardSources,
       });
       await writeDataBlob(accessToken, spreadsheetId, dataBlob);
@@ -411,6 +412,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.debtPayments,
     budget.expenseCategories,
     budget.incomeCategories,
+    budget.owners,
     budget.iOweNova,
     budget.cardSources,
     rulesContext.rules,
@@ -484,6 +486,9 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
               expanded.incomeCategoriesWithColors.map((x) => x.name)
             );
           }
+          if (Array.isArray(expanded.owners)) {
+            budget.setOwners(expanded.owners);
+          }
         } catch {
           const [expenses, mortgage, income, debts, payments, rules, presets] =
             await Promise.all([
@@ -502,6 +507,18 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetPayments = payments;
           sheetRules = rules;
           sheetPresets = presets;
+          const derivedOwners = [
+            ...new Set(
+              [...expenses, ...mortgage]
+                .map((e) => e.owner)
+                .concat(income.map((i) => i.owner))
+                .concat(debts.map((d) => d.owner))
+                .filter((o): o is string => !!o)
+            ),
+          ];
+          if (derivedOwners.length > 0) {
+            budget.setOwners(derivedOwners);
+          }
         }
       } else {
         [
@@ -521,6 +538,18 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           readRulesFromSheet(accessToken, spreadsheetId),
           readPresetsFromSheet(accessToken, spreadsheetId),
         ]);
+        const derivedOwners = [
+          ...new Set(
+            [...sheetExpenses, ...sheetMortgage]
+              .map((e) => e.owner)
+              .concat(sheetIncome.map((i) => i.owner))
+              .concat(sheetDebts.map((d) => d.owner))
+              .filter((o): o is string => !!o)
+          ),
+        ];
+        if (derivedOwners.length > 0) {
+          budget.setOwners(derivedOwners);
+        }
       }
 
       const newExpenses = sheetExpenses.filter(

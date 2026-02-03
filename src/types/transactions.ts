@@ -7,7 +7,7 @@ export interface TransactionRow {
   description: string;
   category: string;
   source: ExpenseSource;
-  cardMember: string;
+  owner: string;
   presetId?: string;
 }
 
@@ -22,7 +22,7 @@ export type SortColumn =
   | "description"
   | "source"
   | "category"
-  | "cardMember";
+  | "owner";
 
 export interface ExpensesByMonthTableProps {
   byMonth: [string, Expense[]][];
@@ -34,7 +34,9 @@ export interface ExpensesByMonthTableProps {
   sortDir: "asc" | "desc";
   onSort: (col: SortColumn) => void;
   onUpdateCategory: (id: string, category: string) => void;
+  onUpdateOwner: (id: string, owner: string) => void;
   expenseCategories: string[];
+  ownerOptions: string[];
   onDeleteOne: (expense: Expense) => void;
   sourceLabelKeys: Record<string, string>;
   t: (key: string, opts?: { count?: number }) => string;
@@ -59,12 +61,12 @@ export interface FiltersAndActionsDialogProps {
   onSourceFilterChange: (value: string) => void;
   categoryFilter: string;
   onCategoryFilterChange: (value: string) => void;
-  cardMemberFilter: string;
-  onCardMemberFilterChange: (value: string) => void;
+  ownerFilter: string;
+  onOwnerFilterChange: (value: string) => void;
   searchFilter: string;
   onSearchFilterChange: (value: string) => void;
   expenseCategories: string[];
-  cardMemberOptions: string[];
+  ownerOptions: string[];
   cardSources: string[];
   hasActiveFilters: boolean;
   onClearFilters: () => void;
@@ -83,8 +85,10 @@ export interface ExpenseActionsDialogProps {
   expense: Expense | null;
   onClose: () => void;
   onUpdateCategory: (id: string, category: string) => void;
+  onUpdateOwner: (id: string, owner: string) => void;
   onDelete: (expense: Expense) => void;
   expenseCategories: string[];
+  ownerOptions: string[];
   t: (key: string) => string;
 }
 

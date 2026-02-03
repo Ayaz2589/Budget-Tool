@@ -3,7 +3,7 @@ export {
   type ExpenseSource,
   type Expense,
   type Income,
-  type DebtOwner,
+  type Owner,
   type Debt,
   type DebtPayment,
   type PresetTransaction,

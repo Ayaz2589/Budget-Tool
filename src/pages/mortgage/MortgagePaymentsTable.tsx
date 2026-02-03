@@ -10,6 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { MortgagePaymentsTableProps } from "@/types/mortgage";
 
 export type { MortgagePaymentsTableProps };
@@ -17,6 +24,8 @@ export type { MortgagePaymentsTableProps };
 export function MortgagePaymentsTable({
   payments,
   onRemove,
+  onUpdateOwner,
+  ownerOptions = [],
 }: MortgagePaymentsTableProps) {
   if (payments.length === 0) {
     return (
@@ -31,6 +40,7 @@ export function MortgagePaymentsTable({
         <TableRow>
           <TableHead>Date</TableHead>
           <TableHead>Category</TableHead>
+          <TableHead>Owner</TableHead>
           <TableHead className="text-right">Amount</TableHead>
           <TableHead className="w-[80px]" />
         </TableRow>
@@ -41,6 +51,26 @@ export function MortgagePaymentsTable({
             <TableCell>{e.date}</TableCell>
             <TableCell>
               <CategoryOption name={e.category ?? ""} type="expense" />
+            </TableCell>
+            <TableCell>
+              <Select
+                value={e.owner || "_none"}
+                onValueChange={(v) =>
+                  onUpdateOwner(e.id, v === "_none" ? "" : v)
+                }
+              >
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="No Owner" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">No Owner</SelectItem>
+                  {ownerOptions.map((o) => (
+                    <SelectItem key={o} value={o}>
+                      {o}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </TableCell>
             <TableCell className="text-right">
               {formatCurrency(e.amount)}

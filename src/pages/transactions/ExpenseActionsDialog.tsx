@@ -24,8 +24,10 @@ export function ExpenseActionsDialog({
   expense,
   onClose,
   onUpdateCategory,
+  onUpdateOwner,
   onDelete,
   expenseCategories,
+  ownerOptions = [],
   t,
 }: ExpenseActionsDialogProps) {
   if (expense === null) return null;
@@ -74,6 +76,27 @@ export function ExpenseActionsDialog({
                 {expenseCategories.map((c) => (
                   <SelectItem key={c} value={c}>
                     <CategoryOption name={c} type="expense" />
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>{t("common.owner")}</Label>
+            <Select
+              value={expense.owner || "_none"}
+              onValueChange={(v) =>
+                onUpdateOwner(expense.id, v === "_none" ? "" : v)
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("common.noOwner")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                {ownerOptions.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
                   </SelectItem>
                 ))}
               </SelectContent>

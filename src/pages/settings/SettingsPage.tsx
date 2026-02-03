@@ -20,6 +20,7 @@ import { GoogleSheetsCard } from "./GoogleSheetsCard";
 import { CardSourcesCard } from "./CardSourcesCard";
 import { ExpenseCategoriesCard } from "./ExpenseCategoriesCard";
 import { IncomeCategoriesCard } from "./IncomeCategoriesCard";
+import { OwnersCard } from "./OwnersCard";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
 const RULES_STORAGE_KEY = "budget-tool-rules";
@@ -29,8 +30,10 @@ export function SettingsPage() {
   const {
     expenseCategories,
     incomeCategories,
+    owners,
     setExpenseCategories,
     setIncomeCategories,
+    setOwners,
     repairCorruptedDates,
   } = useBudget();
   const {
@@ -88,6 +91,24 @@ export function SettingsPage() {
     const trimmed = name.trim();
     if (trimmed && !incomeCategories.includes(trimmed)) {
       setIncomeCategories([...incomeCategories, trimmed]);
+    }
+  };
+
+  const handleRemoveOwner = (owner: string) => {
+    setOwners(owners.filter((o) => o !== owner));
+    const changed = presetTransactions.some((p) => p.owner === owner);
+    if (changed) {
+      const presetsWithoutOwner = presetTransactions.map((p) =>
+        p.owner === owner ? { ...p, owner: "" } : p
+      );
+      setPresets(presetsWithoutOwner);
+    }
+  };
+
+  const handleAddOwner = (name: string) => {
+    const trimmed = name.trim();
+    if (trimmed && !owners.includes(trimmed)) {
+      setOwners([...owners, trimmed]);
     }
   };
 
@@ -157,6 +178,12 @@ export function SettingsPage() {
         categories={incomeCategories}
         onRemove={handleRemoveIncomeCategory}
         onAdd={handleAddIncomeCategory}
+      />
+
+      <OwnersCard
+        owners={owners}
+        onRemove={handleRemoveOwner}
+        onAdd={handleAddOwner}
       />
       </div>
 

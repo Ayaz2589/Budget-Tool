@@ -11,5 +11,6 @@ export interface ParsedExportedPdf {
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
+  owners?: string[];
   cardSources?: string[];
 }

@@ -61,7 +61,9 @@ export function ExpensesByMonthTable({
   sortDir,
   onSort,
   onUpdateCategory,
+  onUpdateOwner,
   expenseCategories,
+  ownerOptions = [],
   onDeleteOne,
   sourceLabelKeys,
   t,
@@ -163,12 +165,12 @@ export function ExpensesByMonthTable({
                   <TableHead>
                     <button
                       type="button"
-                      onClick={() => onSort("cardMember")}
+                      onClick={() => onSort("owner")}
                       className="flex items-center gap-1 hover:text-foreground"
                     >
-                      {t("common.cardMember")}
+                      {t("common.owner")}
                       <SortIcon
-                        column="cardMember"
+                        column="owner"
                         sortBy={sortBy}
                         sortDir={sortDir}
                       />
@@ -228,7 +230,26 @@ export function ExpensesByMonthTable({
                       </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {e.cardMember ?? "—"}
+                      <Select
+                        value={e.owner || "_none"}
+                        onValueChange={(v) =>
+                          onUpdateOwner(e.id, v === "_none" ? "" : v)
+                        }
+                      >
+                        <SelectTrigger className="w-[160px] min-w-[140px]">
+                          <SelectValue placeholder={t("common.noOwner")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="_none">
+                            {t("common.noOwner")}
+                          </SelectItem>
+                          {ownerOptions.map((name) => (
+                            <SelectItem key={name} value={name}>
+                              {name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell>
                       <Select

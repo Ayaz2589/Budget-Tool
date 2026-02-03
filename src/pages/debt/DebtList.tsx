@@ -7,6 +7,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { DollarSign, Calendar, Trash2 } from "lucide-react";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency } from "@/lib/format";
@@ -19,6 +26,8 @@ export function DebtList({
   paymentsByDebt,
   onAddPayment,
   onEditRecurring,
+  onUpdateOwner,
+  ownerOptions = [],
   onDelete,
   onRemovePayment,
 }: DebtListProps) {
@@ -43,10 +52,29 @@ export function DebtList({
             >
               <div>
                 <h3 className="font-semibold text-lg">{debt.name}</h3>
-                <p className="text-muted-foreground text-sm mt-0.5">
-                  {debt.owner === "Tasnuva" ? "Tasnuva" : "Ayaz"}
-                  {debt.startDate ? ` · Started ${debt.startDate}` : ""}
-                </p>
+                <div className="flex flex-wrap items-center gap-2 text-muted-foreground text-sm mt-0.5">
+                  <Select
+                    value={debt.owner || "_none"}
+                    onValueChange={(v) =>
+                      onUpdateOwner(debt.id, v === "_none" ? "" : v)
+                    }
+                  >
+                    <SelectTrigger className="h-7 w-[140px]">
+                      <SelectValue placeholder="No Owner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="_none">No Owner</SelectItem>
+                      {ownerOptions.map((o) => (
+                        <SelectItem key={o} value={o}>
+                          {o}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {debt.startDate ? (
+                    <span>· Started {debt.startDate}</span>
+                  ) : null}
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

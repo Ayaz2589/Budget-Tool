@@ -60,7 +60,7 @@ export function ImportPreviewCard({
                     <TableHead>Date</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead>Amount</TableHead>
-                    <TableHead>Card Member</TableHead>
+                    <TableHead>Owner</TableHead>
                     <TableHead>Category</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -78,7 +78,7 @@ export function ImportPreviewCard({
                       </TableCell>
                       <TableCell>{formatCurrency(e.amount)}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        {e.cardMember ?? "—"}
+                        {e.owner ?? "No Owner"}
                       </TableCell>
                       <TableCell>
                         {isPdfExport ? (
@@ -146,7 +146,7 @@ export function ImportPreviewCard({
                       </TableCell>
                       <TableCell>{formatCurrency(i.amount)}</TableCell>
                       <TableCell>{i.category || "Uncategorized"}</TableCell>
-                      <TableCell>{i.owner ?? "Ayaz"}</TableCell>
+                      <TableCell>{i.owner ?? "No Owner"}</TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {i.recurringAmount != null && i.recurringAmount > 0
                           ? i.recurringFrequency === "biweekly" &&

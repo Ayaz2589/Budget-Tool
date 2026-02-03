@@ -2,6 +2,8 @@ import type { Expense, ExpenseSource } from "./core";
 
 export type RuleCondition =
   | { type: "source"; value: ExpenseSource }
+  | { type: "owner"; value: string; match?: "equals" | "contains" }
+  // Legacy alias for older saved rules
   | { type: "cardMember"; value: string; match?: "equals" | "contains" }
   | {
       type: "expenseAmount";
@@ -37,5 +39,5 @@ export type ConditionType = RuleCondition["type"];
 
 export type RuleExpense = Pick<
   Expense,
-  "date" | "amount" | "description" | "category" | "source" | "cardMember"
+  "date" | "amount" | "description" | "category" | "source" | "owner"
 >;

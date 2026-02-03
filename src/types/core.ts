@@ -23,7 +23,7 @@ export interface Expense {
   description: string;
   category: string;
   source: ExpenseSource;
-  cardMember?: string; // raw from CSV e.g. "AYAZ UDDIN" | "TASNUVA AHMED"
+  owner?: string; // optional owner label (from settings)
 }
 
 export interface Income {
@@ -32,8 +32,8 @@ export interface Income {
   amount: number;
   description: string;
   category: string;
-  /** Ayaz or Tasnuva; default "Ayaz" when missing (backward compat) */
-  owner?: DebtOwner;
+  /** Owner label from settings */
+  owner?: Owner;
   /** Recurring amount (e.g. same as amount for paycheck) */
   recurringAmount?: number;
   /** "monthly" = each month on recurringDayOfMonth; "biweekly" = every 14 days from recurringStartDate */
@@ -44,7 +44,7 @@ export interface Income {
   recurringStartDate?: string;
 }
 
-export type DebtOwner = "Ayaz" | "Tasnuva";
+export type Owner = string;
 
 export type RecurringFrequency = "monthly" | "biweekly";
 
@@ -53,7 +53,7 @@ export interface Debt {
   name: string;
   initialAmount: number;
   startDate?: string; // ISO date YYYY-MM-DD
-  owner?: DebtOwner; // default "Ayaz" when missing (backward compat)
+  owner?: Owner;
   /** Recurring payment amount */
   recurringAmount?: number;
   /** "monthly" = each month on recurringDayOfMonth; "biweekly" = every 14 days from recurringStartDate */
@@ -77,7 +77,7 @@ export interface PresetTransaction {
   source: ExpenseSource;
   description: string;
   category: string;
-  cardMember: string;
+  owner: string;
 }
 
 export interface ParseResult {

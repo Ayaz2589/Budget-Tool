@@ -46,14 +46,14 @@ test("applyRulesToExpense skips when category already set", () => {
   expect(applyRulesToExpense(e, rules).category).toBe("50/50");
 });
 
-test("applyRulesToExpenses supports card member contains", () => {
-  const expenses = [expense({ cardMember: "TASNUVA AHMED" })];
+test("applyRulesToExpenses supports owner contains", () => {
+  const expenses = [expense({ owner: "TASNUVA AHMED" })];
   const rules: Rule[] = [
     {
       id: "r1",
       enabled: true,
       condition: {
-        type: "cardMember",
+        type: "owner",
         value: "tasnuva",
         match: "contains",
       },

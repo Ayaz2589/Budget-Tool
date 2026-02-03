@@ -46,6 +46,7 @@ export function ImportPage() {
     setCardSources,
     setExpenseCategories,
     setIncomeCategories,
+    setOwners,
   } = useBudget();
   const { rules, setRules } = useRules();
   const { setPresets } = usePresetTransactions();
@@ -161,6 +162,9 @@ export function ImportPage() {
             setIncomeCategories(
               parsed.incomeCategoriesWithColors.map((x) => x.name)
             );
+          }
+          if (Array.isArray(parsed.owners) && parsed.owners.length > 0) {
+            setOwners(parsed.owners);
           }
           setPreviewExpenses(applyRulesForPreview(toAddExpenses));
           setPreviewIncome(toAddIncome);

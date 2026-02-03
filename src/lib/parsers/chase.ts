@@ -206,7 +206,7 @@ export function parseChasePdfFromText(pdfText: string): ParseResult {
       description,
       category: "",
       source: "chase",
-      cardMember: "AYAZ UDDIN",
+      owner: "AYAZ UDDIN",
     });
   }
 

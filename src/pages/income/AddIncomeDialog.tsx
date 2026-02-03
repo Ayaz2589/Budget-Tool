@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CategoryOption } from "@/lib/categoryColors";
-import type { DebtOwner, RecurringFrequency } from "@/types/core";
+import type { Owner, RecurringFrequency } from "@/types/core";
 import type {
   AddIncomeFormPayload,
   AddIncomeDialogProps,
@@ -31,6 +31,7 @@ export function AddIncomeDialog({
   open,
   onOpenChange,
   incomeCategories,
+  owners = [],
   onSubmit,
 }: AddIncomeDialogProps) {
   return (
@@ -54,10 +55,12 @@ export function AddIncomeDialog({
 
 function AddIncomeForm({
   incomeCategories,
+  owners = [],
   onSubmit,
   onCancel,
 }: {
   incomeCategories: string[];
+  owners?: string[];
   onSubmit: (payload: AddIncomeFormPayload) => void;
   onCancel: () => void;
 }) {
@@ -65,7 +68,9 @@ function AddIncomeForm({
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState(""); // default: Uncategorized
-  const [owner, setOwner] = useState<DebtOwner>("Ayaz");
+  const [owner, setOwner] = useState<Owner>(
+    owners[0] ?? ""
+  );
   const [recurringChecked, setRecurringChecked] = useState(false);
   const [recurringAmount, setRecurringAmount] = useState("");
   const [recurringFrequency, setRecurringFrequency] =
@@ -100,7 +105,7 @@ function AddIncomeForm({
       amount: num,
       description: description.trim() || "Income",
       category: category || "",
-      owner,
+      owner: owner || undefined,
       recurringAmount:
         typeof recurringAmountNum === "number" ? recurringAmountNum : undefined,
       recurringFrequency: recurringAmountNum != null ? freq : undefined,
@@ -162,13 +167,17 @@ function AddIncomeForm({
       </div>
       <div className="space-y-2">
         <Label>Owner</Label>
-        <Select value={owner} onValueChange={(v) => setOwner(v as DebtOwner)}>
+        <Select value={owner || "_none"} onValueChange={(v) => setOwner(v === "_none" ? "" : v)}>
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Ayaz">Ayaz</SelectItem>
-            <SelectItem value="Tasnuva">Tasnuva</SelectItem>
+            <SelectItem value="_none">No Owner</SelectItem>
+            {owners.map((o) => (
+              <SelectItem key={o} value={o}>
+                {o}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

@@ -33,12 +33,12 @@ export function FiltersAndActionsDialog({
   onSourceFilterChange,
   categoryFilter,
   onCategoryFilterChange,
-  cardMemberFilter,
-  onCardMemberFilterChange,
+  ownerFilter,
+  onOwnerFilterChange,
   searchFilter,
   onSearchFilterChange,
   expenseCategories,
-  cardMemberOptions,
+  ownerOptions = [],
   cardSources,
   hasActiveFilters,
   onClearFilters,
@@ -147,18 +147,19 @@ export function FiltersAndActionsDialog({
               </div>
               <div className="space-y-2 sm:col-span-2 lg:col-span-1">
                 <Label className="text-muted-foreground">
-                  {t("common.cardMember")}
+                  {t("common.owner")}
                 </Label>
                 <Select
-                  value={cardMemberFilter}
-                  onValueChange={onCardMemberFilterChange}
+                  value={ownerFilter}
+                  onValueChange={onOwnerFilterChange}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder={t("common.all")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    {cardMemberOptions.map((name) => (
+                    <SelectItem value="all">{t("common.all")}</SelectItem>
+                    <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                    {ownerOptions.map((name) => (
                       <SelectItem key={name} value={name}>
                         {name}
                       </SelectItem>

@@ -45,6 +45,7 @@ export function TransactionsPage() {
     removeExpenses,
     expenseCategories,
     incomeCategories,
+    owners,
     cardSources,
   } = useBudget();
   const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
@@ -55,7 +56,7 @@ export function TransactionsPage() {
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [searchFilter, setSearchFilter] = useState<string>("");
-  const [cardMemberFilter, setCardMemberFilter] = useState<string>("all");
+  const [ownerFilter, setOwnerFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<SortColumn>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -71,15 +72,15 @@ export function TransactionsPage() {
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
   const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
 
-  const cardMemberOptions = useMemo(() => {
+  const ownerOptions = useMemo(() => {
+    if (owners.length > 0) return owners;
     const fromExpenses = [
       ...new Set(
-        expenses.map((e) => e.cardMember).filter((m): m is string => !!m),
+        expenses.map((e) => e.owner).filter((m): m is string => !!m),
       ),
     ].sort();
-    if (fromExpenses.length > 0) return fromExpenses;
-    return ["AYAZ UDDIN", "TASNUVA AHMED"];
-  }, [expenses]);
+    return fromExpenses;
+  }, [owners, expenses]);
 
   const filtered = useMemo(() => {
     let list = [...expenses]
@@ -102,8 +103,12 @@ export function TransactionsPage() {
       const q = searchFilter.trim().toLowerCase();
       list = list.filter((e) => e.description.toLowerCase().includes(q));
     }
-    if (cardMemberFilter && cardMemberFilter !== "all") {
-      list = list.filter((e) => (e.cardMember ?? "") === cardMemberFilter);
+    if (ownerFilter && ownerFilter !== "all") {
+      if (ownerFilter === "_none") {
+        list = list.filter((e) => !e.owner);
+      } else {
+        list = list.filter((e) => (e.owner ?? "") === ownerFilter);
+      }
     }
     const cmp = sortDir === "asc" ? 1 : -1;
     list.sort((a, b) => {
@@ -124,8 +129,8 @@ export function TransactionsPage() {
         case "category":
           diff = (a.category ?? "").localeCompare(b.category ?? "");
           break;
-        case "cardMember":
-          diff = (a.cardMember ?? "").localeCompare(b.cardMember ?? "");
+        case "owner":
+          diff = (a.owner ?? "").localeCompare(b.owner ?? "");
           break;
         default:
           diff = a.date.localeCompare(b.date);
@@ -139,7 +144,7 @@ export function TransactionsPage() {
     sourceFilter,
     categoryFilter,
     searchFilter,
-    cardMemberFilter,
+    ownerFilter,
     sortBy,
     sortDir,
   ]);
@@ -198,7 +203,7 @@ export function TransactionsPage() {
     sourceFilter !== "all" ||
     categoryFilter ||
     searchFilter.trim() ||
-    cardMemberFilter !== "all",
+    ownerFilter !== "all",
   );
 
   const clearFilters = useCallback(() => {
@@ -206,7 +211,7 @@ export function TransactionsPage() {
     setSourceFilter("all");
     setCategoryFilter("");
     setSearchFilter("");
-    setCardMemberFilter("all");
+    setOwnerFilter("all");
   }, []);
 
   const toggleSort = useCallback(
@@ -258,6 +263,7 @@ export function TransactionsPage() {
       presetTransactions,
       expenseCategoriesWithColors,
       incomeCategoriesWithColors,
+      owners,
       cardSources,
     );
   }, [
@@ -269,6 +275,7 @@ export function TransactionsPage() {
     presetTransactions,
     expenseCategories,
     incomeCategories,
+    owners,
     cardSources,
   ]);
 
@@ -316,12 +323,12 @@ export function TransactionsPage() {
             onSourceFilterChange={setSourceFilter}
             categoryFilter={categoryFilter}
             onCategoryFilterChange={setCategoryFilter}
-            cardMemberFilter={cardMemberFilter}
-            onCardMemberFilterChange={setCardMemberFilter}
+            ownerFilter={ownerFilter}
+            onOwnerFilterChange={setOwnerFilter}
             searchFilter={searchFilter}
             onSearchFilterChange={setSearchFilter}
             expenseCategories={expenseCategories}
-            cardMemberOptions={cardMemberOptions}
+            ownerOptions={ownerOptions}
             cardSources={cardSources}
             hasActiveFilters={hasActiveFilters}
             onClearFilters={clearFilters}
@@ -356,7 +363,11 @@ export function TransactionsPage() {
                     onUpdateCategory={(id, category) =>
                       updateExpense(id, { category })
                     }
+                    onUpdateOwner={(id, owner) =>
+                      updateExpense(id, { owner: owner || undefined })
+                    }
                     expenseCategories={expenseCategories}
+                    ownerOptions={ownerOptions}
                     onDeleteOne={setDeleteOneExpense}
                     sourceLabelKeys={SOURCE_LABEL_KEYS}
                     t={t}
@@ -388,11 +399,15 @@ export function TransactionsPage() {
         expense={expenseForActions}
         onClose={() => setExpenseForActions(null)}
         onUpdateCategory={(id, category) => updateExpense(id, { category })}
+        onUpdateOwner={(id, owner) =>
+          updateExpense(id, { owner: owner || undefined })
+        }
         onDelete={(e) => {
           setExpenseForActions(null);
           setDeleteOneExpense(e);
         }}
         expenseCategories={expenseCategories}
+        ownerOptions={ownerOptions}
         t={t}
       />
 

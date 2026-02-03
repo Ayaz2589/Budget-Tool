@@ -46,6 +46,7 @@ export function downloadTransactionsAndIncomePdf(
   presetTransactions: PresetTransaction[] = [],
   expenseCategoriesWithColors: CategoryWithColorPayload[] = [],
   incomeCategoriesWithColors: CategoryWithColorPayload[] = [],
+  owners: string[] = [],
   cardSources?: string[],
 ): void {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
@@ -134,7 +135,7 @@ export function downloadTransactionsAndIncomePdf(
         "Amount",
         "Category",
         "Source",
-        "Card Member",
+        "Owner",
       ];
       const expenseBody = monthExpenses.map((e) => [
         e.id,
@@ -143,7 +144,7 @@ export function downloadTransactionsAndIncomePdf(
         formatCurrency(e.amount),
         e.category || "—",
         EXPENSE_SOURCE_DISPLAY_LABELS[e.source] ?? e.source,
-        e.cardMember ?? "—",
+        e.owner ?? "No Owner",
       ]);
       autoTable(doc, {
         startY: y,
@@ -172,6 +173,7 @@ export function downloadTransactionsAndIncomePdf(
         "Date",
         "Description",
         "Amount",
+        "Owner",
         "Source",
       ];
       const mortgageBody = monthMortgage.map((e) => [
@@ -179,6 +181,7 @@ export function downloadTransactionsAndIncomePdf(
         e.date,
         e.description.slice(0, 40) + (e.description.length > 40 ? "…" : ""),
         formatCurrency(e.amount),
+        e.owner ?? "No Owner",
         EXPENSE_SOURCE_DISPLAY_LABELS[e.source] ?? e.source,
       ]);
       autoTable(doc, {
@@ -227,7 +230,7 @@ export function downloadTransactionsAndIncomePdf(
           ((i.description || "").length > 50 ? "…" : ""),
         formatCurrency(i.amount),
         i.category || "Uncategorized",
-        i.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+        i.owner ?? "No Owner",
         incomeRecurringLabel(i),
       ]);
       autoTable(doc, {
@@ -271,7 +274,7 @@ export function downloadTransactionsAndIncomePdf(
       d.name.slice(0, 25) + (d.name.length > 25 ? "…" : ""),
       formatCurrency(d.initialAmount),
       d.startDate ?? "—",
-      d.owner === "Tasnuva" ? "Tasnuva" : "Ayaz",
+      d.owner ?? "No Owner",
       d.recurringAmount != null ? formatCurrency(d.recurringAmount) : "—",
       d.recurringDayOfMonth ?? "—",
       d.recurringFrequency ?? "—",
@@ -332,6 +335,7 @@ export function downloadTransactionsAndIncomePdf(
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,
+    owners,
     cardSources,
   });
   if (y > 260) {
@@ -375,6 +379,7 @@ function emptyParsed(): ParsedExportedPdf {
     debtPayments: [],
     rules: [],
     presetTransactions: [],
+    owners: [],
   };
 }
 
@@ -429,6 +434,7 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
             : [],
           expenseCategoriesWithColors: expanded.expenseCategoriesWithColors,
           incomeCategoriesWithColors: expanded.incomeCategoriesWithColors,
+          owners: expanded.owners,
           cardSources: expanded.cardSources,
         };
     } catch {
@@ -511,7 +517,7 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
       description: description || "Imported from PDF",
       category: "",
       source,
-      cardMember: undefined,
+      owner: undefined,
     });
   }
 
@@ -537,5 +543,13 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
     });
   }
 
-  return { expenses, income, debts: [], debtPayments: [], rules: [], presetTransactions: [] };
+  return {
+    expenses,
+    income,
+    debts: [],
+    debtPayments: [],
+    rules: [],
+    presetTransactions: [],
+    owners: [],
+  };
 }

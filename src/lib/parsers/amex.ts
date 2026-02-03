@@ -1,7 +1,7 @@
 import type { Expense, ParseResult } from "@/lib/types";
 
-function hashId(date: string, description: string, amount: number, cardMember: string): string {
-  const str = `${date}|${description}|${amount}|${cardMember}`;
+function hashId(date: string, description: string, amount: number, owner: string): string {
+  const str = `${date}|${description}|${amount}|${owner}`;
   let h = 0;
   for (let i = 0; i < str.length; i++) {
     const c = str.charCodeAt(i);
@@ -66,13 +66,13 @@ export function parseAmexCsv(csvText: string): ParseResult {
     const dateRaw = values[dateIdx] ?? "";
     const rawDescription = (values[descIdx] ?? "").trim();
     const description = cleanDescription(rawDescription);
-    const cardMember = cardIdx >= 0 ? (values[cardIdx] ?? "").trim() : "";
+    const owner = cardIdx >= 0 ? (values[cardIdx] ?? "").trim() : "";
     const amount = parseAmount(values[amountIdx] ?? "0");
 
     if (!dateRaw || amount <= 0) continue;
 
     const date = parseAmexDate(dateRaw);
-    const id = hashId(date, rawDescription, amount, cardMember);
+    const id = hashId(date, rawDescription, amount, owner);
 
     expenses.push({
       id,
@@ -81,7 +81,7 @@ export function parseAmexCsv(csvText: string): ParseResult {
       description,
       category: "",
       source: "amex",
-      cardMember: cardMember || undefined,
+      owner: owner || undefined,
     });
   }
 

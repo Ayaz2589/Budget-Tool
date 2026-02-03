@@ -8,7 +8,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { DollarSign, Calendar, Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency } from "@/lib/format";
 import type { DebtPayment } from "@/types/core";
@@ -23,6 +31,8 @@ export function DebtActionsDialog({
   onClose,
   onAddPayment,
   onEditRecurring,
+  onUpdateOwner,
+  ownerOptions = [],
   onDelete,
   onRemovePayment,
   t,
@@ -96,6 +106,28 @@ export function DebtActionsDialog({
                 {recurringLabel}
               </p>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t("common.owner")}</Label>
+            <Select
+              value={debt.owner || "_none"}
+              onValueChange={(v) =>
+                onUpdateOwner(debt.id, v === "_none" ? "" : v)
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("common.noOwner")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                {ownerOptions.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex flex-col gap-2">

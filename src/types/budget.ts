@@ -7,6 +7,7 @@ export interface BudgetState {
   debtPayments: DebtPayment[];
   expenseCategories: string[];
   incomeCategories: string[];
+  owners: string[];
   /** Enabled card/expense sources; used in transaction table and import. */
   cardSources: string[];
 }

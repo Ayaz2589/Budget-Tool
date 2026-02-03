@@ -2,7 +2,6 @@ import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
-import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
@@ -34,20 +33,15 @@ export function TransactionsPage() {
   const { t } = useTranslation();
   const {
     expenses,
-    income,
-    debts,
-    debtPayments,
     updateExpense,
     removeExpense,
     removeExpenses,
     expenseCategories,
-    incomeCategories,
     owners,
     cardSources,
   } = useBudget();
   const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
     useGoogleAuth();
-  const { presetTransactions } = usePresetTransactions();
   const [monthFilter, setMonthFilter] = useState<string>("");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("");

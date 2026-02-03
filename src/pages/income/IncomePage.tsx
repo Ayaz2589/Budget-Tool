@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
-import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import type { Income } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,19 +29,13 @@ import { IncomeActionsDialog } from "./IncomeActionsDialog";
 
 export function IncomePage() {
   const {
-    expenses,
     income,
-    debts,
-    debtPayments,
     addIncome,
     updateIncome,
     removeIncome,
-    expenseCategories,
     incomeCategories,
     owners,
-    cardSources,
   } = useBudget();
-  const { presetTransactions } = usePresetTransactions();
   const [addOpen, setAddOpen] = useState(false);
   const [editIncome, setEditIncome] = useState<Income | null>(null);
   const [incomeForActions, setIncomeForActions] = useState<Income | null>(null);

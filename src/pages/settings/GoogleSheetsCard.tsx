@@ -46,14 +46,32 @@ export function GoogleSheetsCard({
         <CardTitle>{t("settings.googleSheets")}</CardTitle>
         <CardDescription>{t("settings.googleSheetsDesc")}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         {!isSignedIn ? (
-          <Button onClick={signIn}>Connect Google</Button>
+          <div className="flex flex-col gap-3">
+            <Button onClick={signIn} className="h-11 w-full sm:w-auto">
+              Connect Google
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              We’ll only use this to sync your data to a spreadsheet you choose.
+            </p>
+          </div>
         ) : (
           <>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-muted-foreground">Signed in</span>
-              <Button variant="outline" size="sm" onClick={signOut}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Status
+                </span>
+                <span className="rounded-full border border-border/60 bg-muted/30 px-2 py-1 text-xs">
+                  Connected
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                onClick={signOut}
+                className="h-11"
+              >
                 Disconnect
               </Button>
             </div>
@@ -69,7 +87,7 @@ export function GoogleSheetsCard({
                 <Button
                   variant="outline"
                   onClick={onSetSheetId}
-                  className="shrink-0 w-full sm:w-auto"
+                  className="h-11 shrink-0 w-full sm:w-auto"
                 >
                   Set
                 </Button>
@@ -85,12 +103,12 @@ export function GoogleSheetsCard({
             </div>
             {spreadsheetId && (
               <>
-                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <Button
                     onClick={() => setRestoreConfirmOpen(true)}
                     disabled={syncStatus === "syncing"}
                     variant="outline"
-                    className="w-full sm:w-auto"
+                    className="h-11 w-full"
                   >
                     {syncStatus === "syncing"
                       ? "Syncing..."
@@ -99,7 +117,7 @@ export function GoogleSheetsCard({
                   <Button
                     onClick={() => setSyncConfirmOpen(true)}
                     disabled={syncStatus === "syncing"}
-                    className="w-full sm:w-auto"
+                    className="h-11 w-full"
                   >
                     {syncStatus === "syncing"
                       ? "Syncing..."
@@ -109,16 +127,16 @@ export function GoogleSheetsCard({
                     variant="outline"
                     onClick={onRepairDates}
                     title="Fix dates that were corrupted (e.g. from Google Sheets formatting)"
-                    className="w-full sm:w-auto"
+                    className="h-11 w-full sm:col-span-2"
                   >
                     Repair corrupted dates
                   </Button>
-                  {repairResult && (
-                    <span className="text-sm text-muted-foreground">
-                      {repairResult}
-                    </span>
-                  )}
                 </div>
+                {repairResult && (
+                  <span className="text-sm text-muted-foreground">
+                    {repairResult}
+                  </span>
+                )}
 
                 <Dialog
                   open={syncConfirmOpen}

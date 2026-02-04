@@ -331,19 +331,19 @@ export function Layout() {
           className="fixed bottom-0 left-0 right-0 top-auto z-50 w-full max-w-full max-h-[85vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
         >
           <DialogTitle className="sr-only">{t("layout.more")}</DialogTitle>
-          <div className="overflow-y-auto overscroll-contain p-4 pb-8 flex flex-col gap-1">
+          <div className="overflow-y-auto overscroll-contain p-4 pb-8 flex flex-col gap-2">
             {moreNavItems.map(({ to, labelKey, icon: Icon }) => (
               <DialogClose asChild key={to}>
                 <Link
                   to={to}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-medium transition-colors",
                     location.pathname === to
                       ? "bg-primary text-primary-foreground"
                       : "text-foreground hover:bg-muted",
                   )}
                 >
-                  <Icon className="size-4 shrink-0" />
+                  <Icon className="size-5 shrink-0" />
                   {t(labelKey)}
                 </Link>
               </DialogClose>

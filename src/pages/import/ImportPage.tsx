@@ -514,8 +514,8 @@ export function ImportPage() {
     previewDebtPayments.length > 0;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-2">
+    <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
+      <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{t("import.title")}</h1>
@@ -526,6 +526,18 @@ export function ImportPage() {
           </p>
         </div>
       </div>
+      <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
+        <div className="px-0 py-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold">{t("import.title")}</h1>
+            <p className="text-xs text-muted-foreground">
+              {t("import.subtitle")}
+            </p>
+          </div>
+          <PageTourTrigger pageId="import" steps={importTourSteps} />
+        </div>
+      </div>
+      <div className="space-y-6 pb-24 md:pb-0">
       <div data-tour="uploadCard">
         <ImportSourceCard
           selectedSource={selectedSource}
@@ -666,6 +678,7 @@ export function ImportPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

@@ -12,10 +12,10 @@ function TestWrapper() {
     <BudgetProvider>
       <PresetTransactionsProvider>
         <GoogleAuthProviderFallback>
-          <MemoryRouter initialEntries={["/settings"]}>
+          <MemoryRouter initialEntries={["/dashboard/settings"]}>
             <Routes>
-              <Route path="/settings" element={<Layout />}>
-                <Route index element={<SettingsPage />} />
+              <Route path="/dashboard" element={<Layout />}>
+                <Route path="settings" element={<SettingsPage />} />
               </Route>
             </Routes>
           </MemoryRouter>
@@ -28,8 +28,8 @@ function TestWrapper() {
 test("SettingsPage renders title and Delete all data button", () => {
   render(<TestWrapper />);
   expect(
-    screen.getByRole("heading", { name: "Settings" }),
-  ).toBeInTheDocument();
+    screen.getAllByRole("heading", { name: "Settings" }).length,
+  ).toBeGreaterThanOrEqual(1);
   expect(
     screen.getByRole("button", { name: "Delete all data" }),
   ).toBeInTheDocument();

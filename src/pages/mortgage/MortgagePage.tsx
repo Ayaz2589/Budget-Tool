@@ -2,16 +2,12 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import type { Expense } from "@/lib/types";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { formatCurrency } from "@/lib/format";
 import { mortgageTourSteps } from "@/lib/pageTourSteps";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { AddMortgagePaymentDialog } from "./AddMortgagePaymentDialog";
 import { MortgagePaymentsTable } from "./MortgagePaymentsTable";
 import { MortgagePaymentsList } from "./MortgagePaymentsList";
@@ -76,49 +72,59 @@ export function MortgagePage() {
 
   const { t } = useTranslation();
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-2">
+    <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
+      <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{t("mortgage.title")}</h1>
             <PageTourTrigger pageId="mortgage" steps={mortgageTourSteps} />
           </div>
-          <p className="text-sm text-muted-foreground">{t("mortgage.subtitle")}</p>
+          <p className="text-sm text-muted-foreground">
+            {t("mortgage.subtitle")}
+          </p>
         </div>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("mortgage.mortgagePayments")}</CardTitle>
-          <CardDescription>
+      <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
+        <div className="px-0 py-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold">{t("mortgage.title")}</h1>
+            <p className="text-xs text-muted-foreground">
+              {t("mortgage.subtitle")}
+            </p>
+          </div>
+          <PageTourTrigger pageId="mortgage" steps={mortgageTourSteps} />
+        </div>
+      </div>
+
+      <Card className="flex-1 min-h-0 flex flex-col overflow-hidden">
+        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
+          <div className="px-4 md:px-0 pb-3 text-sm text-muted-foreground">
             {t("mortgage.mortgagePaymentsDesc")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-center gap-4" data-tour="addPayment">
-            <AddMortgagePaymentDialog
-              open={addOpen}
-              onOpenChange={setAddOpen}
-              date={addDate}
-              onDateChange={setAddDate}
-              amount={addAmount}
-              onAmountChange={setAddAmount}
-              owner={addOwner}
-              onOwnerChange={setAddOwner}
-              ownerOptions={owners}
-              onSubmit={handleAdd}
-            />
-            <span className="text-sm text-muted-foreground">
+            <span className="ml-2">
               Total this year: {formatCurrency(totalThisYear)}
             </span>
           </div>
 
+          <AddMortgagePaymentDialog
+            open={addOpen}
+            onOpenChange={setAddOpen}
+            date={addDate}
+            onDateChange={setAddDate}
+            amount={addAmount}
+            onAmountChange={setAddAmount}
+            owner={addOwner}
+            onOwnerChange={setAddOwner}
+            ownerOptions={owners}
+            onSubmit={handleAdd}
+          />
+
           {mortgagePayments.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              No mortgage payments recorded yet. Add one above.
+            <p className="text-muted-foreground text-sm px-4 md:px-0">
+              No mortgage payments recorded yet.
             </p>
           ) : (
             <div data-tour="paymentsList">
-              <div className="hidden md:block overflow-x-auto border rounded-md">
+              <div className="hidden md:block md:border md:rounded-md">
                 <MortgagePaymentsTable
                   payments={mortgagePayments}
                   onRemove={setDeleteConfirm}
@@ -128,7 +134,7 @@ export function MortgagePage() {
                   ownerOptions={owners}
                 />
               </div>
-              <div className="md:hidden max-h-[50vh] overflow-y-auto">
+              <div className="md:hidden">
                 <MortgagePaymentsList
                   payments={mortgagePayments}
                   onPaymentTap={setPaymentForActions}
@@ -138,6 +144,20 @@ export function MortgagePage() {
           )}
         </CardContent>
       </Card>
+
+      <div className="md:hidden fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-30 px-4 pb-3 pointer-events-none">
+        <div className="pointer-events-auto flex items-center justify-end">
+          <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
+            <Button
+              onClick={() => setAddOpen(true)}
+              className="h-11 w-11 rounded-full p-0"
+              aria-label={t("mortgage.addMortgagePayment")}
+            >
+              <Plus className="size-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <MortgagePaymentActionsDialog
         payment={paymentForActions}

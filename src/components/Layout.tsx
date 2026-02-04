@@ -267,7 +267,9 @@ export function Layout() {
           "flex-1 flex flex-col pb-20 md:pb-6",
           location.pathname === "/dashboard/transactions" ||
             location.pathname === "/dashboard/income" ||
-            location.pathname === "/dashboard/debt"
+            location.pathname === "/dashboard/debt" ||
+            location.pathname === "/dashboard/mortgage" ||
+            location.pathname === "/dashboard/presets"
             ? "p-0 md:p-6"
             : "p-4 md:p-6",
           location.pathname !== "/dashboard" && "flatten-mobile-cards",

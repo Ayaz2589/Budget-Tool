@@ -268,7 +268,7 @@ export function Layout() {
       </nav>
       <main
         className={cn(
-          "flex-1 flex flex-col pb-20 md:pb-6 md:ml-[200px] md:w-[calc(100%-200px)]",
+          "flex-1 flex flex-col pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6 md:ml-[200px] md:w-[calc(100%-200px)]",
           location.pathname === "/dashboard/transactions" ||
             location.pathname === "/dashboard/income" ||
             location.pathname === "/dashboard/debt" ||

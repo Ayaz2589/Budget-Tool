@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -18,7 +17,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CategoryOption } from "@/lib/categoryColors";
-import { CalendarIcon } from "lucide-react";
 import type { Owner } from "@/types/core";
 import type {
   AddIncomeFormPayload,
@@ -75,17 +73,6 @@ function AddIncomeForm({
   const [owner, setOwner] = useState<Owner>(owners[0] ?? "");
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
-  const formatDateLabel = (value: string) => {
-    if (!value) return "—";
-    const dateObj = new Date(value);
-    if (Number.isNaN(dateObj.getTime())) return value;
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    }).format(dateObj);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const num = parseFloat(amount.replace(/[$,]/g, ""));
@@ -107,23 +94,13 @@ function AddIncomeForm({
       <div className="flex-1 min-h-0 overflow-auto space-y-4">
         <div className="space-y-2">
           <Label>Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className={selectTriggerClass}>
-                <span className="truncate">{formatDateLabel(date)}</span>
-                <CalendarIcon className="size-4 text-muted-foreground" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="p-4 w-64">
-              <Input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-                className={fieldClass}
-              />
-            </PopoverContent>
-          </Popover>
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+            className={fieldClass}
+          />
         </div>
         <div className="space-y-2">
           <Label>Amount</Label>

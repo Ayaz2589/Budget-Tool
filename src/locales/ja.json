@@ -31,7 +31,7 @@
   },
   "auth": {
     "createAccountHeading": "Orthoアカウントを作成",
-    "createAccountSubheading": "Googleでサインインして支出・収入・予算を一元管理。",
+    "createAccountSubheading": "Ortho を使い始めるには Google でサインインしてください。",
     "googleNotConfigured": "Googleサインインが設定されていません。",
     "notSignedInOrNoSpreadsheet": "サインインしていないか、スプレッドシートが設定されていません。",
     "signInDisclaimer": "サインインするとGoogleスプレッドシートと同期できます。",

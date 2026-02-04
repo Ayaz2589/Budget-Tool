@@ -31,7 +31,7 @@
   },
   "auth": {
     "createAccountHeading": "अपना Ortho अकाउंट बनाएं",
-    "createAccountSubheading": "Google से साइन इन करके खर्च, आय और बजट एक जगह ट्रैक करें।",
+    "createAccountSubheading": "Ortho इस्तेमाल शुरू करने के लिए Google से साइन इन करें।",
     "googleNotConfigured": "Google साइन इन कॉन्फ़िगर नहीं।",
     "notSignedInOrNoSpreadsheet": "साइन इन नहीं या स्प्रैडशीट सेट नहीं।",
     "signInDisclaimer": "साइन इन करने पर Google Sheets के साथ सिंक होगा।",

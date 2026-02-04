@@ -31,7 +31,7 @@
   },
   "auth": {
     "createAccountHeading": "创建您的 Ortho 账户",
-    "createAccountSubheading": "使用 Google 登录，在一个地方管理支出、收入和预算。",
+    "createAccountSubheading": "使用 Ortho 请用 Google 登录。",
     "googleNotConfigured": "未配置 Google 登录。",
     "notSignedInOrNoSpreadsheet": "未登录或未设置表格。",
     "signInDisclaimer": "登录后可与 Google 表格同步数据。",

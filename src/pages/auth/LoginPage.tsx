@@ -19,7 +19,7 @@ export function LoginPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-background">
+    <div className="h-[100dvh] overflow-hidden flex flex-col md:flex-row bg-background md:min-h-screen md:h-auto md:overflow-auto">
       {/* Left column: auth form */}
       <div className="flex flex-1 flex-col justify-center px-6 py-12 sm:px-10 md:px-12 lg:px-16 md:max-w-[480px] md:mx-0 mx-auto w-full max-w-md">
         <div className="flex items-center gap-2 mb-8">

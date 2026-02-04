@@ -31,7 +31,7 @@
   },
   "auth": {
     "createAccountHeading": "আপনার Ortho অ্যাকাউন্ট তৈরি করুন",
-    "createAccountSubheading": "Google দিয়ে সাইন ইন করে ব্যয়, আয় এবং বাজেট এক জায়গায় ট্র্যাক করুন।",
+    "createAccountSubheading": "Ortho ব্যবহার শুরু করতে Google দিয়ে সাইন ইন করুন।",
     "googleNotConfigured": "Google সাইন ইন কনফিগার নেই।",
     "notSignedInOrNoSpreadsheet": "সাইন ইন নেই বা স্প্রেডশিট সেট নেই।",
     "signInDisclaimer": "সাইন ইন করলে Google Sheets এর সাথে সিঙ্ক হবে।",

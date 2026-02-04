@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -20,7 +21,7 @@ import { CategoryOption } from "@/lib/categoryColors";
 import type { ExpenseSource } from "@/types/core";
 import type { FiltersAndActionsDialogProps } from "@/types/transactions";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
-import { Trash2 } from "lucide-react";
+import { CalendarIcon, Trash2 } from "lucide-react";
 
 export type { FiltersAndActionsDialogProps };
 
@@ -50,6 +51,11 @@ export function FiltersAndActionsDialog({
   const sheetSide = "right";
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
+  const monthLabel = monthFilter
+    ? new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(
+        new Date(`${monthFilter}-01`)
+      )
+    : t("common.all");
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -84,12 +90,25 @@ export function FiltersAndActionsDialog({
                 <Label className="text-muted-foreground">
                   {t("transactions.month")}
                 </Label>
-                <Input
-                  type="month"
-                  value={monthFilter}
-                  onChange={(e) => onMonthFilterChange(e.target.value)}
-                  className={fieldClass}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="h-11 w-full justify-between"
+                    >
+                      <span className="truncate">{monthLabel}</span>
+                      <CalendarIcon className="size-4 text-muted-foreground" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="p-4 w-64">
+                    <Input
+                      type="month"
+                      value={monthFilter}
+                      onChange={(e) => onMonthFilterChange(e.target.value)}
+                      className={fieldClass}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="space-y-2">
                 <Label className="text-muted-foreground">Source</Label>

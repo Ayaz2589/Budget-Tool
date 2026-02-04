@@ -19,6 +19,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -27,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Copy, Plus, Trash2 } from "lucide-react";
+import { CalendarIcon, Copy, Plus, Trash2 } from "lucide-react";
 
 function defaultRow(defaultSource: ExpenseSource = "manual"): TransactionRow {
   return {
@@ -148,6 +149,16 @@ export function AddTransactionDialog({
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   const sheetSide = "right";
+  const formatDateLabel = (value: string) => {
+    if (!value) return "—";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    }).format(date);
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -301,14 +312,29 @@ export function AddTransactionDialog({
                     <div className="text-xs text-muted-foreground">
                       {t("addTransaction.date")}
                     </div>
-                    <Input
-                      type="date"
-                      className={fieldClass}
-                      value={row.date}
-                      onChange={(e) =>
-                        updateRow(index, { date: e.target.value })
-                      }
-                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="h-11 w-full justify-between"
+                        >
+                          <span className="truncate">
+                            {formatDateLabel(row.date)}
+                          </span>
+                          <CalendarIcon className="size-4 text-muted-foreground" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent align="start" className="p-4 w-64">
+                        <Input
+                          type="date"
+                          className={fieldClass}
+                          value={row.date}
+                          onChange={(e) =>
+                            updateRow(index, { date: e.target.value })
+                          }
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
 
                   <div className="space-y-1">

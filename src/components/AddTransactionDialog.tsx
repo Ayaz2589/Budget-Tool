@@ -149,7 +149,7 @@ export function AddTransactionDialog({
   const fieldClass = "h-11 w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const sheetSide = isDesktop ? "right" : "top";
+  const sheetSide = isDesktop ? "right" : "bottom";
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -158,7 +158,7 @@ export function AddTransactionDialog({
         className={
           isDesktop
             ? "flex flex-col h-full w-[90vw] max-w-md border-l p-4 gap-3 overflow-hidden rounded-l-2xl md:w-[720px] md:max-w-[720px]"
-            : "flex flex-col w-full max-w-full h-[calc(100vh-56px-env(safe-area-inset-bottom))] border-b p-4 gap-3 overflow-hidden rounded-none"
+            : "flex flex-col w-full max-w-full h-[calc(100vh-56px-env(safe-area-inset-bottom))] border-t p-4 gap-3 overflow-hidden rounded-t-2xl"
         }
       >
         <SheetHeader className="shrink-0 gap-2">

@@ -49,7 +49,7 @@ export function FiltersAndActionsDialog({
   t,
 }: FiltersAndActionsDialogProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const sheetSide = isDesktop ? "right" : "top";
+  const sheetSide = isDesktop ? "right" : "bottom";
   const fieldClass = "h-11 w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
@@ -61,7 +61,7 @@ export function FiltersAndActionsDialog({
         className={
           isDesktop
             ? "h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
-            : "w-full max-w-full h-[calc(100vh-56px-env(safe-area-inset-bottom))] border-b p-0 gap-0 rounded-none overflow-y-auto"
+            : "w-full max-w-full h-[calc(100vh-56px-env(safe-area-inset-bottom))] border-t p-0 gap-0 rounded-t-2xl overflow-y-auto"
         }
       >
         <SheetHeader className="px-4 pt-5 pb-3">

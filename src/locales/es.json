@@ -31,7 +31,7 @@
   },
   "auth": {
     "createAccountHeading": "Crea tu cuenta de Ortho",
-    "createAccountSubheading": "Inicia sesión con Google para gestionar gastos, ingresos y presupuestos.",
+    "createAccountSubheading": "Inicia sesión con Google para empezar a usar Ortho.",
     "googleNotConfigured": "Inicio de sesión con Google no configurado.",
     "notSignedInOrNoSpreadsheet": "No has iniciado sesión o no hay hoja configurada.",
     "signInDisclaimer": "Al iniciar sesión puedes sincronizar tus datos con Google Sheets.",

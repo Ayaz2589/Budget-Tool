@@ -21,7 +21,6 @@ import type { ExpenseSource } from "@/types/core";
 import type { FiltersAndActionsDialogProps } from "@/types/transactions";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
 import { Trash2 } from "lucide-react";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export type { FiltersAndActionsDialogProps };
 
@@ -48,7 +47,6 @@ export function FiltersAndActionsDialog({
   onDeleteAll,
   t,
 }: FiltersAndActionsDialogProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
   const sheetSide = "right";
   const fieldClass = "h-11 w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";

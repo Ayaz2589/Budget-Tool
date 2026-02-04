@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Copy, Plus, Trash2 } from "lucide-react";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 function defaultRow(defaultSource: ExpenseSource = "manual"): TransactionRow {
   return {
@@ -148,7 +147,6 @@ export function AddTransactionDialog({
 
   const fieldClass = "h-11 w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
-  const isDesktop = useMediaQuery("(min-width: 768px)");
   const sheetSide = "right";
 
   return (

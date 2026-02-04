@@ -17,7 +17,6 @@ import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
 import type { ExpenseActionsDialogProps } from "@/types/transactions";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export type { ExpenseActionsDialogProps };
 
@@ -40,7 +39,6 @@ export function ExpenseActionsDialog({
 
   const fieldClass = "h-11 w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
-  const isDesktop = useMediaQuery("(min-width: 768px)");
   const sheetSide = "right";
 
   return (

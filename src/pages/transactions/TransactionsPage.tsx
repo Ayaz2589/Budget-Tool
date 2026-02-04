@@ -227,7 +227,7 @@ export function TransactionsPage() {
         </div>
       </div>
       <div className="flex-1 pb-24 md:pb-0">
-        <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
+        <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0 md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
           <div
             className="hidden md:flex items-center justify-end px-6 pb-4"
             data-tour="toolbar"

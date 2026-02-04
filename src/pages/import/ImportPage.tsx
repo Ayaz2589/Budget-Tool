@@ -528,7 +528,7 @@ export function ImportPage() {
           <PageTourTrigger pageId="import" steps={importTourSteps} />
         </div>
       </div>
-      <div className="space-y-6 pb-24 md:pb-0">
+      <div className="space-y-6 pb-24 md:pb-0 md:px-0">
       <div data-tour="uploadCard">
         <ImportSourceCard
           selectedSource={selectedSource}
@@ -550,12 +550,12 @@ export function ImportPage() {
           t={t}
         />
       </div>
-      <Card>
-        <CardHeader>
+      <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+        <CardHeader className="px-4 md:px-0">
           <CardTitle>{t("import.exportStringTitle")}</CardTitle>
           <CardDescription>{t("import.exportStringDesc")}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 px-4 md:px-0">
           <textarea
             value={exportString}
             onChange={(e) => setExportString(e.target.value)}
@@ -572,12 +572,12 @@ export function ImportPage() {
           </Button>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
+      <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+        <CardHeader className="px-4 md:px-0">
           <CardTitle>{t("import.jsonImportTitle")}</CardTitle>
           <CardDescription>{t("import.jsonImportDesc")}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 px-4 md:px-0">
           <input
             ref={jsonInputRef}
             type="file"
@@ -598,12 +598,12 @@ export function ImportPage() {
           )}
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
+      <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+        <CardHeader className="px-4 md:px-0">
           <CardTitle>{t("import.exportTitle")}</CardTitle>
           <CardDescription>{t("import.exportDesc")}</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col md:flex-row gap-2">
+        <CardContent className="flex flex-col md:flex-row gap-2 px-4 md:px-0">
           <Button
             variant="outline"
             onClick={handleDownloadPdf}

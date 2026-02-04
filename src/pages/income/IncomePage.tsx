@@ -91,7 +91,7 @@ export function IncomePage() {
         onSubmit={handleAdd}
       />
 
-      <Card data-tour="incomeList" className="flex-1 min-h-0 flex flex-col overflow-hidden">
+      <Card data-tour="incomeList" className="flex-1 min-h-0 flex flex-col overflow-hidden md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           {sortedIncome.length === 0 ? (
             <div className="text-center text-muted-foreground py-10 px-4 flex flex-col items-center gap-3">

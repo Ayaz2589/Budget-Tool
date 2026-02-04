@@ -49,7 +49,7 @@ export function DebtList({
           return (
             <div
               key={debt.id}
-              className="rounded-lg border bg-card p-5 space-y-4"
+              className="pb-6 border-b border-border/60 last:border-b-0 space-y-4"
             >
               <div>
                 <h3 className="font-semibold text-lg">{debt.name}</h3>
@@ -97,7 +97,7 @@ export function DebtList({
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/40">
                 <Button
                   type="button"
                   size="sm"
@@ -119,7 +119,7 @@ export function DebtList({
                 </Button>
               </div>
 
-              <div className="pt-2 border-t">
+              <div className="pt-2 border-t border-border/40">
                 <h4 className="text-sm font-medium text-muted-foreground mb-2">
                   Payment history
                 </h4>
@@ -128,7 +128,7 @@ export function DebtList({
                     No payments yet.
                   </p>
                 ) : (
-                  <div className="overflow-x-auto rounded-md border">
+                  <div className="overflow-x-auto rounded-md border border-border/60">
                     <Table>
                       <TableHeader>
                         <TableRow className="hover:bg-transparent">

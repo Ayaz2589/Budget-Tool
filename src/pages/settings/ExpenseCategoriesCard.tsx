@@ -41,11 +41,11 @@ export function ExpenseCategoriesCard({
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+      <CardHeader className="px-4 md:px-0">
         <CardTitle>{t("settings.expenseCategories")}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 pb-6">
+      <CardContent className="space-y-3 pb-6 px-4 md:px-0">
         <ul className="space-y-2">
           {categories.map((category) => (
             <li

@@ -41,12 +41,12 @@ export function CardSourcesCard() {
   const onlyOneEnabled = cardSources.length <= 1;
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+      <CardHeader className="px-4 md:px-0">
         <CardTitle>{t("settings.cardSources")}</CardTitle>
         <CardDescription>{t("settings.cardSourcesDesc")}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 px-4 md:px-0">
         <ul className="space-y-2">
           {ALL_EXPENSE_SOURCES.map((sourceId) => {
             const enabled = cardSources.includes(sourceId);

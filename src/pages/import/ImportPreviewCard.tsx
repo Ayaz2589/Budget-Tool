@@ -39,8 +39,8 @@ export function ImportPreviewCard({
   const isPdfExport = lastDetected === "pdf-export";
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+      <CardHeader className="px-4 md:px-0">
         <CardTitle>Preview</CardTitle>
         <CardDescription>
           {isPdfExport
@@ -48,7 +48,7 @@ export function ImportPreviewCard({
             : 'Transactions matching existing entries (same date and amount) are skipped. Edit category per row if needed, then click "Add to transactions".'}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 px-4 md:px-0">
         {previewExpenses.length > 0 && (
           <div>
             <h3 className="text-sm font-medium mb-2">Expenses to add</h3>

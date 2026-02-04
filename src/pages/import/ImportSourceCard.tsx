@@ -76,12 +76,12 @@ export function ImportSourceCard({
     previewDebtPaymentsCount > 0;
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+      <CardHeader className="px-4 md:px-0">
         <CardTitle>{t("import.uploadStatement")}</CardTitle>
         <CardDescription>{t("import.uploadStatementDesc")}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 px-4 md:px-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {sourceOptions.map((opt) => {
             const Icon = opt.icon;

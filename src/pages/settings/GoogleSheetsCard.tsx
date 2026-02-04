@@ -41,12 +41,12 @@ export function GoogleSheetsCard({
   t,
 }: GoogleSheetsCardProps) {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+      <CardHeader className="px-4 md:px-0">
         <CardTitle>{t("settings.googleSheets")}</CardTitle>
         <CardDescription>{t("settings.googleSheetsDesc")}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-5">
+      <CardContent className="space-y-5 px-4 md:px-0">
         {!isSignedIn ? (
           <div className="flex flex-col gap-3">
             <Button onClick={signIn} className="h-11 w-full sm:w-auto">

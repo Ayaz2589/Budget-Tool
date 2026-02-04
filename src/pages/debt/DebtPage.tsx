@@ -99,11 +99,11 @@ export function DebtPage() {
         }}
       />
 
-      <Card
+      <div
         data-tour="debtList"
         className="flex-1 min-h-0 flex flex-col overflow-hidden"
       >
-        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           {debts.length === 0 ? (
             <div className="text-center text-muted-foreground py-10 px-4 flex flex-col items-center gap-3">
               <CreditCard className="size-8 text-muted-foreground/70" />
@@ -135,8 +135,8 @@ export function DebtPage() {
               </div>
             </>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <div className="md:hidden fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-30 px-4 pb-3 pointer-events-none">
         <div className="pointer-events-auto flex items-center justify-end">

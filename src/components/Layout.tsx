@@ -236,7 +236,7 @@ export function Layout() {
   };
 
   return (
-    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
+    <div className="min-h-screen flex flex-col md:flex-row">
       {/* Mobile header: logo + app name only */}
       <header className="md:hidden flex items-center justify-center gap-2 px-4 py-3 border-b bg-muted/30 shrink-0">
         <Link to="/dashboard" className="flex items-center gap-2 min-w-0">
@@ -264,24 +264,15 @@ export function Layout() {
       </nav>
       <main
         className={cn(
-          "flex-1 min-h-0 flex flex-col overflow-hidden pb-20 md:pb-6",
+          "flex-1 flex flex-col pb-20 md:pb-6",
           location.pathname === "/dashboard/transactions"
             ? "p-0 md:p-6"
             : "p-4 md:p-6",
           location.pathname !== "/dashboard" && "flatten-mobile-cards",
         )}
       >
-        <div
-          className={cn(
-            "flex-1 min-h-0 flex flex-col",
-            location.pathname === "/dashboard/transactions"
-              ? "overflow-hidden"
-              : "overflow-auto",
-          )}
-        >
-          <div className="mx-auto w-full max-w-7xl flex-1 min-h-0 flex flex-col min-w-0">
-            <Outlet />
-          </div>
+        <div className="mx-auto w-full max-w-7xl flex-1 flex flex-col min-w-0">
+          <Outlet />
         </div>
       </main>
 

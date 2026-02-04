@@ -226,7 +226,7 @@ export function TransactionsPage() {
           <PageTourTrigger pageId="transactions" steps={transactionsTourSteps} />
         </div>
       </div>
-      <div className="flex-1 min-h-0 overflow-auto pb-24 md:pb-0">
+      <div className="flex-1 pb-24 md:pb-0">
         <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0">
           <div
             className="hidden md:flex items-center justify-end px-6 pb-4"
@@ -274,7 +274,7 @@ export function TransactionsPage() {
               t={t}
             />
 
-            <div className="flex-1 min-h-0 md:border md:rounded-md" data-tour="expensesList">
+            <div className="flex-1 md:border md:rounded-md" data-tour="expensesList">
               {filtered.length === 0 ? (
                 <div className="text-center text-muted-foreground py-12 px-4">
                   {t("transactions.noTransactions")}

@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { MortgagePaymentsTableProps } from "@/types/mortgage";
+import { useTranslation } from "react-i18next";
 
 export type { MortgagePaymentsTableProps };
 
@@ -27,10 +28,11 @@ export function MortgagePaymentsTable({
   onUpdateOwner,
   ownerOptions = [],
 }: MortgagePaymentsTableProps) {
+  const { t } = useTranslation();
   if (payments.length === 0) {
     return (
       <p className="text-muted-foreground text-sm">
-        No mortgage payments recorded yet. Add one above.
+        {t("mortgage.noPaymentsYet")}
       </p>
     );
   }

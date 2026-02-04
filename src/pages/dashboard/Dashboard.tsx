@@ -202,6 +202,10 @@ export function Dashboard() {
     [totals.totalIncome, essentialsTotal]
   );
 
+  const kpiCardClass = "gap-2 py-3 md:gap-6 md:py-6";
+  const kpiHeaderClass = "px-4 md:px-6 pb-1 pt-0";
+  const kpiContentBase = "px-4 md:px-6 pb-2 md:pb-3";
+
   const trendData = useMemo(
     () =>
       [...monthTotals]
@@ -542,7 +546,7 @@ export function Dashboard() {
   ]);
 
   return (
-    <div className="space-y-6 min-w-0 overflow-x-hidden">
+    <div className="space-y-6 min-w-0 overflow-x-hidden pb-24 md:pb-0">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1 min-w-0">
           <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
@@ -579,63 +583,63 @@ export function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
-        <Card>
-          <CardHeader className="pb-1 pt-3">
+        <Card className={kpiCardClass}>
+          <CardHeader className={kpiHeaderClass}>
             <CardTitle className="text-[11px] font-medium text-muted-foreground">
               {t("dashboard.totalIncome")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-3 text-base font-semibold sm:text-lg">
+          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
             {formatCurrency(totals.totalIncome)}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1 pt-3">
+        <Card className={kpiCardClass}>
+          <CardHeader className={kpiHeaderClass}>
             <CardTitle className="text-[11px] font-medium text-muted-foreground">
               {t("dashboard.totalExpenses")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-3 text-base font-semibold sm:text-lg">
+          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
             {formatCurrency(totals.totalExpenses)}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1 pt-3">
+        <Card className={kpiCardClass}>
+          <CardHeader className={kpiHeaderClass}>
             <CardTitle className="text-[11px] font-medium text-muted-foreground">
               {t("dashboard.netCashflow")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-3 text-base font-semibold sm:text-lg">
+          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
             {formatCurrency(totals.net)}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1 pt-3">
+        <Card className={kpiCardClass}>
+          <CardHeader className={kpiHeaderClass}>
             <CardTitle className="text-[11px] font-medium text-muted-foreground">
               {t("dashboard.avgDailySpend")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-3 text-base font-semibold sm:text-lg">
+          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
             {formatCurrency(avgDailySpend)}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1 pt-3">
+        <Card className={kpiCardClass}>
+          <CardHeader className={kpiHeaderClass}>
             <CardTitle className="text-[11px] font-medium text-muted-foreground">
               {t("dashboard.largestExpense")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-3 text-base font-semibold sm:text-lg">
+          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
             {formatCurrency(largestExpense)}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1 pt-3">
+        <Card className={kpiCardClass}>
+          <CardHeader className={kpiHeaderClass}>
             <CardTitle className="text-[11px] font-medium text-muted-foreground">
               {t("dashboard.incomeCoverage")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-1 pb-3">
+          <CardContent className={`${kpiContentBase} space-y-1`}>
             <div className="text-base font-semibold sm:text-lg">
               {formatCurrency(incomeCoverage)}
             </div>
@@ -646,33 +650,33 @@ export function Dashboard() {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1 pt-3">
+        <Card className={kpiCardClass}>
+          <CardHeader className={kpiHeaderClass}>
             <CardTitle className="text-[11px] font-medium text-muted-foreground">
               {t("dashboard.savingsRate")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-3 text-base font-semibold sm:text-lg">
+          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
             {formatPercent(totals.savingsRate)}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1 pt-3">
+        <Card className={kpiCardClass}>
+          <CardHeader className={kpiHeaderClass}>
             <CardTitle className="text-[11px] font-medium text-muted-foreground">
               {t("dashboard.spentNoMortgage")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-3 text-base font-semibold sm:text-lg">
+          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
             {formatCurrency(totals.spentNoMortgage)}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1 pt-3">
+        <Card className={kpiCardClass}>
+          <CardHeader className={kpiHeaderClass}>
             <CardTitle className="text-[11px] font-medium text-muted-foreground">
               {t("dashboard.debtRemaining")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-3 text-base font-semibold sm:text-lg">
+          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
             {formatCurrency(totals.debtRemaining)}
           </CardContent>
         </Card>

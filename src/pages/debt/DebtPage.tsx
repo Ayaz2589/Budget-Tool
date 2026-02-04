@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { debtTourSteps } from "@/lib/pageTourSteps";
-import { Plus, Trash2 } from "lucide-react";
+import { CreditCard, Plus, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
@@ -105,9 +105,12 @@ export function DebtPage() {
       >
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           {debts.length === 0 ? (
-            <p className="text-muted-foreground text-sm py-6 text-center">
-              No debts yet.
-            </p>
+            <div className="text-center text-muted-foreground py-10 px-4 flex flex-col items-center gap-3">
+              <CreditCard className="size-8 text-muted-foreground/70" />
+              <p className="text-sm font-medium text-foreground/80">
+                {t("debt.noDebtsYet")}
+              </p>
+            </div>
           ) : (
             <>
               <div className="hidden md:block">

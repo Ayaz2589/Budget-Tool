@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DollarSign, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency } from "@/lib/format";
 import type { DebtListProps } from "@/types/debt";
@@ -30,10 +31,11 @@ export function DebtList({
   onDelete,
   onRemovePayment,
 }: DebtListProps) {
+  const { t } = useTranslation();
   if (debts.length === 0) {
     return (
       <p className="text-muted-foreground text-sm py-6 text-center">
-        No debts yet. Add one above.
+        {t("debt.noDebtsYet")}
       </p>
     );
   }

@@ -10,7 +10,7 @@ import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { transactionsTourSteps } from "@/lib/pageTourSteps";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, SlidersHorizontal } from "lucide-react";
+import { Plus, SlidersHorizontal, Receipt } from "lucide-react";
 import { SyncConfirmDialog } from "./SyncConfirmDialog";
 import { TransactionsToolbar } from "./TransactionsToolbar";
 import { FiltersAndActionsDialog } from "./FiltersAndActionsDialog";
@@ -276,8 +276,11 @@ export function TransactionsPage() {
 
             <div className="flex-1 md:border md:rounded-md" data-tour="expensesList">
               {filtered.length === 0 ? (
-                <div className="text-center text-muted-foreground py-12 px-4">
-                  {t("transactions.noTransactions")}
+                <div className="text-center text-muted-foreground py-12 px-4 flex flex-col items-center gap-3">
+                  <Receipt className="size-8 text-muted-foreground/70" />
+                  <p className="text-sm font-medium text-foreground/80">
+                    {t("transactions.noTransactions")}
+                  </p>
                 </div>
               ) : (
                 <>

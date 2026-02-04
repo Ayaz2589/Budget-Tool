@@ -17,6 +17,6 @@ test("IncomeTable shows Date header and empty state when no income", () => {
     screen.getByRole("columnheader", { name: "Date" }),
   ).toBeInTheDocument();
   expect(
-    screen.getByText("No income entries. Add one above."),
+    screen.getByText("No income yet. Add your first entry to get started."),
   ).toBeInTheDocument();
 });

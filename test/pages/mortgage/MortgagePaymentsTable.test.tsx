@@ -5,7 +5,7 @@ import { MortgagePaymentsTable } from "@/pages/mortgage/MortgagePaymentsTable";
 test("MortgagePaymentsTable shows empty state when no payments", () => {
   render(<MortgagePaymentsTable payments={[]} onRemove={() => {}} />);
   expect(
-    screen.getByText("No mortgage payments recorded yet. Add one above."),
+    screen.getByText("No mortgage payments yet. Add your first payment."),
   ).toBeInTheDocument();
 });
 

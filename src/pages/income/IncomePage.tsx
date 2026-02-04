@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Wallet } from "lucide-react";
 import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { incomeTourSteps } from "@/lib/pageTourSteps";
 import { AddIncomeDialog } from "./AddIncomeDialog";
@@ -94,8 +94,11 @@ export function IncomePage() {
       <Card data-tour="incomeList" className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           {sortedIncome.length === 0 ? (
-            <div className="text-center text-muted-foreground py-8 px-4 border rounded-md">
-              No income entries yet.
+            <div className="text-center text-muted-foreground py-10 px-4 flex flex-col items-center gap-3">
+              <Wallet className="size-8 text-muted-foreground/70" />
+              <p className="text-sm font-medium text-foreground/80">
+                {t("income.noIncomeEntries")}
+              </p>
             </div>
           ) : (
             <>

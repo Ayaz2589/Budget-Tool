@@ -7,7 +7,7 @@ import { PageTourTrigger } from "@/components/PageTourTrigger";
 import { formatCurrency } from "@/lib/format";
 import { mortgageTourSteps } from "@/lib/pageTourSteps";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Home, Plus } from "lucide-react";
 import { AddMortgagePaymentDialog } from "./AddMortgagePaymentDialog";
 import { MortgagePaymentsTable } from "./MortgagePaymentsTable";
 import { MortgagePaymentsList } from "./MortgagePaymentsList";
@@ -98,13 +98,6 @@ export function MortgagePage() {
 
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
-          <div className="px-4 md:px-0 pb-3 text-sm text-muted-foreground">
-            {t("mortgage.mortgagePaymentsDesc")}
-            <span className="ml-2">
-              Total this year: {formatCurrency(totalThisYear)}
-            </span>
-          </div>
-
           <AddMortgagePaymentDialog
             open={addOpen}
             onOpenChange={setAddOpen}
@@ -119,9 +112,12 @@ export function MortgagePage() {
           />
 
           {mortgagePayments.length === 0 ? (
-            <p className="text-muted-foreground text-sm px-4 md:px-0">
-              No mortgage payments recorded yet.
-            </p>
+            <div className="text-center text-muted-foreground py-10 px-4 md:px-0 flex flex-col items-center gap-3">
+              <Home className="size-8 text-muted-foreground/70" />
+              <p className="text-sm font-medium text-foreground/80">
+                {t("mortgage.noPaymentsYet")}
+              </p>
+            </div>
           ) : (
             <div data-tour="paymentsList">
               <div className="hidden md:block md:border md:rounded-md">

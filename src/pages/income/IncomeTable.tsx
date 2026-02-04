@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
 import type { IncomeTableProps } from "@/types/income";
@@ -30,6 +31,7 @@ export function IncomeTable({
   onUpdateCategory,
   onUpdateOwner,
 }: IncomeTableProps) {
+  const { t } = useTranslation();
   return (
     <Table>
       <TableHeader>
@@ -49,7 +51,7 @@ export function IncomeTable({
               colSpan={6}
               className="text-center text-muted-foreground py-8"
             >
-              No income entries. Add one above.
+              {t("income.noIncomeEntries")}
             </TableCell>
           </TableRow>
         ) : (

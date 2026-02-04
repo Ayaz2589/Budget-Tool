@@ -14,5 +14,7 @@ test("DebtList shows empty state when no debts", () => {
       onRemovePayment={() => {}}
     />,
   );
-  expect(screen.getByText("No debts yet. Add one above.")).toBeInTheDocument();
+  expect(
+    screen.getByText("No debts yet. Add a debt to start tracking payments."),
+  ).toBeInTheDocument();
 });

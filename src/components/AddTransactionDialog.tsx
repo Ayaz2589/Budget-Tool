@@ -145,7 +145,7 @@ export function AddTransactionDialog({
     }
   };
 
-  const fieldClass = "h-11 w-full";
+  const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   const sheetSide = "right";
 

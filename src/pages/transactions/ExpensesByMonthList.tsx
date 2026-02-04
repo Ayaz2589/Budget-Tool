@@ -56,7 +56,7 @@ export function ExpensesByMonthList({
               </span>
             </button>
             {isOpen && (
-              <div className="divide-y border-b border-border">
+              <div className="divide-y">
                 {monthExpenses.map((e, index) => (
                   <div
                     key={e.id}

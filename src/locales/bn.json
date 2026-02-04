@@ -236,6 +236,7 @@
     "addAll": "সব যোগ করুন",
     "addMissing": "সেটিংসে যোগ করুন",
     "addToTransactions": "লেনদেনে যোগ করুন",
+    "amexCard": "AMEX কার্ড",
     "amexGold": "আমেক্স গোল্ড কার্ড",
     "amexPlatinum": "আমেক্স প্লাটিনাম কার্ড",
     "appleCard": "Apple কার্ড",
@@ -275,8 +276,8 @@
     "startDate": "শুরুর তারিখ",
     "subtitle": "ডেটা ইমপোর্ট ও এক্সপোর্ট করুন।",
     "title": "ডেটা",
-    "uploadStatement": "স্টেটমেন্ট আপলোড",
-    "uploadStatementDesc": "কার্ড বা \"Exported Data (PDF)\" নির্বাচন করুন, তারপর CSV (Amex, Apple) বা PDF আপলোড করুন।"
+    "uploadStatement": "ডেটা ইমপোর্ট করুন",
+    "uploadStatementDesc": "CSV বা রপ্তানিকৃত ডেটা (PDF) ইমপোর্ট করতে একটি উৎস নির্বাচন করুন।"
   },
   "income": {
     "addIncome": "আয় যোগ করুন",

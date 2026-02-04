@@ -5,7 +5,7 @@ import { ImportSourceCard } from "@/pages/import/ImportSourceCard";
 
 const mockT = (key: string) => key;
 
-test("ImportSourceCard shows upload card title and file choose button", () => {
+test("ImportSourceCard shows upload card title and source buttons", () => {
   const fileInputRef = createRef<HTMLInputElement | null>();
   render(
     <ImportSourceCard
@@ -29,7 +29,7 @@ test("ImportSourceCard shows upload card title and file choose button", () => {
     />,
   );
   expect(screen.getByText("import.uploadStatement")).toBeInTheDocument();
-  expect(
-    screen.getByRole("button", { name: /import\.choosecsvfile/i }),
-  ).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /import\.amexcard/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /import\.applecard/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /import\.exportedpdf/i })).toBeInTheDocument();
 });

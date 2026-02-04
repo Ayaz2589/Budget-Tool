@@ -236,6 +236,7 @@
     "addAll": "Add all",
     "addMissing": "Add to settings",
     "addToTransactions": "Add to transactions",
+    "amexCard": "AMEX Card",
     "amexGold": "Amex Gold Card",
     "amexPlatinum": "Amex Platinum Card",
     "appleCard": "Apple Card",
@@ -273,8 +274,8 @@
     "startDate": "Start Date",
     "subtitle": "Import and export your data.",
     "title": "Data",
-    "uploadStatement": "Upload statement",
-    "uploadStatementDesc": "Select a card or \"Exported Data (PDF)\", then choose a CSV file (Amex, Apple) or a previously downloaded export PDF. CSV imports skip transactions that already exist (same date and amount). Exported data imports skip by ID. After reviewing the preview, click \"Add to transactions\" or \"Add all\" to save—they persist across refreshes and appear on the Transactions and Income pages."
+    "uploadStatement": "Import data",
+    "uploadStatementDesc": "Select a source to import CSV or Exported Data (PDF)."
   },
   "income": {
     "addIncome": "Add income",

@@ -95,13 +95,12 @@ export function ImportPage() {
       selectedSource !== "pdf-export" &&
       !cardSources.includes(selectedSource)
     ) {
-      const firstValid = cardSources.includes("amex")
-        ? "amex"
-        : cardSources.includes("amex-gold")
-        ? "amex-gold"
-        : cardSources.includes("apple")
-        ? "apple"
-        : "pdf-export";
+      const firstValid =
+        cardSources.includes("amex") || cardSources.includes("amex-gold")
+          ? "amex"
+          : cardSources.includes("apple")
+          ? "apple"
+          : "pdf-export";
       setSelectedSource(firstValid as SourceChoice);
     }
   }, [cardSources, selectedSource]);
@@ -234,7 +233,7 @@ export function ImportPage() {
             setSourceLabel("");
             return;
           }
-          handleParsedExport(parsed, "Exported Data (PDF)");
+          handleParsedExport(parsed, t("import.exportedPdf"));
         } catch (err) {
           setImportError(
             err instanceof Error ? err.message : "PDF import failed"
@@ -255,31 +254,23 @@ export function ImportPage() {
         try {
           const text = String(reader.result);
           const csvSource: CsvSource =
-            selectedSource === "amex" || selectedSource === "amex-gold"
-              ? "amex"
-              : (selectedSource as CsvSource);
+            selectedSource === "amex" ? "amex" : (selectedSource as CsvSource);
           const result = parseCsv(text, csvSource);
           let toAdd = filterOutExistingExpenses(result.expenses, expenses);
-          if (selectedSource === "amex-gold") {
-            toAdd = toAdd.map((e) => ({
-              ...e,
-              source: "amex-gold" as const,
-              id: e.id.replace(/^amex-/, "amex-gold-"),
-            }));
-          } else if (selectedSource === "amex") {
-            toAdd = toAdd.map((e) => ({ ...e, source: "amex" as const }));
+          if (selectedSource === "amex") {
+            const source =
+              cardSources.includes("amex") ? "amex" : "amex-gold";
+            toAdd = toAdd.map((e) => ({ ...e, source }));
           }
           setSkippedDuplicates(result.expenses.length - toAdd.length);
           setPreviewExpenses(toAdd);
           setPreviewIncome([]);
           const label =
             selectedSource === "amex"
-              ? "Amex Platinum Card"
-              : selectedSource === "amex-gold"
-              ? "Amex Gold Card"
+              ? t("import.amexCard")
               : selectedSource === "apple"
-              ? "Apple Card"
-              : "CSV Import";
+              ? t("import.appleCard")
+              : t("import.chooseCsvFile");
           setSourceLabel(label);
           setLastDetected(selectedSource);
         } catch (err) {
@@ -323,7 +314,7 @@ export function ImportPage() {
         setExportStringError("Export string not recognized.");
         return;
       }
-      handleParsedExport(parsed, "Exported Data (String)");
+      handleParsedExport(parsed, t("import.importExportString"));
     } catch (err) {
       setExportStringError(
         err instanceof Error ? err.message : "Export string import failed"
@@ -351,7 +342,7 @@ export function ImportPage() {
           setJsonImportError("JSON export contained no data.");
           return;
         }
-        handleParsedExport(parsed, "Exported Data (JSON)");
+        handleParsedExport(parsed, t("import.importJson"));
       } catch (err) {
         setJsonImportError(
           err instanceof Error ? err.message : "JSON import failed"
@@ -576,7 +567,7 @@ export function ImportPage() {
               {exportStringError}
             </span>
           )}
-          <Button onClick={handleExportStringImport}>
+          <Button onClick={handleExportStringImport} className="w-full md:w-auto">
             {t("import.importExportString")}
           </Button>
         </CardContent>
@@ -594,7 +585,10 @@ export function ImportPage() {
             className="hidden"
             onChange={handleJsonFileChange}
           />
-          <Button onClick={() => jsonInputRef.current?.click()}>
+          <Button
+            onClick={() => jsonInputRef.current?.click()}
+            className="w-full md:w-auto"
+          >
             {t("import.importJson")}
           </Button>
           {jsonImportError && (
@@ -609,14 +603,26 @@ export function ImportPage() {
           <CardTitle>{t("import.exportTitle")}</CardTitle>
           <CardDescription>{t("import.exportDesc")}</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={handleDownloadPdf}>
+        <CardContent className="flex flex-col md:flex-row gap-2">
+          <Button
+            variant="outline"
+            onClick={handleDownloadPdf}
+            className="w-full md:w-auto"
+          >
             {t("import.downloadPdf")}
           </Button>
-          <Button variant="outline" onClick={handleDownloadJson}>
+          <Button
+            variant="outline"
+            onClick={handleDownloadJson}
+            className="w-full md:w-auto"
+          >
             {t("import.downloadJson")}
           </Button>
-          <Button variant="outline" onClick={handleDownloadExportString}>
+          <Button
+            variant="outline"
+            onClick={handleDownloadExportString}
+            className="w-full md:w-auto"
+          >
             {t("import.downloadExportString")}
           </Button>
         </CardContent>

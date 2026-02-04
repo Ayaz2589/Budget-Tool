@@ -236,6 +236,7 @@
     "addAll": "सभी जोड़ें",
     "addMissing": "सेटिंग्स में जोड़ें",
     "addToTransactions": "लेनदेन में जोड़ें",
+    "amexCard": "AMEX कार्ड",
     "amexGold": "अमैक्स गोल्ड कार्ड",
     "amexPlatinum": "अमैक्स प्लैटिनम कार्ड",
     "appleCard": "Apple कार्ड",
@@ -275,8 +276,8 @@
     "startDate": "शुरू तारीख",
     "subtitle": "डेटा आयात और निर्यात करें।",
     "title": "डेटा",
-    "uploadStatement": "स्टेटमेंट अपलोड करें",
-    "uploadStatementDesc": "कार्ड या \"Exported Data (PDF)\" चुनें, फिर CSV या PDF अपलोड करें।"
+    "uploadStatement": "डेटा आयात करें",
+    "uploadStatementDesc": "CSV या निर्यातित डेटा (PDF) आयात करने के लिए एक स्रोत चुनें।"
   },
   "income": {
     "addIncome": "आय जोड़ें",

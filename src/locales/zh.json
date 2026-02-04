@@ -237,6 +237,7 @@
     "addMissing": "添加到设置",
     "addToTransactions": "添加到交易",
     "americanExpress": "American Express",
+    "amexCard": "AMEX 卡",
     "amexGold": "美国运通金卡",
     "amexPlatinum": "美国运通白金卡",
     "appleCard": "Apple Card",
@@ -275,8 +276,8 @@
     "startDate": "开始日期",
     "subtitle": "导入和导出你的数据。",
     "title": "数据",
-    "uploadStatement": "上传账单",
-    "uploadStatementDesc": "选择卡片或“导出数据(PDF)”，然后上传 CSV 或 PDF。"
+    "uploadStatement": "导入数据",
+    "uploadStatementDesc": "选择一个来源来导入 CSV 或导出的数据（PDF）。"
   },
   "income": {
     "addIncome": "添加收入",

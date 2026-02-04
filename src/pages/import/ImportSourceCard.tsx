@@ -17,43 +17,11 @@ function PdfExportIcon({
 }) {
   return <FileText size={size} className={className} />;
 }
-import {
-  AmexPlatinumCardIcon,
-  AmexGoldCardIcon,
-  AppleCardIcon,
-} from "@/components/cards";
-import { EXPENSE_SOURCE_DISPLAY_LABELS } from "@/lib/sourceLabels";
+import { AmexPlatinumCardIcon, AppleCardIcon } from "@/components/cards";
 import { cn } from "@/lib/utils";
 import type { SourceChoice, ImportSourceCardProps } from "@/types/import";
 
 export type { ImportSourceCardProps };
-
-const ALL_SOURCE_OPTIONS: {
-  value: SourceChoice;
-  label: string;
-  icon: React.ComponentType<{ className?: string; size?: number }>;
-}[] = [
-  {
-    value: "amex",
-    label: EXPENSE_SOURCE_DISPLAY_LABELS.amex,
-    icon: AmexPlatinumCardIcon,
-  },
-  {
-    value: "amex-gold",
-    label: EXPENSE_SOURCE_DISPLAY_LABELS["amex-gold"],
-    icon: AmexGoldCardIcon,
-  },
-  {
-    value: "apple",
-    label: EXPENSE_SOURCE_DISPLAY_LABELS.apple,
-    icon: AppleCardIcon,
-  },
-  {
-    value: "pdf-export",
-    label: "Exported Data (PDF)",
-    icon: PdfExportIcon,
-  },
-];
 
 export function ImportSourceCard({
   selectedSource,
@@ -74,9 +42,33 @@ export function ImportSourceCard({
   cardSources,
   t,
 }: ImportSourceCardProps) {
-  const sourceOptions = ALL_SOURCE_OPTIONS.filter(
-    (opt) => opt.value === "pdf-export" || cardSources.includes(opt.value)
-  );
+  const sourceOptions: {
+    value: SourceChoice;
+    label: string;
+    icon: React.ComponentType<{ className?: string; size?: number }>;
+  }[] = [
+    {
+      value: "amex",
+      label: t("import.amexCard"),
+      icon: AmexPlatinumCardIcon,
+    },
+    {
+      value: "apple",
+      label: t("import.appleCard"),
+      icon: AppleCardIcon,
+    },
+    {
+      value: "pdf-export",
+      label: t("import.exportedPdf"),
+      icon: PdfExportIcon,
+    },
+  ].filter((opt) => {
+    if (opt.value === "pdf-export") return true;
+    if (opt.value === "amex") {
+      return cardSources.includes("amex") || cardSources.includes("amex-gold");
+    }
+    return cardSources.includes(opt.value);
+  });
   const hasPreview =
     previewExpensesCount > 0 ||
     previewIncomeCount > 0 ||
@@ -90,7 +82,7 @@ export function ImportSourceCard({
         <CardDescription>{t("import.uploadStatementDesc")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {sourceOptions.map((opt) => {
             const Icon = opt.icon;
             const isPdfOpt = opt.value === "pdf-export";
@@ -98,7 +90,14 @@ export function ImportSourceCard({
               <button
                 key={opt.value}
                 type="button"
-                onClick={() => onSourceChange(opt.value)}
+                onClick={() => {
+                  onSourceChange(opt.value);
+                  if (fileInputRef.current) {
+                    fileInputRef.current.accept =
+                      opt.value === "pdf-export" ? ".pdf" : ".csv";
+                    fileInputRef.current.click();
+                  }
+                }}
                 className={cn(
                   "flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors text-left",
                   "hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -127,12 +126,6 @@ export function ImportSourceCard({
           className="hidden"
           onChange={onFileChange}
         />
-        <Button onClick={() => fileInputRef.current?.click()}>
-          <Upload className="size-4" />
-          {selectedSource === "pdf-export"
-            ? t("import.chooseExportedPdf")
-            : t("import.chooseCsvFile")}
-        </Button>
         {importError && (
           <span className="text-sm text-destructive block">{importError}</span>
         )}
@@ -155,7 +148,7 @@ export function ImportSourceCard({
           </span>
         )}
         {hasPreview && (
-          <Button onClick={onAddToTransactions}>
+          <Button onClick={onAddToTransactions} className="w-full md:w-auto">
             {isPdfExport ? "Add all" : "Add to transactions"}
           </Button>
         )}

@@ -236,6 +236,7 @@
     "addAll": "すべて追加",
     "addMissing": "設定に追加",
     "addToTransactions": "取引に追加",
+    "amexCard": "AMEXカード",
     "amexGold": "アメックス・ゴールドカード",
     "amexPlatinum": "アメックス・プラチナカード",
     "appleCard": "Apple Card",
@@ -275,8 +276,8 @@
     "startDate": "開始日",
     "subtitle": "データのインポートとエクスポート。",
     "title": "データ",
-    "uploadStatement": "明細をアップロード",
-    "uploadStatementDesc": "カードまたは「エクスポートデータ(PDF)」を選択し、CSVまたはPDFをアップロードします。"
+    "uploadStatement": "データをインポート",
+    "uploadStatementDesc": "CSV またはエクスポートデータ（PDF）を取り込むソースを選択してください。"
   },
   "income": {
     "addIncome": "収入を追加",

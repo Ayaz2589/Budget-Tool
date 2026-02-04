@@ -237,6 +237,7 @@
     "addMissing": "Agregar a ajustes",
     "addToTransactions": "Añadir a transacciones",
     "americanExpress": "American Express",
+    "amexCard": "Tarjeta AMEX",
     "amexGold": "Tarjeta Amex Gold",
     "amexPlatinum": "Tarjeta Amex Platinum",
     "appleCard": "Apple Card",
@@ -275,8 +276,8 @@
     "startDate": "Fecha inicio",
     "subtitle": "Importa y exporta tus datos.",
     "title": "Datos",
-    "uploadStatement": "Subir extracto",
-    "uploadStatementDesc": "Selecciona una tarjeta o \"Datos exportados (PDF)\", luego elige un CSV (Amex, Apple) o un PDF exportado. Los CSV omiten transacciones existentes. Los datos exportados omiten por ID."
+    "uploadStatement": "Importar datos",
+    "uploadStatementDesc": "Selecciona una fuente para importar CSV o Datos exportados (PDF)."
   },
   "income": {
     "addIncome": "Añadir ingreso",

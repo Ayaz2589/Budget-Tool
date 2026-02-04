@@ -230,6 +230,10 @@ export function Layout() {
     prevSignedInRef.current = isSignedIn;
   }, [isSignedIn, navigate]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location.pathname]);
+
   const handleLanguageChange = (locale: string) => {
     i18n.changeLanguage(locale);
     persistLocale(locale);

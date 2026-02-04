@@ -81,10 +81,9 @@ export function OwnersCard({ owners, onRemove, onAdd }: OwnersCardProps) {
           <Button
             type="button"
             variant="default"
-            size="sm"
             onClick={handleAdd}
             disabled={!newOwner.trim()}
-            className="shrink-0"
+            className="h-11 shrink-0"
           >
             {t("settings.addOwner")}
           </Button>

@@ -31,110 +31,108 @@ export function IncomeTable({
   onUpdateOwner,
 }: IncomeTableProps) {
   return (
-    <div className="overflow-x-auto max-h-[50vh] overflow-y-auto border rounded-md">
-      <Table>
-        <TableHeader>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Date</TableHead>
+          <TableHead>Description</TableHead>
+          <TableHead>Amount</TableHead>
+          <TableHead>Category</TableHead>
+          <TableHead>Owner</TableHead>
+          <TableHead className="w-[120px]">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {sortedIncome.length === 0 ? (
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Owner</TableHead>
-            <TableHead className="w-[120px]">Actions</TableHead>
+            <TableCell
+              colSpan={6}
+              className="text-center text-muted-foreground py-8"
+            >
+              No income entries. Add one above.
+            </TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedIncome.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={6}
-                className="text-center text-muted-foreground py-8"
-              >
-                No income entries. Add one above.
+        ) : (
+          sortedIncome.map((i) => (
+            <TableRow key={i.id}>
+              <TableCell className="whitespace-nowrap">{i.date}</TableCell>
+              <TableCell>{i.description}</TableCell>
+              <TableCell>{formatCurrency(i.amount)}</TableCell>
+              <TableCell>
+                <Select
+                  value={i.category || "_"}
+                  onValueChange={(v) =>
+                    onUpdateCategory(i.id, v === "_" ? "" : v)
+                  }
+                >
+                  <SelectTrigger className="w-[220px] min-w-[200px]">
+                    <SelectValue>
+                      <CategoryOption
+                        name={i.category || "Uncategorized"}
+                        type="income"
+                      />
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_">
+                      <CategoryOption name="Uncategorized" type="income" />
+                    </SelectItem>
+                    {incomeCategories.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        <CategoryOption name={c} type="income" />
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell>
+                <Select
+                  value={i.owner || "_none"}
+                  onValueChange={(v) =>
+                    onUpdateOwner(i.id, v === "_none" ? "" : v)
+                  }
+                >
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_none">No Owner</SelectItem>
+                    {ownerOptions.map((o) => (
+                      <SelectItem key={o} value={o}>
+                        {o}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
+                    onClick={() => onEdit(i)}
+                    aria-label="Edit"
+                  >
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 text-destructive hover:text-destructive"
+                    onClick={() => onDelete(i.id)}
+                    aria-label="Delete"
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
-          ) : (
-            sortedIncome.map((i) => (
-              <TableRow key={i.id}>
-                <TableCell className="whitespace-nowrap">{i.date}</TableCell>
-                <TableCell>{i.description}</TableCell>
-                <TableCell>{formatCurrency(i.amount)}</TableCell>
-                <TableCell>
-                  <Select
-                    value={i.category || "_"}
-                    onValueChange={(v) =>
-                      onUpdateCategory(i.id, v === "_" ? "" : v)
-                    }
-                  >
-                    <SelectTrigger className="w-[220px] min-w-[200px]">
-                      <SelectValue>
-                        <CategoryOption
-                          name={i.category || "Uncategorized"}
-                          type="income"
-                        />
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="_">
-                        <CategoryOption name="Uncategorized" type="income" />
-                      </SelectItem>
-                      {incomeCategories.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          <CategoryOption name={c} type="income" />
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <Select
-                    value={i.owner || "_none"}
-                    onValueChange={(v) =>
-                      onUpdateOwner(i.id, v === "_none" ? "" : v)
-                    }
-                  >
-                    <SelectTrigger className="w-[120px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="_none">No Owner</SelectItem>
-                      {ownerOptions.map((o) => (
-                        <SelectItem key={o} value={o}>
-                          {o}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => onEdit(i)}
-                      aria-label="Edit"
-                    >
-                      <Pencil className="size-4" />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-destructive hover:text-destructive"
-                      onClick={() => onDelete(i.id)}
-                      aria-label="Delete"
-                    >
-                      <Trash2 className="size-4 text-destructive" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+          ))
+        )}
+      </TableBody>
+    </Table>
   );
 }

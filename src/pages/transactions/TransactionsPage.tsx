@@ -242,7 +242,7 @@ export function TransactionsPage() {
               t={t}
             />
           </div>
-          <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 md:px-0 md:gap-4 transactions-card-content">
+        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
             <SyncConfirmDialog
               open={syncConfirmOpen}
               onOpenChange={setSyncConfirmOpen}

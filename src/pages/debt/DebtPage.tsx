@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import type { Debt, DebtPayment } from "@/lib/types";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,

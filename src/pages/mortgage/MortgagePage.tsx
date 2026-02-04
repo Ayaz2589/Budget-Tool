@@ -4,7 +4,6 @@ import { useBudget } from "@/context/BudgetContext";
 import type { Expense } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageTourTrigger } from "@/components/PageTourTrigger";
-import { formatCurrency } from "@/lib/format";
 import { mortgageTourSteps } from "@/lib/pageTourSteps";
 import { Button } from "@/components/ui/button";
 import { Home, Plus } from "lucide-react";
@@ -38,13 +37,6 @@ export function MortgagePage() {
       )
       .sort((a, b) => b.date.localeCompare(a.date));
   }, [expenses]);
-
-  const totalThisYear = useMemo(() => {
-    const y = new Date().getFullYear();
-    return mortgagePayments
-      .filter((e) => e.date.startsWith(String(y)))
-      .reduce((s, e) => s + e.amount, 0);
-  }, [mortgagePayments]);
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();

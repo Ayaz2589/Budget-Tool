@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 
 function PdfExportIcon({
   className = "",
@@ -42,11 +42,7 @@ export function ImportSourceCard({
   cardSources,
   t,
 }: ImportSourceCardProps) {
-  const sourceOptions: {
-    value: SourceChoice;
-    label: string;
-    icon: React.ComponentType<{ className?: string; size?: number }>;
-  }[] = [
+  const sourceOptions = [
     {
       value: "amex",
       label: t("import.amexCard"),
@@ -62,7 +58,13 @@ export function ImportSourceCard({
       label: t("import.exportedPdf"),
       icon: PdfExportIcon,
     },
-  ].filter((opt) => {
+  ] satisfies {
+    value: SourceChoice;
+    label: string;
+    icon: React.ComponentType<{ className?: string; size?: number }>;
+  }[];
+
+  const filteredSourceOptions = sourceOptions.filter((opt) => {
     if (opt.value === "pdf-export") return true;
     if (opt.value === "amex") {
       return cardSources.includes("amex") || cardSources.includes("amex-gold");
@@ -83,7 +85,7 @@ export function ImportSourceCard({
       </CardHeader>
       <CardContent className="space-y-4 px-4 md:px-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {sourceOptions.map((opt) => {
+          {filteredSourceOptions.map((opt) => {
             const Icon = opt.icon;
             const isPdfOpt = opt.value === "pdf-export";
             return (

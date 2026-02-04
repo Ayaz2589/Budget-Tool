@@ -254,7 +254,7 @@ export function Layout() {
       </header>
 
       {/* Desktop sidebar: fixed width so it doesn't change with language */}
-      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 border-r bg-muted/30 p-2 flex-col gap-1 w-[200px] overflow-hidden">
+      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 border-r bg-muted/30 p-2 flex-col gap-1 w-[220px] overflow-hidden">
         <SidebarContent
           location={location}
           t={t}
@@ -268,7 +268,7 @@ export function Layout() {
       </nav>
       <main
         className={cn(
-          "flex-1 flex flex-col pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6 md:ml-[200px] md:w-[calc(100%-200px)]",
+          "flex-1 flex flex-col pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6 md:ml-[220px] md:w-[calc(100%-220px)]",
           location.pathname === "/dashboard/transactions" ||
             location.pathname === "/dashboard/income" ||
             location.pathname === "/dashboard/debt" ||

@@ -2,7 +2,7 @@
 
 ## Budget Tool — What Was Done So Far
 
-**Last updated:** 2026-02-03
+**Last updated:** 2026-02-04
 
 ---
 

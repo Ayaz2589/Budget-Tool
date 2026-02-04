@@ -1,9 +1,9 @@
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Trash2 } from "lucide-react";
@@ -29,6 +29,8 @@ export function MortgagePaymentActionsDialog({
   t,
 }: MortgagePaymentActionsDialogProps) {
   if (payment === null) return null;
+  const fieldClass = "h-11 w-full";
+  const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
   const handleRemove = () => {
     onRemove(payment);
@@ -36,34 +38,48 @@ export function MortgagePaymentActionsDialog({
   };
 
   return (
-    <Dialog open={payment !== null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent
+    <Sheet open={payment !== null} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent
+        side="right"
         showCloseButton={true}
-        className="fixed bottom-0 left-0 right-0 top-auto z-50 w-full max-w-full max-h-[85vh] translate-x-0 translate-y-0 rounded-t-2xl border-t p-0 gap-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
+        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
       >
-        <DialogHeader className="p-4 pb-2">
-          <DialogTitle className="text-left truncate pr-8">
+        <SheetHeader className="px-4 pt-5 pb-3">
+          <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
             {payment.date} · {formatCurrency(payment.amount)}
-          </DialogTitle>
-        </DialogHeader>
-        <div className="overflow-y-auto overscroll-contain px-4 pb-8 flex flex-col gap-4">
-          <div className="text-sm text-muted-foreground space-y-1">
-            <p className="font-medium text-foreground">
-              <CategoryOption
-                name={payment.category ?? "Mortgage"}
-                type="expense"
-              />
-            </p>
+          </SheetTitle>
+        </SheetHeader>
+        <div className="grid gap-5 px-4 pb-8 overflow-y-auto overscroll-contain">
+          <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
+            <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
+              <span>{t("common.category")}</span>
+              <span>
+                <CategoryOption
+                  name={payment.category ?? "Mortgage"}
+                  type="expense"
+                />
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                {t("common.amount")}
+              </span>
+              <span className="text-lg font-semibold text-foreground">
+                {formatCurrency(payment.amount)}
+              </span>
+            </div>
           </div>
           <div className="space-y-2">
-            <Label>{t("common.owner")}</Label>
+            <Label className="text-sm text-muted-foreground">
+              {t("common.owner")}
+            </Label>
             <Select
               value={payment.owner || "_none"}
               onValueChange={(v) =>
                 onUpdateOwner(payment.id, v === "_none" ? "" : v)
               }
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className={selectTriggerClass}>
                 <SelectValue placeholder={t("common.noOwner")} />
               </SelectTrigger>
               <SelectContent>
@@ -78,14 +94,14 @@ export function MortgagePaymentActionsDialog({
           </div>
           <Button
             variant="destructive"
-            className="w-full"
+            className={fieldClass}
             onClick={handleRemove}
           >
             <Trash2 className="size-4" />
             {t("common.remove")}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }

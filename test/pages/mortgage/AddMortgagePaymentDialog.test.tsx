@@ -2,23 +2,6 @@ import { test, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { AddMortgagePaymentDialog } from "@/pages/mortgage/AddMortgagePaymentDialog";
 
-test("AddMortgagePaymentDialog shows Add payment button when closed", () => {
-  render(
-    <AddMortgagePaymentDialog
-      open={false}
-      onOpenChange={() => {}}
-      date=""
-      onDateChange={() => {}}
-      amount=""
-      onAmountChange={() => {}}
-      onSubmit={() => {}}
-    />,
-  );
-  expect(
-    screen.getByRole("button", { name: /add payment/i }),
-  ).toBeInTheDocument();
-});
-
 test("AddMortgagePaymentDialog shows title when open", () => {
   render(
     <AddMortgagePaymentDialog

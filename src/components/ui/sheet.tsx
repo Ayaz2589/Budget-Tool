@@ -38,6 +38,7 @@ const SheetContent = ({
   className,
   children,
   showCloseButton = true,
+  onOpenAutoFocus,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: keyof typeof sheetVariants;
@@ -58,6 +59,10 @@ const SheetContent = ({
           useMobileTopSheet &&
             "!inset-0 !h-[100dvh] !w-screen !max-w-none !border-0 !rounded-none data-[state=open]:slide-in-from-top data-[state=closed]:slide-out-to-top"
         )}
+        onOpenAutoFocus={(event) => {
+          if (useMobileTopSheet) event.preventDefault();
+          onOpenAutoFocus?.(event);
+        }}
         {...props}
       >
         {children}

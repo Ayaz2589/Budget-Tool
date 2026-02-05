@@ -22,7 +22,7 @@
     "sourceAmexGold": "Amex Gold 카드",
     "sourceAmexPlatinum": "Amex Platinum 카드",
     "sourceApple": "Apple 카드",
-    "sourceChase": "Chase",
+    "sourceChase": "체이스",
     "sourceManual": "수동",
     "sourceTd": "TD",
     "transaction": "거래",
@@ -321,7 +321,7 @@
     "footerCta": "Google로 로그인",
     "heroCta": "시작하기",
     "heroTagline": "한 곳에서 지출, 수입, 예산을 추적하세요.",
-    "heroTitle": "Ortho",
+    "heroTitle": "모두를 위한 더 스마트한 예산 관리",
     "valueProp": "Amex, Apple Card, Chase에서 가져오기. 지출 분류, Google 스프레드시트 동기화."
   },
   "layout": {
@@ -391,7 +391,7 @@
     "expenseCategoriesDesc": "쉼표로 구분된 목록. 드롭다운 및 규칙에 사용.",
     "expenseCategoriesPlaceholder": "내 구매, Tasnuva 구매, 50/50, Amazon",
     "expenseCategoriesUncategorizedHint": "카테고리를 제거하면 해당 거래는 미분류로 설정됩니다.",
-    "googleSheets": "Google Sheets",
+    "googleSheets": "Google 스프레드시트",
     "googleSheetsDesc": "Google 계정을 연결하고 지출, 수입 및 합계를 스프레드시트에 동기화하세요.",
     "incomeCategories": "수입 카테고리",
     "incomeCategoriesDesc": "수입 항목의 쉼표로 구분된 목록.",
@@ -480,7 +480,7 @@
       "deleteAllContent": "모든 데이터를 영구 삭제합니다.",
       "deleteAllTitle": "모든 데이터 삭제",
       "googleSheetsContent": "동기화를 위해 연결하세요.",
-      "googleSheetsTitle": "Google Sheets",
+      "googleSheetsTitle": "Google 스프레드시트 동기화",
       "introContent": "카테고리와 소유자 관리.",
       "introTitle": "설정"
     },

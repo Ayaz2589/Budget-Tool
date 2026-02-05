@@ -22,7 +22,7 @@
     "sourceAmexGold": "অ্যামেক্স গোল্ড",
     "sourceAmexPlatinum": "অ্যামেক্স প্লাটিনাম",
     "sourceApple": "Apple কার্ড",
-    "sourceChase": "Chase",
+    "sourceChase": "চেইজ",
     "sourceManual": "ম্যানুয়াল",
     "sourceTd": "TD",
     "transaction": "লেনদেন",
@@ -321,7 +321,7 @@
     "footerCta": "Google দিয়ে সাইন ইন করুন",
     "heroCta": "শুরু করুন",
     "heroTagline": "এক জায়গায় ব্যয়, আয় এবং বাজেট ট্র্যাক করুন।",
-    "heroTitle": "Ortho",
+    "heroTitle": "সবার জন্য স্মার্ট বাজেটিং",
     "valueProp": "Amex, Apple Card এবং Chase থেকে ইম্পোর্ট করুন। ব্যয় ক্যাটাগরাইজ করুন, Google Sheets এর সাথে সিঙ্ক করুন।"
   },
   "layout": {
@@ -391,7 +391,7 @@
     "expenseCategoriesDesc": "কমা-বিচ্ছিন্ন তালিকা। ড্রপডাউন ও নিয়মে ব্যবহৃত।",
     "expenseCategoriesPlaceholder": "আমার ক্রয়, তাসনুভার ক্রয়, ৫০/৫০, Amazon",
     "expenseCategoriesUncategorizedHint": "ক্যাটাগরি সরালে সংশ্লিষ্ট লেনদেন অশ্রেণীবদ্ধ হয়ে যাবে।",
-    "googleSheets": "Google Sheets",
+    "googleSheets": "গুগল শিটস",
     "googleSheetsDesc": "আপনার Google অ্যাকাউন্ট সংযুক্ত করুন এবং ব্যয়, আয় ও মোট একটি স্প্রেডশিটে সিঙ্ক করুন।",
     "incomeCategories": "আয় ক্যাটাগরি",
     "incomeCategoriesDesc": "আয় এন্ট্রির জন্য কমা-বিচ্ছিন্ন তালিকা।",
@@ -480,7 +480,7 @@
       "deleteAllContent": "সব ডেটা স্থায়ীভাবে মুছবে।",
       "deleteAllTitle": "সব ডেটা মুছুন",
       "googleSheetsContent": "ডেটা সিঙ্ক করার জন্য কানেক্ট করুন।",
-      "googleSheetsTitle": "Google Sheets",
+      "googleSheetsTitle": "গুগল শিটস সিঙ্ক",
       "introContent": "ক্যাটাগরি ও মালিক ম্যানেজ করুন।",
       "introTitle": "সেটিংস"
     },

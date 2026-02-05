@@ -22,7 +22,7 @@
     "sourceAmexGold": "Amex Gold कार्ड",
     "sourceAmexPlatinum": "Amex Platinum कार्ड",
     "sourceApple": "Apple कार्ड",
-    "sourceChase": "Chase",
+    "sourceChase": "चेस",
     "sourceManual": "मैनुअल",
     "sourceTd": "TD",
     "transaction": "लेनदेन",
@@ -321,7 +321,7 @@
     "footerCta": "Google से साइन इन करें",
     "heroCta": "शुरू करें",
     "heroTagline": "एक जगह खर्च, आय और बजट ट्रैक करें।",
-    "heroTitle": "Ortho",
+    "heroTitle": "सबके लिए स्मार्ट बजटिंग",
     "valueProp": "Amex, Apple Card और Chase से इम्पोर्ट करें। खर्च कैटेगराइज़ करें, Google Sheets के साथ सिंक करें।"
   },
   "layout": {
@@ -480,7 +480,7 @@
       "deleteAllContent": "सभी डेटा स्थायी रूप से हटाता है।",
       "deleteAllTitle": "सभी डेटा हटाएँ",
       "googleSheetsContent": "डेटा सिंक करने के लिए कनेक्ट करें।",
-      "googleSheetsTitle": "Google Sheets",
+      "googleSheetsTitle": "Google Sheets सिंक",
       "introContent": "श्रेणियाँ और मालिक प्रबंधित करें।",
       "introTitle": "सेटिंग्स"
     },

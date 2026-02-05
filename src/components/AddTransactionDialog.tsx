@@ -351,7 +351,11 @@ export function AddTransactionDialog({
                       {t("addTransaction.date")}
                     </div>
                     <Input
-                      type="date"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="YYYY-MM-DD"
+                      pattern="\d{4}-\d{2}-\d{2}"
+                      maxLength={10}
                       className={fieldClass}
                       value={row.date}
                       onChange={(e) =>

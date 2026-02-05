@@ -75,7 +75,7 @@ export function MortgagePage() {
             {t("mortgage.subtitle")}
           </p>
         </div>
-        <Button onClick={() => setAddOpen(true)}>
+        <Button data-tour-action="openAddMortgage" onClick={() => setAddOpen(true)}>
           <Plus className="size-4" />
           {t("mortgage.addPayment")}
         </Button>
@@ -107,33 +107,35 @@ export function MortgagePage() {
             onSubmit={handleAdd}
           />
 
-          {mortgagePayments.length === 0 ? (
-            <div className="text-center text-muted-foreground py-10 px-4 md:px-0 flex flex-col items-center gap-3">
-              <Home className="size-8 text-muted-foreground/70" />
-              <p className="text-sm font-medium text-foreground/80">
-                {t("mortgage.noPaymentsYet")}
-              </p>
-            </div>
-          ) : (
-            <div data-tour="paymentsList">
-              <div className="hidden md:block md:border md:rounded-md">
-                <MortgagePaymentsTable
-                  payments={mortgagePayments}
-                  onRemove={setDeleteConfirm}
-                  onUpdateOwner={(id, owner) =>
-                    updateExpense(id, { owner: owner || undefined })
-                  }
-                  ownerOptions={owners}
-                />
+          <div data-tour="paymentsList">
+            {mortgagePayments.length === 0 ? (
+              <div className="text-center text-muted-foreground py-10 px-4 md:px-0 flex flex-col items-center gap-3">
+                <Home className="size-8 text-muted-foreground/70" />
+                <p className="text-sm font-medium text-foreground/80">
+                  {t("mortgage.noPaymentsYet")}
+                </p>
               </div>
-              <div className="md:hidden">
-                <MortgagePaymentsList
-                  payments={mortgagePayments}
-                  onPaymentTap={setPaymentForActions}
-                />
-              </div>
-            </div>
-          )}
+            ) : (
+              <>
+                <div className="hidden md:block md:border md:rounded-md">
+                  <MortgagePaymentsTable
+                    payments={mortgagePayments}
+                    onRemove={setDeleteConfirm}
+                    onUpdateOwner={(id, owner) =>
+                      updateExpense(id, { owner: owner || undefined })
+                    }
+                    ownerOptions={owners}
+                  />
+                </div>
+                <div className="md:hidden">
+                  <MortgagePaymentsList
+                    payments={mortgagePayments}
+                    onPaymentTap={setPaymentForActions}
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -142,6 +144,7 @@ export function MortgagePage() {
           <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
             <Button
               onClick={() => setAddOpen(true)}
+              data-tour-action="openAddMortgage"
               className="h-11 w-11 rounded-full p-0"
               aria-label={t("mortgage.addMortgagePayment")}
             >

@@ -66,7 +66,11 @@ export function DebtPage() {
           </div>
           <p className="text-sm text-muted-foreground">{t("debt.subtitle")}</p>
         </div>
-        <Button data-tour="addDebt" onClick={() => setAddDebtOpen(true)}>
+        <Button
+          data-tour="addDebt"
+          data-tour-action="openAddDebt"
+          onClick={() => setAddDebtOpen(true)}
+        >
           <Plus className="size-4" />
           {t("debt.addDebt")}
         </Button>
@@ -137,6 +141,7 @@ export function DebtPage() {
           <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
             <Button
               onClick={() => setAddDebtOpen(true)}
+              data-tour-action="openAddDebt"
               className="h-11 w-11 rounded-full p-0"
               aria-label={t("debt.addDebt")}
             >

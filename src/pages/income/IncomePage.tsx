@@ -61,7 +61,11 @@ export function IncomePage() {
           </div>
           <p className="text-sm text-muted-foreground">{t("income.subtitle")}</p>
         </div>
-        <Button data-tour="addIncome" onClick={() => setAddOpen(true)}>
+        <Button
+          data-tour="addIncome"
+          data-tour-action="openAddIncome"
+          onClick={() => setAddOpen(true)}
+        >
           <Plus className="size-4" />
           {t("income.addIncome")}
         </Button>
@@ -128,6 +132,7 @@ export function IncomePage() {
           <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
             <Button
               onClick={() => setAddOpen(true)}
+              data-tour-action="openAddIncome"
               className="h-11 w-11 rounded-full p-0"
               aria-label={t("income.addIncome")}
             >

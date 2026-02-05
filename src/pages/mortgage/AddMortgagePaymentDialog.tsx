@@ -37,6 +37,7 @@ export function AddMortgagePaymentDialog({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
+        data-tour="addMortgageSheet"
         className="flex flex-col h-full w-[85vw] max-w-sm border-l p-4 gap-3 overflow-hidden rounded-l-2xl"
       >
         <SheetHeader className="gap-2">

@@ -317,11 +317,15 @@ export function TransactionsPage() {
       </div>
 
       <div className="md:hidden fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-30 px-4 pb-3 pointer-events-none">
-        <div className="pointer-events-auto flex items-center justify-end">
+        <div
+          data-tour="toolbar"
+          className="pointer-events-auto flex items-center justify-end"
+        >
           <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
             <Button
               variant="secondary"
               onClick={() => setFiltersPopupOpen(true)}
+              data-tour-action="openFilters"
               className="h-11 w-11 rounded-full p-0"
               aria-label={
                 hasActiveFilters
@@ -333,6 +337,7 @@ export function TransactionsPage() {
             </Button>
             <Button
               onClick={() => setAddTransactionOpen(true)}
+              data-tour-action="openAddExpense"
               className="h-11 w-11 rounded-full p-0"
               aria-label={t("common.add")}
             >

@@ -75,6 +75,10 @@ export function MortgagePage() {
             {t("mortgage.subtitle")}
           </p>
         </div>
+        <Button onClick={() => setAddOpen(true)}>
+          <Plus className="size-4" />
+          {t("mortgage.addPayment")}
+        </Button>
       </div>
       <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
         <div className="px-0 py-3 flex items-center justify-between gap-3">

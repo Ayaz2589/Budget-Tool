@@ -46,7 +46,7 @@ export function IncomeCategoriesCard({
         <CardTitle>{t("settings.incomeCategories")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 pb-6 px-4 md:px-0">
-        <ul className="space-y-2">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {categories.map((category) => (
             <li
               key={category}

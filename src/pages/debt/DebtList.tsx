@@ -51,53 +51,53 @@ export function DebtList({
               key={debt.id}
               className="pb-6 border-b border-border/60 last:border-b-0 space-y-4"
             >
-              <div>
-                <h3 className="font-semibold text-lg">{debt.name}</h3>
-                <div className="flex flex-wrap items-center gap-2 text-muted-foreground text-sm mt-0.5">
-                  <Select
-                    value={debt.owner || "_none"}
-                    onValueChange={(v) =>
-                      onUpdateOwner(debt.id, v === "_none" ? "" : v)
-                    }
-                  >
-                    <SelectTrigger className="h-7 w-[140px]">
-                      <SelectValue placeholder="No Owner" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="_none">No Owner</SelectItem>
-                      {ownerOptions.map((o) => (
-                        <SelectItem key={o} value={o}>
-                          {o}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {debt.startDate ? (
-                    <span>· Started {debt.startDate}</span>
-                  ) : null}
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div className="space-y-2 min-w-0">
+                  <h3 className="font-semibold text-lg">{debt.name}</h3>
+                  <div className="flex flex-wrap items-center gap-2 text-muted-foreground text-sm">
+                    <Select
+                      value={debt.owner || "_none"}
+                      onValueChange={(v) =>
+                        onUpdateOwner(debt.id, v === "_none" ? "" : v)
+                      }
+                    >
+                      <SelectTrigger className="h-9 w-[220px]">
+                        <SelectValue placeholder="No Owner" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_none">No Owner</SelectItem>
+                        {ownerOptions.map((o) => (
+                          <SelectItem key={o} value={o}>
+                            {o}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {debt.startDate ? <span>Started {debt.startDate}</span> : null}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8 lg:min-w-[320px]">
+                  <div>
+                    <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                      Initial
+                    </p>
+                    <p className="text-sm font-medium mt-0.5">
+                      {formatCurrency(debt.initialAmount)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                      Balance
+                    </p>
+                    <p className="text-lg font-semibold mt-0.5">
+                      {formatCurrency(balance)}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
-                    Initial
-                  </p>
-                  <p className="text-sm font-medium mt-0.5">
-                    {formatCurrency(debt.initialAmount)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
-                    Balance
-                  </p>
-                  <p className="text-lg font-semibold mt-0.5">
-                    {formatCurrency(balance)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/40">
+              <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/40">
                 <Button
                   type="button"
                   size="sm"

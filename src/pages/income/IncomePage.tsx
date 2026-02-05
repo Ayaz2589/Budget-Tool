@@ -61,6 +61,10 @@ export function IncomePage() {
           </div>
           <p className="text-sm text-muted-foreground">{t("income.subtitle")}</p>
         </div>
+        <Button data-tour="addIncome" onClick={() => setAddOpen(true)}>
+          <Plus className="size-4" />
+          {t("income.addIncome")}
+        </Button>
       </div>
       <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
         <div className="px-0 py-3 flex items-center justify-between gap-3">
@@ -72,15 +76,6 @@ export function IncomePage() {
           </div>
           <PageTourTrigger pageId="income" steps={incomeTourSteps} />
         </div>
-      </div>
-      <div
-        data-tour="addIncome"
-        className="hidden md:flex items-center justify-end mb-4"
-      >
-        <Button onClick={() => setAddOpen(true)}>
-          <Plus className="size-4" />
-          {t("income.addIncome")}
-        </Button>
       </div>
 
       <AddIncomeDialog

@@ -94,7 +94,7 @@ export function IncomeTable({
                     onUpdateOwner(i.id, v === "_none" ? "" : v)
                   }
                 >
-                  <SelectTrigger className="w-[120px]">
+                  <SelectTrigger className="w-[180px]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

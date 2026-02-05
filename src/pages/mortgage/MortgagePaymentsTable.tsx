@@ -61,7 +61,7 @@ export function MortgagePaymentsTable({
                   onUpdateOwner(e.id, v === "_none" ? "" : v)
                 }
               >
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder="No Owner" />
                 </SelectTrigger>
                 <SelectContent>

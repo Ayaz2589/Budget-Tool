@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Copy, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
 
 function defaultRow(defaultSource: ExpenseSource = "manual"): TransactionRow {
   return {
@@ -52,11 +52,13 @@ export function AddTransactionDialog({
   const [rows, setRows] = useState<TransactionRow[]>(() => [
     defaultRow(defaultSource),
   ]);
+  const [activeRowIndex, setActiveRowIndex] = useState(0);
 
   useEffect(() => {
     if (open) {
       const fallback = (cardSources[0] as ExpenseSource) ?? "manual";
       setRows([defaultRow(fallback)]);
+      setActiveRowIndex(0);
     }
   }, [open, cardSources]);
 
@@ -77,7 +79,11 @@ export function AddTransactionDialog({
   };
 
   const addRow = () => {
-    setRows((prev) => [...prev, defaultRow()]);
+    setRows((prev) => {
+      const next = [...prev, defaultRow(defaultSource)];
+      setActiveRowIndex(next.length - 1);
+      return next;
+    });
   };
 
   const copyRow = (index: number) => {
@@ -88,11 +94,20 @@ export function AddTransactionDialog({
       newRow,
       ...prev.slice(index + 1),
     ]);
+    setActiveRowIndex(index + 1);
   };
 
   const removeRow = (index: number) => {
     if (rows.length <= 1) return;
-    setRows((prev) => prev.filter((_, i) => i !== index));
+    setRows((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      setActiveRowIndex((current) => {
+        if (current === index) return Math.max(0, index - 1);
+        if (current > index) return current - 1;
+        return current;
+      });
+      return next;
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -172,17 +187,42 @@ export function AddTransactionDialog({
           <div className="flex-1 min-h-0 overflow-auto space-y-4">
             {rows.map((row, index) => (
               <div key={row.id} className="rounded-xl border p-4 space-y-4">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-base font-medium">
-                    {t("addTransaction.transaction")} {index + 1}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setActiveRowIndex(index)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setActiveRowIndex(index);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between gap-2 text-left cursor-pointer"
+                >
+                  <div className="min-w-0">
+                    <div className="text-base font-medium">
+                      {t("addTransaction.transaction")} {index + 1}
+                    </div>
+                    {activeRowIndex !== index && (
+                      <div className="text-xs text-muted-foreground mt-1 truncate">
+                        {(row.description || t("addTransaction.placeholderDescription"))}
+                        {" · "}
+                        {(row.category || t("addTransaction.uncategorized"))}
+                        {" · "}
+                        {row.amount || "0.00"}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 shrink-0">
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       className="size-9"
-                      onClick={() => copyRow(index)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        copyRow(index);
+                      }}
                       title={t("addTransaction.copyRow")}
                     >
                       <Copy className="size-4" />
@@ -193,15 +233,24 @@ export function AddTransactionDialog({
                         variant="ghost"
                         size="icon"
                         className="size-9 text-destructive hover:text-destructive"
-                        onClick={() => removeRow(index)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeRow(index);
+                        }}
                         title={t("addTransaction.removeRow")}
                       >
                         <Trash2 className="size-4 text-destructive" />
                       </Button>
                     )}
+                    <ChevronDown
+                      className={`size-4 text-muted-foreground transition-transform ${
+                        activeRowIndex === index ? "rotate-180" : ""
+                      }`}
+                    />
                   </div>
                 </div>
 
+                {activeRowIndex === index && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {presetTransactions.length > 0 &&
                     expenseCategories.length > 0 && (
@@ -395,6 +444,7 @@ export function AddTransactionDialog({
                     </Select>
                   </div>
                 </div>
+                )}
               </div>
             ))}
           </div>

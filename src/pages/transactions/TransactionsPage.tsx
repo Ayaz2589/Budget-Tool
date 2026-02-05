@@ -212,6 +212,17 @@ export function TransactionsPage() {
             {t("transactions.subtitle")}
           </p>
         </div>
+        <div data-tour="toolbar">
+          <TransactionsToolbar
+            onOpenFilters={() => setFiltersPopupOpen(true)}
+            onAddTransaction={() => setAddTransactionOpen(true)}
+            hasActiveFilters={hasActiveFilters}
+            showSync={!!(isSignedIn && spreadsheetId)}
+            syncStatus={syncStatus}
+            onSync={() => setSyncConfirmOpen(true)}
+            t={t}
+          />
+        </div>
       </div>
       <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
         <div className="px-0 py-3 flex items-center justify-between gap-3">
@@ -228,20 +239,6 @@ export function TransactionsPage() {
       </div>
       <div className="flex-1 pb-24 md:pb-0">
         <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0 md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-          <div
-            className="hidden md:flex items-center justify-end px-6 pb-4"
-            data-tour="toolbar"
-          >
-            <TransactionsToolbar
-              onOpenFilters={() => setFiltersPopupOpen(true)}
-              onAddTransaction={() => setAddTransactionOpen(true)}
-              hasActiveFilters={hasActiveFilters}
-              showSync={!!(isSignedIn && spreadsheetId)}
-              syncStatus={syncStatus}
-              onSync={() => setSyncConfirmOpen(true)}
-              t={t}
-            />
-          </div>
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
             <SyncConfirmDialog
               open={syncConfirmOpen}

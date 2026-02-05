@@ -66,6 +66,10 @@ export function DebtPage() {
           </div>
           <p className="text-sm text-muted-foreground">{t("debt.subtitle")}</p>
         </div>
+        <Button data-tour="addDebt" onClick={() => setAddDebtOpen(true)}>
+          <Plus className="size-4" />
+          {t("debt.addDebt")}
+        </Button>
       </div>
       <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
         <div className="px-0 py-3 flex items-center justify-between gap-3">
@@ -77,15 +81,6 @@ export function DebtPage() {
           </div>
           <PageTourTrigger pageId="debt" steps={debtTourSteps} />
         </div>
-      </div>
-      <div
-        data-tour="addDebt"
-        className="hidden md:flex items-center justify-end mb-4"
-      >
-        <Button onClick={() => setAddDebtOpen(true)}>
-          <Plus className="size-4" />
-          {t("debt.addDebt")}
-        </Button>
       </div>
 
       <AddDebtDialog

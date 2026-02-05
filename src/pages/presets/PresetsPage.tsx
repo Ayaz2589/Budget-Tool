@@ -78,6 +78,13 @@ export function PresetsPage() {
             {t("presetTransactions.description")}
           </p>
         </div>
+        <Button
+          onClick={() => setPresetOpen(true)}
+          disabled={expenseCategories.length === 0}
+        >
+          <Plus className="size-4" />
+          {t("presetTransactions.addPreset")}
+        </Button>
       </div>
       <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
         <div className="px-0 py-3 flex items-center justify-between gap-3">

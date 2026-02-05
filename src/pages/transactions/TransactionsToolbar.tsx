@@ -27,13 +27,11 @@ export function TransactionsToolbar({
         <Button
           variant="outline"
           onClick={onOpenFilters}
-          className="gap-2"
+          className="gap-2 h-11"
           aria-label={filtersLabel}
         >
           <SlidersHorizontal className="size-4" />
-          <span className="hidden sm:inline">
-            {t("common.filtersAndActions")}
-          </span>
+          <span>{t("common.filtersAndActions")}</span>
           {hasActiveFilters && (
             <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium sm:ml-0">
               {t("common.active")}
@@ -41,22 +39,20 @@ export function TransactionsToolbar({
           )}
         </Button>
         <Button
-          size="sm"
           onClick={onAddTransaction}
-          className="gap-1.5"
-          aria-label={t("common.add")}
+          className="gap-1.5 h-11"
+          aria-label="Add Expense"
         >
           <Plus className="size-4" />
-          <span className="hidden sm:inline">{t("common.add")}</span>
+          <span>Add Expense</span>
         </Button>
       </div>
       {showSync && (
         <Button
-          size="sm"
           variant="outline"
           onClick={onSync}
           disabled={syncStatus === "syncing"}
-          className="gap-1.5"
+          className="gap-1.5 h-11"
           aria-label={syncLabel}
         >
           <RefreshCw
@@ -64,7 +60,7 @@ export function TransactionsToolbar({
               syncStatus === "syncing" ? "animate-spin" : ""
             }`}
           />
-          <span className="hidden sm:inline">{syncLabel}</span>
+          <span>{syncLabel}</span>
         </Button>
       )}
     </div>

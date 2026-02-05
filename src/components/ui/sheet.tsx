@@ -2,6 +2,7 @@ import * as React from "react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
 
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 
 const Sheet = SheetPrimitive.Root;
@@ -41,29 +42,37 @@ const SheetContent = ({
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: keyof typeof sheetVariants;
   showCloseButton?: boolean;
-}) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content
-      className={cn(
-        "fixed z-50 bg-background shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out duration-200",
-        sheetVariants[side],
-        className
-      )}
-      {...props}
-    >
-      {children}
-      {showCloseButton && (
-        <SheetPrimitive.Close
-          className="absolute right-4 top-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none"
-          aria-label="Close"
-        >
-          <XIcon className="size-4" />
-        </SheetPrimitive.Close>
-      )}
-    </SheetPrimitive.Content>
-  </SheetPortal>
-);
+}) => {
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const useMobileTopSheet = isMobile && side === "right";
+  const effectiveSide = useMobileTopSheet ? "top" : side;
+
+  return (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        className={cn(
+          "fixed z-50 bg-background shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out duration-200",
+          sheetVariants[effectiveSide],
+          className,
+          useMobileTopSheet &&
+            "!inset-0 !h-[100dvh] !w-screen !max-w-none !border-0 !rounded-none data-[state=open]:slide-in-from-top data-[state=closed]:slide-out-to-top"
+        )}
+        {...props}
+      >
+        {children}
+        {showCloseButton && (
+          <SheetPrimitive.Close
+            className="absolute right-4 top-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none"
+            aria-label="Close"
+          >
+            <XIcon className="size-4" />
+          </SheetPrimitive.Close>
+        )}
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  );
+};
 
 const SheetHeader = ({
   className,

@@ -87,7 +87,11 @@ export function AddDebtDialog({
             <div className="space-y-2">
               <Label>Start date (optional)</Label>
               <Input
-                type="date"
+                type="text"
+                inputMode="numeric"
+                placeholder="YYYY-MM-DD"
+                pattern="\d{4}-\d{2}-\d{2}"
+                maxLength={10}
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 className={fieldClass}

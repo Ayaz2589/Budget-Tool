@@ -84,7 +84,11 @@ export function FiltersAndActionsDialog({
                   {t("transactions.month")}
                 </Label>
                 <Input
-                  type="month"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="YYYY-MM"
+                  pattern="\d{4}-\d{2}"
+                  maxLength={7}
                   value={monthFilter}
                   onChange={(e) => onMonthFilterChange(e.target.value)}
                   className={fieldClass}

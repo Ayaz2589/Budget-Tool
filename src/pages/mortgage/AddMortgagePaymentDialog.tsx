@@ -53,7 +53,11 @@ export function AddMortgagePaymentDialog({
             <div className="space-y-2">
               <Label>Date</Label>
               <Input
-                type="date"
+                type="text"
+                inputMode="numeric"
+                placeholder="YYYY-MM-DD"
+                pattern="\d{4}-\d{2}-\d{2}"
+                maxLength={10}
                 value={date}
                 onChange={(e) => onDateChange(e.target.value)}
                 required

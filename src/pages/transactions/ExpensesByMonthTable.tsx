@@ -91,7 +91,6 @@ export function ExpensesByMonthTable({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">{t("common.id")}</TableHead>
                   <TableHead>
                     <button
                       type="button"
@@ -181,18 +180,12 @@ export function ExpensesByMonthTable({
                   </TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {monthExpenses.map((e, index) => (
-                  <TableRow
-                    key={e.id}
-                    className={index % 2 === 1 ? "bg-muted/30" : undefined}
-                  >
-                    <TableCell
-                      className="font-mono text-xs max-w-[100px] truncate"
-                      title={e.id}
+                <TableBody>
+                  {monthExpenses.map((e, index) => (
+                    <TableRow
+                      key={e.id}
+                      className={index % 2 === 1 ? "bg-muted/30" : undefined}
                     >
-                      {e.id}
-                    </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {e.date}
                     </TableCell>

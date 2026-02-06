@@ -33,12 +33,14 @@ export interface EditIncomeDialogProps {
 }
 
 export interface IncomeListProps {
-  sortedIncome: Income[];
+  byMonth: [string, Income[]][];
+  defaultOpenMonth: string;
   onIncomeTap: (income: Income) => void;
 }
 
 export interface IncomeTableProps {
-  sortedIncome: Income[];
+  byMonth: [string, Income[]][];
+  defaultOpenMonth: string;
   incomeCategories: string[];
   ownerOptions: string[];
   onEdit: (income: Income) => void;

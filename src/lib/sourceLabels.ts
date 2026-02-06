@@ -9,7 +9,6 @@ import { ALL_EXPENSE_SOURCES } from "@/lib/types";
 export const EXPENSE_SOURCE_LOCALE_KEYS: Record<ExpenseSource, string> = {
   amex: "sourceAmexPlatinum",
   "amex-gold": "sourceAmexGold",
-  chase: "sourceChase",
   apple: "sourceApple",
   manual: "sourceManual",
   td: "sourceTd",
@@ -19,7 +18,6 @@ export const EXPENSE_SOURCE_LOCALE_KEYS: Record<ExpenseSource, string> = {
 export const EXPENSE_SOURCE_DISPLAY_LABELS: Record<ExpenseSource, string> = {
   amex: "Amex Platinum Card",
   "amex-gold": "Amex Gold Card",
-  chase: "Chase",
   apple: "Apple Card",
   manual: "Manual",
   td: "Debit (TD Bank)",
@@ -30,7 +28,6 @@ export const SOURCE_LABEL_KEYS: Record<ExpenseSource | "all", string> = {
   all: "common.all",
   amex: "transactions.sourceAmexPlatinum",
   "amex-gold": "transactions.sourceAmexGold",
-  chase: "transactions.sourceChase",
   apple: "transactions.sourceApple",
   manual: "transactions.sourceManual",
   td: "transactions.sourceTd",

@@ -12,7 +12,6 @@ import type { SheetIds } from "@/types/sheets";
 const VALID_EXPENSE_SOURCES: ExpenseSource[] = [
   "amex",
   "amex-gold",
-  "chase",
   "apple",
   "manual",
   "td",

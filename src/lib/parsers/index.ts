@@ -39,5 +39,4 @@ export function parseCsv(csvText: string, source?: CsvSource): ParseResult {
 }
 
 export { parseAmexCsv, cleanDescription } from "./amex";
-export { parseChasePdfFromText } from "./chase";
 export { parseAppleCsv } from "./apple";

@@ -21,12 +21,11 @@ test("CardSourcesCard renders title and list of sources", () => {
   render(<TestWrapper />);
   expect(screen.getByText("Card sources")).toBeInTheDocument();
   // All expense sources should appear (labels from i18n)
-  expect(screen.getByText("Manual")).toBeInTheDocument();
-  expect(screen.getByText("Chase")).toBeInTheDocument();
+  expect(screen.getAllByText("Manual").length).toBeGreaterThan(0);
 });
 
 test("CardSourcesCard renders checkboxes for each source", () => {
   render(<TestWrapper />);
   const checkboxes = screen.getAllByRole("checkbox");
-  expect(checkboxes.length).toBeGreaterThanOrEqual(6); // amex, amex-gold, chase, apple, manual, td
+  expect(checkboxes.length).toBeGreaterThanOrEqual(5); // amex, amex-gold, apple, manual, td
 });

@@ -84,7 +84,7 @@ test("parseExportedPdfData V2 round-trip using serializeToBlob (export path incl
       { name: "Amazon", color: "orange" },
     ],
     incomeCategoriesWithColors: [{ name: "Paycheck", color: "green" }],
-    cardSources: ["amex", "chase", "manual"],
+    cardSources: ["amex", "manual"],
   };
   const v2Block = serializeToBlob(input);
   const pdfText = `${DATA_START}\n${v2Block}\n${DATA_END}`;
@@ -125,7 +125,7 @@ test("parseExportedPdfData V2 round-trip using serializeToBlob (export path incl
   expect(result.incomeCategoriesWithColors).toEqual([
     { name: "Paycheck", color: "green" },
   ]);
-  expect(result.cardSources).toEqual(["amex", "chase", "manual"]);
+  expect(result.cardSources).toEqual(["amex", "manual"]);
 });
 
 test("parseExportedPdfData V2 with whitespace in Base64: strips and decodes", () => {

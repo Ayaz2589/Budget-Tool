@@ -26,8 +26,6 @@ export function ExpensesByMonthList({
         return "MANUAL";
       case "td":
         return "TD";
-      case "chase":
-        return "CHASE";
       default:
         return String(source).toUpperCase();
     }

@@ -16,8 +16,6 @@ import {
   Landmark,
   Globe,
   MoreHorizontal,
-  Loader2,
-  RefreshCcw,
 } from "lucide-react";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { Button } from "@/components/ui/button";
@@ -36,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { persistLocale } from "@/i18n";
 import i18n from "@/i18n";
+import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 
 function Avatar({
   userProfile,
@@ -491,37 +490,12 @@ export function Layout() {
           </div>
         </DialogContent>
       </Dialog>
-      {showSyncStatusUi &&
-        (hasUnsyncedChanges || syncStatus === "syncing" || showSyncComplete) && (
-        <div
-          className={cn(
-            "fixed z-50 rounded-full border px-3 py-2 text-xs font-medium shadow-lg flex items-center gap-2 left-4 md:left-[240px] bottom-[calc(6rem+env(safe-area-inset-bottom))] md:bottom-4",
-            syncStatus === "syncing"
-              ? "bg-sky-600 text-white border-sky-500"
-              : hasUnsyncedChanges
-                ? "bg-amber-400 text-black border-amber-300"
-              : "bg-emerald-600 text-white border-emerald-500"
-          )}
-          role="status"
-          aria-live="polite"
-        >
-          {syncStatus === "syncing" ? (
-            <>
-              <Loader2 className="size-3.5 animate-spin" />
-              <span>Syncing</span>
-            </>
-          ) : hasUnsyncedChanges ? (
-            <>
-              <RefreshCcw className="size-3.5" />
-              <span>Sync pending</span>
-            </>
-          ) : (
-            <>
-              <RefreshCcw className="size-3.5" />
-              <span>Sync complete</span>
-            </>
-          )}
-        </div>
+      {showSyncStatusUi && (
+        <SyncStatusIndicator
+          hasUnsyncedChanges={hasUnsyncedChanges}
+          syncStatus={syncStatus}
+          showSyncComplete={showSyncComplete}
+        />
       )}
     </div>
   );

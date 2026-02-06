@@ -429,7 +429,7 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
 
   // Find all expense rows: "amex-xxx 2026-01-26 ... $110.60 ..." (id prefix + id suffix + date, then later $amount)
   const expenseIdRe =
-    /(amex-gold-|amex-|chase-|apple-|manual-|td-)([a-z0-9-]+)\s+(\d{4}-\d{2}-\d{2})\s/g;
+    /(amex-gold-|amex-|apple-|manual-|td-)([a-z0-9-]+)\s+(\d{4}-\d{2}-\d{2})\s/g;
   let match: RegExpExecArray | null;
   const expenseMatches: {
     id: string;
@@ -469,7 +469,6 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
     const sourceMap: Record<string, ExpenseSource> = {
       "amex-": "amex",
       "amex-gold-": "amex-gold",
-      "chase-": "chase",
       "apple-": "apple",
       "manual-": "manual",
       "td-": "td",

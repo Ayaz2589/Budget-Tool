@@ -1,7 +1,6 @@
 export type ExpenseSource =
   | "amex"
   | "amex-gold"
-  | "chase"
   | "apple"
   | "manual"
   | "td";
@@ -10,7 +9,6 @@ export type ExpenseSource =
 export const ALL_EXPENSE_SOURCES: ExpenseSource[] = [
   "amex",
   "amex-gold",
-  "chase",
   "apple",
   "manual",
   "td",

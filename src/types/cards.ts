@@ -6,11 +6,6 @@ export interface SourceIconProps {
   className?: string;
 }
 
-export interface ChaseCardIconProps {
-  className?: string;
-  size?: number;
-}
-
 export interface AppleCardIconProps {
   className?: string;
   size?: number;

@@ -3,7 +3,6 @@ import type { SourceIconProps } from "@/types/cards";
 import { AmexPlatinumCardIcon } from "./AmexPlatinumCardIcon";
 import { AmexGoldCardIcon } from "./AmexGoldCardIcon";
 import { AppleCardIcon } from "./AppleCardIcon";
-import { ChaseCardIcon } from "./ChaseCardIcon";
 
 const SOURCE_ICONS: Record<
   ExpenseSource,
@@ -11,7 +10,6 @@ const SOURCE_ICONS: Record<
 > = {
   amex: AmexPlatinumCardIcon,
   "amex-gold": AmexGoldCardIcon,
-  chase: ChaseCardIcon,
   apple: AppleCardIcon,
   manual: () => null,
   td: () => null,

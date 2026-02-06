@@ -110,10 +110,3 @@ export interface TransactionsToolbarProps {
   hasActiveFilters: boolean;
   t: (key: string) => string;
 }
-
-export interface SyncConfirmDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
-  t: (key: string) => string;
-}

@@ -24,7 +24,7 @@ test("ImportSourceCard shows upload card title and source buttons", () => {
       skippedDuplicates={0}
       onAddToTransactions={() => {}}
       isPdfExport={false}
-      cardSources={["amex", "amex-gold", "chase", "apple", "manual", "td"]}
+      cardSources={["amex", "amex-gold", "apple", "manual", "td"]}
       t={mockT}
     />,
   );

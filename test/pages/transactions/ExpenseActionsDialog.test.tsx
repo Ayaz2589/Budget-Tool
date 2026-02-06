@@ -16,6 +16,7 @@ test("ExpenseActionsDialog shows description, amount, category select, and delet
         source: "manual",
       }}
       onClose={() => {}}
+      onEdit={() => {}}
       onUpdateCategory={() => {}}
       onUpdateOwner={() => {}}
       onDelete={() => {}}

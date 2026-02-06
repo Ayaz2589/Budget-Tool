@@ -34,6 +34,7 @@ export interface ExpensesByMonthTableProps {
   onUpdateOwner: (id: string, owner: string) => void;
   expenseCategories: string[];
   ownerOptions: string[];
+  onEditOne: (expense: Expense) => void;
   onDeleteOne: (expense: Expense) => void;
   sourceLabelKeys: Record<string, string>;
   t: (key: string, opts?: { count?: number }) => string;
@@ -73,12 +74,32 @@ export interface FiltersAndActionsDialogProps {
 export interface ExpenseActionsDialogProps {
   expense: Expense | null;
   onClose: () => void;
+  onEdit: (expense: Expense) => void;
   onUpdateCategory: (id: string, category: string) => void;
   onUpdateOwner: (id: string, owner: string) => void;
   onDelete: (expense: Expense) => void;
   expenseCategories: string[];
   ownerOptions: string[];
   t: (key: string) => string;
+}
+
+export interface EditTransactionDialogProps {
+  expense: Expense | null;
+  onClose: () => void;
+  onSubmit: (
+    id: string,
+    updates: {
+      date: string;
+      amount: number;
+      description: string;
+      category: string;
+      source: ExpenseSource;
+      owner?: string;
+    },
+  ) => void;
+  expenseCategories: string[];
+  ownerOptions: string[];
+  cardSources: string[];
 }
 
 export interface DeleteOneTransactionDialogProps {

@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { SourceIcon } from "@/components/cards";
 import { formatCurrency } from "@/lib/format";
@@ -60,6 +60,7 @@ export function ExpensesByMonthTable({
   onUpdateOwner,
   expenseCategories,
   ownerOptions = [],
+  onEditOne,
   onDeleteOne,
   sourceLabelKeys,
   t,
@@ -249,15 +250,26 @@ export function ExpensesByMonthTable({
                       </Select>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onDeleteOne(e)}
-                        className="size-8 text-destructive hover:text-destructive"
-                        aria-label={t("common.delete")}
-                      >
-                        <Trash2 className="size-4 text-destructive" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onEditOne(e)}
+                          className="size-8"
+                          aria-label={t("common.edit")}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onDeleteOne(e)}
+                          className="size-8 text-destructive hover:text-destructive"
+                          aria-label={t("common.delete")}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

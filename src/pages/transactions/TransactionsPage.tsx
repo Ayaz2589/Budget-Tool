@@ -14,6 +14,7 @@ import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
 import { ExpensesByMonthTable, type SortColumn } from "./ExpensesByMonthTable";
 import { ExpensesByMonthList } from "./ExpensesByMonthList";
 import { ExpenseActionsDialog } from "./ExpenseActionsDialog";
+import { EditTransactionDialog } from "./EditTransactionDialog";
 import {
   DeleteOneTransactionDialog,
   DeleteAllTransactionsDialog,
@@ -41,6 +42,7 @@ export function TransactionsPage() {
   const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
     null,
   );
+  const [editExpense, setEditExpense] = useState<Expense | null>(null);
   const [expenseForActions, setExpenseForActions] = useState<Expense | null>(
     null,
   );
@@ -274,6 +276,7 @@ export function TransactionsPage() {
                       }
                       expenseCategories={expenseCategories}
                       ownerOptions={ownerOptions}
+                      onEditOne={setEditExpense}
                       onDeleteOne={setDeleteOneExpense}
                       sourceLabelKeys={SOURCE_LABEL_KEYS}
                       t={t}
@@ -333,6 +336,10 @@ export function TransactionsPage() {
       <ExpenseActionsDialog
         expense={expenseForActions}
         onClose={() => setExpenseForActions(null)}
+        onEdit={(expense) => {
+          setExpenseForActions(null);
+          setEditExpense(expense);
+        }}
         onUpdateCategory={(id, category) => updateExpense(id, { category })}
         onUpdateOwner={(id, owner) =>
           updateExpense(id, { owner: owner || undefined })
@@ -344,6 +351,15 @@ export function TransactionsPage() {
         expenseCategories={expenseCategories}
         ownerOptions={ownerOptions}
         t={t}
+      />
+
+      <EditTransactionDialog
+        expense={editExpense}
+        onClose={() => setEditExpense(null)}
+        onSubmit={(id, updates) => updateExpense(id, updates)}
+        expenseCategories={expenseCategories}
+        ownerOptions={ownerOptions}
+        cardSources={cardSources}
       />
 
       <DeleteOneTransactionDialog

@@ -5,6 +5,11 @@ import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import type { ExpenseSource } from "@/types/core";
 import { SOURCE_OPTIONS } from "@/lib/sourceLabels";
+import {
+  formatCurrencyFromNumber,
+  formatCurrencyInput,
+  parseCurrencyInput,
+} from "@/lib/currencyInput";
 import { SourceIcon } from "@/components/cards";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -100,7 +105,7 @@ export function PresetsPage() {
     setPresetDescription(preset.description);
     setPresetAmount(
       typeof preset.amount === "number" && Number.isFinite(preset.amount)
-        ? preset.amount.toFixed(2)
+        ? formatCurrencyFromNumber(preset.amount)
         : ""
     );
     setPresetCategory(preset.category);
@@ -110,7 +115,7 @@ export function PresetsPage() {
 
   const handleSavePreset = () => {
     const parsedAmount = presetAmount.trim()
-      ? parseFloat(presetAmount.replace(/[$,]/g, ""))
+      ? parseCurrencyInput(presetAmount)
       : undefined;
     const normalizedAmount =
       typeof parsedAmount === "number" && Number.isFinite(parsedAmount) && parsedAmount >= 0
@@ -223,7 +228,9 @@ export function PresetsPage() {
                     <Label>{t("common.amount")}</Label>
                     <Input
                       value={presetAmount}
-                      onChange={(e) => setPresetAmount(e.target.value)}
+                      onChange={(e) =>
+                        setPresetAmount(formatCurrencyInput(e.target.value))
+                      }
                       placeholder="Optional"
                       inputMode="decimal"
                       className={fieldClass}
@@ -338,7 +345,7 @@ export function PresetsPage() {
                                   {sourceLabel}
                                 </span>
                                 {typeof preset.amount === "number"
-                                  ? ` · $${preset.amount.toFixed(2)}`
+                                  ? ` · ${formatCurrencyFromNumber(preset.amount)}`
                                   : ""}
                                 {" · "}
                                 {preset.owner || t("common.noOwner")}

@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
-import { cleanDescription } from "@/lib/parsers";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,10 +14,7 @@ import { ExpensesByMonthTable, type SortColumn } from "./ExpensesByMonthTable";
 import { ExpensesByMonthList } from "./ExpensesByMonthList";
 import { ExpenseActionsDialog } from "./ExpenseActionsDialog";
 import { EditTransactionDialog } from "./EditTransactionDialog";
-import {
-  DeleteOneTransactionDialog,
-  DeleteAllTransactionsDialog,
-} from "./DeleteTransactionDialogs";
+import { DeleteOneTransactionDialog } from "./DeleteTransactionDialogs";
 
 export function TransactionsPage() {
   const { t } = useTranslation();
@@ -26,7 +22,6 @@ export function TransactionsPage() {
     expenses,
     updateExpense,
     removeExpense,
-    removeExpenses,
     expenseCategories,
     owners,
     cardSources,
@@ -38,7 +33,6 @@ export function TransactionsPage() {
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<SortColumn>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [deleteAllOpen, setDeleteAllOpen] = useState(false);
   const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
     null,
   );
@@ -141,15 +135,6 @@ export function TransactionsPage() {
     ? currentMonthKey
     : (byMonth[0]?.[0] ?? "");
 
-  const cleanAllDescriptions = useCallback(() => {
-    expenses.forEach((e) => {
-      const cleaned = cleanDescription(e.description);
-      if (cleaned !== e.description) {
-        updateExpense(e.id, { description: cleaned });
-      }
-    });
-  }, [expenses, updateExpense]);
-
   const hasActiveFilters = Boolean(
     monthFilter ||
     sourceFilter !== "all" ||
@@ -177,11 +162,6 @@ export function TransactionsPage() {
     },
     [sortBy],
   );
-
-  const handleDeleteAll = useCallback(() => {
-    removeExpenses(expenses.map((e) => e.id));
-    setDeleteAllOpen(false);
-  }, [expenses, removeExpenses]);
 
   const handleDeleteOne = useCallback(() => {
     if (deleteOneExpense) {
@@ -245,9 +225,6 @@ export function TransactionsPage() {
               cardSources={cardSources}
               hasActiveFilters={hasActiveFilters}
               onClearFilters={clearFilters}
-              onCleanDescriptions={cleanAllDescriptions}
-              expensesCount={expenses.length}
-              onDeleteAll={() => setDeleteAllOpen(true)}
               t={t}
             />
 
@@ -366,14 +343,6 @@ export function TransactionsPage() {
         expense={deleteOneExpense}
         onClose={() => setDeleteOneExpense(null)}
         onConfirm={handleDeleteOne}
-        t={t}
-      />
-
-      <DeleteAllTransactionsDialog
-        open={deleteAllOpen}
-        onOpenChange={setDeleteAllOpen}
-        count={expenses.length}
-        onConfirm={handleDeleteAll}
         t={t}
       />
     </div>

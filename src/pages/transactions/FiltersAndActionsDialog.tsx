@@ -20,7 +20,6 @@ import { CategoryOption } from "@/lib/categoryColors";
 import type { ExpenseSource } from "@/types/core";
 import type { FiltersAndActionsDialogProps } from "@/types/transactions";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
-import { Trash2 } from "lucide-react";
 
 export type { FiltersAndActionsDialogProps };
 
@@ -42,21 +41,19 @@ export function FiltersAndActionsDialog({
   cardSources,
   hasActiveFilters,
   onClearFilters,
-  onCleanDescriptions,
-  expensesCount,
-  onDeleteAll,
   t,
 }: FiltersAndActionsDialogProps) {
   const sheetSide = "right";
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
+  const handleCancel = () => onOpenChange(false);
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side={sheetSide}
         showCloseButton={true}
        
-        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
+        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col"
       >
         <SheetHeader className="px-4 pt-5 pb-3">
           <SheetTitle>{t("transactions.filtersActionsTitle")}</SheetTitle>
@@ -64,7 +61,7 @@ export function FiltersAndActionsDialog({
             {t("transactions.filtersActionsDesc")}
           </SheetDescription>
         </SheetHeader>
-        <div className="grid gap-6 px-4 pb-8 overflow-y-auto overscroll-contain">
+        <div className="grid gap-6 px-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
           {/* Filters */}
           <section className="space-y-4">
             <div className="flex items-center justify-between gap-2">
@@ -184,33 +181,16 @@ export function FiltersAndActionsDialog({
             </div>
           </section>
 
-          {/* Actions */}
-          <section className="space-y-4 border-t pt-6">
-            <h3 className="text-sm font-semibold">{t("common.actions")}</h3>
-
-            <div className="grid grid-cols-1 gap-2">
-              <Button
-                variant="outline"
-                onClick={onCleanDescriptions}
-                className="h-11 w-full justify-start"
-              >
-                {t("transactions.cleanDescriptions")}
-              </Button>
-            </div>
-
-            {expensesCount > 0 && (
-              <div className="pt-1">
-                <Button
-                  variant="destructive"
-                  className="h-11 w-full"
-                  onClick={onDeleteAll}
-                >
-                  <Trash2 className="size-4" />
-                  {t("transactions.deleteAll")}
-                </Button>
-              </div>
-            )}
-          </section>
+        </div>
+        <div className="border-t px-4 py-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleCancel}
+            className="h-11 w-full"
+          >
+            {t("common.cancel")}
+          </Button>
         </div>
       </SheetContent>
     </Sheet>

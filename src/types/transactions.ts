@@ -65,9 +65,6 @@ export interface FiltersAndActionsDialogProps {
   cardSources: string[];
   hasActiveFilters: boolean;
   onClearFilters: () => void;
-  onCleanDescriptions: () => void;
-  expensesCount: number;
-  onDeleteAll: () => void;
   t: (key: string, opts?: { count?: number }) => string;
 }
 

@@ -25,9 +25,6 @@ test("FiltersAndActionsDialog shows title and Filters section when open", () => 
       cardSources={["amex", "apple", "chase", "manual", "td"]}
       hasActiveFilters={false}
       onClearFilters={() => {}}
-      onCleanDescriptions={() => {}}
-      expensesCount={0}
-      onDeleteAll={() => {}}
       t={mockT}
     />,
   );
@@ -36,5 +33,4 @@ test("FiltersAndActionsDialog shows title and Filters section when open", () => 
     screen.getByText("transactions.filtersActionsTitle"),
   ).toBeInTheDocument();
   expect(screen.getByText("common.filters")).toBeInTheDocument();
-  expect(screen.getByText("common.actions")).toBeInTheDocument();
 });

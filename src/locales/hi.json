@@ -360,7 +360,8 @@
     "mortgage": "बंधक",
     "presets": "प्रीसेट",
     "settings": "सेटिंग्स",
-    "transactions": "लेनदेन"
+    "transactions": "लेनदेन",
+    "investments": "Investments"
   },
   "presetTransactions": {
     "addPreset": "प्रीसेट जोड़ें",
@@ -476,5 +477,42 @@
     "title": "लेनदेन",
     "transaction_one": "{{count}} लेनदेन",
     "transaction_other": "{{count}} लेनदेन"
+  },
+  "investments": {
+    "title": "Investments",
+    "subtitle": "Track portfolio holdings with delayed market data and DCA metrics.",
+    "selectPortfolio": "Select portfolio",
+    "newPortfolio": "New portfolio",
+    "renamePrompt": "Rename portfolio",
+    "deletePortfolioConfirm": "Delete this portfolio?",
+    "newPortfolioPlaceholder": "My portfolio",
+    "noPortfolio": "Create a portfolio to get started.",
+    "holdings": "Holdings",
+    "addHolding": "Add holding",
+    "editHolding": "Edit holding",
+    "noHoldings": "No holdings yet.",
+    "holdingDescription": "Search a symbol and enter your position details.",
+    "symbol": "Symbol",
+    "name": "Name",
+    "companyOptional": "Company name (optional)",
+    "quantity": "Quantity",
+    "investedAmount": "Invested amount",
+    "qty": "Qty",
+    "invested": "Invested",
+    "marketValue": "Market value",
+    "unrealized": "Unrealized P/L",
+    "metrics": "Portfolio metrics",
+    "totalInvested": "Total invested",
+    "totalValue": "Total value",
+    "totalPnL": "Total P/L",
+    "totalPnLPercent": "Total P/L %",
+    "chart": "Chart",
+    "line": "Line",
+    "candlestick": "Candlestick",
+    "refresh": "Refresh",
+    "noSymbolForChart": "Select a holding to view chart data.",
+    "refreshError": "Unable to refresh market data right now.",
+    "rateLimited": "Market data is temporarily rate-limited. Try again in about {{seconds}}s.",
+    "rateLimitedDaily": "Daily market-data quota reached for the current API key. Try again tomorrow or switch to a different API key."
   }
 }

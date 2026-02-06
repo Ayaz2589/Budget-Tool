@@ -21,7 +21,17 @@ export function ExpensesByMonthList({
       case "amex-gold":
         return "AMEX";
       case "apple":
-        return "APPLE";
+        return "MC";
+      case "visa":
+        return "VISA";
+      case "sapphire":
+        return "SAPPHIRE";
+      case "bank-of-america":
+        return "BOA";
+      case "wells-fargo":
+        return "WF";
+      case "chase":
+        return "CHASE";
       case "manual":
         return "MANUAL";
       case "td":

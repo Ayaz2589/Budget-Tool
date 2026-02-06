@@ -17,7 +17,7 @@ function PdfExportIcon({
 }) {
   return <FileText size={size} className={className} />;
 }
-import { AmexPlatinumCardIcon, AppleCardIcon } from "@/components/cards";
+import { AmexPlatinumCardIcon, MasterCardIcon, ChaseCardIcon } from "@/components/cards";
 import { cn } from "@/lib/utils";
 import type { SourceChoice, ImportSourceCardProps } from "@/types/import";
 
@@ -51,7 +51,12 @@ export function ImportSourceCard({
     {
       value: "apple",
       label: t("import.appleCard"),
-      icon: AppleCardIcon,
+      icon: MasterCardIcon,
+    },
+    {
+      value: "chase",
+      label: t("import.chaseCard"),
+      icon: ChaseCardIcon,
     },
     {
       value: "pdf-export",

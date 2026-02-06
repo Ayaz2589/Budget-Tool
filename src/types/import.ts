@@ -1,12 +1,13 @@
 import type * as React from "react";
 import type { Debt, DebtPayment, Expense, Income } from "./core";
 
-export type CsvSource = "amex" | "apple" | "unknown";
+export type CsvSource = "amex" | "apple" | "chase" | "unknown";
 
 export type SourceChoice =
   | "amex"
   | "amex-gold"
   | "apple"
+  | "chase"
   | "pdf-export";
 
 export interface ImportPreviewCardProps {

@@ -24,12 +24,13 @@ test("ImportSourceCard shows upload card title and source buttons", () => {
       skippedDuplicates={0}
       onAddToTransactions={() => {}}
       isPdfExport={false}
-      cardSources={["amex", "amex-gold", "apple", "manual", "td"]}
+      cardSources={["amex", "amex-gold", "apple", "chase", "manual", "td"]}
       t={mockT}
     />,
   );
   expect(screen.getByText("import.uploadStatement")).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /import\.amexcard/i })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /import\.applecard/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /import\.chasecard/i })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /import\.exportedpdf/i })).toBeInTheDocument();
 });

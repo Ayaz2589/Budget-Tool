@@ -13,6 +13,11 @@ const VALID_EXPENSE_SOURCES: ExpenseSource[] = [
   "amex",
   "amex-gold",
   "apple",
+  "visa",
+  "sapphire",
+  "bank-of-america",
+  "wells-fargo",
+  "chase",
   "manual",
   "td",
 ];

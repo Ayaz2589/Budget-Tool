@@ -10,6 +10,11 @@ export const EXPENSE_SOURCE_LOCALE_KEYS: Record<ExpenseSource, string> = {
   amex: "sourceAmexPlatinum",
   "amex-gold": "sourceAmexGold",
   apple: "sourceApple",
+  visa: "sourceVisa",
+  sapphire: "sourceSapphire",
+  "bank-of-america": "sourceBankOfAmerica",
+  "wells-fargo": "sourceWellsFargo",
+  chase: "sourceChase",
   manual: "sourceManual",
   td: "sourceTd",
 };
@@ -18,9 +23,14 @@ export const EXPENSE_SOURCE_LOCALE_KEYS: Record<ExpenseSource, string> = {
 export const EXPENSE_SOURCE_DISPLAY_LABELS: Record<ExpenseSource, string> = {
   amex: "Amex Platinum Card",
   "amex-gold": "Amex Gold Card",
-  apple: "Apple Card",
+  apple: "Master Card",
+  visa: "Visa",
+  sapphire: "Sapphire",
+  "bank-of-america": "Bank of America",
+  "wells-fargo": "Wells Fargo",
+  chase: "Chase",
   manual: "Manual",
-  td: "Debit (TD Bank)",
+  td: "TD Bank",
 };
 
 /** Full i18n keys for transaction filter dropdown (transactions.* + common.all). */
@@ -29,6 +39,11 @@ export const SOURCE_LABEL_KEYS: Record<ExpenseSource | "all", string> = {
   amex: "transactions.sourceAmexPlatinum",
   "amex-gold": "transactions.sourceAmexGold",
   apple: "transactions.sourceApple",
+  visa: "transactions.sourceVisa",
+  sapphire: "transactions.sourceSapphire",
+  "bank-of-america": "transactions.sourceBankOfAmerica",
+  "wells-fargo": "transactions.sourceWellsFargo",
+  chase: "transactions.sourceChase",
   manual: "transactions.sourceManual",
   td: "transactions.sourceTd",
 };

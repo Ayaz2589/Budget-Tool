@@ -27,5 +27,5 @@ test("CardSourcesCard renders title and list of sources", () => {
 test("CardSourcesCard renders checkboxes for each source", () => {
   render(<TestWrapper />);
   const checkboxes = screen.getAllByRole("checkbox");
-  expect(checkboxes.length).toBeGreaterThanOrEqual(5); // amex, amex-gold, apple, manual, td
+  expect(checkboxes.length).toBeGreaterThanOrEqual(10); // amex, amex-gold, apple/mastercard, visa, sapphire, boa, wells-fargo, chase, manual, td
 });

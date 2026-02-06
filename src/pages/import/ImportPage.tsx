@@ -96,6 +96,8 @@ export function ImportPage() {
       const firstValid =
         cardSources.includes("amex") || cardSources.includes("amex-gold")
           ? "amex"
+          : cardSources.includes("chase")
+          ? "chase"
           : cardSources.includes("apple")
           ? "apple"
           : "pdf-export";
@@ -266,6 +268,8 @@ export function ImportPage() {
           const label =
             selectedSource === "amex"
               ? t("import.amexCard")
+              : selectedSource === "chase"
+              ? t("import.chaseCard")
               : selectedSource === "apple"
               ? t("import.appleCard")
               : t("import.chooseCsvFile");

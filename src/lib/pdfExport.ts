@@ -470,6 +470,11 @@ function parseExportedPdfTableFallback(pdfText: string): ParsedExportedPdf {
       "amex-": "amex",
       "amex-gold-": "amex-gold",
       "apple-": "apple",
+      "visa-": "visa",
+      "sapphire-": "sapphire",
+      "bank-of-america-": "bank-of-america",
+      "wells-fargo-": "wells-fargo",
+      "chase-": "chase",
       "manual-": "manual",
       "td-": "td",
     };

@@ -2,7 +2,13 @@ import type { ExpenseSource } from "@/types/core";
 import type { SourceIconProps } from "@/types/cards";
 import { AmexPlatinumCardIcon } from "./AmexPlatinumCardIcon";
 import { AmexGoldCardIcon } from "./AmexGoldCardIcon";
-import { AppleCardIcon } from "./AppleCardIcon";
+import { MasterCardIcon } from "./MasterCardIcon";
+import { ChaseCardIcon } from "./ChaseCardIcon";
+import { TdBankCardIcon } from "./TdBankCardIcon";
+import { VisaCardIcon } from "./VisaCardIcon";
+import { SapphireCardIcon } from "./SapphireCardIcon";
+import { BankOfAmericaCardIcon } from "./BankOfAmericaCardIcon";
+import { WellsFargoCardIcon } from "./WellsFargoCardIcon";
 
 const SOURCE_ICONS: Record<
   ExpenseSource,
@@ -10,9 +16,14 @@ const SOURCE_ICONS: Record<
 > = {
   amex: AmexPlatinumCardIcon,
   "amex-gold": AmexGoldCardIcon,
-  apple: AppleCardIcon,
+  apple: MasterCardIcon,
+  visa: VisaCardIcon,
+  sapphire: SapphireCardIcon,
+  "bank-of-america": BankOfAmericaCardIcon,
+  "wells-fargo": WellsFargoCardIcon,
+  chase: ChaseCardIcon,
   manual: () => null,
-  td: () => null,
+  td: TdBankCardIcon,
 };
 
 export function SourceIcon({
@@ -27,6 +38,6 @@ export function SourceIcon({
     size?: number;
   }>;
   const el = <Rendered size={size} className={className} />;
-  if (source === "manual" || source === "td") return null;
+  if (source === "manual") return null;
   return el;
 }

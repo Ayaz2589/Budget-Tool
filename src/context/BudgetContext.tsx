@@ -65,9 +65,16 @@ function loadStoredBudget(): {
         owners?: string[];
       };
       const cardSources = Array.isArray(data.cardSources)
-        ? data.cardSources.filter((s): s is ExpenseSource =>
-            ALL_EXPENSE_SOURCES.includes(s as ExpenseSource)
-          )
+        ? (() => {
+            const filtered = data.cardSources.filter((s): s is ExpenseSource =>
+              ALL_EXPENSE_SOURCES.includes(s as ExpenseSource)
+            );
+            // Migration: ensure newly added sources are available for existing users.
+            for (const src of ALL_EXPENSE_SOURCES) {
+              if (!filtered.includes(src)) filtered.push(src);
+            }
+            return filtered;
+          })()
         : [...ALL_EXPENSE_SOURCES];
       const expenseCategories =
         Array.isArray(data.expenseCategories) &&

@@ -17,6 +17,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CategoryOption } from "@/lib/categoryColors";
+import {
+  formatCurrencyFromNumber,
+  formatCurrencyInput,
+  parseCurrencyInput,
+} from "@/lib/currencyInput";
 import type { Owner } from "@/types/core";
 import type {
   EditIncomeFormPayload,
@@ -42,7 +47,7 @@ export function EditIncomeDialog({
   useEffect(() => {
     if (income) {
       setDate(income.date);
-      setAmount(String(income.amount));
+      setAmount(formatCurrencyFromNumber(income.amount));
       setDescription(income.description ?? "");
       setCategory(income.category ?? ""); // default: Uncategorized
       setOwner(income.owner ?? "");
@@ -52,7 +57,7 @@ export function EditIncomeDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!income) return;
-    const num = parseFloat(amount.replace(/[$,]/g, ""));
+    const num = parseCurrencyInput(amount);
     if (Number.isNaN(num) || num <= 0) return;
     onSubmit(income.id, {
       date: date.trim(),
@@ -100,7 +105,7 @@ export function EditIncomeDialog({
                 type="text"
                 placeholder="0.00"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => setAmount(formatCurrencyInput(e.target.value))}
                 required
                 className={fieldClass}
               />

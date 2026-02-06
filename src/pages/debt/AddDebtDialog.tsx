@@ -17,6 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Owner } from "@/types/core";
+import {
+  formatCurrencyInput,
+  parseCurrencyInput,
+} from "@/lib/currencyInput";
 import type { AddDebtPayload, AddDebtDialogProps } from "@/types/debt";
 
 export type { AddDebtPayload, AddDebtDialogProps };
@@ -34,7 +38,7 @@ export function AddDebtDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const num = parseFloat(amount.replace(/[$,]/g, ""));
+    const num = parseCurrencyInput(amount);
     if (Number.isNaN(num) || num < 0) return;
     onSubmit({
       name: name.trim() || "Debt",
@@ -80,7 +84,7 @@ export function AddDebtDialog({
                 type="text"
                 placeholder="0.00"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => setAmount(formatCurrencyInput(e.target.value))}
                 required
                 className={fieldClass}
               />

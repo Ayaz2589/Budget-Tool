@@ -2,6 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import type { ExpenseSource } from "@/types/core";
 import type { EditTransactionDialogProps } from "@/types/transactions";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
+import {
+  formatCurrencyFromNumber,
+  formatCurrencyInput,
+  parseCurrencyInput,
+} from "@/lib/currencyInput";
 import { CategoryOption } from "@/lib/categoryColors";
 import { SourceIcon } from "@/components/cards";
 import { Button } from "@/components/ui/button";
@@ -42,7 +47,7 @@ export function EditTransactionDialog({
   useEffect(() => {
     if (!expense) return;
     setDate(expense.date);
-    setAmount(expense.amount.toFixed(2));
+    setAmount(formatCurrencyFromNumber(expense.amount));
     setDescription(expense.description ?? "");
     setCategory(expense.category ?? "");
     setSource(expense.source);
@@ -56,7 +61,7 @@ export function EditTransactionDialog({
 
   const handleSave = () => {
     if (!expense) return;
-    const parsed = parseFloat(amount.replace(/[$,]/g, ""));
+    const parsed = parseCurrencyInput(amount);
     if (Number.isNaN(parsed) || parsed <= 0) return;
     onSubmit(expense.id, {
       date,
@@ -102,7 +107,7 @@ export function EditTransactionDialog({
               type="text"
               inputMode="decimal"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => setAmount(formatCurrencyInput(e.target.value))}
               className="h-11"
             />
           </div>

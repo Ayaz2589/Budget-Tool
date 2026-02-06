@@ -7,6 +7,11 @@ import type {
   TransactionRow,
   AddTransactionDialogProps,
 } from "@/types/transactions";
+import {
+  formatCurrencyFromNumber,
+  formatCurrencyInput,
+  parseCurrencyInput,
+} from "@/lib/currencyInput";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { SourceIcon } from "@/components/cards";
 import { CategoryOption, getCategoryColor } from "@/lib/categoryColors";
@@ -113,7 +118,7 @@ export function AddTransactionDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const toAdd = rows.flatMap((row) => {
-      const num = parseFloat(row.amount.replace(/[$,]/g, ""));
+      const num = parseCurrencyInput(row.amount);
       if (Number.isNaN(num) || num <= 0) return [];
       return [
         {
@@ -137,7 +142,7 @@ export function AddTransactionDialog({
   };
 
   const validCount = rows.filter((r) => {
-    const n = parseFloat(r.amount.replace(/[$,]/g, ""));
+    const n = parseCurrencyInput(r.amount);
     return !Number.isNaN(n) && n > 0;
   }).length;
 
@@ -155,7 +160,7 @@ export function AddTransactionDialog({
         description: preset.description,
         amount:
           typeof preset.amount === "number" && Number.isFinite(preset.amount)
-            ? preset.amount.toFixed(2)
+            ? formatCurrencyFromNumber(preset.amount)
             : rows[index]?.amount ?? "",
         category: preset.category,
         owner: preset.owner,
@@ -380,7 +385,9 @@ export function AddTransactionDialog({
                       className={fieldClass}
                       value={row.amount}
                       onChange={(e) =>
-                        updateRow(index, { amount: e.target.value })
+                        updateRow(index, {
+                          amount: formatCurrencyInput(e.target.value),
+                        })
                       }
                     />
                   </div>

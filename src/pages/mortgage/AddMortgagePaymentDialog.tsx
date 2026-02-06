@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatCurrencyInput } from "@/lib/currencyInput";
 import type { AddMortgagePaymentDialogProps } from "@/types/mortgage";
 
 export type { AddMortgagePaymentDialogProps };
@@ -71,7 +72,7 @@ export function AddMortgagePaymentDialog({
                 type="text"
                 placeholder="0.00"
                 value={amount}
-                onChange={(e) => onAmountChange(e.target.value)}
+                onChange={(e) => onAmountChange(formatCurrencyInput(e.target.value))}
                 required
                 className={fieldClass}
               />

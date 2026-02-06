@@ -10,6 +10,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  formatCurrencyInput,
+  parseCurrencyInput,
+} from "@/lib/currencyInput";
 import type { AddPaymentPayload, AddPaymentDialogProps } from "@/types/debt";
 
 export type { AddPaymentPayload, AddPaymentDialogProps };
@@ -35,7 +39,7 @@ export function AddPaymentDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!debtId) return;
-    const num = parseFloat(amount.replace(/[$,]/g, ""));
+    const num = parseCurrencyInput(amount);
     if (Number.isNaN(num) || num <= 0) return;
     onSubmit({
       debtId,
@@ -71,7 +75,7 @@ export function AddPaymentDialog({
               type="text"
               placeholder="0.00"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => setAmount(formatCurrencyInput(e.target.value))}
               required
             />
           </div>

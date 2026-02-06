@@ -5,6 +5,10 @@ import type { Expense } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Home, Plus } from "lucide-react";
+import {
+  formatCurrencyFromNumber,
+  parseCurrencyInput,
+} from "@/lib/currencyInput";
 import { AddMortgagePaymentDialog } from "./AddMortgagePaymentDialog";
 import { MortgagePaymentsTable } from "./MortgagePaymentsTable";
 import { MortgagePaymentsList } from "./MortgagePaymentsList";
@@ -20,7 +24,9 @@ export function MortgagePage() {
   const [addDate, setAddDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   );
-  const [addAmount, setAddAmount] = useState(String(DEFAULT_MORTGAGE_AMOUNT));
+  const [addAmount, setAddAmount] = useState(
+    formatCurrencyFromNumber(DEFAULT_MORTGAGE_AMOUNT)
+  );
   const [addOwner, setAddOwner] = useState(() => owners[0] ?? "");
   const [deleteConfirm, setDeleteConfirm] = useState<Expense | null>(null);
   const [paymentForActions, setPaymentForActions] = useState<Expense | null>(
@@ -38,7 +44,7 @@ export function MortgagePage() {
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    const num = parseFloat(addAmount.replace(/[$,]/g, ""));
+    const num = parseCurrencyInput(addAmount);
     if (Number.isNaN(num) || num <= 0) return;
     const dateStr = addDate.trim();
     if (!dateStr) return;
@@ -51,7 +57,7 @@ export function MortgagePage() {
       owner: addOwner || undefined,
     });
     setAddDate(new Date().toISOString().slice(0, 10));
-    setAddAmount(String(DEFAULT_MORTGAGE_AMOUNT));
+    setAddAmount(formatCurrencyFromNumber(DEFAULT_MORTGAGE_AMOUNT));
     setAddOpen(false);
   };
 

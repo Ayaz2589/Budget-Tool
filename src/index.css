@@ -159,22 +159,6 @@
   }
 }
 
-/* Helper icon pulse + scale when tour not yet seen */
-@keyframes help-pulse-scale {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.15);
-    opacity: 0.85;
-  }
-}
-.animate-help-pulse-scale {
-  animation: help-pulse-scale 1.5s ease-in-out infinite;
-}
-
 /* Flatten card containers on mobile for non-dashboard pages (more screen real estate) */
 @media (max-width: 767px) {
   .flatten-mobile-cards [data-slot="card"] {

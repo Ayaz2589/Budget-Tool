@@ -16,8 +16,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PageTourTrigger } from "@/components/PageTourTrigger";
-import { settingsTourSteps } from "@/lib/pageTourSteps";
 import { GoogleSheetsCard } from "./GoogleSheetsCard";
 import { CardSourcesCard } from "./CardSourcesCard";
 import { ExpenseCategoriesCard } from "./ExpenseCategoriesCard";
@@ -143,7 +141,6 @@ export function SettingsPage() {
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-semibold sm:text-2xl">{t("settings.title")}</h1>
-            <PageTourTrigger pageId="settings" steps={settingsTourSteps} />
           </div>
           <p className="text-sm text-muted-foreground">{t("settings.subtitle")}</p>
         </div>
@@ -156,12 +153,11 @@ export function SettingsPage() {
               {t("settings.subtitle")}
             </p>
           </div>
-          <PageTourTrigger pageId="settings" steps={settingsTourSteps} />
         </div>
       </div>
       <div className="space-y-4 sm:space-y-6 pb-24 md:pb-0">
 
-      <div data-tour="googleSheets">
+      <div>
         <GoogleSheetsCard
           isSignedIn={isSignedIn}
           signIn={signIn}
@@ -210,7 +206,7 @@ export function SettingsPage() {
         </div>
       )}
 
-      <div data-tour="categories" className="space-y-4 sm:space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <CardSourcesCard />
 
         <ExpenseCategoriesCard
@@ -232,7 +228,7 @@ export function SettingsPage() {
         />
       </div>
 
-      <div className="pt-4 border-t sm:pt-6" data-tour="deleteAll">
+      <div className="pt-4 border-t sm:pt-6">
         <Button
           variant="outline"
           className="w-full sm:w-auto text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"

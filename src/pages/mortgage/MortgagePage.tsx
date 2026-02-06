@@ -3,8 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import type { Expense } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { PageTourTrigger } from "@/components/PageTourTrigger";
-import { mortgageTourSteps } from "@/lib/pageTourSteps";
 import { Button } from "@/components/ui/button";
 import { Home, Plus } from "lucide-react";
 import { AddMortgagePaymentDialog } from "./AddMortgagePaymentDialog";
@@ -69,13 +67,12 @@ export function MortgagePage() {
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{t("mortgage.title")}</h1>
-            <PageTourTrigger pageId="mortgage" steps={mortgageTourSteps} />
           </div>
           <p className="text-sm text-muted-foreground">
             {t("mortgage.subtitle")}
           </p>
         </div>
-        <Button data-tour-action="openAddMortgage" onClick={() => setAddOpen(true)}>
+        <Button onClick={() => setAddOpen(true)}>
           <Plus className="size-4" />
           {t("mortgage.addPayment")}
         </Button>
@@ -88,7 +85,6 @@ export function MortgagePage() {
               {t("mortgage.subtitle")}
             </p>
           </div>
-          <PageTourTrigger pageId="mortgage" steps={mortgageTourSteps} />
         </div>
       </div>
 
@@ -107,7 +103,7 @@ export function MortgagePage() {
             onSubmit={handleAdd}
           />
 
-          <div data-tour="paymentsList">
+          <div>
             {mortgagePayments.length === 0 ? (
               <div className="text-center text-muted-foreground py-10 px-4 md:px-0 flex flex-col items-center gap-3">
                 <Home className="size-8 text-muted-foreground/70" />
@@ -144,7 +140,7 @@ export function MortgagePage() {
           <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
             <Button
               onClick={() => setAddOpen(true)}
-              data-tour-action="openAddMortgage"
+             
               className="h-11 w-11 rounded-full p-0"
               aria-label={t("mortgage.addMortgagePayment")}
             >

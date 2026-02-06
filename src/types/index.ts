@@ -9,7 +9,6 @@ export * from "./auth";
 export * from "./budget";
 export * from "./import";
 export * from "./category";
-export * from "./tour";
 export * from "./context";
 export * from "./ui";
 export * from "./debt";

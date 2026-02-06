@@ -168,7 +168,7 @@ export function AddTransactionDialog({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side={sheetSide}
-        data-tour="addExpenseSheet"
+       
         className="flex flex-col h-full w-[90vw] max-w-md border-l p-4 gap-3 overflow-hidden rounded-l-2xl md:w-[720px] md:max-w-[720px]"
         onOpenAutoFocus={(event) => event.preventDefault()}
       >

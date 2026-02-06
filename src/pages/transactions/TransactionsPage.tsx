@@ -5,8 +5,6 @@ import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
-import { PageTourTrigger } from "@/components/PageTourTrigger";
-import { transactionsTourSteps } from "@/lib/pageTourSteps";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, SlidersHorizontal, Receipt } from "lucide-react";
@@ -198,16 +196,12 @@ export function TransactionsPage() {
             <h1 className="text-2xl font-semibold">
               {t("transactions.title")}
             </h1>
-            <PageTourTrigger
-              pageId="transactions"
-              steps={transactionsTourSteps}
-            />
           </div>
           <p className="text-sm text-muted-foreground">
             {t("transactions.subtitle")}
           </p>
         </div>
-        <div data-tour="toolbar">
+        <div>
           <TransactionsToolbar
             onOpenFilters={() => setFiltersPopupOpen(true)}
             onAddTransaction={() => setAddTransactionOpen(true)}
@@ -226,7 +220,6 @@ export function TransactionsPage() {
               {t("transactions.subtitle")}
             </p>
           </div>
-          <PageTourTrigger pageId="transactions" steps={transactionsTourSteps} />
         </div>
       </div>
       <div className="flex-1 pb-24 md:pb-0">
@@ -256,7 +249,7 @@ export function TransactionsPage() {
               t={t}
             />
 
-            <div className="flex-1 md:border md:rounded-md" data-tour="expensesList">
+            <div className="flex-1 md:border md:rounded-md">
               {filtered.length === 0 ? (
                 <div className="text-center text-muted-foreground py-12 px-4 flex flex-col items-center gap-3">
                   <Receipt className="size-8 text-muted-foreground/70" />
@@ -303,14 +296,14 @@ export function TransactionsPage() {
 
       <div className="md:hidden fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-30 px-4 pb-3 pointer-events-none">
         <div
-          data-tour="toolbar"
+         
           className="pointer-events-auto flex items-center justify-end"
         >
           <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
             <Button
               variant="secondary"
               onClick={() => setFiltersPopupOpen(true)}
-              data-tour-action="openFilters"
+             
               className="h-11 w-11 rounded-full p-0"
               aria-label={
                 hasActiveFilters
@@ -322,7 +315,7 @@ export function TransactionsPage() {
             </Button>
             <Button
               onClick={() => setAddTransactionOpen(true)}
-              data-tour-action="openAddExpense"
+             
               className="h-11 w-11 rounded-full p-0"
               aria-label={t("common.add")}
             >

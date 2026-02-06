@@ -32,6 +32,7 @@ export interface ExpensesByMonthTableProps {
   onSort: (col: SortColumn) => void;
   onUpdateCategory: (id: string, category: string) => void;
   onUpdateOwner: (id: string, owner: string) => void;
+  onEdit: (expense: Expense) => void;
   expenseCategories: string[];
   ownerOptions: string[];
   onDeleteOne: (expense: Expense) => void;
@@ -75,6 +76,7 @@ export interface ExpenseActionsDialogProps {
   onClose: () => void;
   onUpdateCategory: (id: string, category: string) => void;
   onUpdateOwner: (id: string, owner: string) => void;
+  onEdit: (expense: Expense) => void;
   onDelete: (expense: Expense) => void;
   expenseCategories: string[];
   ownerOptions: string[];

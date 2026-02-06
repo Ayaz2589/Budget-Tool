@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency } from "@/lib/format";
 import type { ExpenseActionsDialogProps } from "@/types/transactions";
@@ -25,6 +25,7 @@ export function ExpenseActionsDialog({
   onClose,
   onUpdateCategory,
   onUpdateOwner,
+  onEdit,
   onDelete,
   expenseCategories,
   ownerOptions = [],
@@ -119,6 +120,17 @@ export function ExpenseActionsDialog({
               </SelectContent>
             </Select>
           </div>
+          <Button
+            variant="outline"
+            className={fieldClass}
+            onClick={() => {
+              onEdit(expense);
+              onClose();
+            }}
+          >
+            <Pencil className="size-4" />
+            {t("common.edit")}
+          </Button>
           <Button
             variant="destructive"
             className={fieldClass}

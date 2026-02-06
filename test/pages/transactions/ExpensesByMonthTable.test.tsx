@@ -32,7 +32,9 @@ test("ExpensesByMonthTable shows Date and Category headers when has data", () =>
       onSort={() => {}}
       onUpdateCategory={() => {}}
       onUpdateOwner={() => {}}
+      onEdit={() => {}}
       expenseCategories={["My Purchase"]}
+      ownerOptions={[]}
       onDeleteOne={() => {}}
       sourceLabelKeys={SOURCE_LABEL_KEYS}
       t={mockT}

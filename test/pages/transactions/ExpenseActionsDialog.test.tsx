@@ -18,6 +18,7 @@ test("ExpenseActionsDialog shows description, amount, category select, and delet
       onClose={() => {}}
       onUpdateCategory={() => {}}
       onUpdateOwner={() => {}}
+      onEdit={() => {}}
       onDelete={() => {}}
       expenseCategories={["Food", "Transport"]}
       ownerOptions={["Alex", "Sam"]}

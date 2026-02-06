@@ -14,6 +14,7 @@ import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
 import { ExpensesByMonthTable, type SortColumn } from "./ExpensesByMonthTable";
 import { ExpensesByMonthList } from "./ExpensesByMonthList";
 import { ExpenseActionsDialog } from "./ExpenseActionsDialog";
+import { EditTransactionDialog } from "./EditTransactionDialog";
 import {
   DeleteOneTransactionDialog,
   DeleteAllTransactionsDialog,
@@ -44,6 +45,7 @@ export function TransactionsPage() {
   const [expenseForActions, setExpenseForActions] = useState<Expense | null>(
     null,
   );
+  const [editExpense, setEditExpense] = useState<Expense | null>(null);
   const [filtersPopupOpen, setFiltersPopupOpen] = useState(false);
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
 
@@ -272,6 +274,7 @@ export function TransactionsPage() {
                       onUpdateOwner={(id, owner) =>
                         updateExpense(id, { owner: owner || undefined })
                       }
+                      onEdit={setEditExpense}
                       expenseCategories={expenseCategories}
                       ownerOptions={ownerOptions}
                       onDeleteOne={setDeleteOneExpense}
@@ -337,6 +340,10 @@ export function TransactionsPage() {
         onUpdateOwner={(id, owner) =>
           updateExpense(id, { owner: owner || undefined })
         }
+        onEdit={(e) => {
+          setExpenseForActions(null);
+          setEditExpense(e);
+        }}
         onDelete={(e) => {
           setExpenseForActions(null);
           setDeleteOneExpense(e);
@@ -344,6 +351,14 @@ export function TransactionsPage() {
         expenseCategories={expenseCategories}
         ownerOptions={ownerOptions}
         t={t}
+      />
+      <EditTransactionDialog
+        expense={editExpense}
+        onClose={() => setEditExpense(null)}
+        onSubmit={updateExpense}
+        expenseCategories={expenseCategories}
+        ownerOptions={ownerOptions}
+        cardSources={cardSources}
       />
 
       <DeleteOneTransactionDialog

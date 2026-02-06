@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { SourceIcon } from "@/components/cards";
 import { formatCurrency } from "@/lib/format";
@@ -58,6 +58,7 @@ export function ExpensesByMonthTable({
   onSort,
   onUpdateCategory,
   onUpdateOwner,
+  onEdit,
   expenseCategories,
   ownerOptions = [],
   onDeleteOne,
@@ -91,7 +92,6 @@ export function ExpensesByMonthTable({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">{t("common.id")}</TableHead>
                   <TableHead>
                     <button
                       type="button"
@@ -181,21 +181,15 @@ export function ExpensesByMonthTable({
                   </TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {monthExpenses.map((e, index) => (
-                  <TableRow
-                    key={e.id}
-                    className={index % 2 === 1 ? "bg-muted/30" : undefined}
-                  >
-                    <TableCell
-                      className="font-mono text-xs max-w-[100px] truncate"
-                      title={e.id}
+                <TableBody>
+                  {monthExpenses.map((e, index) => (
+                    <TableRow
+                      key={e.id}
+                      className={index % 2 === 1 ? "bg-muted/30" : undefined}
                     >
-                      {e.id}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap">
-                      {e.date}
-                    </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {e.date}
+                      </TableCell>
                     <TableCell className="max-w-[220px] truncate">
                       {e.description}
                     </TableCell>
@@ -256,15 +250,26 @@ export function ExpensesByMonthTable({
                       </Select>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onDeleteOne(e)}
-                        className="size-8 text-destructive hover:text-destructive"
-                        aria-label={t("common.delete")}
-                      >
-                        <Trash2 className="size-4 text-destructive" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onEdit(e)}
+                          className="size-8"
+                          aria-label={t("common.edit")}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onDeleteOne(e)}
+                          className="size-8 text-destructive hover:text-destructive"
+                          aria-label={t("common.delete")}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

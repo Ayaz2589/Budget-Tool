@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Loader2, RefreshCcw } from "lucide-react";
+import { CheckCircle2, Clock3, Loader2 } from "lucide-react";
 
 type SyncStatus = "idle" | "syncing" | "success" | "error";
 
@@ -36,17 +36,17 @@ export function SyncStatusIndicator({
     >
       {syncStatus === "syncing" ? (
         <>
-          <Loader2 className="size-3.5 animate-spin" />
+          <Loader2 className="size-3.5 animate-spin" data-testid="sync-icon-syncing" />
           <span>Syncing</span>
         </>
       ) : hasUnsyncedChanges ? (
         <>
-          <RefreshCcw className="size-3.5" />
+          <Clock3 className="size-3.5" data-testid="sync-icon-pending" />
           <span>Sync pending</span>
         </>
       ) : (
         <>
-          <RefreshCcw className="size-3.5" />
+          <CheckCircle2 className="size-3.5" data-testid="sync-icon-complete" />
           <span>Sync complete</span>
         </>
       )}

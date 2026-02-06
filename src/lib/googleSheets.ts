@@ -607,6 +607,204 @@ export async function writeTotalsSheet(
   await updateSheet(accessToken, spreadsheetId, range, rows, false);
 }
 
+function buildExpensesValues(expenses: Expense[]): unknown[][] {
+  const headers = [
+    [
+      "ID",
+      "Date",
+      "Amount",
+      "Description",
+      "Category",
+      "Source",
+      "Owner",
+    ],
+  ];
+  const rows = expenses.map((e) => [
+    e.id,
+    e.date,
+    e.amount,
+    e.description,
+    e.category || "Uncategorized",
+    e.source,
+    e.owner ?? "",
+  ]);
+  return [...headers, ...rows];
+}
+
+function buildIncomeValues(income: Income[]): unknown[][] {
+  const headers = [["Date", "Amount", "Description", "Category", "Owner"]];
+  const rows = income.map((i) => [
+    i.date,
+    i.amount,
+    i.description,
+    i.category || "Uncategorized",
+    i.owner ?? "",
+  ]);
+  return [...headers, ...rows];
+}
+
+function buildDebtsValues(debts: Debt[]): unknown[][] {
+  const headers = [["Id", "Name", "Initial Amount", "Start Date", "Owner"]];
+  const rows = debts.map((d) => [
+    d.id,
+    d.name,
+    d.initialAmount,
+    d.startDate ?? "",
+    d.owner ?? "",
+  ]);
+  return [...headers, ...rows];
+}
+
+function buildDebtPaymentsValues(debtPayments: DebtPayment[]): unknown[][] {
+  const headers = [["Id", "Debt Id", "Date", "Amount", "Note"]];
+  const rows = debtPayments.map((p) => [
+    p.id,
+    p.debtId,
+    p.date,
+    p.amount,
+    p.note ?? "",
+  ]);
+  return [...headers, ...rows];
+}
+
+function buildPresetsValues(presetTransactions: PresetTransaction[]): unknown[][] {
+  const headers = [["Id", "Source", "Description", "Category", "Owner"]];
+  const rows = presetTransactions.map((p) => [
+    p.id,
+    p.source,
+    p.description,
+    p.category || "Uncategorized",
+    p.owner,
+  ]);
+  return [...headers, ...rows];
+}
+
+function buildTotalsValues(months: MonthTotals[], grandTotal: MonthTotals): unknown[][] {
+  const headers = [
+    "Month",
+    "Total Earned",
+    "Total Spent",
+    "Total Spent w/o Mortgage",
+    "Total 50/50 Spent",
+    "50/50 Split",
+    "Tasnuva's Purchase",
+    "Tasnuva's Total Spending",
+    "I Owe Nova",
+    "My Total Spending w/o Mortgage",
+    "Total Saved",
+    "Personal Savings Rate",
+    "HYSA",
+    "Investing (S&P 500)",
+    "Investing Total",
+  ];
+  return [
+    headers,
+    ...months.map((m) => [
+      m.monthLabel,
+      m.totalEarned,
+      m.totalSpent,
+      m.totalSpentWithoutMortgage,
+      m.total5050Spent,
+      m.split5050,
+      m.novasPurchase,
+      m.novasTotalSpending,
+      m.iOweNova,
+      m.myTotalSpendingWithoutMortgage,
+      m.totalSaved,
+      m.personalSavingsRate,
+      m.hysa,
+      m.investingSp500,
+      m.investingTotal,
+    ]),
+    [
+      grandTotal.monthLabel,
+      grandTotal.totalEarned,
+      grandTotal.totalSpent,
+      grandTotal.totalSpentWithoutMortgage,
+      grandTotal.total5050Spent,
+      grandTotal.split5050,
+      grandTotal.novasPurchase,
+      grandTotal.novasTotalSpending,
+      grandTotal.iOweNova,
+      grandTotal.myTotalSpendingWithoutMortgage,
+      grandTotal.totalSaved,
+      grandTotal.personalSavingsRate,
+      grandTotal.hysa,
+      grandTotal.investingSp500,
+      grandTotal.investingTotal,
+    ],
+  ];
+}
+
+export async function syncAllSheetsBatch(
+  accessToken: string,
+  spreadsheetId: string,
+  payload: {
+    expenses: Expense[];
+    mortgageExpenses: Expense[];
+    income: Income[];
+    debts: Debt[];
+    debtPayments: DebtPayment[];
+    presetTransactions: PresetTransaction[];
+    dataBlob: string;
+    months: MonthTotals[];
+    grandTotal: MonthTotals;
+  }
+): Promise<void> {
+  const clearRes = await fetch(`${SHEETS_API}/${spreadsheetId}/values:batchClear`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ranges: [
+        "Expenses!A1:G10000",
+        "Mortgage!A1:G10000",
+        "Income!A1:E10000",
+        "Debts!A1:E10000",
+        "DebtPayments!A1:E10000",
+        "PresetTransactions!A1:E10000",
+        "Data!A1:A1",
+        "Totals!A1:O1000",
+      ],
+    }),
+  });
+  if (!clearRes.ok) {
+    const err = await clearRes.text();
+    throw new Error(`Sheets batch clear failed: ${clearRes.status} ${err}`);
+  }
+
+  const totalsValues = buildTotalsValues(payload.months, payload.grandTotal);
+  const updateRes = await fetch(`${SHEETS_API}/${spreadsheetId}/values:batchUpdate`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      valueInputOption: "USER_ENTERED",
+      data: [
+        { range: "Expenses!A1:G", values: buildExpensesValues(payload.expenses) },
+        { range: "Mortgage!A1:G", values: buildExpensesValues(payload.mortgageExpenses) },
+        { range: "Income!A1:E", values: buildIncomeValues(payload.income) },
+        { range: "Debts!A1:E", values: buildDebtsValues(payload.debts) },
+        { range: "DebtPayments!A1:E", values: buildDebtPaymentsValues(payload.debtPayments) },
+        {
+          range: "PresetTransactions!A1:E",
+          values: buildPresetsValues(payload.presetTransactions),
+        },
+        { range: "Data!A1", values: [[payload.dataBlob]] },
+        { range: "Totals!A1:O1000", values: totalsValues },
+      ],
+    }),
+  });
+  if (!updateRes.ok) {
+    const err = await updateRes.text();
+    throw new Error(`Sheets batch update failed: ${updateRes.status} ${err}`);
+  }
+}
+
 async function clearRange(
   accessToken: string,
   spreadsheetId: string,

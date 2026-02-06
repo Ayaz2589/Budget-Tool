@@ -15,14 +15,7 @@ import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
 import {
   ensureSheetsExist,
-  clearAndWriteExpenses,
-  clearAndWriteMortgage,
-  clearAndWriteIncome,
-  clearAndWriteDebts,
-  clearAndWriteDebtPayments,
-  clearAndWritePresets,
-  writeTotalsSheet,
-  writeDataBlob,
+  syncAllSheetsBatch,
   readDataBlob,
   getSheetIds,
   applySheetsFormatting,
@@ -43,6 +36,8 @@ const ACCESS_TOKEN_STORAGE_KEY = "budget-tool-google-access-token";
 const AUTO_SYNC_ENABLED_KEY = "budget-tool-auto-sync-enabled";
 const AUTO_SYNC_DEBOUNCE_MS = 2_000;
 const AUTO_SYNC_INTERVAL_MS = 5 * 60_000;
+const SYNC_RATE_LIMIT_BASE_DELAY_MS = 3_000;
+const SYNC_RATE_LIMIT_MAX_DELAY_MS = 30_000;
 
 /** Set when user signs out or visits /auth; used to skip landing and go to /auth on next visit. */
 export const RETURNING_USER_KEY = "budget-tool-returning-user";
@@ -211,6 +206,15 @@ function isUnauthorizedError(err: unknown): boolean {
   return false;
 }
 
+function isRateLimitError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  return (
+    err.message.includes("429") ||
+    err.message.includes("RATE_LIMIT_EXCEEDED") ||
+    err.message.includes("RESOURCE_EXHAUSTED")
+  );
+}
+
 export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(
     getStoredAccessToken
@@ -238,9 +242,13 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const [lastSyncAt, setLastSyncAt] = useState<number | null>(null);
   const [hasUnsyncedChanges, setHasUnsyncedChanges] = useState(false);
   const [syncHealth, setSyncHealth] = useState<SyncHealth>("healthy");
-  const activeSignatureRef = useRef<string | null>(null);
+  const latestSyncSignatureRef = useRef<string>("");
+  const lastSyncedSignatureRef = useRef<string | null>(null);
   const inFlightRef = useRef(false);
-  const pendingAfterFlightRef = useRef(false);
+  const syncQueuedRef = useRef(false);
+  const nextSyncAllowedAtRef = useRef(0);
+  const retryBackoffMsRef = useRef(SYNC_RATE_LIMIT_BASE_DELAY_MS);
+  const retryTimerRef = useRef<number | null>(null);
 
   const clearSession = useCallback(() => {
     clearStoredAccessToken();
@@ -249,7 +257,16 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     setUserProfile(null);
     setHasUnsyncedChanges(false);
     setSyncHealth("healthy");
-    activeSignatureRef.current = null;
+    latestSyncSignatureRef.current = "";
+    lastSyncedSignatureRef.current = null;
+    syncQueuedRef.current = false;
+    inFlightRef.current = false;
+    nextSyncAllowedAtRef.current = 0;
+    retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+    if (retryTimerRef.current != null) {
+      window.clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
     try {
       localStorage.setItem(RETURNING_USER_KEY, "1");
     } catch {
@@ -346,11 +363,27 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     if (id) {
       const extracted = id.includes("/") ? extractSpreadsheetId(id) : id;
       setSpreadsheetIdState(extracted || id);
-      activeSignatureRef.current = null;
+      latestSyncSignatureRef.current = "";
+      lastSyncedSignatureRef.current = null;
+      syncQueuedRef.current = false;
+      nextSyncAllowedAtRef.current = 0;
+      retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+      if (retryTimerRef.current != null) {
+        window.clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
       setHasUnsyncedChanges(false);
     } else {
       setSpreadsheetIdState(null);
-      activeSignatureRef.current = null;
+      latestSyncSignatureRef.current = "";
+      lastSyncedSignatureRef.current = null;
+      syncQueuedRef.current = false;
+      nextSyncAllowedAtRef.current = 0;
+      retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+      if (retryTimerRef.current != null) {
+        window.clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
       setHasUnsyncedChanges(false);
     }
   }, []);
@@ -394,6 +427,46 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     ]
   );
 
+  useEffect(() => {
+    latestSyncSignatureRef.current = syncSignature;
+  }, [syncSignature]);
+
+  const getSyncSnapshot = useCallback(() => {
+    const expenseCategoriesWithColors = budget.expenseCategories.map((name) => ({
+      name,
+      color: getCategoryColor(name, "expense"),
+    }));
+    const incomeCategoriesWithColors = budget.incomeCategories.map((name) => ({
+      name,
+      color: getCategoryColor(name, "income"),
+    }));
+
+    return {
+      signature: latestSyncSignatureRef.current,
+      expenses: budget.expenses,
+      income: budget.income,
+      debts: budget.debts,
+      debtPayments: budget.debtPayments,
+      presetTransactions,
+      expenseCategoriesWithColors,
+      incomeCategoriesWithColors,
+      owners: budget.owners,
+      cardSources: budget.cardSources,
+      iOweNova: budget.iOweNova,
+    };
+  }, [
+    budget.expenses,
+    budget.income,
+    budget.debts,
+    budget.debtPayments,
+    presetTransactions,
+    budget.expenseCategories,
+    budget.incomeCategories,
+    budget.owners,
+    budget.cardSources,
+    budget.iOweNova,
+  ]);
+
   const runSync = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
       setSyncStatus("error");
@@ -402,110 +475,120 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     if (inFlightRef.current) {
-      pendingAfterFlightRef.current = true;
+      syncQueuedRef.current = true;
+      return;
+    }
+    const now = Date.now();
+    if (nextSyncAllowedAtRef.current > now) {
+      syncQueuedRef.current = true;
+      if (retryTimerRef.current == null) {
+        retryTimerRef.current = window.setTimeout(() => {
+          retryTimerRef.current = null;
+          void runSync();
+        }, nextSyncAllowedAtRef.current - now);
+      }
       return;
     }
     inFlightRef.current = true;
     setSyncStatus("syncing");
     setSyncErrorMessage(null);
     try {
+      const snapshot = getSyncSnapshot();
       await ensureSheetsExist(accessToken, spreadsheetId);
-      const nonMortgageExpenses = budget.expenses.filter(
+      const nonMortgageExpenses = snapshot.expenses.filter(
         (e) => (e.category || "").toLowerCase() !== "mortgage"
       );
-      const mortgageExpenses = budget.expenses.filter(
+      const mortgageExpenses = snapshot.expenses.filter(
         (e) => (e.category || "").toLowerCase() === "mortgage"
       );
-      await clearAndWriteExpenses(
-        accessToken,
-        spreadsheetId,
-        nonMortgageExpenses
-      );
-      await clearAndWriteMortgage(accessToken, spreadsheetId, mortgageExpenses);
-      await clearAndWriteIncome(accessToken, spreadsheetId, budget.income);
-      await clearAndWriteDebts(accessToken, spreadsheetId, budget.debts);
-      await clearAndWriteDebtPayments(
-        accessToken,
-        spreadsheetId,
-        budget.debtPayments
-      );
-      await clearAndWritePresets(
-        accessToken,
-        spreadsheetId,
-        presetTransactions
-      );
-      const expenseCategoriesWithColors = budget.expenseCategories.map(
-        (name) => ({
-          name,
-          color: getCategoryColor(name, "expense"),
-        })
-      );
-      const incomeCategoriesWithColors = budget.incomeCategories.map(
-        (name) => ({
-          name,
-          color: getCategoryColor(name, "income"),
-        })
-      );
       const dataBlob = serializeToBlob({
-        expenses: budget.expenses,
-        income: budget.income,
-        debts: budget.debts,
-        debtPayments: budget.debtPayments,
-        presetTransactions,
-        expenseCategoriesWithColors,
-        incomeCategoriesWithColors,
-        owners: budget.owners,
-        cardSources: budget.cardSources,
+        expenses: snapshot.expenses,
+        income: snapshot.income,
+        debts: snapshot.debts,
+        debtPayments: snapshot.debtPayments,
+        presetTransactions: snapshot.presetTransactions,
+        expenseCategoriesWithColors: snapshot.expenseCategoriesWithColors,
+        incomeCategoriesWithColors: snapshot.incomeCategoriesWithColors,
+        owners: snapshot.owners,
+        cardSources: snapshot.cardSources,
       });
-      await writeDataBlob(accessToken, spreadsheetId, dataBlob);
       const months = computeAllTotals({
-        expenses: budget.expenses,
-        income: budget.income,
-        iOweNovaByMonth: budget.iOweNova,
+        expenses: snapshot.expenses,
+        income: snapshot.income,
+        iOweNovaByMonth: snapshot.iOweNova,
       });
       const grand = computeGrandTotals(months);
-      await writeTotalsSheet(accessToken, spreadsheetId, months, grand);
+      await syncAllSheetsBatch(accessToken, spreadsheetId, {
+        expenses: nonMortgageExpenses,
+        mortgageExpenses,
+        income: snapshot.income,
+        debts: snapshot.debts,
+        debtPayments: snapshot.debtPayments,
+        presetTransactions: snapshot.presetTransactions,
+        dataBlob,
+        months,
+        grandTotal: grand,
+      });
       const sheetIds = await getSheetIds(accessToken, spreadsheetId);
       if (sheetIds) {
         await applySheetsFormatting(accessToken, spreadsheetId, sheetIds);
       }
-      activeSignatureRef.current = syncSignature;
+      lastSyncedSignatureRef.current = snapshot.signature;
       setSyncStatus("success");
       setSyncErrorMessage(null);
       setLastSyncAt(Date.now());
-      setHasUnsyncedChanges(false);
+      const changed = latestSyncSignatureRef.current !== lastSyncedSignatureRef.current;
+      setHasUnsyncedChanges(changed);
       setSyncHealth("healthy");
+      retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+      nextSyncAllowedAtRef.current = 0;
     } catch (err) {
       if (isUnauthorizedError(err)) {
         clearSession();
       }
       const message = err instanceof Error ? err.message : String(err);
       console.error("Sync failed:", err);
-      setSyncStatus("error");
-      setSyncErrorMessage(message);
-      setSyncHealth("error");
+      if (isRateLimitError(err)) {
+        syncQueuedRef.current = true;
+        nextSyncAllowedAtRef.current = Date.now() + retryBackoffMsRef.current;
+        retryBackoffMsRef.current = Math.min(
+          retryBackoffMsRef.current * 2,
+          SYNC_RATE_LIMIT_MAX_DELAY_MS
+        );
+        setSyncStatus("idle");
+        setSyncErrorMessage("Rate limited by Google Sheets, retrying automatically.");
+        setSyncHealth("warning");
+      } else {
+        setSyncStatus("error");
+        setSyncErrorMessage(message);
+        setSyncHealth("error");
+      }
     } finally {
       inFlightRef.current = false;
-      if (pendingAfterFlightRef.current) {
-        pendingAfterFlightRef.current = false;
-        void runSync();
+      const shouldRunAgain =
+        syncQueuedRef.current ||
+        latestSyncSignatureRef.current !== lastSyncedSignatureRef.current;
+      if (shouldRunAgain) {
+        const waitMs = Math.max(0, nextSyncAllowedAtRef.current - Date.now());
+        if (waitMs > 0) {
+          if (retryTimerRef.current == null) {
+            retryTimerRef.current = window.setTimeout(() => {
+              retryTimerRef.current = null;
+              syncQueuedRef.current = false;
+              void runSync();
+            }, waitMs);
+          }
+        } else {
+          syncQueuedRef.current = false;
+          void runSync();
+        }
       }
     }
   }, [
     accessToken,
     spreadsheetId,
     clearSession,
-    budget.expenses,
-    budget.income,
-    budget.debts,
-    budget.debtPayments,
-    budget.expenseCategories,
-    budget.incomeCategories,
-    budget.owners,
-    budget.iOweNova,
-    budget.cardSources,
-    presetTransactions,
-    syncSignature,
+    getSyncSnapshot,
   ]);
 
   const syncToSheets = useCallback(async () => {
@@ -515,14 +598,21 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!accessToken || !spreadsheetId) {
       setHasUnsyncedChanges(false);
-      activeSignatureRef.current = null;
+      lastSyncedSignatureRef.current = null;
+      nextSyncAllowedAtRef.current = 0;
+      retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+      if (retryTimerRef.current != null) {
+        window.clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
       return;
     }
-    if (activeSignatureRef.current == null) {
-      activeSignatureRef.current = syncSignature;
+    if (lastSyncedSignatureRef.current == null) {
+      lastSyncedSignatureRef.current = latestSyncSignatureRef.current;
       return;
     }
-    const changed = activeSignatureRef.current !== syncSignature;
+    const changed =
+      latestSyncSignatureRef.current !== lastSyncedSignatureRef.current;
     setHasUnsyncedChanges(changed);
     setSyncHealth(changed ? "warning" : "healthy");
   }, [accessToken, spreadsheetId, syncSignature]);
@@ -752,7 +842,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       setSyncErrorMessage(null);
       setHasUnsyncedChanges(false);
       setSyncHealth("healthy");
-      activeSignatureRef.current = null;
+      lastSyncedSignatureRef.current = latestSyncSignatureRef.current;
     } catch (err) {
       if (isUnauthorizedError(err)) {
         clearSession();
@@ -761,6 +851,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       console.error("Restore from sheet failed:", err);
       setSyncStatus("error");
       setSyncErrorMessage(message);
+      setSyncHealth("error");
     }
   }, [
     accessToken,

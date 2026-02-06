@@ -11,6 +11,7 @@ test("SyncStatusIndicator shows syncing state", () => {
     />
   );
   expect(screen.getByText("Syncing")).toBeInTheDocument();
+  expect(screen.getByTestId("sync-icon-syncing")).toBeInTheDocument();
 });
 
 test("SyncStatusIndicator shows pending state", () => {
@@ -22,6 +23,7 @@ test("SyncStatusIndicator shows pending state", () => {
     />
   );
   expect(screen.getByText("Sync pending")).toBeInTheDocument();
+  expect(screen.getByTestId("sync-icon-pending")).toBeInTheDocument();
 });
 
 test("SyncStatusIndicator shows complete state", () => {
@@ -33,4 +35,5 @@ test("SyncStatusIndicator shows complete state", () => {
     />
   );
   expect(screen.getByText("Sync complete")).toBeInTheDocument();
+  expect(screen.getByTestId("sync-icon-complete")).toBeInTheDocument();
 });

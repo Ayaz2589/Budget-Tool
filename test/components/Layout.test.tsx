@@ -1,34 +1,106 @@
-import { test, expect } from "bun:test";
-import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { afterEach, expect, mock, test } from "bun:test";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { BudgetProvider } from "@/context/BudgetContext";
-import { GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
+import { GoogleAuthContext } from "@/context/GoogleAuthContext";
+import type { GoogleAuthContextValue } from "@/types/auth";
 import { Layout } from "@/components/Layout";
 
-function TestWrapper() {
-  return (
+function buildAuthValue(
+  overrides: Partial<GoogleAuthContextValue> = {},
+): GoogleAuthContextValue {
+  return {
+    isSignedIn: false,
+    userProfile: null,
+    signIn: () => {},
+    signOut: () => {},
+    spreadsheetId: null,
+    setSpreadsheetId: () => {},
+    syncToSheets: async () => {},
+    pullFromSheet: async () => {},
+    syncStatus: "idle",
+    syncErrorMessage: null,
+    isAutoSyncEnabled: false,
+    setAutoSyncEnabled: () => {},
+    lastSyncAt: null,
+    hasUnsyncedChanges: false,
+    syncHealth: "healthy",
+    ...overrides,
+  };
+}
+
+function renderLayout(
+  authOverrides: Partial<GoogleAuthContextValue> = {},
+  route = "/dashboard",
+) {
+  return render(
     <BudgetProvider>
-      <GoogleAuthProviderFallback>
-        <MemoryRouter initialEntries={["/dashboard"]}>
+      <GoogleAuthContext.Provider value={buildAuthValue(authOverrides)}>
+        <MemoryRouter initialEntries={[route]}>
           <Routes>
             <Route path="/dashboard" element={<Layout />}>
               <Route index element={<div>Dashboard content</div>} />
+              <Route path="transactions" element={<div>Transactions content</div>} />
             </Route>
           </Routes>
         </MemoryRouter>
-      </GoogleAuthProviderFallback>
-    </BudgetProvider>
+      </GoogleAuthContext.Provider>
+    </BudgetProvider>,
   );
 }
 
-test("Layout renders branding and nav", () => {
-  render(<TestWrapper />);
-  // App name appears in mobile header and in desktop sidebar
+afterEach(() => cleanup());
+
+test("Layout renders branding, nav, and routed content", () => {
+  renderLayout();
   expect(screen.getAllByText("Ortho").length).toBeGreaterThanOrEqual(1);
   expect(
     screen.getAllByRole("link", { name: /dashboard/i }).length,
   ).toBeGreaterThanOrEqual(1);
   expect(screen.getByText("Dashboard content")).toBeInTheDocument();
-  // Mobile bottom nav has More button
   expect(screen.getByRole("button", { name: /more/i })).toBeInTheDocument();
+});
+
+test("Layout opens More sheet and shows additional nav links", () => {
+  renderLayout();
+  fireEvent.click(screen.getByRole("button", { name: "More" }));
+  expect(screen.getByRole("link", { name: "Debt" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Settings" })).toBeInTheDocument();
+});
+
+test("Layout shows sync indicator on non-dashboard routes when unsynced", () => {
+  renderLayout(
+    {
+      isSignedIn: true,
+      spreadsheetId: "sheet-id",
+      hasUnsyncedChanges: true,
+      syncStatus: "idle",
+    },
+    "/dashboard/transactions",
+  );
+  expect(screen.getByRole("status")).toBeInTheDocument();
+  expect(screen.getByText("Sync pending")).toBeInTheDocument();
+});
+
+test("Layout calls signOut from More sheet and supports avatar fallback", () => {
+  const signOut = mock(() => {});
+  const { container } = renderLayout({
+    isSignedIn: true,
+    userProfile: {
+      name: "Ayaz Uddin",
+      picture: "https://example.com/avatar.png",
+      email: "ayaz@example.com",
+    },
+    signOut,
+  });
+
+  const avatar = container.querySelector("img");
+  expect(avatar).not.toBeNull();
+  fireEvent.error(avatar!);
+  expect(screen.getByText("AU")).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: "More" }));
+  const signOutButtons = screen.getAllByRole("button", { name: "Sign out" });
+  fireEvent.click(signOutButtons[signOutButtons.length - 1]!);
+  expect(signOut).toHaveBeenCalledTimes(1);
 });

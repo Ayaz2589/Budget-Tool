@@ -1,9 +1,10 @@
-import { test, expect } from "bun:test";
-import { render, screen } from "@testing-library/react";
+import { afterEach, test, expect, mock } from "bun:test";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createRef } from "react";
 import { ImportSourceCard } from "@/pages/import/ImportSourceCard";
 
 const mockT = (key: string) => key;
+afterEach(() => cleanup());
 
 test("ImportSourceCard shows upload card title and source buttons", () => {
   const fileInputRef = createRef<HTMLInputElement | null>();
@@ -33,4 +34,33 @@ test("ImportSourceCard shows upload card title and source buttons", () => {
   expect(screen.getByRole("button", { name: /import\.applecard/i })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /import\.chasecard/i })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /import\.exportedpdf/i })).toBeInTheDocument();
+});
+
+test("ImportSourceCard hides unavailable sources and shows add button for preview", () => {
+  const onAddToTransactions = mock(() => {});
+  render(
+    <ImportSourceCard
+      selectedSource="apple"
+      onSourceChange={() => {}}
+      fileInputRef={createRef<HTMLInputElement | null>()}
+      accept=".csv"
+      onFileChange={() => {}}
+      importError=""
+      lastDetected="apple"
+      sourceLabel="MasterCard"
+      previewExpensesCount={2}
+      previewIncomeCount={0}
+      previewDebtsCount={0}
+      previewDebtPaymentsCount={0}
+      skippedDuplicates={1}
+      onAddToTransactions={onAddToTransactions}
+      isPdfExport={false}
+      cardSources={["apple"]}
+      t={mockT}
+    />,
+  );
+  expect(screen.getByText("MasterCard · 2 rows (1 duplicates skipped)")).toBeInTheDocument();
+  const addButton = screen.getByRole("button", { name: /add to transactions/i });
+  fireEvent.click(addButton);
+  expect(onAddToTransactions).toHaveBeenCalledTimes(1);
 });

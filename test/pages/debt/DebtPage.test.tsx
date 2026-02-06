@@ -91,3 +91,28 @@ test("DebtPage shows delete debt confirmation dialog when Delete debt is clicked
     screen.getByRole("button", { name: "Delete debt", hidden: false }),
   ).toBeInTheDocument();
 });
+
+test("DebtPage opens add debt sheet from page action", () => {
+  localStorage.clear();
+  localStorage.setItem(
+    BUDGET_STORAGE_KEY,
+    JSON.stringify({
+      expenses: [],
+      income: [],
+      debts: [],
+      debtPayments: [],
+    }),
+  );
+
+  render(
+    <BudgetProvider>
+      <PresetTransactionsProvider>
+        <DebtPage />
+      </PresetTransactionsProvider>
+    </BudgetProvider>,
+  );
+
+  const addButtons = screen.getAllByRole("button", { name: /add debt/i });
+  fireEvent.click(addButtons[0]!);
+  expect(screen.getAllByText("New debt").length).toBeGreaterThan(0);
+});

@@ -1,5 +1,9 @@
-import { test, expect } from "bun:test";
-import { buildExpandedPayload, parseBudgetJson } from "@/lib/jsonExport";
+import { test, expect, mock } from "bun:test";
+import {
+  buildExpandedPayload,
+  downloadBudgetJson,
+  parseBudgetJson,
+} from "@/lib/jsonExport";
 import type { ExpandedPayload } from "@/types/payload";
 
 test("buildExpandedPayload returns expected shape and parseBudgetJson roundtrips", () => {
@@ -64,4 +68,48 @@ test("buildExpandedPayload returns expected shape and parseBudgetJson roundtrips
   expect(parsed.incomeCategoriesWithColors?.[0]?.name).toBe("Paycheck");
   expect(parsed.owners?.[0]).toBe("Alex");
   expect(parsed.cardSources?.[0]).toBe("amex");
+});
+
+test("parseBudgetJson throws on invalid JSON", () => {
+  expect(() => parseBudgetJson("{")).toThrow();
+});
+
+test("downloadBudgetJson creates object URL and clicks anchor", () => {
+  const createObjectURL = mock(() => "blob:test");
+  const revokeObjectURL = mock(() => {});
+  const originalCreate = URL.createObjectURL;
+  const originalRevoke = URL.revokeObjectURL;
+  URL.createObjectURL = createObjectURL as unknown as typeof URL.createObjectURL;
+  URL.revokeObjectURL = revokeObjectURL as unknown as typeof URL.revokeObjectURL;
+
+  const click = mock(() => {});
+  const originalCreateElement = document.createElement.bind(document);
+  const createElementMock = mock((tag: string) => {
+    const el = originalCreateElement(tag);
+    if (tag === "a") {
+      (el as HTMLAnchorElement).click = click as unknown as () => void;
+    }
+    return el;
+  });
+  document.createElement = createElementMock as unknown as typeof document.createElement;
+
+  downloadBudgetJson({
+    expenses: [],
+    income: [],
+    debts: [],
+    debtPayments: [],
+    presetTransactions: [],
+    expenseCategoriesWithColors: [],
+    incomeCategoriesWithColors: [],
+    owners: [],
+    cardSources: [],
+  });
+
+  expect(createObjectURL).toHaveBeenCalledTimes(1);
+  expect(click).toHaveBeenCalledTimes(1);
+  expect(revokeObjectURL).toHaveBeenCalledTimes(1);
+
+  URL.createObjectURL = originalCreate;
+  URL.revokeObjectURL = originalRevoke;
+  document.createElement = originalCreateElement as typeof document.createElement;
 });

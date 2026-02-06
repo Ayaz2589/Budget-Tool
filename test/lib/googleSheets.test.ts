@@ -1,5 +1,11 @@
 import { test, expect, mock, beforeEach, afterEach } from "bun:test";
-import { extractSpreadsheetId, syncAllSheetsBatch } from "@/lib/googleSheets";
+import {
+  extractSpreadsheetId,
+  getSheetValues,
+  readExpensesFromSheet,
+  readIncomeFromSheet,
+  syncAllSheetsBatch,
+} from "@/lib/googleSheets";
 import type { MonthTotals } from "@/types/totals";
 
 test("extractSpreadsheetId extracts id from URL", () => {
@@ -108,4 +114,62 @@ test("syncAllSheetsBatch throws when batchClear fails", async () => {
       grandTotal: { ...monthTotals, monthKey: "grand", monthLabel: "Grand Total" },
     })
   ).rejects.toThrow(/batch clear failed/i);
+});
+
+test("getSheetValues throws with status on read failure", async () => {
+  const fetchMock = mock(() =>
+    Promise.resolve(new Response("forbidden", { status: 403 }))
+  );
+  globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+  await expect(
+    getSheetValues("token", "sheet-123", "Expenses!A2:G")
+  ).rejects.toThrow(/Sheets read failed: 403/i);
+});
+
+test("readExpensesFromSheet parses modern rows with id and owner", async () => {
+  const fetchMock = mock(() =>
+    Promise.resolve(
+      new Response(
+        JSON.stringify({
+          values: [
+            ["e1", "2026-02-06", "10.5", "Coffee", "Food", "manual", "Ayaz"],
+          ],
+        }),
+        { status: 200 }
+      )
+    )
+  );
+  globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+  const expenses = await readExpensesFromSheet("token", "sheet-123");
+  expect(expenses).toHaveLength(1);
+  expect(expenses[0]).toMatchObject({
+    id: "e1",
+    date: "2026-02-06",
+    amount: 10.5,
+    description: "Coffee",
+    category: "Food",
+    source: "manual",
+    owner: "Ayaz",
+  });
+});
+
+test("readIncomeFromSheet normalizes Uncategorized to empty category", async () => {
+  const fetchMock = mock(() =>
+    Promise.resolve(
+      new Response(
+        JSON.stringify({
+          values: [["2026-02-06", "1000", "Paycheck", "Uncategorized", "Ayaz"]],
+        }),
+        { status: 200 }
+      )
+    )
+  );
+  globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+  const income = await readIncomeFromSheet("token", "sheet-123");
+  expect(income).toHaveLength(1);
+  expect(income[0]?.category).toBe("");
+  expect(income[0]?.owner).toBe("Ayaz");
 });

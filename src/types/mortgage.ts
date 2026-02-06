@@ -1,4 +1,5 @@
 import type { Expense } from "./core";
+import type { UiFormatSettings } from "@/lib/format";
 
 export interface MortgagePaymentsTableProps {
   payments: Expense[];
@@ -30,6 +31,7 @@ export interface MortgagePaymentsListProps {
 export interface AddMortgagePaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  dateFormat?: UiFormatSettings["dateFormat"];
   date: string;
   onDateChange: (value: string) => void;
   amount: string;

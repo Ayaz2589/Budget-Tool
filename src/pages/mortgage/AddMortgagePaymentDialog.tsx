@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrencyInput } from "@/lib/currencyInput";
+import { formatDateInput, getDateInputPlaceholder } from "@/lib/dateInput";
 import type { AddMortgagePaymentDialogProps } from "@/types/mortgage";
 
 export type { AddMortgagePaymentDialogProps };
@@ -23,6 +24,7 @@ export type { AddMortgagePaymentDialogProps };
 export function AddMortgagePaymentDialog({
   open,
   onOpenChange,
+  dateFormat = "YYYY/MM/DD",
   date,
   onDateChange,
   amount,
@@ -57,11 +59,12 @@ export function AddMortgagePaymentDialog({
               <Input
                 type="text"
                 inputMode="numeric"
-                placeholder="YYYY-MM-DD"
-                pattern="\d{4}-\d{2}-\d{2}"
+                placeholder={getDateInputPlaceholder(dateFormat)}
                 maxLength={10}
                 value={date}
-                onChange={(e) => onDateChange(e.target.value)}
+                onChange={(e) =>
+                  onDateChange(formatDateInput(e.target.value, dateFormat))
+                }
                 required
                 className={fieldClass}
               />

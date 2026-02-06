@@ -21,6 +21,12 @@ import {
   formatCurrencyInput,
   parseCurrencyInput,
 } from "@/lib/currencyInput";
+import {
+  dateInputToIso,
+  formatDateInput,
+  getDateInputPlaceholder,
+  isoToDateInput,
+} from "@/lib/dateInput";
 import type { Owner } from "@/types/core";
 import type {
   AddIncomeFormPayload,
@@ -34,6 +40,7 @@ export function AddIncomeDialog({
   onOpenChange,
   incomeCategories,
   owners = [],
+  dateFormat = "YYYY/MM/DD",
   onSubmit,
 }: AddIncomeDialogProps) {
   return (
@@ -52,6 +59,7 @@ export function AddIncomeDialog({
         <AddIncomeForm
           incomeCategories={incomeCategories}
           owners={owners}
+          dateFormat={dateFormat}
           onSubmit={onSubmit}
           onCancel={() => onOpenChange(false)}
         />
@@ -63,15 +71,19 @@ export function AddIncomeDialog({
 function AddIncomeForm({
   incomeCategories,
   owners = [],
+  dateFormat = "YYYY/MM/DD",
   onSubmit,
   onCancel,
 }: {
   incomeCategories: string[];
   owners?: string[];
+  dateFormat?: "YYYY/MM/DD" | "MM/DD/YYYY";
   onSubmit: (payload: AddIncomeFormPayload) => void;
   onCancel: () => void;
 }) {
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(() =>
+    isoToDateInput(new Date().toISOString().slice(0, 10), dateFormat)
+  );
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState(""); // default: Uncategorized
@@ -82,8 +94,10 @@ function AddIncomeForm({
     e.preventDefault();
     const num = parseCurrencyInput(amount);
     if (Number.isNaN(num) || num <= 0) return;
+    const isoDate = dateInputToIso(date, dateFormat);
+    if (!isoDate) return;
     onSubmit({
-      date: date.trim(),
+      date: isoDate,
       amount: num,
       description: description.trim() || "Income",
       category: category || "",
@@ -102,11 +116,12 @@ function AddIncomeForm({
           <Input
             type="text"
             inputMode="numeric"
-            placeholder="YYYY-MM-DD"
-            pattern="\d{4}-\d{2}-\d{2}"
+            placeholder={getDateInputPlaceholder(dateFormat)}
             maxLength={10}
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={(e) =>
+              setDate(formatDateInput(e.target.value, dateFormat))
+            }
             required
             className={fieldClass}
           />

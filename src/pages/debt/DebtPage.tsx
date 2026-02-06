@@ -28,6 +28,7 @@ export function DebtPage() {
     addDebtPayment,
     removeDebtPayment,
     owners,
+    uiFormatSettings,
   } = useBudget();
   const [addDebtOpen, setAddDebtOpen] = useState(false);
   const [paymentDebtId, setPaymentDebtId] = useState<string | null>(null);
@@ -85,6 +86,7 @@ export function DebtPage() {
         open={addDebtOpen}
         onOpenChange={setAddDebtOpen}
         owners={owners}
+        dateFormat={uiFormatSettings.dateFormat}
         onSubmit={(payload) => {
           addDebt(payload);
           setAddDebtOpen(false);

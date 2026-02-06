@@ -51,14 +51,11 @@ function loadStoredUiFormatSettings(): UiFormatSettings {
     const raw = localStorage.getItem(UI_FORMAT_STORAGE_KEY);
     if (!raw) return fallback;
     const data = JSON.parse(raw) as Partial<UiFormatSettings>;
-    const locale = typeof data.locale === "string" ? data.locale : fallback.locale;
-    const currency =
-      typeof data.currency === "string" ? data.currency : fallback.currency;
     const dateFormat =
       data.dateFormat === "MM/DD/YYYY" || data.dateFormat === "YYYY/MM/DD"
         ? data.dateFormat
         : fallback.dateFormat;
-    return { locale, currency, dateFormat };
+    return { ...fallback, dateFormat };
   } catch {
     return fallback;
   }

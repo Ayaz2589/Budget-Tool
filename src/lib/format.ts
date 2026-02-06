@@ -13,7 +13,11 @@ const DEFAULT_UI_FORMAT: UiFormatSettings = {
 let uiFormatSettings: UiFormatSettings = { ...DEFAULT_UI_FORMAT };
 
 export function setUiFormatSettings(settings: UiFormatSettings): void {
-  uiFormatSettings = { ...settings };
+  // Currency/locale are fixed to USD formatting; only date format is user-configurable.
+  uiFormatSettings = {
+    ...DEFAULT_UI_FORMAT,
+    dateFormat: settings.dateFormat,
+  };
 }
 
 export function getDefaultUiFormatSettings(): UiFormatSettings {

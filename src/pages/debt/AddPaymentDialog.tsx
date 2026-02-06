@@ -14,6 +14,13 @@ import {
   formatCurrencyInput,
   parseCurrencyInput,
 } from "@/lib/currencyInput";
+import {
+  dateInputToIso,
+  formatDateInput,
+  getDateInputPlaceholder,
+  isoToDateInput,
+} from "@/lib/dateInput";
+import { useBudget } from "@/context/BudgetContext";
 import type { AddPaymentPayload, AddPaymentDialogProps } from "@/types/debt";
 
 export type { AddPaymentPayload, AddPaymentDialogProps };
@@ -24,26 +31,33 @@ export function AddPaymentDialog({
   onClose,
   onSubmit,
 }: AddPaymentDialogProps) {
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const { uiFormatSettings } = useBudget();
+  const [date, setDate] = useState(() =>
+    isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
+  );
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
 
   useEffect(() => {
     if (open) {
-      setDate(new Date().toISOString().slice(0, 10));
+      setDate(
+        isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
+      );
       setAmount("");
       setNote("");
     }
-  }, [open]);
+  }, [open, uiFormatSettings.dateFormat]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!debtId) return;
     const num = parseCurrencyInput(amount);
     if (Number.isNaN(num) || num <= 0) return;
+    const isoDate = dateInputToIso(date, uiFormatSettings.dateFormat);
+    if (!isoDate) return;
     onSubmit({
       debtId,
-      date,
+      date: isoDate,
       amount: num,
       note: note.trim() || undefined,
     });
@@ -63,9 +77,14 @@ export function AddPaymentDialog({
           <div className="space-y-2">
             <Label>Date</Label>
             <Input
-              type="date"
+              type="text"
+              inputMode="numeric"
+              placeholder={getDateInputPlaceholder(uiFormatSettings.dateFormat)}
+              maxLength={10}
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) =>
+                setDate(formatDateInput(e.target.value, uiFormatSettings.dateFormat))
+              }
               required
             />
           </div>

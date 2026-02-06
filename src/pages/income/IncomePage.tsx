@@ -27,6 +27,7 @@ export function IncomePage() {
     removeIncome,
     incomeCategories,
     owners,
+    uiFormatSettings,
   } = useBudget();
   const [addOpen, setAddOpen] = useState(false);
   const [editIncome, setEditIncome] = useState<Income | null>(null);
@@ -96,6 +97,7 @@ export function IncomePage() {
         onOpenChange={setAddOpen}
         incomeCategories={incomeCategories}
         owners={owners}
+        dateFormat={uiFormatSettings.dateFormat}
         onSubmit={handleAdd}
       />
 

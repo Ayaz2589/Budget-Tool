@@ -21,6 +21,11 @@ import {
   formatCurrencyInput,
   parseCurrencyInput,
 } from "@/lib/currencyInput";
+import {
+  dateInputToIso,
+  formatDateInput,
+  getDateInputPlaceholder,
+} from "@/lib/dateInput";
 import type { AddDebtPayload, AddDebtDialogProps } from "@/types/debt";
 
 export type { AddDebtPayload, AddDebtDialogProps };
@@ -29,6 +34,7 @@ export function AddDebtDialog({
   open,
   onOpenChange,
   owners = [],
+  dateFormat = "YYYY/MM/DD",
   onSubmit,
 }: AddDebtDialogProps) {
   const [name, setName] = useState("");
@@ -40,10 +46,14 @@ export function AddDebtDialog({
     e.preventDefault();
     const num = parseCurrencyInput(amount);
     if (Number.isNaN(num) || num < 0) return;
+    const isoStartDate = startDate.trim()
+      ? dateInputToIso(startDate, dateFormat)
+      : undefined;
+    if (startDate.trim() && !isoStartDate) return;
     onSubmit({
       name: name.trim() || "Debt",
       initialAmount: num,
-      startDate: startDate.trim() || undefined,
+      startDate: isoStartDate || undefined,
       owner: owner || "",
     });
   };
@@ -94,11 +104,12 @@ export function AddDebtDialog({
               <Input
                 type="text"
                 inputMode="numeric"
-                placeholder="YYYY-MM-DD"
-                pattern="\d{4}-\d{2}-\d{2}"
+                placeholder={getDateInputPlaceholder(dateFormat)}
                 maxLength={10}
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(e) =>
+                  setStartDate(formatDateInput(e.target.value, dateFormat))
+                }
                 className={fieldClass}
               />
             </div>

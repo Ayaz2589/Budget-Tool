@@ -7,6 +7,12 @@ import {
   formatCurrencyInput,
   parseCurrencyInput,
 } from "@/lib/currencyInput";
+import {
+  dateInputToIso,
+  formatDateInput,
+  getDateInputPlaceholder,
+  isoToDateInput,
+} from "@/lib/dateInput";
 import { CategoryOption } from "@/lib/categoryColors";
 import { SourceIcon } from "@/components/cards";
 import { Button } from "@/components/ui/button";
@@ -27,6 +33,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useTranslation } from "react-i18next";
+import { useBudget } from "@/context/BudgetContext";
 
 export function EditTransactionDialog({
   expense,
@@ -37,6 +44,7 @@ export function EditTransactionDialog({
   cardSources,
 }: EditTransactionDialogProps) {
   const { t } = useTranslation();
+  const { uiFormatSettings } = useBudget();
   const [date, setDate] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -46,13 +54,13 @@ export function EditTransactionDialog({
 
   useEffect(() => {
     if (!expense) return;
-    setDate(expense.date);
+    setDate(isoToDateInput(expense.date, uiFormatSettings.dateFormat));
     setAmount(formatCurrencyFromNumber(expense.amount));
     setDescription(expense.description ?? "");
     setCategory(expense.category ?? "");
     setSource(expense.source);
     setOwner(expense.owner ?? "");
-  }, [expense]);
+  }, [expense, uiFormatSettings.dateFormat]);
 
   const effectiveSource = useMemo<ExpenseSource>(() => {
     if (cardSources.includes(source)) return source;
@@ -63,8 +71,10 @@ export function EditTransactionDialog({
     if (!expense) return;
     const parsed = parseCurrencyInput(amount);
     if (Number.isNaN(parsed) || parsed <= 0) return;
+    const isoDate = dateInputToIso(date, uiFormatSettings.dateFormat);
+    if (!isoDate) return;
     onSubmit(expense.id, {
-      date,
+      date: isoDate,
       amount: parsed,
       description: description.trim(),
       category,
@@ -92,11 +102,12 @@ export function EditTransactionDialog({
             <Input
               type="text"
               inputMode="numeric"
-              placeholder="YYYY-MM-DD"
-              pattern="\d{4}-\d{2}-\d{2}"
+              placeholder={getDateInputPlaceholder(uiFormatSettings.dateFormat)}
               maxLength={10}
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) =>
+                setDate(formatDateInput(e.target.value, uiFormatSettings.dateFormat))
+              }
               className="h-11"
             />
           </div>

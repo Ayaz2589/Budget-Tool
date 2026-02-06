@@ -1,4 +1,5 @@
 import type { Owner, Income } from "./core";
+import type { UiFormatSettings } from "@/lib/format";
 
 export interface AddIncomeFormPayload {
   date: string;
@@ -13,6 +14,7 @@ export interface AddIncomeDialogProps {
   onOpenChange: (open: boolean) => void;
   incomeCategories: string[];
   owners: string[];
+  dateFormat?: UiFormatSettings["dateFormat"];
   onSubmit: (payload: AddIncomeFormPayload) => void;
 }
 

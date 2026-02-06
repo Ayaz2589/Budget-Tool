@@ -1,4 +1,5 @@
 import type { Debt, DebtPayment, Owner } from "./core";
+import type { UiFormatSettings } from "@/lib/format";
 
 export interface DebtListProps {
   debts: Debt[];
@@ -28,6 +29,7 @@ export interface AddDebtDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   owners: string[];
+  dateFormat?: UiFormatSettings["dateFormat"];
   onSubmit: (payload: AddDebtPayload) => void;
 }
 

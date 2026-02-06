@@ -12,6 +12,12 @@ import {
   formatCurrencyInput,
   parseCurrencyInput,
 } from "@/lib/currencyInput";
+import {
+  dateInputToIso,
+  formatDateInput,
+  getDateInputPlaceholder,
+  isoToDateInput,
+} from "@/lib/dateInput";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { SourceIcon } from "@/components/cards";
 import { CategoryOption, getCategoryColor } from "@/lib/categoryColors";
@@ -34,10 +40,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
 
-function defaultRow(defaultSource: ExpenseSource = "manual"): TransactionRow {
+function defaultRow(
+  defaultSource: ExpenseSource = "manual",
+  dateValue: string = new Date().toISOString().slice(0, 10)
+): TransactionRow {
   return {
     id: crypto.randomUUID(),
-    date: new Date().toISOString().slice(0, 10),
+    date: dateValue,
     amount: "",
     description: "",
     category: "", // default: Uncategorized (empty string; UI shows "_" in Select)
@@ -51,21 +60,36 @@ export function AddTransactionDialog({
   onOpenChange,
 }: AddTransactionDialogProps) {
   const { t } = useTranslation();
-  const { expenses, addExpense, expenseCategories, cardSources, owners } = useBudget();
+  const {
+    expenses,
+    addExpense,
+    expenseCategories,
+    cardSources,
+    owners,
+    uiFormatSettings,
+  } = useBudget();
   const { presetTransactions } = usePresetTransactions();
   const defaultSource = (cardSources[0] as ExpenseSource) ?? "manual";
   const [rows, setRows] = useState<TransactionRow[]>(() => [
-    defaultRow(defaultSource),
+    defaultRow(
+      defaultSource,
+      isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
+    ),
   ]);
   const [activeRowIndex, setActiveRowIndex] = useState(0);
 
   useEffect(() => {
     if (open) {
       const fallback = (cardSources[0] as ExpenseSource) ?? "manual";
-      setRows([defaultRow(fallback)]);
+      setRows([
+        defaultRow(
+          fallback,
+          isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
+        ),
+      ]);
       setActiveRowIndex(0);
     }
-  }, [open, cardSources]);
+  }, [open, cardSources, uiFormatSettings.dateFormat]);
 
   const ownerOptions = useMemo(() => {
     if (owners.length > 0) return owners;
@@ -85,7 +109,13 @@ export function AddTransactionDialog({
 
   const addRow = () => {
     setRows((prev) => {
-      const next = [...prev, defaultRow(defaultSource)];
+      const next = [
+        ...prev,
+        defaultRow(
+          defaultSource,
+          isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
+        ),
+      ];
       setActiveRowIndex(next.length - 1);
       return next;
     });
@@ -120,9 +150,11 @@ export function AddTransactionDialog({
     const toAdd = rows.flatMap((row) => {
       const num = parseCurrencyInput(row.amount);
       if (Number.isNaN(num) || num <= 0) return [];
+      const isoDate = dateInputToIso(row.date, uiFormatSettings.dateFormat);
+      if (!isoDate) return [];
       return [
         {
-          date: row.date,
+          date: isoDate,
           amount: num,
           description:
             row.description.trim() ||
@@ -136,7 +168,12 @@ export function AddTransactionDialog({
     toAdd.forEach((expense) => addExpense(expense));
     const added = toAdd.length;
     if (added > 0) {
-      setRows([defaultRow()]);
+      setRows([
+        defaultRow(
+          defaultSource,
+          isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
+        ),
+      ]);
       onOpenChange(false);
     }
   };
@@ -364,13 +401,17 @@ export function AddTransactionDialog({
                     <Input
                       type="text"
                       inputMode="numeric"
-                      placeholder="YYYY-MM-DD"
-                      pattern="\d{4}-\d{2}-\d{2}"
+                      placeholder={getDateInputPlaceholder(uiFormatSettings.dateFormat)}
                       maxLength={10}
                       className={fieldClass}
                       value={row.date}
                       onChange={(e) =>
-                        updateRow(index, { date: e.target.value })
+                        updateRow(index, {
+                          date: formatDateInput(
+                            e.target.value,
+                            uiFormatSettings.dateFormat
+                          ),
+                        })
                       }
                     />
                   </div>

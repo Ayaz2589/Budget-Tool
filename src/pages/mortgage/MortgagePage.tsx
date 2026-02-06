@@ -9,6 +9,7 @@ import {
   formatCurrencyFromNumber,
   parseCurrencyInput,
 } from "@/lib/currencyInput";
+import { dateInputToIso, isoToDateInput } from "@/lib/dateInput";
 import { AddMortgagePaymentDialog } from "./AddMortgagePaymentDialog";
 import { MortgagePaymentsTable } from "./MortgagePaymentsTable";
 import { MortgagePaymentsList } from "./MortgagePaymentsList";
@@ -19,10 +20,10 @@ const MORTGAGE_CATEGORY = "Mortgage";
 const DEFAULT_MORTGAGE_AMOUNT = 5400;
 
 export function MortgagePage() {
-  const { expenses, addExpense, updateExpense, removeExpense, owners } = useBudget();
+  const { expenses, addExpense, updateExpense, removeExpense, owners, uiFormatSettings } = useBudget();
   const [addOpen, setAddOpen] = useState(false);
   const [addDate, setAddDate] = useState(() =>
-    new Date().toISOString().slice(0, 10),
+    isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat),
   );
   const [addAmount, setAddAmount] = useState(
     formatCurrencyFromNumber(DEFAULT_MORTGAGE_AMOUNT)
@@ -46,17 +47,19 @@ export function MortgagePage() {
     e.preventDefault();
     const num = parseCurrencyInput(addAmount);
     if (Number.isNaN(num) || num <= 0) return;
-    const dateStr = addDate.trim();
-    if (!dateStr) return;
+    const isoDate = dateInputToIso(addDate, uiFormatSettings.dateFormat);
+    if (!isoDate) return;
     addExpense({
-      date: dateStr,
+      date: isoDate,
       amount: num,
       description: MORTGAGE_CATEGORY,
       category: MORTGAGE_CATEGORY,
       source: "manual",
       owner: addOwner || undefined,
     });
-    setAddDate(new Date().toISOString().slice(0, 10));
+    setAddDate(
+      isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
+    );
     setAddAmount(formatCurrencyFromNumber(DEFAULT_MORTGAGE_AMOUNT));
     setAddOpen(false);
   };
@@ -99,6 +102,7 @@ export function MortgagePage() {
           <AddMortgagePaymentDialog
             open={addOpen}
             onOpenChange={setAddOpen}
+            dateFormat={uiFormatSettings.dateFormat}
             date={addDate}
             onDateChange={setAddDate}
             amount={addAmount}

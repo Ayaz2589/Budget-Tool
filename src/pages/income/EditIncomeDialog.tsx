@@ -22,6 +22,13 @@ import {
   formatCurrencyInput,
   parseCurrencyInput,
 } from "@/lib/currencyInput";
+import {
+  dateInputToIso,
+  formatDateInput,
+  getDateInputPlaceholder,
+  isoToDateInput,
+} from "@/lib/dateInput";
+import { useBudget } from "@/context/BudgetContext";
 import type { Owner } from "@/types/core";
 import type {
   EditIncomeFormPayload,
@@ -42,25 +49,28 @@ export function EditIncomeDialog({
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [owner, setOwner] = useState<Owner>("");
+  const { uiFormatSettings } = useBudget();
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   useEffect(() => {
     if (income) {
-      setDate(income.date);
+      setDate(isoToDateInput(income.date, uiFormatSettings.dateFormat));
       setAmount(formatCurrencyFromNumber(income.amount));
       setDescription(income.description ?? "");
       setCategory(income.category ?? ""); // default: Uncategorized
       setOwner(income.owner ?? "");
     }
-  }, [income, incomeCategories, owners]);
+  }, [income, incomeCategories, owners, uiFormatSettings.dateFormat]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!income) return;
     const num = parseCurrencyInput(amount);
     if (Number.isNaN(num) || num <= 0) return;
+    const isoDate = dateInputToIso(date, uiFormatSettings.dateFormat);
+    if (!isoDate) return;
     onSubmit(income.id, {
-      date: date.trim(),
+      date: isoDate,
       amount: num,
       description: description.trim() || "Income",
       category: category || "",
@@ -90,11 +100,12 @@ export function EditIncomeDialog({
               <Input
                 type="text"
                 inputMode="numeric"
-                placeholder="YYYY-MM-DD"
-                pattern="\d{4}-\d{2}-\d{2}"
+                placeholder={getDateInputPlaceholder(uiFormatSettings.dateFormat)}
                 maxLength={10}
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
+                onChange={(e) =>
+                  setDate(formatDateInput(e.target.value, uiFormatSettings.dateFormat))
+                }
                 required
                 className={fieldClass}
               />

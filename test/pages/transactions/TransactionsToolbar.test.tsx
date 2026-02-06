@@ -10,9 +10,6 @@ test("TransactionsToolbar shows Filters and Add buttons", () => {
       onOpenFilters={() => {}}
       onAddTransaction={() => {}}
       hasActiveFilters={false}
-      showSync={false}
-      syncStatus="idle"
-      onSync={() => {}}
       t={mockT}
     />,
   );
@@ -21,22 +18,5 @@ test("TransactionsToolbar shows Filters and Add buttons", () => {
   ).toBeInTheDocument();
   expect(
     screen.getByRole("button", { name: /add expense/i }),
-  ).toBeInTheDocument();
-});
-
-test("TransactionsToolbar shows Sync button when showSync is true", () => {
-  render(
-    <TransactionsToolbar
-      onOpenFilters={() => {}}
-      onAddTransaction={() => {}}
-      hasActiveFilters={false}
-      showSync={true}
-      syncStatus="idle"
-      onSync={() => {}}
-      t={mockT}
-    />,
-  );
-  expect(
-    screen.getByRole("button", { name: /transactions\.syncToSheets/i }),
   ).toBeInTheDocument();
 });

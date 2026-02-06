@@ -231,6 +231,7 @@ export function Layout() {
     hasUnsyncedChanges,
   } = useGoogleAuth();
   const currentLng = i18n.language;
+  const showSyncStatusUi = location.pathname !== "/dashboard";
   const [moreOpen, setMoreOpen] = useState(false);
   const [showSyncComplete, setShowSyncComplete] = useState(false);
   const prevSignedInRef = useRef(isSignedIn);
@@ -490,17 +491,17 @@ export function Layout() {
           </div>
         </DialogContent>
       </Dialog>
-      {(hasUnsyncedChanges || syncStatus === "syncing" || showSyncComplete) && (
+      {showSyncStatusUi &&
+        (hasUnsyncedChanges || syncStatus === "syncing" || showSyncComplete) && (
         <div
           className={cn(
-            "md:hidden fixed z-50 left-4 rounded-full border px-3 py-2 text-xs font-medium shadow-lg flex items-center gap-2",
+            "fixed z-50 rounded-full border px-3 py-2 text-xs font-medium shadow-lg flex items-center gap-2 left-4 md:left-[240px] bottom-[calc(6rem+env(safe-area-inset-bottom))] md:bottom-4",
             syncStatus === "syncing"
               ? "bg-sky-600 text-white border-sky-500"
               : hasUnsyncedChanges
                 ? "bg-amber-400 text-black border-amber-300"
               : "bg-emerald-600 text-white border-emerald-500"
           )}
-          style={{ bottom: "calc(6rem + env(safe-area-inset-bottom))" }}
           role="status"
           aria-live="polite"
         >

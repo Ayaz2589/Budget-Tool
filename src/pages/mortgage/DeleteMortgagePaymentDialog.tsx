@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import type { DeleteMortgagePaymentDialogProps } from "@/types/mortgage";
 
 export type { DeleteMortgagePaymentDialogProps };
@@ -25,7 +25,7 @@ export function DeleteMortgagePaymentDialog({
           <DialogTitle>Remove mortgage payment?</DialogTitle>
           <DialogDescription>
             {expense
-              ? `Remove ${expense.date} payment of ${formatCurrency(
+              ? `Remove ${formatDate(expense.date)} payment of ${formatCurrency(
                   expense.amount
                 )}? This cannot be undone.`
               : ""}

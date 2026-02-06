@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getDebtBalance } from "@/lib/debtUtils";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import type { DebtPayment } from "@/types/core";
 import { cn } from "@/lib/utils";
 import type { DebtActionsDialogProps } from "@/types/debt";
@@ -126,7 +126,7 @@ export function DebtActionsDialog({
                       "flex items-center justify-between gap-2 py-2 px-3 rounded-md bg-muted/50 text-sm"
                     )}
                   >
-                    <span className="text-muted-foreground">{p.date}</span>
+                    <span className="text-muted-foreground">{formatDate(p.date)}</span>
                     <span className="font-medium">
                       {formatCurrency(p.amount)}
                     </span>

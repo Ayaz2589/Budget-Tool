@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CategoryOption } from "@/lib/categoryColors";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
 import type { IncomeTableProps } from "@/types/income";
 
@@ -72,7 +72,7 @@ export function IncomeTable({
                 <TableBody>
                   {monthIncome.map((i) => (
                     <TableRow key={i.id}>
-                      <TableCell className="whitespace-nowrap">{i.date}</TableCell>
+                      <TableCell className="whitespace-nowrap">{formatDate(i.date)}</TableCell>
                       <TableCell>{i.description}</TableCell>
                       <TableCell>{formatCurrency(i.amount)}</TableCell>
                       <TableCell>

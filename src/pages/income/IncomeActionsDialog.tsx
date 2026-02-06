@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import type { IncomeActionsDialogProps } from "@/types/income";
 
 export type { IncomeActionsDialogProps };
@@ -78,7 +78,7 @@ export function IncomeActionsDialog({
             <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
               <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
                 <span>{t("common.date")}</span>
-                <span>{income.date}</span>
+                <span>{formatDate(income.date)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground uppercase tracking-wide">

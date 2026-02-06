@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { SourceIcon } from "@/components/cards";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import type {
@@ -188,7 +188,7 @@ export function ExpensesByMonthTable({
                       className={index % 2 === 1 ? "bg-muted/30" : undefined}
                     >
                     <TableCell className="whitespace-nowrap">
-                      {e.date}
+                      {formatDate(e.date)}
                     </TableCell>
                     <TableCell className="max-w-[220px] truncate">
                       {e.description}

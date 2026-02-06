@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { getDebtBalance } from "@/lib/debtUtils";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -43,7 +43,7 @@ export function DebtListMobile({
                 <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
                   <span>
                     {debt.owner || "No Owner"}
-                    {debt.startDate ? ` · ${debt.startDate}` : ""}
+                    {debt.startDate ? ` · ${formatDate(debt.startDate)}` : ""}
                   </span>
                 </div>
               </div>
@@ -85,7 +85,7 @@ export function DebtListMobile({
                       className="flex items-center justify-between text-xs"
                     >
                       <div className="text-muted-foreground">
-                        {p.date}
+                        {formatDate(p.date)}
                         {p.note ? ` · ${p.note}` : ""}
                       </div>
                       <div className="font-medium">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
 import { cn } from "@/lib/utils";
 import type { IncomeListProps } from "@/types/income";
@@ -51,7 +51,7 @@ export function IncomeList({
                       onClick={() => onIncomeTap(i)}
                       aria-label={`${i.description || "Income"}, ${formatCurrency(
                         i.amount
-                      )}, ${i.date}`}
+                      )}, ${formatDate(i.date)}`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -59,7 +59,7 @@ export function IncomeList({
                             {i.description || "—"}
                           </div>
                           <div className="text-xs text-muted-foreground mt-0.5">
-                            {i.date} · {i.category || "Uncategorized"}
+                            {formatDate(i.date)} · {i.category || "Uncategorized"}
                           </div>
                         </div>
                         <div className="text-base font-semibold shrink-0">

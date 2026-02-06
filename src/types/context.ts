@@ -1,6 +1,7 @@
 import type { Debt, DebtPayment, Expense, Income } from "./core";
 import type { BudgetState } from "./budget";
 import type { PresetTransaction } from "./core";
+import type { UiFormatSettings } from "@/lib/format";
 
 export interface BudgetContextValue extends BudgetState {
   addExpenses: (expenses: Expense[]) => void;
@@ -27,6 +28,8 @@ export interface BudgetContextValue extends BudgetState {
   setIOweNova: (monthKey: string, amount: number) => void;
   iOweNova: Record<string, number>;
   repairCorruptedDates: () => { fixedExpenses: number; fixedIncome: number };
+  uiFormatSettings: UiFormatSettings;
+  setUiFormatSettings: (settings: UiFormatSettings) => void;
   useDummyData: boolean;
   setUseDummyData: (value: boolean) => void;
 }

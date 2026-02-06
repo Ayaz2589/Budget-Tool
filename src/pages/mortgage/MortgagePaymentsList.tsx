@@ -1,4 +1,4 @@
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { MortgagePaymentsListProps } from "@/types/mortgage";
 
@@ -22,11 +22,11 @@ export function MortgagePaymentsList({
               type="button"
               className="flex-1 min-w-0 text-left"
               onClick={() => onPaymentTap(e)}
-              aria-label={`${e.date}, ${formatCurrency(e.amount)}`}
+              aria-label={`${formatDate(e.date)}, ${formatCurrency(e.amount)}`}
             >
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-base font-medium text-foreground">
-                  {e.date}
+                  {formatDate(e.date)}
                 </span>
                 <span className="shrink-0 text-base font-semibold">
                   {formatCurrency(e.amount)}

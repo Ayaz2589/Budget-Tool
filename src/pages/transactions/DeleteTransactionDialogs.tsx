@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import type {
   DeleteOneTransactionDialogProps,
   DeleteSelectedTransactionsDialogProps,
@@ -35,7 +35,7 @@ export function DeleteOneTransactionDialog({
           <DialogDescription>
             {expense
               ? t("transactions.deleteThisDesc", {
-                  date: expense.date,
+                  date: formatDate(expense.date),
                   description: expense.description,
                   amount: formatCurrency(expense.amount),
                 })

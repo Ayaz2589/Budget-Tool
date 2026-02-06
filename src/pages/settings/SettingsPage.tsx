@@ -5,9 +5,17 @@ import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { extractSpreadsheetId } from "@/lib/googleSheets";
+import { formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +32,10 @@ import { OwnersCard } from "./OwnersCard";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
 const PRESET_STORAGE_KEY = "budget-tool-preset-transactions";
+const DATE_FORMAT_OPTIONS = [
+  { value: "YYYY/MM/DD", label: "YYYY/MM/DD" },
+  { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
+] as const;
 
 export function SettingsPage() {
   const {
@@ -34,6 +46,8 @@ export function SettingsPage() {
     setIncomeCategories,
     setOwners,
     repairCorruptedDates,
+    uiFormatSettings,
+    setUiFormatSettings,
     useDummyData,
     setUseDummyData,
   } = useBudget();
@@ -205,6 +219,40 @@ export function SettingsPage() {
           </div>
         </div>
       )}
+
+      <div className="rounded-lg border border-border/60 p-4 space-y-3">
+        <div className="space-y-1">
+          <h3 className="text-sm font-semibold">{t("settings.dateFormatTitle")}</h3>
+          <p className="text-xs text-muted-foreground">
+            {t("settings.dateFormatDesc")}
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label>{t("settings.dateFormatLabel")}</Label>
+          <Select
+            value={uiFormatSettings.dateFormat}
+            onValueChange={(dateFormat: "YYYY/MM/DD" | "MM/DD/YYYY") =>
+              setUiFormatSettings({ ...uiFormatSettings, dateFormat })
+            }
+          >
+            <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DATE_FORMAT_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {t("settings.dateFormatPreview", {
+            date: formatDate("2026-02-06"),
+          })}
+        </p>
+      </div>
 
       <div className="space-y-4 sm:space-y-6">
         <CardSourcesCard />

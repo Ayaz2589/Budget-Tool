@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import {
   Select,
   SelectContent,
@@ -46,7 +46,7 @@ export function MortgagePaymentActionsDialog({
       >
         <SheetHeader className="px-4 pt-5 pb-3">
           <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
-            {payment.date} · {formatCurrency(payment.amount)}
+            {formatDate(payment.date)} · {formatCurrency(payment.amount)}
           </SheetTitle>
         </SheetHeader>
         <div className="grid gap-5 px-4 pb-8 overflow-y-auto overscroll-contain">

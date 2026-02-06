@@ -62,7 +62,7 @@ test("ExpensesByMonthList has tap target for each expense", () => {
     />,
   );
   const tapTarget = screen.getByRole("button", {
-    name: /test purchase.*\$50\.00.*2025-01-15/i,
+    name: /test purchase.*\$50\.00.*2025\/01\/15/i,
   });
   expect(tapTarget).toBeInTheDocument();
 });

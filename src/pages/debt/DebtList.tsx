@@ -17,7 +17,7 @@ import {
 import { Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getDebtBalance } from "@/lib/debtUtils";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import type { DebtListProps } from "@/types/debt";
 
 export type { DebtListProps };
@@ -73,7 +73,7 @@ export function DebtList({
                         ))}
                       </SelectContent>
                     </Select>
-                    {debt.startDate ? <span>Started {debt.startDate}</span> : null}
+                    {debt.startDate ? <span>Started {formatDate(debt.startDate)}</span> : null}
                   </div>
                 </div>
 
@@ -143,7 +143,7 @@ export function DebtList({
                       <TableBody>
                         {payments.map((p) => (
                           <TableRow key={p.id}>
-                            <TableCell className="text-sm">{p.date}</TableCell>
+                            <TableCell className="text-sm">{formatDate(p.date)}</TableCell>
                             <TableCell className="text-sm font-medium">
                               {formatCurrency(p.amount)}
                             </TableCell>

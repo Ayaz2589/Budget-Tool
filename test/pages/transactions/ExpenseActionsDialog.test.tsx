@@ -30,7 +30,7 @@ test("ExpenseActionsDialog shows description, amount, category select, and delet
   const withinDialog = within(dialog);
   expect(withinDialog.getByText("Coffee")).toBeInTheDocument();
   expect(withinDialog.getByText("$100.00")).toBeInTheDocument();
-  expect(withinDialog.getByText("2025-01-15")).toBeInTheDocument();
+  expect(withinDialog.getByText("2025/01/15")).toBeInTheDocument();
   expect(withinDialog.getByText("common.category")).toBeInTheDocument();
   expect(withinDialog.getByText("common.owner")).toBeInTheDocument();
   expect(withinDialog.getAllByRole("combobox")).toHaveLength(2);

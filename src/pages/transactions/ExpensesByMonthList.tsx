@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
 import { cn } from "@/lib/utils";
 import type { ExpensesByMonthListProps } from "@/types/transactions";
@@ -79,7 +79,7 @@ export function ExpensesByMonthList({
                       onClick={() => onExpenseTap(e)}
                       aria-label={`${e.description}, ${formatCurrency(
                         e.amount
-                      )}, ${e.date}`}
+                      )}, ${formatDate(e.date)}`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -87,7 +87,7 @@ export function ExpensesByMonthList({
                             {e.description || "—"}
                           </div>
                           <div className="text-xs text-muted-foreground mt-0.5">
-                            {e.date} · {e.category || "Uncategorized"}
+                            {formatDate(e.date)} · {e.category || "Uncategorized"}
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">

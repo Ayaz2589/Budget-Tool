@@ -19,6 +19,11 @@ import {
   DEFAULT_EXPENSE_CATEGORIES,
   DEFAULT_INCOME_CATEGORIES,
 } from "@/lib/types";
+import {
+  getDefaultUiFormatSettings,
+  setUiFormatSettings as applyUiFormatSettings,
+  type UiFormatSettings,
+} from "@/lib/format";
 import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 import { buildDummyBudget, type DummyBudgetData } from "@/lib/dummyData";
 import type { BudgetState } from "@/types/budget";
@@ -26,6 +31,7 @@ import type { BudgetContextValue } from "@/types/context";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
 const DUMMY_STORAGE_KEY = "budget-tool-dummy-mode";
+const UI_FORMAT_STORAGE_KEY = "budget-tool-ui-format";
 
 export type { BudgetState };
 
@@ -37,6 +43,25 @@ function generateId(): string {
 
 function getCurrentMonthKey(): string {
   return new Date().toISOString().slice(0, 7);
+}
+
+function loadStoredUiFormatSettings(): UiFormatSettings {
+  const fallback = getDefaultUiFormatSettings();
+  try {
+    const raw = localStorage.getItem(UI_FORMAT_STORAGE_KEY);
+    if (!raw) return fallback;
+    const data = JSON.parse(raw) as Partial<UiFormatSettings>;
+    const locale = typeof data.locale === "string" ? data.locale : fallback.locale;
+    const currency =
+      typeof data.currency === "string" ? data.currency : fallback.currency;
+    const dateFormat =
+      data.dateFormat === "MM/DD/YYYY" || data.dateFormat === "YYYY/MM/DD"
+        ? data.dateFormat
+        : fallback.dateFormat;
+    return { locale, currency, dateFormat };
+  } catch {
+    return fallback;
+  }
 }
 
 function loadStoredBudget(): {
@@ -153,6 +178,13 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const [iOweNova, setIOweNovaState] = useState<Record<string, number>>(
     stored.iOweNova
   );
+  const [uiFormatSettings, setUiFormatSettingsState] = useState<UiFormatSettings>(
+    () => {
+      const initialSettings = loadStoredUiFormatSettings();
+      applyUiFormatSettings(initialSettings);
+      return initialSettings;
+    }
+  );
   const [useDummyData, setUseDummyDataState] = useState(() => {
     if (!isDev) return false;
     try {
@@ -181,6 +213,15 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       // ignore
     }
   }, [isDev, useDummyData]);
+
+  useEffect(() => {
+    applyUiFormatSettings(uiFormatSettings);
+    try {
+      localStorage.setItem(UI_FORMAT_STORAGE_KEY, JSON.stringify(uiFormatSettings));
+    } catch {
+      // ignore
+    }
+  }, [uiFormatSettings]);
 
   useEffect(() => {
     if (useDummyData) return;
@@ -678,6 +719,10 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     [useDummyData]
   );
 
+  const setUiFormatSettings = useCallback((settings: UiFormatSettings) => {
+    setUiFormatSettingsState(settings);
+  }, []);
+
   const repairCorruptedDates = useCallback(() => {
     const activeExpenses = useDummyData ? dummyState.expenses : expenses;
     const activeIncome = useDummyData ? dummyState.income : income;
@@ -762,6 +807,8 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       setIOweNova,
       iOweNova: useDummyData ? dummyState.iOweNova : iOweNova,
       repairCorruptedDates,
+      uiFormatSettings,
+      setUiFormatSettings,
       useDummyData,
       setUseDummyData,
     }),
@@ -793,8 +840,10 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       setCardSources,
       setExpenseCategories,
       setIOweNova,
+      setUiFormatSettings,
       setIncomeCategories,
       setOwners,
+      uiFormatSettings,
       updateDebt,
       updateDebtPayment,
       updateExpense,

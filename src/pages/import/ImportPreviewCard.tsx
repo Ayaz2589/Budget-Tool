@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CategoryOption } from "@/lib/categoryColors";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import type { ImportPreviewCardProps } from "@/types/import";
 
 export type { ImportPreviewCardProps };
@@ -71,7 +71,7 @@ export function ImportPreviewCard({
                         {e.id}
                       </TableCell>
                       <TableCell className="whitespace-nowrap">
-                        {e.date}
+                        {formatDate(e.date)}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate">
                         {e.description}
@@ -138,7 +138,7 @@ export function ImportPreviewCard({
                         {i.id}
                       </TableCell>
                       <TableCell className="whitespace-nowrap">
-                        {i.date}
+                        {formatDate(i.date)}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate">
                         {i.description}
@@ -171,7 +171,7 @@ export function ImportPreviewCard({
                     <TableRow key={d.id}>
                       <TableCell>{d.name}</TableCell>
                       <TableCell>{formatCurrency(d.initialAmount)}</TableCell>
-                      <TableCell>{d.startDate ?? "—"}</TableCell>
+                      <TableCell>{d.startDate ? formatDate(d.startDate) : "—"}</TableCell>
                       <TableCell>{d.owner ?? "Ayaz"}</TableCell>
                     </TableRow>
                   ))}
@@ -199,7 +199,7 @@ export function ImportPreviewCard({
                       <TableCell className="font-mono text-xs">
                         {p.debtId}
                       </TableCell>
-                      <TableCell>{p.date}</TableCell>
+                      <TableCell>{formatDate(p.date)}</TableCell>
                       <TableCell>{formatCurrency(p.amount)}</TableCell>
                       <TableCell className="text-muted-foreground">
                         {p.note ?? "—"}

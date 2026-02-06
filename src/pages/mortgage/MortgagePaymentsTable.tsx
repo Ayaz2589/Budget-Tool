@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import {
   Select,
   SelectContent,
@@ -50,7 +50,7 @@ export function MortgagePaymentsTable({
       <TableBody>
         {payments.map((e) => (
           <TableRow key={e.id}>
-            <TableCell>{e.date}</TableCell>
+            <TableCell>{formatDate(e.date)}</TableCell>
             <TableCell>
               <CategoryOption name={e.category ?? ""} type="expense" />
             </TableCell>

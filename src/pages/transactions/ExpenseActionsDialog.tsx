@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Pencil, Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import type { ExpenseActionsDialogProps } from "@/types/transactions";
 
 export type { ExpenseActionsDialogProps };
@@ -58,7 +58,7 @@ export function ExpenseActionsDialog({
           <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
             <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
               <span>{t("common.date")}</span>
-              <span>{expense.date}</span>
+              <span>{formatDate(expense.date)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground uppercase tracking-wide">

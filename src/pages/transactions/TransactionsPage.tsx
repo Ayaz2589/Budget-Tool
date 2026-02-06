@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
-import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
 import { cleanDescription } from "@/lib/parsers";
@@ -11,7 +10,6 @@ import { transactionsTourSteps } from "@/lib/pageTourSteps";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, SlidersHorizontal, Receipt } from "lucide-react";
-import { SyncConfirmDialog } from "./SyncConfirmDialog";
 import { TransactionsToolbar } from "./TransactionsToolbar";
 import { FiltersAndActionsDialog } from "./FiltersAndActionsDialog";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
@@ -34,8 +32,6 @@ export function TransactionsPage() {
     owners,
     cardSources,
   } = useBudget();
-  const { isSignedIn, spreadsheetId, syncToSheets, syncStatus } =
-    useGoogleAuth();
   const [monthFilter, setMonthFilter] = useState<string>("");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
@@ -52,7 +48,6 @@ export function TransactionsPage() {
   );
   const [filtersPopupOpen, setFiltersPopupOpen] = useState(false);
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
-  const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
 
   const ownerOptions = useMemo(() => {
     if (owners.length > 0) return owners;
@@ -217,9 +212,6 @@ export function TransactionsPage() {
             onOpenFilters={() => setFiltersPopupOpen(true)}
             onAddTransaction={() => setAddTransactionOpen(true)}
             hasActiveFilters={hasActiveFilters}
-            showSync={!!(isSignedIn && spreadsheetId)}
-            syncStatus={syncStatus}
-            onSync={() => setSyncConfirmOpen(true)}
             t={t}
           />
         </div>
@@ -240,13 +232,6 @@ export function TransactionsPage() {
       <div className="flex-1 pb-24 md:pb-0">
         <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0 md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
-            <SyncConfirmDialog
-              open={syncConfirmOpen}
-              onOpenChange={setSyncConfirmOpen}
-              onConfirm={syncToSheets}
-              t={t}
-            />
-
             <FiltersAndActionsDialog
               open={filtersPopupOpen}
               onOpenChange={setFiltersPopupOpen}

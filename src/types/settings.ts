@@ -28,6 +28,11 @@ export interface GoogleSheetsCardProps {
   pullFromSheet: () => void;
   syncStatus: "idle" | "syncing" | "success" | "error";
   syncErrorMessage: string | undefined;
+  isAutoSyncEnabled: boolean;
+  onAutoSyncToggle: (enabled: boolean) => void;
+  lastSyncAt: number | null;
+  hasUnsyncedChanges: boolean;
+  syncHealth: "healthy" | "warning" | "error";
   onRepairDates: () => void;
   repairResult: string | null;
   syncConfirmOpen: boolean;

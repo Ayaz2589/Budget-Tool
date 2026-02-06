@@ -16,6 +16,8 @@ import {
   Landmark,
   Globe,
   MoreHorizontal,
+  Loader2,
+  RefreshCcw,
 } from "lucide-react";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { Button } from "@/components/ui/button";
@@ -215,13 +217,26 @@ function SidebarContent({
 }
 
 export function Layout() {
+  const MIN_SYNCING_VISIBLE_MS = 1200;
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const { isSignedIn, userProfile, signIn, signOut } = useGoogleAuth();
+  const {
+    isSignedIn,
+    userProfile,
+    signIn,
+    signOut,
+    spreadsheetId,
+    syncStatus,
+    hasUnsyncedChanges,
+  } = useGoogleAuth();
   const currentLng = i18n.language;
+  const showSyncStatusUi = location.pathname !== "/dashboard";
   const [moreOpen, setMoreOpen] = useState(false);
+  const [showSyncComplete, setShowSyncComplete] = useState(false);
   const prevSignedInRef = useRef(isSignedIn);
+  const syncingStartedAtRef = useRef<number | null>(null);
+  const delayedCompleteTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (prevSignedInRef.current && !isSignedIn) {
@@ -233,6 +248,66 @@ export function Layout() {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isSignedIn || !spreadsheetId) {
+      syncingStartedAtRef.current = null;
+      setShowSyncComplete(false);
+      if (delayedCompleteTimerRef.current != null) {
+        window.clearTimeout(delayedCompleteTimerRef.current);
+        delayedCompleteTimerRef.current = null;
+      }
+      return;
+    }
+
+    if (syncStatus === "syncing") {
+      syncingStartedAtRef.current = Date.now();
+      setShowSyncComplete(false);
+      if (delayedCompleteTimerRef.current != null) {
+        window.clearTimeout(delayedCompleteTimerRef.current);
+        delayedCompleteTimerRef.current = null;
+      }
+      return;
+    }
+
+    if (syncStatus === "success") {
+      const startedAt = syncingStartedAtRef.current;
+      const elapsed = startedAt == null ? MIN_SYNCING_VISIBLE_MS : Date.now() - startedAt;
+      const remaining = Math.max(0, MIN_SYNCING_VISIBLE_MS - elapsed);
+      if (delayedCompleteTimerRef.current != null) {
+        window.clearTimeout(delayedCompleteTimerRef.current);
+      }
+      delayedCompleteTimerRef.current = window.setTimeout(() => {
+        setShowSyncComplete(true);
+        delayedCompleteTimerRef.current = null;
+      }, remaining);
+      return;
+    }
+
+    if (syncStatus === "error") {
+      syncingStartedAtRef.current = null;
+      setShowSyncComplete(false);
+      if (delayedCompleteTimerRef.current != null) {
+        window.clearTimeout(delayedCompleteTimerRef.current);
+        delayedCompleteTimerRef.current = null;
+      }
+    }
+  }, [isSignedIn, spreadsheetId, syncStatus]);
+
+  useEffect(() => {
+    if (!showSyncComplete) return;
+    const timeout = window.setTimeout(() => setShowSyncComplete(false), 2200);
+    return () => window.clearTimeout(timeout);
+  }, [showSyncComplete]);
+
+  useEffect(
+    () => () => {
+      if (delayedCompleteTimerRef.current != null) {
+        window.clearTimeout(delayedCompleteTimerRef.current);
+      }
+    },
+    []
+  );
 
   const handleLanguageChange = (locale: string) => {
     i18n.changeLanguage(locale);
@@ -416,6 +491,38 @@ export function Layout() {
           </div>
         </DialogContent>
       </Dialog>
+      {showSyncStatusUi &&
+        (hasUnsyncedChanges || syncStatus === "syncing" || showSyncComplete) && (
+        <div
+          className={cn(
+            "fixed z-50 rounded-full border px-3 py-2 text-xs font-medium shadow-lg flex items-center gap-2 left-4 md:left-[240px] bottom-[calc(6rem+env(safe-area-inset-bottom))] md:bottom-4",
+            syncStatus === "syncing"
+              ? "bg-sky-600 text-white border-sky-500"
+              : hasUnsyncedChanges
+                ? "bg-amber-400 text-black border-amber-300"
+              : "bg-emerald-600 text-white border-emerald-500"
+          )}
+          role="status"
+          aria-live="polite"
+        >
+          {syncStatus === "syncing" ? (
+            <>
+              <Loader2 className="size-3.5 animate-spin" />
+              <span>Syncing</span>
+            </>
+          ) : hasUnsyncedChanges ? (
+            <>
+              <RefreshCcw className="size-3.5" />
+              <span>Sync pending</span>
+            </>
+          ) : (
+            <>
+              <RefreshCcw className="size-3.5" />
+              <span>Sync complete</span>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -108,9 +108,6 @@ export interface TransactionsToolbarProps {
   onOpenFilters: () => void;
   onAddTransaction: () => void;
   hasActiveFilters: boolean;
-  showSync: boolean;
-  syncStatus: import("./auth").SyncStatus;
-  onSync: () => void;
   t: (key: string) => string;
 }
 

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Plus, SlidersHorizontal, RefreshCw } from "lucide-react";
+import { Plus, SlidersHorizontal } from "lucide-react";
 import type { TransactionsToolbarProps } from "@/types/transactions";
 
 export type { TransactionsToolbarProps };
@@ -8,18 +8,11 @@ export function TransactionsToolbar({
   onOpenFilters,
   onAddTransaction,
   hasActiveFilters,
-  showSync,
-  syncStatus,
-  onSync,
   t,
 }: TransactionsToolbarProps) {
   const filtersLabel = hasActiveFilters
     ? `${t("common.filtersAndActions")} (${t("common.active")})`
     : t("common.filtersAndActions");
-  const syncLabel =
-    syncStatus === "syncing"
-      ? t("transactions.syncing")
-      : t("transactions.syncToSheets");
 
   return (
     <div className="flex items-center justify-between md:justify-end gap-2 shrink-0">
@@ -49,22 +42,6 @@ export function TransactionsToolbar({
           <span>Add Expense</span>
         </Button>
       </div>
-      {showSync && (
-        <Button
-          variant="outline"
-          onClick={onSync}
-          disabled={syncStatus === "syncing"}
-          className="gap-1.5 h-11"
-          aria-label={syncLabel}
-        >
-          <RefreshCw
-            className={`size-4 ${
-              syncStatus === "syncing" ? "animate-spin" : ""
-            }`}
-          />
-          <span>{syncLabel}</span>
-        </Button>
-      )}
     </div>
   );
 }

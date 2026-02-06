@@ -49,6 +49,11 @@ export function SettingsPage() {
     pullFromSheet,
     syncStatus,
     syncErrorMessage,
+    isAutoSyncEnabled,
+    setAutoSyncEnabled,
+    lastSyncAt,
+    hasUnsyncedChanges,
+    syncHealth,
   } = useGoogleAuth();
   const { presetTransactions, setPresets } = usePresetTransactions();
   const { t } = useTranslation();
@@ -169,6 +174,11 @@ export function SettingsPage() {
           pullFromSheet={pullFromSheet}
           syncStatus={syncStatus}
           syncErrorMessage={syncErrorMessage ?? undefined}
+          isAutoSyncEnabled={isAutoSyncEnabled}
+          onAutoSyncToggle={setAutoSyncEnabled}
+          lastSyncAt={lastSyncAt}
+          hasUnsyncedChanges={hasUnsyncedChanges}
+          syncHealth={syncHealth}
           onRepairDates={handleRepairDates}
           repairResult={repairResult}
           syncConfirmOpen={syncConfirmOpen}

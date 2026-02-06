@@ -58,6 +58,7 @@ export interface PresetTransaction {
   description: string;
   category: string;
   owner: string;
+  amount?: number;
 }
 
 export interface ParseResult {

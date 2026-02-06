@@ -82,6 +82,7 @@ export function buildMinifiedPayload(
       desc: x.description,
       c: x.category,
       o: x.owner,
+      a: x.amount,
     })),
     ec: expenseCategoriesWithColors.map((x) => ({ n: x.name, c: x.color })),
     ic: incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color })),
@@ -160,6 +161,10 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
       owner:
         String(get("owner", "o", "")) ||
         String(get("cardMember", "cm", "")),
+      amount:
+        get("amount", "a", undefined) == null
+          ? undefined
+          : Number(get("amount", "a", 0)),
     } as PresetTransaction;
   });
 

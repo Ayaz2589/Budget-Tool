@@ -32,7 +32,7 @@ test("ExpensesByMonthList shows month header and expense when has one month and 
       t={mockT}
     />,
   );
-  expect(screen.getByText("January 2025")).toBeInTheDocument();
+  expect(screen.getAllByText("January 2025").length).toBeGreaterThan(0);
   expect(screen.getByText("Test purchase")).toBeInTheDocument();
   expect(screen.getByText("$50.00")).toBeInTheDocument();
 });

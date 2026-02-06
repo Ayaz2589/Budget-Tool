@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CategoryOption } from "@/lib/categoryColors";
+import { formatUsdInput, parseUsdInput } from "@/lib/currencyInput";
 import type { Owner } from "@/types/core";
 import type {
   AddIncomeFormPayload,
@@ -76,7 +77,7 @@ function AddIncomeForm({
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const num = parseFloat(amount.replace(/[$,]/g, ""));
+    const num = parseUsdInput(amount);
     if (Number.isNaN(num) || num <= 0) return;
     onSubmit({
       date: date.trim(),
@@ -113,7 +114,7 @@ function AddIncomeForm({
             type="text"
             placeholder="0.00"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(formatUsdInput(e.target.value))}
             required
             className={fieldClass}
           />

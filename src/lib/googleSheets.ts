@@ -462,17 +462,18 @@ export async function clearAndWritePresets(
   spreadsheetId: string,
   presetTransactions: PresetTransaction[]
 ): Promise<void> {
-  const headers = [["Id", "Source", "Description", "Category", "Owner"]];
+  const headers = [["Id", "Source", "Description", "Category", "Owner", "Amount"]];
   const rows = presetTransactions.map((p) => [
     p.id,
     p.source,
     p.description,
     p.category || "Uncategorized",
     p.owner,
+    p.amount ?? "",
   ]);
   const values = [...headers, ...rows];
-  const range = "PresetTransactions!A1:E";
-  await clearRange(accessToken, spreadsheetId, "PresetTransactions!A1:E10000");
+  const range = "PresetTransactions!A1:F";
+  await clearRange(accessToken, spreadsheetId, "PresetTransactions!A1:F10000");
   if (values.length > 0) {
     await updateSheet(accessToken, spreadsheetId, range, values, false);
   }
@@ -485,7 +486,7 @@ export async function readPresetsFromSheet(
   const rows = await getSheetValues(
     accessToken,
     spreadsheetId,
-    "PresetTransactions!A2:E",
+    "PresetTransactions!A2:F",
     "UNFORMATTED_VALUE",
   );
   const presets: PresetTransaction[] = [];
@@ -495,6 +496,7 @@ export async function readPresetsFromSheet(
     const description = String(row[2] ?? "").trim();
     const category = normalizeCategoryFromSheet(String(row[3] ?? ""));
     const owner = String(row[4] ?? "").trim();
+    const amount = parseAmount(row[5]);
     if (!id) continue;
     const source: ExpenseSource = VALID_EXPENSE_SOURCES.includes(
       rawSource as ExpenseSource,
@@ -507,6 +509,7 @@ export async function readPresetsFromSheet(
       description,
       category,
       owner,
+      amount: amount == null || amount <= 0 ? undefined : amount,
     });
   }
   return presets;
@@ -1044,14 +1047,14 @@ export async function applySheetsFormatting(
     }
   }
 
-  // PresetTransactions: header row bold + larger, all left align (A–E)
+  // PresetTransactions: header row bold + larger, all left align (A–F)
   requests.push(
     repeatCellRequest(
       sheetIds.presetTransactions,
       0,
       1,
       0,
-      5,
+      6,
       { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
       headerFields
     )
@@ -1062,7 +1065,7 @@ export async function applySheetsFormatting(
       0,
       10000,
       0,
-      5,
+      6,
       { horizontalAlignment: "LEFT" },
       leftAlignFields
     )

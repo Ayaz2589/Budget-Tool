@@ -34,6 +34,7 @@ export interface BudgetContextValue extends BudgetState {
 export interface PresetTransactionsContextValue {
   presetTransactions: PresetTransaction[];
   addPreset: (preset: Omit<PresetTransaction, "id">) => void;
+  updatePreset: (id: string, updates: Partial<Omit<PresetTransaction, "id">>) => void;
   removePreset: (id: string) => void;
   setPresets: (presets: PresetTransaction[]) => void;
 }

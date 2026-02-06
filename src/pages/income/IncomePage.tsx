@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
 import type { Income } from "@/lib/types";
@@ -35,6 +35,19 @@ export function IncomePage() {
 
   const { t } = useTranslation();
   const sortedIncome = [...income].sort((a, b) => b.date.localeCompare(a.date));
+  const byMonth = useMemo(() => {
+    const map = new Map<string, Income[]>();
+    for (const i of sortedIncome) {
+      const key = i.date.slice(0, 7);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(i);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [sortedIncome]);
+  const currentMonthKey = new Date().toISOString().slice(0, 7);
+  const defaultOpenMonth = byMonth.some(([k]) => k === currentMonthKey)
+    ? currentMonthKey
+    : (byMonth[0]?.[0] ?? "");
 
   const handleAdd = (payload: Parameters<typeof addIncome>[0]) => {
     addIncome(payload);
@@ -99,7 +112,8 @@ export function IncomePage() {
             <>
               <div className="hidden md:block md:border md:rounded-md">
                 <IncomeTable
-                  sortedIncome={sortedIncome}
+                  byMonth={byMonth}
+                  defaultOpenMonth={defaultOpenMonth}
                   incomeCategories={incomeCategories}
                   ownerOptions={owners}
                   onEdit={setEditIncome}
@@ -114,7 +128,8 @@ export function IncomePage() {
               </div>
               <div className="md:hidden">
                 <IncomeList
-                  sortedIncome={sortedIncome}
+                  byMonth={byMonth}
+                  defaultOpenMonth={defaultOpenMonth}
                   onIncomeTap={setIncomeForActions}
                 />
               </div>

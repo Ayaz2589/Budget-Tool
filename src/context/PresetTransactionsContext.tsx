@@ -36,6 +36,12 @@ export function PresetTransactionsProvider({
             (p as PresetTransaction & { cardMember?: string }).owner ??
             (p as PresetTransaction & { cardMember?: string }).cardMember ??
             "",
+          amount: (() => {
+            const raw = (p as PresetTransaction & { amount?: unknown }).amount;
+            if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) return raw;
+            const parsed = Number(raw);
+            return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+          })(),
         }));
       } catch {
         return [];
@@ -63,6 +69,15 @@ export function PresetTransactionsProvider({
     [persist, presetTransactions]
   );
 
+  const updatePreset = useCallback(
+    (id: string, updates: Partial<Omit<PresetTransaction, "id">>) => {
+      persist(
+        presetTransactions.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+      );
+    },
+    [persist, presetTransactions]
+  );
+
   const setPresets = useCallback(
     (presets: PresetTransaction[]) => {
       persist(presets);
@@ -74,10 +89,11 @@ export function PresetTransactionsProvider({
     () => ({
       presetTransactions,
       addPreset,
+      updatePreset,
       removePreset,
       setPresets,
     }),
-    [presetTransactions, addPreset, removePreset, setPresets]
+    [presetTransactions, addPreset, updatePreset, removePreset, setPresets]
   );
 
   return (

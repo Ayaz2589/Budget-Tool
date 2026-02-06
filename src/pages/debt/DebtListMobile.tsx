@@ -1,6 +1,9 @@
+import { Button } from "@/components/ui/button";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { DebtListMobileProps } from "@/types/debt";
 
 export type { DebtListMobileProps };
@@ -8,27 +11,27 @@ export type { DebtListMobileProps };
 export function DebtListMobile({
   debts,
   paymentsByDebt,
-  onDebtTap,
+  onAddPayment,
+  onDelete,
 }: DebtListMobileProps) {
+  const { t } = useTranslation();
   return (
-    <div className="space-y-0">
+    <div className="space-y-3 px-4 pb-2">
       {debts.map((debt, index) => {
         const payments = paymentsByDebt.get(debt.id) ?? [];
         const balance = getDebtBalance(debt, payments);
         return (
-          <div key={debt.id} className="border-t border-border">
+          <div
+            key={debt.id}
+            className="rounded-xl border border-border/60 overflow-hidden"
+          >
             <div
               className={cn(
                 "px-4 py-3 flex items-start gap-2",
-                index % 2 === 1 ? "bg-muted/30" : "bg-background"
+                index % 2 === 1 ? "bg-muted/20" : "bg-background"
               )}
             >
-              <button
-                type="button"
-                className="flex-1 min-w-0 text-left"
-                onClick={() => onDebtTap(debt)}
-                aria-label={`${debt.name}, balance ${formatCurrency(balance)}`}
-              >
+              <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="truncate text-base font-medium text-foreground">
                     {debt.name}
@@ -43,15 +46,36 @@ export function DebtListMobile({
                     {debt.startDate ? ` · ${debt.startDate}` : ""}
                   </span>
                 </div>
-              </button>
+              </div>
             </div>
             <div className="px-4 pb-3">
+              <div className="mb-2 flex items-center gap-2">
+                <Button
+                  type="button"
+                  onClick={() => onAddPayment(debt.id)}
+                  disabled={balance <= 0}
+                  className="h-11 flex-1"
+                  aria-label={`${t("debt.makePayment")} ${debt.name}`}
+                >
+                  {t("debt.makePayment")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => onDelete(debt.id)}
+                  className="h-11 flex-1"
+                  aria-label={`${t("debt.deleteDebt")} ${debt.name}`}
+                >
+                  <Trash2 className="size-4" />
+                  {t("debt.deleteDebt")}
+                </Button>
+              </div>
               <div className="text-xs text-muted-foreground mb-2">
-                Payment history
+                {t("debt.paymentHistory")}
               </div>
               {payments.length === 0 ? (
                 <div className="text-xs text-muted-foreground">
-                  No payments yet.
+                  {t("debt.noPaymentsYet")}
                 </div>
               ) : (
                 <div className="space-y-2">

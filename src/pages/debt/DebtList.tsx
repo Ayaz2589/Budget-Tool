@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DollarSign, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency } from "@/lib/format";
@@ -98,25 +98,25 @@ export function DebtList({
               </div>
 
               <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/40">
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={() => onAddPayment(debt.id)}
-                  disabled={balance <= 0}
-                >
-                  <DollarSign className="size-4" />
-                  Make payment
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive ml-auto"
-                  onClick={() => onDelete(debt.id)}
-                >
-                  <Trash2 className="size-4 text-destructive" />
-                  Delete debt
-                </Button>
+                <div className="ml-auto flex items-center gap-2">
+                  <Button
+                    type="button"
+                    className="h-11"
+                    onClick={() => onAddPayment(debt.id)}
+                    disabled={balance <= 0}
+                  >
+                    Make payment
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => onDelete(debt.id)}
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                    Delete debt
+                  </Button>
+                </div>
               </div>
 
               <div className="pt-2 border-t border-border/40">

@@ -17,7 +17,6 @@ import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
 import { DebtList } from "./DebtList";
 import { DebtListMobile } from "./DebtListMobile";
-import { DebtActionsDialog } from "./DebtActionsDialog";
 
 export function DebtPage() {
   const {
@@ -35,7 +34,6 @@ export function DebtPage() {
   const [deleteConfirmDebtId, setDeleteConfirmDebtId] = useState<string | null>(
     null,
   );
-  const [debtForActions, setDebtForActions] = useState<Debt | null>(null);
   const [paymentToRemoveId, setPaymentToRemoveId] = useState<string | null>(
     null,
   );
@@ -124,7 +122,8 @@ export function DebtPage() {
                 <DebtListMobile
                   debts={debts}
                   paymentsByDebt={paymentsByDebt}
-                  onDebtTap={setDebtForActions}
+                  onAddPayment={setPaymentDebtId}
+                  onDelete={setDeleteConfirmDebtId}
                 />
               </div>
             </>
@@ -146,28 +145,6 @@ export function DebtPage() {
           </div>
         </div>
       </div>
-
-      <DebtActionsDialog
-        debt={debtForActions}
-        payments={
-          debtForActions ? (paymentsByDebt.get(debtForActions.id) ?? []) : []
-        }
-        onClose={() => setDebtForActions(null)}
-        onAddPayment={(id) => {
-          setDebtForActions(null);
-          setPaymentDebtId(id);
-        }}
-        onUpdateOwner={(id, owner) =>
-          updateDebt(id, { owner: owner || undefined })
-        }
-        ownerOptions={owners}
-        onDelete={(id) => {
-          setDebtForActions(null);
-          setDeleteConfirmDebtId(id);
-        }}
-        onRemovePayment={removeDebtPayment}
-        t={t}
-      />
 
       <Dialog
         open={paymentToRemoveId !== null}

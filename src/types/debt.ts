@@ -13,7 +13,8 @@ export interface DebtListProps {
 export interface DebtListMobileProps {
   debts: Debt[];
   paymentsByDebt: Map<string, DebtPayment[]>;
-  onDebtTap: (debt: Debt) => void;
+  onAddPayment: (debtId: string) => void;
+  onDelete: (debtId: string) => void;
 }
 
 export interface AddDebtPayload {

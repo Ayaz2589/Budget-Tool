@@ -11,8 +11,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { PageTourTrigger } from "@/components/PageTourTrigger";
-import { debtTourSteps } from "@/lib/pageTourSteps";
 import { CreditCard, Plus, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { AddDebtDialog } from "./AddDebtDialog";
@@ -62,13 +60,12 @@ export function DebtPage() {
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{t("debt.title")}</h1>
-            <PageTourTrigger pageId="debt" steps={debtTourSteps} />
           </div>
           <p className="text-sm text-muted-foreground">{t("debt.subtitle")}</p>
         </div>
         <Button
-          data-tour="addDebt"
-          data-tour-action="openAddDebt"
+         
+         
           onClick={() => setAddDebtOpen(true)}
         >
           <Plus className="size-4" />
@@ -83,7 +80,6 @@ export function DebtPage() {
               {t("debt.subtitle")}
             </p>
           </div>
-          <PageTourTrigger pageId="debt" steps={debtTourSteps} />
         </div>
       </div>
 
@@ -98,7 +94,7 @@ export function DebtPage() {
       />
 
       <div
-        data-tour="debtList"
+       
         className="flex-1 min-h-0 flex flex-col overflow-hidden"
       >
         <div className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
@@ -141,7 +137,7 @@ export function DebtPage() {
           <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
             <Button
               onClick={() => setAddDebtOpen(true)}
-              data-tour-action="openAddDebt"
+             
               className="h-11 w-11 rounded-full p-0"
               aria-label={t("debt.addDebt")}
             >

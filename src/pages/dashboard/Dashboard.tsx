@@ -582,7 +582,7 @@ export function Dashboard() {
         )}
       </div>
 
-      <div data-tour="dashboardKpis" className="grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
         <Card className={kpiCardClass}>
           <CardHeader className={kpiHeaderClass}>
             <CardTitle className="text-[11px] font-medium text-muted-foreground">

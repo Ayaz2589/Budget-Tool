@@ -7,8 +7,6 @@ import { parseExportedPdfData } from "@/lib/pdfExport";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
-import { PageTourTrigger } from "@/components/PageTourTrigger";
-import { importTourSteps } from "@/lib/pageTourSteps";
 import { ImportSourceCard } from "./ImportSourceCard";
 import type { SourceChoice } from "@/types/import";
 import { ImportPreviewCard } from "./ImportPreviewCard";
@@ -510,7 +508,6 @@ export function ImportPage() {
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{t("import.title")}</h1>
-            <PageTourTrigger pageId="import" steps={importTourSteps} />
           </div>
           <p className="text-sm text-muted-foreground">
             {t("import.subtitle")}
@@ -525,11 +522,10 @@ export function ImportPage() {
               {t("import.subtitle")}
             </p>
           </div>
-          <PageTourTrigger pageId="import" steps={importTourSteps} />
         </div>
       </div>
       <div className="space-y-6 pb-24 md:pb-0 md:px-0">
-      <div data-tour="uploadCard">
+      <div>
         <ImportSourceCard
           selectedSource={selectedSource}
           onSourceChange={setSelectedSource}
@@ -628,7 +624,7 @@ export function ImportPage() {
         </CardContent>
       </Card>
       {hasPreview && (
-        <div data-tour="previewCard">
+        <div>
           <ImportPreviewCard
             previewExpenses={previewExpenses}
             previewIncome={previewIncome}

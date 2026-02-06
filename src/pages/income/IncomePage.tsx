@@ -13,8 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Plus, Trash2, Wallet } from "lucide-react";
-import { PageTourTrigger } from "@/components/PageTourTrigger";
-import { incomeTourSteps } from "@/lib/pageTourSteps";
 import { AddIncomeDialog } from "./AddIncomeDialog";
 import { EditIncomeDialog } from "./EditIncomeDialog";
 import { IncomeTable } from "./IncomeTable";
@@ -57,13 +55,12 @@ export function IncomePage() {
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{t("income.title")}</h1>
-            <PageTourTrigger pageId="income" steps={incomeTourSteps} />
           </div>
           <p className="text-sm text-muted-foreground">{t("income.subtitle")}</p>
         </div>
         <Button
-          data-tour="addIncome"
-          data-tour-action="openAddIncome"
+         
+         
           onClick={() => setAddOpen(true)}
         >
           <Plus className="size-4" />
@@ -78,7 +75,6 @@ export function IncomePage() {
               {t("income.subtitle")}
             </p>
           </div>
-          <PageTourTrigger pageId="income" steps={incomeTourSteps} />
         </div>
       </div>
 
@@ -90,7 +86,7 @@ export function IncomePage() {
         onSubmit={handleAdd}
       />
 
-      <Card data-tour="incomeList" className="flex-1 min-h-0 flex flex-col overflow-hidden md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+      <Card className="flex-1 min-h-0 flex flex-col overflow-hidden md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           {sortedIncome.length === 0 ? (
             <div className="text-center text-muted-foreground py-10 px-4 flex flex-col items-center gap-3">
@@ -132,7 +128,7 @@ export function IncomePage() {
           <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
             <Button
               onClick={() => setAddOpen(true)}
-              data-tour-action="openAddIncome"
+             
               className="h-11 w-11 rounded-full p-0"
               aria-label={t("income.addIncome")}
             >

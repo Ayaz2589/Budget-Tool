@@ -21,7 +21,7 @@ export function TransactionsToolbar({
           variant="outline"
           onClick={onOpenFilters}
           className="gap-2 h-11"
-          data-tour-action="openFilters"
+         
           aria-label={filtersLabel}
         >
           <SlidersHorizontal className="size-4" />
@@ -35,7 +35,7 @@ export function TransactionsToolbar({
         <Button
           onClick={onAddTransaction}
           className="gap-1.5 h-11"
-          data-tour-action="openAddExpense"
+         
           aria-label="Add Expense"
         >
           <Plus className="size-4" />

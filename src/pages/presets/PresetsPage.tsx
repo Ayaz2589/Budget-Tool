@@ -1,12 +1,19 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import type { ExpenseSource } from "@/types/core";
 import { SOURCE_OPTIONS } from "@/lib/sourceLabels";
+import { SourceIcon } from "@/components/cards";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   Sheet,
   SheetContent,
@@ -34,7 +41,7 @@ import {
 export function PresetsPage() {
   const { t } = useTranslation();
   const { expenseCategories, cardSources, owners } = useBudget();
-  const { presetTransactions, addPreset, removePreset } =
+  const { presetTransactions, addPreset, removePreset, setPresets } =
     usePresetTransactions();
 
   const sourceOptionsFiltered = useMemo(
@@ -46,23 +53,88 @@ export function PresetsPage() {
   const [presetOpen, setPresetOpen] = useState(false);
   const [presetSource, setPresetSource] = useState<ExpenseSource>("manual");
   const [presetDescription, setPresetDescription] = useState("");
+  const [presetAmount, setPresetAmount] = useState("");
   const [presetCategory, setPresetCategory] = useState(
     expenseCategories[0] ?? ""
   );
   const [presetMember, setPresetMember] = useState(ownerOptions[0] ?? "");
   const [presetToDeleteId, setPresetToDeleteId] = useState<string | null>(null);
+  const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
 
-  const handleAddPreset = () => {
-    addPreset({
-      source: presetSource,
-      description: presetDescription.trim(),
-      category: presetCategory,
-      owner: presetMember,
-    });
+  const groupedPresets = useMemo(() => {
+    const map = new Map<string, typeof presetTransactions>();
+    for (const p of presetTransactions) {
+      const key = p.category || t("common.uncategorized");
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(p);
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([category, presets]) => [
+        category,
+        [...presets].sort((a, b) =>
+          (a.description || "").localeCompare(b.description || "")
+        ),
+      ] as const);
+  }, [presetTransactions, t]);
+
+  const resetForm = () => {
     setPresetSource("manual");
     setPresetDescription("");
+    setPresetAmount("");
     setPresetCategory(expenseCategories[0] ?? "");
     setPresetMember(ownerOptions[0] ?? "");
+    setEditingPresetId(null);
+  };
+
+  const openForNew = () => {
+    resetForm();
+    setPresetOpen(true);
+  };
+
+  const openForEdit = (presetId: string) => {
+    const preset = presetTransactions.find((p) => p.id === presetId);
+    if (!preset) return;
+    setEditingPresetId(preset.id);
+    setPresetSource(preset.source);
+    setPresetDescription(preset.description);
+    setPresetAmount(
+      typeof preset.amount === "number" && Number.isFinite(preset.amount)
+        ? preset.amount.toFixed(2)
+        : ""
+    );
+    setPresetCategory(preset.category);
+    setPresetMember(preset.owner || "");
+    setPresetOpen(true);
+  };
+
+  const handleSavePreset = () => {
+    const parsedAmount = presetAmount.trim()
+      ? parseFloat(presetAmount.replace(/[$,]/g, ""))
+      : undefined;
+    const normalizedAmount =
+      typeof parsedAmount === "number" && Number.isFinite(parsedAmount) && parsedAmount >= 0
+        ? parsedAmount
+        : undefined;
+
+    const payload = {
+      source: presetSource,
+      description: presetDescription.trim(),
+      amount: normalizedAmount,
+      category: presetCategory,
+      owner: presetMember,
+    };
+
+    if (editingPresetId) {
+      setPresets(
+        presetTransactions.map((p) =>
+          p.id === editingPresetId ? { ...p, ...payload } : p
+        )
+      );
+    } else {
+      addPreset(payload);
+    }
+    resetForm();
     setPresetOpen(false);
   };
 
@@ -79,7 +151,7 @@ export function PresetsPage() {
           </p>
         </div>
         <Button
-          onClick={() => setPresetOpen(true)}
+          onClick={openForNew}
           disabled={expenseCategories.length === 0}
         >
           <Plus className="size-4" />
@@ -105,7 +177,11 @@ export function PresetsPage() {
               className="flex flex-col h-full w-[85vw] max-w-sm border-l p-4 gap-3 overflow-hidden rounded-l-2xl"
             >
               <SheetHeader>
-                <SheetTitle>{t("presetTransactions.newPreset")}</SheetTitle>
+                <SheetTitle>
+                  {editingPresetId
+                    ? `${t("common.edit")} ${t("presetTransactions.newPreset").toLowerCase()}`
+                    : t("presetTransactions.newPreset")}
+                </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden">
                 <div className="flex-1 min-h-0 overflow-auto space-y-4">
@@ -125,7 +201,10 @@ export function PresetsPage() {
                       <SelectContent>
                         {sourceOptionsFiltered.map((opt) => (
                           <SelectItem key={opt.value} value={opt.value}>
-                            {opt.label}
+                            <span className="flex items-center gap-2">
+                              <SourceIcon source={opt.value} size={16} />
+                              {opt.label}
+                            </span>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -137,6 +216,16 @@ export function PresetsPage() {
                       value={presetDescription}
                       onChange={(e) => setPresetDescription(e.target.value)}
                       placeholder={t("addTransaction.placeholderDescription")}
+                      className={fieldClass}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t("common.amount")}</Label>
+                    <Input
+                      value={presetAmount}
+                      onChange={(e) => setPresetAmount(e.target.value)}
+                      placeholder="Optional"
+                      inputMode="decimal"
                       className={fieldClass}
                     />
                   </div>
@@ -190,7 +279,7 @@ export function PresetsPage() {
                   >
                     {t("common.cancel")}
                   </Button>
-                  <Button className="h-11 flex-1" onClick={handleAddPreset}>
+                  <Button className="h-11 flex-1" onClick={handleSavePreset}>
                     {t("common.save")}
                   </Button>
                 </div>
@@ -205,40 +294,82 @@ export function PresetsPage() {
                 : t("presetTransactions.empty")}
             </div>
           ) : (
-            <div className="space-y-0">
-              {presetTransactions.map((preset, index) => {
-                const sourceLabel =
-                  SOURCE_OPTIONS.find((o) => o.value === preset.source)?.label ??
-                  preset.source;
-                return (
-                  <div key={preset.id} className="border-t border-border">
-                    <div
-                      className={`px-4 py-3 flex items-start gap-2 ${
-                        index % 2 === 1 ? "bg-muted/30" : "bg-background"
-                      }`}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="text-base font-medium text-foreground truncate">
-                          {sourceLabel}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-0.5">
-                          {preset.description || "—"} · {preset.category} ·{" "}
-                          {preset.owner || t("common.noOwner")}
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setPresetToDeleteId(preset.id)}
-                        aria-label={t("presetTransactions.delete")}
-                      >
-                        <Trash2 className="size-4 text-destructive" />
-                      </Button>
+            <Accordion
+              type="multiple"
+              defaultValue={groupedPresets.map(([categoryName]) => categoryName)}
+              className="space-y-2"
+            >
+              {groupedPresets.map(([categoryName, presets]) => (
+                <AccordionItem
+                  key={categoryName}
+                  value={categoryName}
+                  className="border border-border rounded-md overflow-hidden"
+                >
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30">
+                    <span className="flex items-center gap-2 text-sm font-semibold">
+                      <span>{categoryName}</span>
+                      <span className="text-muted-foreground font-normal">
+                        ({presets.length === 1
+                          ? t("transactions.transaction_one", { count: 1 })
+                          : t("transactions.transaction_other", { count: presets.length })})
+                      </span>
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 pb-0">
+                    <div className="divide-y">
+                      {presets.map((preset, index) => {
+                        const sourceLabel =
+                          SOURCE_OPTIONS.find((o) => o.value === preset.source)?.label ??
+                          preset.source;
+                        return (
+                          <div
+                            key={preset.id}
+                            className={`px-4 py-3 flex items-start gap-2 ${
+                              index % 2 === 1 ? "bg-muted/30" : "bg-background"
+                            }`}
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="text-base font-medium text-foreground truncate">
+                                {preset.description || "—"}
+                              </div>
+                              <div className="text-xs text-muted-foreground mt-0.5">
+                                <span className="inline-flex items-center gap-1.5">
+                                  <SourceIcon source={preset.source} size={14} />
+                                  {sourceLabel}
+                                </span>
+                                {typeof preset.amount === "number"
+                                  ? ` · $${preset.amount.toFixed(2)}`
+                                  : ""}
+                                {" · "}
+                                {preset.owner || t("common.noOwner")}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => openForEdit(preset.id)}
+                                aria-label={t("common.edit")}
+                              >
+                                <Pencil className="size-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setPresetToDeleteId(preset.id)}
+                                aria-label={t("presetTransactions.delete")}
+                              >
+                                <Trash2 className="size-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           )}
         </CardContent>
       </Card>
@@ -247,7 +378,7 @@ export function PresetsPage() {
         <div className="pointer-events-auto flex items-center justify-end">
           <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
             <Button
-              onClick={() => setPresetOpen(true)}
+              onClick={openForNew}
               className="h-11 w-11 rounded-full p-0"
               disabled={expenseCategories.length === 0}
               aria-label={t("presetTransactions.addPreset")}

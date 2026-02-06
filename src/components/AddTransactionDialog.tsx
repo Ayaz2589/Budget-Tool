@@ -153,6 +153,10 @@ export function AddTransactionDialog({
       updateRow(index, {
         source: preset.source,
         description: preset.description,
+        amount:
+          typeof preset.amount === "number" && Number.isFinite(preset.amount)
+            ? preset.amount.toFixed(2)
+            : rows[index]?.amount ?? "",
         category: preset.category,
         owner: preset.owner,
         presetId: preset.id,

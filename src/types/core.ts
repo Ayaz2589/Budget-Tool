@@ -66,6 +66,7 @@ export interface PresetTransaction {
   id: string;
   source: ExpenseSource;
   description: string;
+  amount?: number;
   category: string;
   owner: string;
 }

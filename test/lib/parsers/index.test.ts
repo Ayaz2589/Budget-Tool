@@ -11,7 +11,7 @@ test("detectCsvSource detects amex", () => {
   expect(detectCsvSource(header)).toBe("amex");
 });
 
-test("detectCsvSource returns unknown for chase headers", () => {
+test("detectCsvSource returns unknown for unsupported bank headers (legacy chase format)", () => {
   expect(detectCsvSource("Details,Posting Date,Description,Amount,Chase")).toBe(
     "unknown",
   );

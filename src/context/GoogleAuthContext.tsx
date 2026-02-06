@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -35,10 +36,13 @@ import {
 } from "@/lib/googleSheets";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
-import type { SyncStatus } from "@/types/auth";
+import type { SyncHealth, SyncStatus } from "@/types/auth";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
 const ACCESS_TOKEN_STORAGE_KEY = "budget-tool-google-access-token";
+const AUTO_SYNC_ENABLED_KEY = "budget-tool-auto-sync-enabled";
+const AUTO_SYNC_DEBOUNCE_MS = 2_000;
+const AUTO_SYNC_INTERVAL_MS = 5 * 60_000;
 
 /** Set when user signs out or visits /auth; used to skip landing and go to /auth on next visit. */
 export const RETURNING_USER_KEY = "budget-tool-returning-user";
@@ -125,6 +129,10 @@ export function GoogleAuthProviderFallback({
   });
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
   const [syncErrorMessage, setSyncErrorMessage] = useState<string | null>(null);
+  const [isAutoSyncEnabled, setIsAutoSyncEnabled] = useState(false);
+  const [lastSyncAt] = useState<number | null>(null);
+  const [hasUnsyncedChanges] = useState(false);
+  const [syncHealth] = useState<SyncHealth>("healthy");
 
   useEffect(() => {
     if (spreadsheetId) {
@@ -169,8 +177,22 @@ export function GoogleAuthProviderFallback({
       },
       syncStatus,
       syncErrorMessage,
+      isAutoSyncEnabled,
+      setAutoSyncEnabled: setIsAutoSyncEnabled,
+      lastSyncAt,
+      hasUnsyncedChanges,
+      syncHealth,
     }),
-    [spreadsheetId, setSpreadsheetId, syncStatus, syncErrorMessage]
+    [
+      spreadsheetId,
+      setSpreadsheetId,
+      syncStatus,
+      syncErrorMessage,
+      isAutoSyncEnabled,
+      lastSyncAt,
+      hasUnsyncedChanges,
+      syncHealth,
+    ]
   );
 
   return (
@@ -206,12 +228,28 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   });
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
   const [syncErrorMessage, setSyncErrorMessage] = useState<string | null>(null);
+  const [isAutoSyncEnabled, setIsAutoSyncEnabledState] = useState(() => {
+    try {
+      return localStorage.getItem(AUTO_SYNC_ENABLED_KEY) !== "false";
+    } catch {
+      return true;
+    }
+  });
+  const [lastSyncAt, setLastSyncAt] = useState<number | null>(null);
+  const [hasUnsyncedChanges, setHasUnsyncedChanges] = useState(false);
+  const [syncHealth, setSyncHealth] = useState<SyncHealth>("healthy");
+  const activeSignatureRef = useRef<string | null>(null);
+  const inFlightRef = useRef(false);
+  const pendingAfterFlightRef = useRef(false);
 
   const clearSession = useCallback(() => {
     clearStoredAccessToken();
     setAccessToken(null);
     setExpiresAt(null);
     setUserProfile(null);
+    setHasUnsyncedChanges(false);
+    setSyncHealth("healthy");
+    activeSignatureRef.current = null;
     try {
       localStorage.setItem(RETURNING_USER_KEY, "1");
     } catch {
@@ -308,20 +346,66 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     if (id) {
       const extracted = id.includes("/") ? extractSpreadsheetId(id) : id;
       setSpreadsheetIdState(extracted || id);
+      activeSignatureRef.current = null;
+      setHasUnsyncedChanges(false);
     } else {
       setSpreadsheetIdState(null);
+      activeSignatureRef.current = null;
+      setHasUnsyncedChanges(false);
+    }
+  }, []);
+
+  const setAutoSyncEnabled = useCallback((enabled: boolean) => {
+    setIsAutoSyncEnabledState(enabled);
+    try {
+      localStorage.setItem(AUTO_SYNC_ENABLED_KEY, enabled ? "true" : "false");
+    } catch {
+      // ignore
     }
   }, []);
 
   const budget = useBudget();
   const { presetTransactions, setPresets } = usePresetTransactions();
+  const syncSignature = useMemo(
+    () =>
+      JSON.stringify({
+        expenses: budget.expenses,
+        income: budget.income,
+        debts: budget.debts,
+        debtPayments: budget.debtPayments,
+        presetTransactions,
+        expenseCategories: budget.expenseCategories,
+        incomeCategories: budget.incomeCategories,
+        owners: budget.owners,
+        cardSources: budget.cardSources,
+        iOweNova: budget.iOweNova,
+      }),
+    [
+      budget.expenses,
+      budget.income,
+      budget.debts,
+      budget.debtPayments,
+      presetTransactions,
+      budget.expenseCategories,
+      budget.incomeCategories,
+      budget.owners,
+      budget.cardSources,
+      budget.iOweNova,
+    ]
+  );
 
-  const syncToSheets = useCallback(async () => {
+  const runSync = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
       setSyncStatus("error");
       setSyncErrorMessage(i18n.t("auth.notSignedInOrNoSpreadsheet"));
+      setSyncHealth("error");
       return;
     }
+    if (inFlightRef.current) {
+      pendingAfterFlightRef.current = true;
+      return;
+    }
+    inFlightRef.current = true;
     setSyncStatus("syncing");
     setSyncErrorMessage(null);
     try {
@@ -385,8 +469,12 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       if (sheetIds) {
         await applySheetsFormatting(accessToken, spreadsheetId, sheetIds);
       }
+      activeSignatureRef.current = syncSignature;
       setSyncStatus("success");
       setSyncErrorMessage(null);
+      setLastSyncAt(Date.now());
+      setHasUnsyncedChanges(false);
+      setSyncHealth("healthy");
     } catch (err) {
       if (isUnauthorizedError(err)) {
         clearSession();
@@ -395,6 +483,13 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       console.error("Sync failed:", err);
       setSyncStatus("error");
       setSyncErrorMessage(message);
+      setSyncHealth("error");
+    } finally {
+      inFlightRef.current = false;
+      if (pendingAfterFlightRef.current) {
+        pendingAfterFlightRef.current = false;
+        void runSync();
+      }
     }
   }, [
     accessToken,
@@ -410,6 +505,60 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.iOweNova,
     budget.cardSources,
     presetTransactions,
+    syncSignature,
+  ]);
+
+  const syncToSheets = useCallback(async () => {
+    await runSync();
+  }, [runSync]);
+
+  useEffect(() => {
+    if (!accessToken || !spreadsheetId) {
+      setHasUnsyncedChanges(false);
+      activeSignatureRef.current = null;
+      return;
+    }
+    if (activeSignatureRef.current == null) {
+      activeSignatureRef.current = syncSignature;
+      return;
+    }
+    const changed = activeSignatureRef.current !== syncSignature;
+    setHasUnsyncedChanges(changed);
+    setSyncHealth(changed ? "warning" : "healthy");
+  }, [accessToken, spreadsheetId, syncSignature]);
+
+  useEffect(() => {
+    if (!isAutoSyncEnabled) return;
+    if (!accessToken || !spreadsheetId) return;
+    if (!hasUnsyncedChanges) return;
+    const timer = window.setTimeout(() => {
+      if (document.visibilityState === "hidden") return;
+      void runSync();
+    }, AUTO_SYNC_DEBOUNCE_MS);
+    return () => window.clearTimeout(timer);
+  }, [
+    isAutoSyncEnabled,
+    accessToken,
+    spreadsheetId,
+    hasUnsyncedChanges,
+    runSync,
+  ]);
+
+  useEffect(() => {
+    if (!isAutoSyncEnabled) return;
+    if (!accessToken || !spreadsheetId) return;
+    const interval = window.setInterval(() => {
+      if (!hasUnsyncedChanges) return;
+      if (document.visibilityState === "hidden") return;
+      void runSync();
+    }, AUTO_SYNC_INTERVAL_MS);
+    return () => window.clearInterval(interval);
+  }, [
+    isAutoSyncEnabled,
+    accessToken,
+    spreadsheetId,
+    hasUnsyncedChanges,
+    runSync,
   ]);
 
   const pullFromSheet = useCallback(async () => {
@@ -601,6 +750,9 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
 
       setSyncStatus("success");
       setSyncErrorMessage(null);
+      setHasUnsyncedChanges(false);
+      setSyncHealth("healthy");
+      activeSignatureRef.current = null;
     } catch (err) {
       if (isUnauthorizedError(err)) {
         clearSession();
@@ -638,6 +790,11 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       pullFromSheet,
       syncStatus,
       syncErrorMessage,
+      isAutoSyncEnabled,
+      setAutoSyncEnabled,
+      lastSyncAt,
+      hasUnsyncedChanges,
+      syncHealth,
     }),
     [
       accessToken,
@@ -650,6 +807,11 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       pullFromSheet,
       syncStatus,
       syncErrorMessage,
+      isAutoSyncEnabled,
+      setAutoSyncEnabled,
+      lastSyncAt,
+      hasUnsyncedChanges,
+      syncHealth,
     ]
   );
 

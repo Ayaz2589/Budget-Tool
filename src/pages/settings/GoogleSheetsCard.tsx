@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +33,11 @@ export function GoogleSheetsCard({
   pullFromSheet,
   syncStatus,
   syncErrorMessage,
+  isAutoSyncEnabled,
+  onAutoSyncToggle,
+  lastSyncAt,
+  hasUnsyncedChanges,
+  syncHealth,
   onRepairDates,
   repairResult,
   syncConfirmOpen,
@@ -58,6 +64,41 @@ export function GoogleSheetsCard({
           </div>
         ) : (
           <>
+            <div className="rounded-lg border border-border/60 p-3">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="auto-sync-toggle"
+                  checked={isAutoSyncEnabled}
+                  onCheckedChange={(checked) => onAutoSyncToggle(checked === true)}
+                />
+                <div className="space-y-1">
+                  <Label htmlFor="auto-sync-toggle" className="text-sm font-medium">
+                    Auto sync changes
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Automatically syncs after edits with a short delay.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-2 text-xs text-muted-foreground">
+                <span>
+                  Health:{" "}
+                  {syncHealth === "healthy"
+                    ? "Healthy"
+                    : syncHealth === "warning"
+                      ? "Pending changes"
+                      : "Needs attention"}
+                </span>
+                {lastSyncAt && (
+                  <span className="ml-3">
+                    Last sync: {new Date(lastSyncAt).toLocaleString()}
+                  </span>
+                )}
+                {hasUnsyncedChanges && (
+                  <span className="ml-3">Unsynced updates detected</span>
+                )}
+              </div>
+            </div>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs uppercase tracking-wide text-muted-foreground">

@@ -1,4 +1,5 @@
 export type SyncStatus = "idle" | "syncing" | "success" | "error";
+export type SyncHealth = "healthy" | "warning" | "error";
 
 export interface GoogleUserProfile {
   name: string;
@@ -17,4 +18,9 @@ export interface GoogleAuthContextValue {
   pullFromSheet: () => Promise<void>;
   syncStatus: SyncStatus;
   syncErrorMessage: string | null;
+  isAutoSyncEnabled: boolean;
+  setAutoSyncEnabled: (enabled: boolean) => void;
+  lastSyncAt: number | null;
+  hasUnsyncedChanges: boolean;
+  syncHealth: SyncHealth;
 }

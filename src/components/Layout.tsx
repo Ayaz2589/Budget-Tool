@@ -342,7 +342,7 @@ export function Layout() {
       </nav>
       <main
         className={cn(
-          "flex-1 flex flex-col pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6 md:ml-[220px] md:w-[calc(100%-220px)]",
+          "flex-1 flex flex-col pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-6 md:ml-[220px] md:w-[calc(100%-220px)]",
           location.pathname === "/dashboard/transactions" ||
             location.pathname === "/dashboard/income" ||
             location.pathname === "/dashboard/debt" ||
@@ -362,7 +362,7 @@ export function Layout() {
 
       {/* Mobile bottom nav */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 py-2 safe-area-pb"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 py-3 safe-area-pb"
         aria-label={t("layout.navigation")}
       >
         {bottomNavItems.map(({ to, labelKey, icon: Icon }) => (
@@ -370,7 +370,7 @@ export function Layout() {
             key={to}
             to={to}
             className={cn(
-              "flex flex-col items-center gap-0.5 px-4 py-1 rounded-md text-xs font-medium transition-colors min-w-0 flex-1 max-w-[33%]",
+              "flex flex-col items-center gap-1 px-4 py-1.5 rounded-md text-xs font-medium transition-colors min-w-0 flex-1 max-w-[33%]",
               location.pathname === to
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground",
@@ -384,7 +384,7 @@ export function Layout() {
           type="button"
           onClick={() => setMoreOpen(true)}
           className={cn(
-            "flex flex-col items-center gap-0.5 px-4 py-1 rounded-md text-xs font-medium transition-colors min-w-0 flex-1 max-w-[33%] text-muted-foreground hover:text-foreground",
+            "flex flex-col items-center gap-1 px-4 py-1.5 rounded-md text-xs font-medium transition-colors min-w-0 flex-1 max-w-[33%] text-muted-foreground hover:text-foreground",
             moreNavItems.some(({ to }) => location.pathname === to)
               ? "text-primary"
               : "",

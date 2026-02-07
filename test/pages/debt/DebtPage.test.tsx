@@ -42,6 +42,7 @@ test("DebtPage shows remove payment confirmation dialog when Remove is clicked",
     </BudgetProvider>,
   );
 
+  fireEvent.click(screen.getAllByRole("button", { name: /car loan/i })[0]!);
   const removeButton = screen.getByRole("button", { name: "Remove" });
   fireEvent.click(removeButton);
 
@@ -81,6 +82,7 @@ test("DebtPage shows delete debt confirmation dialog when Delete debt is clicked
     </BudgetProvider>,
   );
 
+  fireEvent.click(screen.getAllByRole("button", { name: /car loan/i })[0]!);
   const deleteDebtButton = screen.getByRole("button", { name: "Delete debt" });
   fireEvent.click(deleteDebtButton);
 

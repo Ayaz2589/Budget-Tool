@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
-import type { DebtPayment } from "@/lib/types";
+import type { Debt, DebtPayment } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Plus, Trash2 } from "lucide-react";
-import { formatCurrency } from "@/lib/format";
 import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
 import { DebtList } from "./DebtList";
 import { DebtListMobile } from "./DebtListMobile";
+import { DebtActionsDialog } from "./DebtActionsDialog";
 
 export function DebtPage() {
   const {
@@ -35,9 +35,7 @@ export function DebtPage() {
   const [deleteConfirmDebtId, setDeleteConfirmDebtId] = useState<string | null>(
     null,
   );
-  const [paymentToRemoveId, setPaymentToRemoveId] = useState<string | null>(
-    null,
-  );
+  const [debtForActions, setDebtForActions] = useState<Debt | null>(null);
 
   const paymentsByDebt = useMemo(() => {
     const map = new Map<string, DebtPayment[]>();
@@ -111,21 +109,14 @@ export function DebtPage() {
                 <DebtList
                   debts={debts}
                   paymentsByDebt={paymentsByDebt}
-                  onAddPayment={setPaymentDebtId}
-                  onUpdateOwner={(id, owner) =>
-                    updateDebt(id, { owner: owner || undefined })
-                  }
-                  ownerOptions={owners}
-                  onDelete={setDeleteConfirmDebtId}
-                  onRemovePayment={setPaymentToRemoveId}
+                  onDebtTap={setDebtForActions}
                 />
               </div>
               <div className="md:hidden">
                 <DebtListMobile
                   debts={debts}
                   paymentsByDebt={paymentsByDebt}
-                  onAddPayment={setPaymentDebtId}
-                  onDelete={setDeleteConfirmDebtId}
+                  onDebtTap={setDebtForActions}
                 />
               </div>
             </>
@@ -147,50 +138,6 @@ export function DebtPage() {
           </div>
         </div>
       </div>
-
-      <Dialog
-        open={paymentToRemoveId !== null}
-        onOpenChange={(open) => !open && setPaymentToRemoveId(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("debt.removePaymentTitle")}</DialogTitle>
-            <DialogDescription>
-              {(() => {
-                const p = debtPayments.find((x) => x.id === paymentToRemoveId);
-                return p
-                  ? t("debt.removePaymentDesc", {
-                      amount: formatCurrency(p.amount),
-                      date: p.date,
-                    })
-                  : "";
-              })()}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setPaymentToRemoveId(null)}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => {
-                if (paymentToRemoveId) {
-                  removeDebtPayment(paymentToRemoveId);
-                  setPaymentToRemoveId(null);
-                }
-              }}
-            >
-              <Trash2 className="size-4" />
-              {t("debt.removePayment")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <Dialog
         open={deleteConfirmDebtId !== null}
@@ -236,6 +183,22 @@ export function DebtPage() {
           addDebtPayment(payload);
           setPaymentDebtId(null);
         }}
+      />
+
+      <DebtActionsDialog
+        debt={debtForActions}
+        payments={
+          debtForActions ? (paymentsByDebt.get(debtForActions.id) ?? []) : []
+        }
+        onClose={() => setDebtForActions(null)}
+        onAddPayment={setPaymentDebtId}
+        onUpdateOwner={(id, owner) =>
+          updateDebt(id, { owner: owner || undefined })
+        }
+        ownerOptions={owners}
+        onDelete={setDeleteConfirmDebtId}
+        onRemovePayment={removeDebtPayment}
+        t={t}
       />
     </div>
   );

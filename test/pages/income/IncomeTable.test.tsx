@@ -9,11 +9,7 @@ test("IncomeTable shows empty state when no income", () => {
     <IncomeTable
       byMonth={[]}
       defaultOpenMonth=""
-      incomeCategories={["Paycheck", "Other"]}
-      onEdit={() => {}}
-      onDelete={() => {}}
-      onUpdateCategory={() => {}}
-      onUpdateOwner={() => {}}
+      onIncomeTap={() => {}}
     />,
   );
   expect(
@@ -22,9 +18,8 @@ test("IncomeTable shows empty state when no income", () => {
   ).toBeGreaterThan(0);
 });
 
-test("IncomeTable shows month header and action buttons", () => {
-  const onEdit = mock(() => {});
-  const onDelete = mock(() => {});
+test("IncomeTable shows month header and row tap action", () => {
+  const onIncomeTap = mock(() => {});
   render(
     <IncomeTable
       byMonth={[
@@ -43,18 +38,13 @@ test("IncomeTable shows month header and action buttons", () => {
         ],
       ]}
       defaultOpenMonth="2026-02"
-      incomeCategories={["Paycheck", "Other"]}
-      ownerOptions={["Ayaz"]}
-      onEdit={onEdit}
-      onDelete={onDelete}
-      onUpdateCategory={() => {}}
-      onUpdateOwner={() => {}}
+      onIncomeTap={onIncomeTap}
     />,
   );
 
   expect(screen.getAllByText("February 2026").length).toBeGreaterThan(0);
-  fireEvent.click(screen.getByRole("button", { name: "Edit" }));
-  fireEvent.click(screen.getByRole("button", { name: "Delete" }));
-  expect(onEdit).toHaveBeenCalledTimes(1);
-  expect(onDelete).toHaveBeenCalledWith("i1");
+  fireEvent.click(screen.getByRole("button", { name: /Salary/i }));
+  expect(onIncomeTap).toHaveBeenCalledWith(
+    expect.objectContaining({ id: "i1" }),
+  );
 });

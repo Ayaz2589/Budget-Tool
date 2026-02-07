@@ -38,8 +38,8 @@ test("IncomePage shows delete income confirmation dialog when delete is clicked"
     </BudgetProvider>,
   );
 
-  const deleteButton = screen.getByRole("button", { name: "Delete" });
-  fireEvent.click(deleteButton);
+  fireEvent.click(screen.getAllByRole("button", { name: /Pay/i })[0]!);
+  fireEvent.click(screen.getAllByRole("button", { name: "Delete" })[0]!);
 
   expect(screen.getByRole("dialog")).toBeInTheDocument();
   expect(screen.getByText("Delete this income?")).toBeInTheDocument();

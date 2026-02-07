@@ -4,15 +4,7 @@ import { useBudget } from "@/context/BudgetContext";
 import type { Income } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Plus, Trash2, Wallet } from "lucide-react";
+import { Plus, Wallet } from "lucide-react";
 import { AddIncomeDialog } from "./AddIncomeDialog";
 import { EditIncomeDialog } from "./EditIncomeDialog";
 import { IncomeTable } from "./IncomeTable";
@@ -32,7 +24,6 @@ export function IncomePage() {
   const [addOpen, setAddOpen] = useState(false);
   const [editIncome, setEditIncome] = useState<Income | null>(null);
   const [incomeForActions, setIncomeForActions] = useState<Income | null>(null);
-  const [incomeToDeleteId, setIncomeToDeleteId] = useState<string | null>(null);
 
   const { t } = useTranslation();
   const sortedIncome = [...income].sort((a, b) => b.date.localeCompare(a.date));
@@ -112,20 +103,11 @@ export function IncomePage() {
             </div>
           ) : (
             <>
-              <div className="hidden md:block md:border md:rounded-md">
+              <div className="hidden md:block">
                 <IncomeTable
                   byMonth={byMonth}
                   defaultOpenMonth={defaultOpenMonth}
-                  incomeCategories={incomeCategories}
-                  ownerOptions={owners}
-                  onEdit={setEditIncome}
-                  onDelete={setIncomeToDeleteId}
-                  onUpdateCategory={(id, category) =>
-                    updateIncome(id, { category })
-                  }
-                  onUpdateOwner={(id, owner) =>
-                    updateIncome(id, { owner: owner || undefined })
-                  }
+                  onIncomeTap={setIncomeForActions}
                 />
               </div>
               <div className="md:hidden">
@@ -171,42 +153,6 @@ export function IncomePage() {
         ownerOptions={owners}
         t={t}
       />
-
-      <Dialog
-        open={incomeToDeleteId !== null}
-        onOpenChange={(open) => !open && setIncomeToDeleteId(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("income.deleteIncomeTitle")}</DialogTitle>
-            <DialogDescription>
-              {t("income.deleteIncomeDesc")}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIncomeToDeleteId(null)}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => {
-                if (incomeToDeleteId) {
-                  removeIncome(incomeToDeleteId);
-                  setIncomeToDeleteId(null);
-                }
-              }}
-            >
-              <Trash2 className="size-4" />
-              {t("common.delete")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <EditIncomeDialog
         income={editIncome}

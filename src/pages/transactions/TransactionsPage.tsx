@@ -228,7 +228,7 @@ export function TransactionsPage() {
               t={t}
             />
 
-            <div className="flex-1 md:border md:rounded-md">
+            <div className="flex-1">
               {filtered.length === 0 ? (
                 <div className="text-center text-muted-foreground py-12 px-4 flex flex-col items-center gap-3">
                   <Receipt className="size-8 text-muted-foreground/70" />
@@ -245,16 +245,7 @@ export function TransactionsPage() {
                       sortBy={sortBy}
                       sortDir={sortDir}
                       onSort={toggleSort}
-                      onUpdateCategory={(id, category) =>
-                        updateExpense(id, { category })
-                      }
-                      onUpdateOwner={(id, owner) =>
-                        updateExpense(id, { owner: owner || undefined })
-                      }
-                      expenseCategories={expenseCategories}
-                      ownerOptions={ownerOptions}
-                      onEditOne={setEditExpense}
-                      onDeleteOne={setDeleteOneExpense}
+                      onExpenseTap={setExpenseForActions}
                       sourceLabelKeys={SOURCE_LABEL_KEYS}
                       t={t}
                     />

@@ -194,11 +194,11 @@ test("TransactionsPage applies all filter branches and can clear filters", () =>
   fireEvent.click(
     screen.getAllByRole("button", { name: /January 2026/i }).at(-1)!,
   );
-  expect(screen.getByText("Beta rent")).toBeInTheDocument();
+  expect(screen.getAllByText("Beta rent").length).toBeGreaterThan(0);
   expect(screen.getAllByText("Gamma utilities").length).toBeGreaterThan(0);
 });
 
-test("TransactionsPage supports sorting branches and row actions", () => {
+test("TransactionsPage supports sorting branches and row tap actions", () => {
   render(<TestWrapper />);
 
   fireEvent.click(screen.getAllByRole("button", { name: /^Amount/i })[0]!);
@@ -208,8 +208,11 @@ test("TransactionsPage supports sorting branches and row actions", () => {
   fireEvent.click(screen.getAllByRole("button", { name: /^Owner/i })[0]!);
   fireEvent.click(screen.getAllByRole("button", { name: /^Category/i })[0]!);
 
+  fireEvent.click(screen.getAllByRole("button", { name: /Gamma utilities/i })[0]!);
   fireEvent.click(screen.getAllByRole("button", { name: "Delete" })[0]!);
-  const deleteDialog = screen.getByRole("dialog");
+  const deleteDialog = screen.getByRole("dialog", {
+    name: "Delete this transaction?",
+  });
   expect(deleteDialog).toBeInTheDocument();
   fireEvent.click(within(deleteDialog).getByRole("button", { name: "Cancel" }));
 });

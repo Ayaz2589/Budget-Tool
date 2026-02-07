@@ -30,12 +30,7 @@ export interface ExpensesByMonthTableProps {
   sortBy: SortColumn;
   sortDir: "asc" | "desc";
   onSort: (col: SortColumn) => void;
-  onUpdateCategory: (id: string, category: string) => void;
-  onUpdateOwner: (id: string, owner: string) => void;
-  expenseCategories: string[];
-  ownerOptions: string[];
-  onEditOne: (expense: Expense) => void;
-  onDeleteOne: (expense: Expense) => void;
+  onExpenseTap: (expense: Expense) => void;
   sourceLabelKeys: Record<string, string>;
   t: (key: string, opts?: { count?: number }) => string;
 }

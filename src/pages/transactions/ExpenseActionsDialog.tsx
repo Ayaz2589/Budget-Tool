@@ -38,7 +38,7 @@ export function ExpenseActionsDialog({
     onClose();
   };
 
-  const fieldClass = "h-11 w-full";
+  const actionButtonClass = "h-11 w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   const sheetSide = "right";
 
@@ -47,95 +47,101 @@ export function ExpenseActionsDialog({
       <SheetContent
         side={sheetSide}
         showCloseButton={true}
-        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
+        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-hidden flex flex-col"
       >
         <SheetHeader className="px-4 pt-5 pb-3">
           <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
             {expense.description || t("addTransaction.transaction")}
           </SheetTitle>
         </SheetHeader>
-        <div className="grid gap-5 px-4 pb-8 overflow-y-auto overscroll-contain">
-          <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
-            <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
-              <span>{t("common.date")}</span>
-              <span>{formatDate(expense.date)}</span>
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-6">
+          <div className="grid gap-5">
+            <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
+              <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
+                <span>{t("common.date")}</span>
+                <span>{formatDate(expense.date)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                  {t("common.amount")}
+                </span>
+                <span className="text-lg font-semibold text-foreground">
+                  {formatCurrency(expense.amount)}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t("common.amount")}
-              </span>
-              <span className="text-lg font-semibold text-foreground">
-                {formatCurrency(expense.amount)}
-              </span>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">
+                {t("common.category")}
+              </Label>
+              <Select
+                value={expense.category || "_"}
+                onValueChange={(v) =>
+                  onUpdateCategory(expense.id, v === "_" ? "" : v)
+                }
+              >
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder={t("common.category")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_">
+                    <CategoryOption
+                      name={t("common.uncategorized")}
+                      type="expense"
+                    />
+                  </SelectItem>
+                  {expenseCategories.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      <CategoryOption name={c} type="expense" />
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">
+                {t("common.owner")}
+              </Label>
+              <Select
+                value={expense.owner || "_none"}
+                onValueChange={(v) =>
+                  onUpdateOwner(expense.id, v === "_none" ? "" : v)
+                }
+              >
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder={t("common.noOwner")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                  {ownerOptions.map((o) => (
+                    <SelectItem key={o} value={o}>
+                      {o}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
-          <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground">
-              {t("common.category")}
-            </Label>
-            <Select
-              value={expense.category || "_"}
-              onValueChange={(v) =>
-                onUpdateCategory(expense.id, v === "_" ? "" : v)
-              }
+        </div>
+        <div className="border-t border-border/60 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)] bg-background">
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant="outline"
+              className={actionButtonClass}
+              onClick={() => onEdit(expense)}
             >
-              <SelectTrigger className={selectTriggerClass}>
-                <SelectValue placeholder={t("common.category")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="_">
-                  <CategoryOption
-                    name={t("common.uncategorized")}
-                    type="expense"
-                  />
-                </SelectItem>
-                {expenseCategories.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    <CategoryOption name={c} type="expense" />
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground">
-              {t("common.owner")}
-            </Label>
-            <Select
-              value={expense.owner || "_none"}
-              onValueChange={(v) =>
-                onUpdateOwner(expense.id, v === "_none" ? "" : v)
-              }
+              <Pencil className="size-4" />
+              {t("common.edit")}
+            </Button>
+            <Button
+              variant="destructive"
+              className={actionButtonClass}
+              onClick={handleDelete}
             >
-              <SelectTrigger className={selectTriggerClass}>
-                <SelectValue placeholder={t("common.noOwner")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
-                {ownerOptions.map((o) => (
-                  <SelectItem key={o} value={o}>
-                    {o}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Trash2 className="size-4" />
+              {t("common.delete")}
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            className={fieldClass}
-            onClick={() => onEdit(expense)}
-          >
-            <Pencil className="size-4" />
-            {t("common.edit")}
-          </Button>
-          <Button
-            variant="destructive"
-            className={fieldClass}
-            onClick={handleDelete}
-          >
-            <Trash2 className="size-4" />
-            {t("common.delete")}
-          </Button>
         </div>
       </SheetContent>
     </Sheet>

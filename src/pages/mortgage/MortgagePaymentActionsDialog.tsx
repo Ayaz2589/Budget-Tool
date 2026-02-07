@@ -29,7 +29,7 @@ export function MortgagePaymentActionsDialog({
   t,
 }: MortgagePaymentActionsDialogProps) {
   if (payment === null) return null;
-  const fieldClass = "h-11 w-full";
+  const actionButtonClass = "h-11 w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
   const handleRemove = () => {
@@ -42,59 +42,63 @@ export function MortgagePaymentActionsDialog({
       <SheetContent
         side="right"
         showCloseButton={true}
-        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
+        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-hidden flex flex-col"
       >
         <SheetHeader className="px-4 pt-5 pb-3">
           <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
             {formatDate(payment.date)} · {formatCurrency(payment.amount)}
           </SheetTitle>
         </SheetHeader>
-        <div className="grid gap-5 px-4 pb-8 overflow-y-auto overscroll-contain">
-          <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
-            <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
-              <span>{t("common.category")}</span>
-              <span>
-                <CategoryOption
-                  name={payment.category ?? "Mortgage"}
-                  type="expense"
-                />
-              </span>
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-6">
+          <div className="grid gap-5">
+            <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
+              <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
+                <span>{t("common.category")}</span>
+                <span>
+                  <CategoryOption
+                    name={payment.category ?? "Mortgage"}
+                    type="expense"
+                  />
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                  {t("common.amount")}
+                </span>
+                <span className="text-lg font-semibold text-foreground">
+                  {formatCurrency(payment.amount)}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t("common.amount")}
-              </span>
-              <span className="text-lg font-semibold text-foreground">
-                {formatCurrency(payment.amount)}
-              </span>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">
+                {t("common.owner")}
+              </Label>
+              <Select
+                value={payment.owner || "_none"}
+                onValueChange={(v) =>
+                  onUpdateOwner(payment.id, v === "_none" ? "" : v)
+                }
+              >
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder={t("common.noOwner")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                  {ownerOptions.map((o) => (
+                    <SelectItem key={o} value={o}>
+                      {o}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
-          <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground">
-              {t("common.owner")}
-            </Label>
-            <Select
-              value={payment.owner || "_none"}
-              onValueChange={(v) =>
-                onUpdateOwner(payment.id, v === "_none" ? "" : v)
-              }
-            >
-              <SelectTrigger className={selectTriggerClass}>
-                <SelectValue placeholder={t("common.noOwner")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
-                {ownerOptions.map((o) => (
-                  <SelectItem key={o} value={o}>
-                    {o}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        </div>
+        <div className="border-t border-border/60 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)] bg-background">
           <Button
             variant="destructive"
-            className={fieldClass}
+            className={actionButtonClass}
             onClick={handleRemove}
           >
             <Trash2 className="size-4" />

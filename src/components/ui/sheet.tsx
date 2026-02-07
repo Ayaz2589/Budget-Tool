@@ -68,10 +68,10 @@ const SheetContent = ({
         {children}
         {showCloseButton && (
           <SheetPrimitive.Close
-            className="absolute right-4 top-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none"
+            className="absolute right-3 top-3 inline-flex size-10 items-center justify-center rounded-md text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus:ring-2 focus:ring-offset-2 focus:outline-none"
             aria-label="Close"
           >
-            <XIcon className="size-4" />
+            <XIcon className="size-5" />
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Content>
@@ -83,7 +83,10 @@ const SheetHeader = ({
   className,
   ...props
 }: React.ComponentProps<"div">) => (
-  <div className={cn("flex flex-col gap-2 text-center sm:text-left", className)} {...props} />
+  <div
+    className={cn("flex flex-col gap-2 text-left pr-12", className)}
+    {...props}
+  />
 );
 
 const SheetFooter = ({
@@ -98,7 +101,7 @@ const SheetTitle = ({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Title>) => (
   <SheetPrimitive.Title
-    className={cn("text-lg leading-none font-semibold", className)}
+    className={cn("text-left text-lg leading-none font-semibold", className)}
     {...props}
   />
 );

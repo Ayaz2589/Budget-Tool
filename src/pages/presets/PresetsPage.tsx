@@ -14,11 +14,13 @@ import { SourceIcon } from "@/components/cards";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Sheet,
   SheetContent,
@@ -86,6 +88,11 @@ export function PresetsPage() {
         ),
       ] as const);
   }, [presetTransactions, t]);
+
+  const desktopPresets = useMemo(
+    () => groupedPresets.flatMap(([, presets]) => presets),
+    [groupedPresets]
+  );
 
   const resetForm = () => {
     setPresetSource("manual");
@@ -347,80 +354,66 @@ export function PresetsPage() {
           ) : (
             <>
               <div className="hidden md:block">
-                <Accordion
-                  type="multiple"
-                  defaultValue={groupedPresets.map(([categoryName]) => categoryName)}
-                  className="space-y-2"
-                >
-                  {groupedPresets.map(([categoryName, presets]) => (
-                    <AccordionItem
-                      key={categoryName}
-                      value={categoryName}
-                      className="border border-border rounded-md overflow-hidden"
-                    >
-                      <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30">
-                        <span className="flex items-center gap-2 text-sm font-semibold">
-                          <span>{categoryName}</span>
-                          <span className="text-muted-foreground font-normal">
-                            ({presets.length === 1
-                              ? t("transactions.transaction_one", { count: 1 })
-                              : t("transactions.transaction_other", { count: presets.length })})
-                          </span>
-                        </span>
-                      </AccordionTrigger>
-                      <AccordionContent className="px-0 pb-0">
-                        <div className="divide-y">
-                          {presets.map((preset, index) => {
-                            const sourceLabel = getSourceLabel(preset.source);
-                            return (
-                              <div
-                                key={preset.id}
-                                className={`px-4 py-3 flex items-start gap-2 ${
-                                  index % 2 === 1 ? "bg-muted/30" : "bg-background"
-                                }`}
-                              >
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-base font-medium text-foreground truncate">
-                                    {preset.description || "—"}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground mt-0.5">
-                                    <span className="inline-flex items-center gap-1.5">
-                                      <SourceIcon source={preset.source} size={14} />
-                                      {sourceLabel}
-                                    </span>
-                                    {typeof preset.amount === "number"
-                                      ? ` · ${formatCurrencyFromNumber(preset.amount)}`
-                                      : ""}
-                                    {" · "}
-                                    {preset.owner || t("common.noOwner")}
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => openForEdit(preset.id)}
-                                    aria-label={t("common.edit")}
-                                  >
-                                    <Pencil className="size-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setPresetToDeleteId(preset.id)}
-                                    aria-label={t("presetTransactions.delete")}
-                                  >
-                                    <Trash2 className="size-4 text-destructive" />
-                                  </Button>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t("common.description")}</TableHead>
+                      <TableHead>{t("common.source")}</TableHead>
+                      <TableHead>{t("common.amount")}</TableHead>
+                      <TableHead>{t("common.owner")}</TableHead>
+                      <TableHead>{t("common.category")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {desktopPresets.map((preset, index) => {
+                      const sourceLabel = getSourceLabel(preset.source);
+                      const amountLabel =
+                        typeof preset.amount === "number"
+                          ? formatCurrencyFromNumber(preset.amount)
+                          : "—";
+                      return (
+                        <TableRow
+                          key={preset.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => setPresetForActions(preset)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              setPresetForActions(preset);
+                            }
+                          }}
+                          className={cn(
+                            "cursor-pointer [&>td]:py-4",
+                            index % 2 === 1 ? "bg-muted/30" : undefined
+                          )}
+                          aria-label={`${preset.description || "Preset"}, ${sourceLabel}, ${amountLabel}, ${
+                            preset.owner || t("common.noOwner")
+                          }`}
+                        >
+                          <TableCell className="max-w-[260px] truncate font-medium">
+                            {preset.description || "—"}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            <span className="flex items-center gap-2">
+                              <SourceIcon source={preset.source} size={16} />
+                              {sourceLabel}
+                            </span>
+                          </TableCell>
+                          <TableCell className="font-semibold">
+                            {amountLabel}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {preset.owner || t("common.noOwner")}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {preset.category || t("common.uncategorized")}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
               </div>
               <div className="md:hidden">
                 <div className="space-y-4">

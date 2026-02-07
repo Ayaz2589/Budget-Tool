@@ -6,29 +6,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
-import { CategoryOption } from "@/lib/categoryColors";
-import { formatCurrency, formatDate } from "@/lib/format";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import type { MortgagePaymentsTableProps } from "@/types/mortgage";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/format";
+import type { MortgagePaymentsTableProps } from "@/types/mortgage";
 
 export type { MortgagePaymentsTableProps };
 
 export function MortgagePaymentsTable({
   payments,
-  onRemove,
-  onUpdateOwner,
-  ownerOptions = [],
+  onPaymentTap,
 }: MortgagePaymentsTableProps) {
   const { t } = useTranslation();
+
   if (payments.length === 0) {
     return (
       <p className="text-muted-foreground text-sm">
@@ -36,57 +26,53 @@ export function MortgagePaymentsTable({
       </p>
     );
   }
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Date</TableHead>
-          <TableHead>Category</TableHead>
-          <TableHead>Owner</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
-          <TableHead className="w-[80px]" />
+          <TableHead>{t("common.date")}</TableHead>
+          <TableHead>{t("common.description")}</TableHead>
+          <TableHead>{t("common.amount")}</TableHead>
+          <TableHead>{t("common.owner")}</TableHead>
+          <TableHead>{t("common.category")}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {payments.map((e) => (
-          <TableRow key={e.id}>
-            <TableCell>{formatDate(e.date)}</TableCell>
-            <TableCell>
-              <CategoryOption name={e.category ?? ""} type="expense" />
+        {payments.map((payment, index) => (
+          <TableRow
+            key={payment.id}
+            role="button"
+            tabIndex={0}
+            onClick={() => onPaymentTap(payment)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onPaymentTap(payment);
+              }
+            }}
+            className={cn(
+              "cursor-pointer [&>td]:py-4",
+              index % 2 === 1 ? "bg-muted/30" : undefined,
+            )}
+            aria-label={`${payment.description || "Mortgage"}, ${formatCurrency(
+              payment.amount,
+            )}, ${formatDate(payment.date)}`}
+          >
+            <TableCell className="whitespace-nowrap text-muted-foreground">
+              {formatDate(payment.date)}
             </TableCell>
-            <TableCell>
-              <Select
-                value={e.owner || "_none"}
-                onValueChange={(v) =>
-                  onUpdateOwner(e.id, v === "_none" ? "" : v)
-                }
-              >
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="No Owner" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_none">No Owner</SelectItem>
-                  {ownerOptions.map((o) => (
-                    <SelectItem key={o} value={o}>
-                      {o}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <TableCell className="max-w-[260px] truncate font-medium">
+              {payment.description || "Mortgage"}
             </TableCell>
-            <TableCell className="text-right">
-              {formatCurrency(e.amount)}
+            <TableCell className="font-semibold">
+              {formatCurrency(payment.amount)}
             </TableCell>
-            <TableCell>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-destructive hover:text-destructive"
-                onClick={() => onRemove(e)}
-                aria-label="Remove payment"
-              >
-                <Trash2 className="size-4 text-destructive" />
-              </Button>
+            <TableCell className="text-muted-foreground">
+              {payment.owner || t("common.noOwner")}
+            </TableCell>
+            <TableCell className="text-muted-foreground">
+              {payment.category || "Mortgage"}
             </TableCell>
           </TableRow>
         ))}

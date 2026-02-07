@@ -123,14 +123,10 @@ export function MortgagePage() {
               </div>
             ) : (
               <>
-                <div className="hidden md:block md:border md:rounded-md">
+                <div className="hidden md:block">
                   <MortgagePaymentsTable
                     payments={mortgagePayments}
-                    onRemove={setDeleteConfirm}
-                    onUpdateOwner={(id, owner) =>
-                      updateExpense(id, { owner: owner || undefined })
-                    }
-                    ownerOptions={owners}
+                    onPaymentTap={setPaymentForActions}
                   />
                 </div>
                 <div className="md:hidden">

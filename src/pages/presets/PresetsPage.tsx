@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
-import type { ExpenseSource } from "@/types/core";
+import type { ExpenseSource, PresetTransaction } from "@/types/core";
 import { SOURCE_OPTIONS } from "@/lib/sourceLabels";
 import {
   formatCurrencyFromNumber,
@@ -42,6 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 export function PresetsPage() {
   const { t } = useTranslation();
@@ -65,6 +66,9 @@ export function PresetsPage() {
   const [presetMember, setPresetMember] = useState(ownerOptions[0] ?? "");
   const [presetToDeleteId, setPresetToDeleteId] = useState<string | null>(null);
   const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
+  const [presetForActions, setPresetForActions] =
+    useState<PresetTransaction | null>(null);
+  const [openCategory, setOpenCategory] = useState<string>("");
 
   const groupedPresets = useMemo(() => {
     const map = new Map<string, typeof presetTransactions>();
@@ -142,6 +146,46 @@ export function PresetsPage() {
     resetForm();
     setPresetOpen(false);
   };
+
+  const getSourceLabel = (source: ExpenseSource) =>
+    SOURCE_OPTIONS.find((o) => o.value === source)?.label ?? source;
+
+  const getSourceBadge = (source: ExpenseSource) => {
+    switch (source) {
+      case "amex":
+        return "AMEX";
+      case "amex-gold":
+        return "AMEX";
+      case "apple":
+        return "MC";
+      case "visa":
+        return "VISA";
+      case "sapphire":
+        return "SAPPHIRE";
+      case "bank-of-america":
+        return "BOA";
+      case "wells-fargo":
+        return "WF";
+      case "chase":
+        return "CHASE";
+      case "manual":
+        return "MANUAL";
+      case "td":
+        return "TD";
+      default:
+        return String(source).toUpperCase();
+    }
+  };
+
+  useEffect(() => {
+    if (
+      openCategory &&
+      groupedPresets.some(([categoryName]) => categoryName === openCategory)
+    ) {
+      return;
+    }
+    setOpenCategory(groupedPresets[0]?.[0] ?? "");
+  }, [groupedPresets, openCategory]);
 
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
@@ -301,82 +345,177 @@ export function PresetsPage() {
                 : t("presetTransactions.empty")}
             </div>
           ) : (
-            <Accordion
-              type="multiple"
-              defaultValue={groupedPresets.map(([categoryName]) => categoryName)}
-              className="space-y-2"
-            >
-              {groupedPresets.map(([categoryName, presets]) => (
-                <AccordionItem
-                  key={categoryName}
-                  value={categoryName}
-                  className="border border-border rounded-md overflow-hidden"
+            <>
+              <div className="hidden md:block">
+                <Accordion
+                  type="multiple"
+                  defaultValue={groupedPresets.map(([categoryName]) => categoryName)}
+                  className="space-y-2"
                 >
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30">
-                    <span className="flex items-center gap-2 text-sm font-semibold">
-                      <span>{categoryName}</span>
-                      <span className="text-muted-foreground font-normal">
-                        ({presets.length === 1
-                          ? t("transactions.transaction_one", { count: 1 })
-                          : t("transactions.transaction_other", { count: presets.length })})
-                      </span>
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-0 pb-0">
-                    <div className="divide-y">
-                      {presets.map((preset, index) => {
-                        const sourceLabel =
-                          SOURCE_OPTIONS.find((o) => o.value === preset.source)?.label ??
-                          preset.source;
-                        return (
-                          <div
-                            key={preset.id}
-                            className={`px-4 py-3 flex items-start gap-2 ${
-                              index % 2 === 1 ? "bg-muted/30" : "bg-background"
-                            }`}
+                  {groupedPresets.map(([categoryName, presets]) => (
+                    <AccordionItem
+                      key={categoryName}
+                      value={categoryName}
+                      className="border border-border rounded-md overflow-hidden"
+                    >
+                      <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/30">
+                        <span className="flex items-center gap-2 text-sm font-semibold">
+                          <span>{categoryName}</span>
+                          <span className="text-muted-foreground font-normal">
+                            ({presets.length === 1
+                              ? t("transactions.transaction_one", { count: 1 })
+                              : t("transactions.transaction_other", { count: presets.length })})
+                          </span>
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-0 pb-0">
+                        <div className="divide-y">
+                          {presets.map((preset, index) => {
+                            const sourceLabel = getSourceLabel(preset.source);
+                            return (
+                              <div
+                                key={preset.id}
+                                className={`px-4 py-3 flex items-start gap-2 ${
+                                  index % 2 === 1 ? "bg-muted/30" : "bg-background"
+                                }`}
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-base font-medium text-foreground truncate">
+                                    {preset.description || "—"}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground mt-0.5">
+                                    <span className="inline-flex items-center gap-1.5">
+                                      <SourceIcon source={preset.source} size={14} />
+                                      {sourceLabel}
+                                    </span>
+                                    {typeof preset.amount === "number"
+                                      ? ` · ${formatCurrencyFromNumber(preset.amount)}`
+                                      : ""}
+                                    {" · "}
+                                    {preset.owner || t("common.noOwner")}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => openForEdit(preset.id)}
+                                    aria-label={t("common.edit")}
+                                  >
+                                    <Pencil className="size-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setPresetToDeleteId(preset.id)}
+                                    aria-label={t("presetTransactions.delete")}
+                                  >
+                                    <Trash2 className="size-4 text-destructive" />
+                                  </Button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+              <div className="md:hidden">
+                <div className="space-y-4">
+                  {groupedPresets.map(([categoryName, presets]) => {
+                    const isOpen = openCategory === categoryName;
+                    return (
+                      <div key={categoryName} className="border-t border-border">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOpenCategory(isOpen ? "" : categoryName)
+                          }
+                          className="sticky top-0 z-10 w-full px-4 py-3 flex items-center justify-between text-left text-sm font-medium bg-background/90 backdrop-blur border-b border-border/60"
+                          aria-expanded={isOpen}
+                        >
+                          <span className="flex items-center gap-2">
+                            <span>{categoryName}</span>
+                            <span className="text-muted-foreground font-normal">
+                              ({presets.length === 1
+                                ? t("transactions.transaction_one", { count: 1 })
+                                : t("transactions.transaction_other", {
+                                    count: presets.length,
+                                  })})
+                            </span>
+                          </span>
+                          <span
+                            className={cn(
+                              "transition-transform text-muted-foreground",
+                              isOpen ? "rotate-180" : "rotate-0"
+                            )}
                           >
-                            <div className="flex-1 min-w-0">
-                              <div className="text-base font-medium text-foreground truncate">
-                                {preset.description || "—"}
-                              </div>
-                              <div className="text-xs text-muted-foreground mt-0.5">
-                                <span className="inline-flex items-center gap-1.5">
-                                  <SourceIcon source={preset.source} size={14} />
-                                  {sourceLabel}
-                                </span>
-                                {typeof preset.amount === "number"
-                                  ? ` · ${formatCurrencyFromNumber(preset.amount)}`
-                                  : ""}
-                                {" · "}
-                                {preset.owner || t("common.noOwner")}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => openForEdit(preset.id)}
-                                aria-label={t("common.edit")}
-                              >
-                                <Pencil className="size-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setPresetToDeleteId(preset.id)}
-                                aria-label={t("presetTransactions.delete")}
-                              >
-                                <Trash2 className="size-4 text-destructive" />
-                              </Button>
-                            </div>
+                            ▼
+                          </span>
+                        </button>
+                        {isOpen && (
+                          <div className="divide-y">
+                            {presets.map((preset, index) => {
+                              const sourceLabel = getSourceLabel(preset.source);
+                              const amountLabel =
+                                typeof preset.amount === "number"
+                                  ? formatCurrencyFromNumber(preset.amount)
+                                  : "";
+                              return (
+                                <div
+                                  key={preset.id}
+                                  className={cn(
+                                    "px-4 py-5 flex items-start gap-2",
+                                    index % 2 === 1
+                                      ? "bg-muted/30"
+                                      : "bg-background"
+                                  )}
+                                >
+                                  <button
+                                    type="button"
+                                    className="flex-1 min-w-0 min-h-14 text-left"
+                                    onClick={() => setPresetForActions(preset)}
+                                    aria-label={`${preset.description || "Preset"}, ${sourceLabel}${
+                                      amountLabel ? `, ${amountLabel}` : ""
+                                    }, ${preset.owner || t("common.noOwner")}`}
+                                  >
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="min-w-0">
+                                        <div className="text-base font-medium text-foreground truncate">
+                                          {preset.description || "—"}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground mt-0.5">
+                                          {(preset.owner || t("common.noOwner")) +
+                                            " · " +
+                                            (preset.category ||
+                                              t("common.uncategorized"))}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-2 shrink-0">
+                                        <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                                          {getSourceBadge(preset.source)}
+                                        </span>
+                                        {amountLabel ? (
+                                          <div className="text-base font-semibold">
+                                            {amountLabel}
+                                          </div>
+                                        ) : null}
+                                      </div>
+                                    </div>
+                                  </button>
+                                </div>
+                              );
+                            })}
                           </div>
-                        );
-                      })}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -395,6 +534,92 @@ export function PresetsPage() {
           </div>
         </div>
       </div>
+
+      <Sheet
+        open={presetForActions !== null}
+        onOpenChange={(open) => !open && setPresetForActions(null)}
+      >
+        <SheetContent
+          side="right"
+          showCloseButton={true}
+          className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-hidden flex flex-col"
+        >
+          {presetForActions ? (
+            <>
+              <SheetHeader className="px-4 pt-5 pb-3">
+                <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
+                  {presetForActions.description || "—"}
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-6">
+                <div className="grid gap-5">
+                  <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
+                      <span>{t("common.source")}</span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <SourceIcon source={presetForActions.source} size={14} />
+                        {getSourceLabel(presetForActions.source)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                        {t("common.amount")}
+                      </span>
+                      <span className="text-lg font-semibold text-foreground">
+                        {typeof presetForActions.amount === "number"
+                          ? formatCurrencyFromNumber(presetForActions.amount)
+                          : "—"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm text-muted-foreground">
+                      {t("common.category")}
+                    </Label>
+                    <div className="h-11 px-3 border rounded-md bg-background flex items-center text-sm">
+                      {presetForActions.category || t("common.uncategorized")}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm text-muted-foreground">
+                      {t("common.owner")}
+                    </Label>
+                    <div className="h-11 px-3 border rounded-md bg-background flex items-center text-sm">
+                      {presetForActions.owner || t("common.noOwner")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-border/60 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)] bg-background">
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    className="h-11 w-full"
+                    onClick={() => {
+                      setPresetForActions(null);
+                      openForEdit(presetForActions.id);
+                    }}
+                  >
+                    <Pencil className="size-4" />
+                    {t("common.edit")}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="h-11 w-full"
+                    onClick={() => {
+                      setPresetToDeleteId(presetForActions.id);
+                      setPresetForActions(null);
+                    }}
+                  >
+                    <Trash2 className="size-4" />
+                    {t("common.delete")}
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : null}
+        </SheetContent>
+      </Sheet>
 
       <Dialog
         open={presetToDeleteId !== null}

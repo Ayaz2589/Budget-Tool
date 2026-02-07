@@ -69,13 +69,13 @@ export function ExpensesByMonthList({
                   <div
                     key={e.id}
                     className={cn(
-                      "px-4 py-3 flex items-start gap-2",
+                      "px-4 py-4 flex items-start gap-2",
                       index % 2 === 1 ? "bg-muted/30" : "bg-background"
                     )}
                   >
                     <button
                       type="button"
-                      className="flex-1 min-w-0 text-left"
+                      className="flex-1 min-w-0 min-h-12 text-left"
                       onClick={() => onExpenseTap(e)}
                       aria-label={`${e.description}, ${formatCurrency(
                         e.amount

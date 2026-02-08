@@ -90,7 +90,7 @@ export function EditTransactionDialog({
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
       >
         <DsSheetHeader title={t("common.edit")} />
-        <div className="grid gap-4 px-4 pb-6 overflow-y-auto">
+        <div className="grid gap-4 px-4 pt-4 pb-6 overflow-y-auto">
           <div className="space-y-2">
             <Label>{t("common.date")}</Label>
             <Input

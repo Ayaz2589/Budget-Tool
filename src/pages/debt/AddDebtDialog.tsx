@@ -1,10 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +25,7 @@ import {
   getDateInputPlaceholder,
 } from "@/lib/dateInput";
 import type { AddDebtPayload, AddDebtDialogProps } from "@/types/debt";
+import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { AddDebtPayload, AddDebtDialogProps };
 
@@ -37,6 +36,7 @@ export function AddDebtDialog({
   dateFormat = "YYYY/MM/DD",
   onSubmit,
 }: AddDebtDialogProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -51,7 +51,7 @@ export function AddDebtDialog({
       : undefined;
     if (startDate.trim() && !isoStartDate) return;
     onSubmit({
-      name: name.trim() || "Debt",
+      name: name.trim() || t("debt.name"),
       initialAmount: num,
       startDate: isoStartDate || undefined,
       owner: owner || "",
@@ -64,24 +64,21 @@ export function AddDebtDialog({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-       
-        className="flex flex-col h-full w-[85vw] max-w-sm border-l p-4 gap-3 overflow-hidden rounded-l-2xl"
+        className="flex flex-col h-full w-[85vw] max-w-sm border-l p-0 gap-0 overflow-hidden rounded-l-2xl"
       >
-        <SheetHeader className="gap-2">
-          <SheetTitle>New debt</SheetTitle>
-          <SheetDescription>
-            Enter the debt name and initial amount owed.
-          </SheetDescription>
-        </SheetHeader>
+        <DsSheetHeader
+          title={t("debt.newDebt")}
+          description={t("debt.newDebtDesc")}
+        />
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden"
+          className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden px-4 py-3"
         >
           <div className="flex-1 min-h-0 overflow-auto space-y-4">
             <div className="space-y-2">
-              <Label>Name</Label>
+              <Label>{t("debt.name")}</Label>
               <Input
-                placeholder="e.g. Car loan, Credit card"
+                placeholder={t("debt.placeholderName")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -89,7 +86,7 @@ export function AddDebtDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Initial amount owed</Label>
+              <Label>{t("debt.initialAmountOwed")}</Label>
               <Input
                 type="text"
                 placeholder="0.00"
@@ -100,7 +97,7 @@ export function AddDebtDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Start date (optional)</Label>
+              <Label>{t("debt.startDateOptional")}</Label>
               <Input
                 type="text"
                 inputMode="numeric"
@@ -114,7 +111,7 @@ export function AddDebtDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Owner</Label>
+              <Label>{t("common.owner")}</Label>
               <Select
                 value={owner || "_none"}
                 onValueChange={(v) => setOwner(v === "_none" ? "" : v)}
@@ -123,7 +120,7 @@ export function AddDebtDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="_none">No Owner</SelectItem>
+                  <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
                   {owners.map((o) => (
                     <SelectItem key={o} value={o}>
                       {o}
@@ -133,19 +130,19 @@ export function AddDebtDialog({
               </Select>
             </div>
           </div>
-          <div className="flex items-center gap-2 pt-2">
+          <DsSheetActions className="grid grid-cols-2 gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="h-11 flex-1"
+              className="h-11 w-full"
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
-            <Button type="submit" className="h-11 flex-1">
-              Add debt
+            <Button type="submit" className="h-11 w-full">
+              {t("debt.addDebt")}
             </Button>
-          </div>
+          </DsSheetActions>
         </form>
       </SheetContent>
     </Sheet>

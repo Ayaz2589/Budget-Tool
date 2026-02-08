@@ -65,8 +65,8 @@ export function DebtActionsDialog({
         showCloseButton={true}
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col overflow-hidden"
       >
-        <DsSheetHeader className="p-4 pb-2" title={debt.name} />
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 flex flex-col gap-4">
+        <DsSheetHeader className="p-4" title={debt.name} />
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pt-4 pb-4 flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <p className="text-muted-foreground text-xs uppercase tracking-wide">

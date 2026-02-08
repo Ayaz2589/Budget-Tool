@@ -1,8 +1,6 @@
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -17,6 +15,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { CategoryOption } from "@/lib/categoryColors";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { ExpenseActionsDialogProps } from "@/types/transactions";
+import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { ExpenseActionsDialogProps };
 
@@ -49,11 +48,7 @@ export function ExpenseActionsDialog({
         showCloseButton={true}
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-hidden flex flex-col"
       >
-        <SheetHeader className="px-4 pt-5 pb-3">
-          <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
-            {expense.description || t("addTransaction.transaction")}
-          </SheetTitle>
-        </SheetHeader>
+        <DsSheetHeader title={expense.description || t("addTransaction.transaction")} />
         <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-6">
           <div className="grid gap-5">
             <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
@@ -123,10 +118,11 @@ export function ExpenseActionsDialog({
             </div>
           </div>
         </div>
-        <div className="border-t border-border/60 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)] bg-background">
+        <DsSheetActions>
           <div className="grid grid-cols-2 gap-2">
             <Button
               variant="outline"
+              density="compact"
               className={actionButtonClass}
               onClick={() => onEdit(expense)}
             >
@@ -135,6 +131,7 @@ export function ExpenseActionsDialog({
             </Button>
             <Button
               variant="destructive"
+              density="compact"
               className={actionButtonClass}
               onClick={handleDelete}
             >
@@ -142,7 +139,7 @@ export function ExpenseActionsDialog({
               {t("common.delete")}
             </Button>
           </div>
-        </div>
+        </DsSheetActions>
       </SheetContent>
     </Sheet>
   );

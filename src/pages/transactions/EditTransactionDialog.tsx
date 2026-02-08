@@ -28,12 +28,10 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context/BudgetContext";
+import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export function EditTransactionDialog({
   expense,
@@ -91,11 +89,7 @@ export function EditTransactionDialog({
         showCloseButton={true}
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
       >
-        <SheetHeader className="px-4 pt-5 pb-3">
-          <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
-            {t("common.edit")}
-          </SheetTitle>
-        </SheetHeader>
+        <DsSheetHeader title={t("common.edit")} />
         <div className="grid gap-4 px-4 pb-6 overflow-y-auto">
           <div className="space-y-2">
             <Label>{t("common.date")}</Label>
@@ -200,14 +194,14 @@ export function EditTransactionDialog({
             </Select>
           </div>
         </div>
-        <SheetFooter className="px-4 pb-4 pt-2 grid grid-cols-2 gap-3">
+        <DsSheetActions className="grid grid-cols-2 gap-3 pb-4">
           <Button type="button" variant="outline" className="h-11" onClick={onClose}>
             {t("common.cancel")}
           </Button>
           <Button type="button" className="h-11" onClick={handleSave}>
             {t("common.save")}
           </Button>
-        </SheetFooter>
+        </DsSheetActions>
       </SheetContent>
     </Sheet>
   );

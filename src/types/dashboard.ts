@@ -34,7 +34,7 @@ export interface DashboardDebtRow {
   progress: number;
 }
 
-export interface DashboardRecentItem extends Expense {}
+export type DashboardRecentItem = Expense;
 
 export type DashboardInsightType =
   | "spending_spike"

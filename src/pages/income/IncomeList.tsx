@@ -3,6 +3,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
 import { cn } from "@/lib/utils";
 import type { IncomeListProps } from "@/types/income";
+import { DsDataRow } from "@/components/ds";
 
 export type { IncomeListProps };
 
@@ -41,32 +42,23 @@ export function IncomeList({
                   <div
                     key={i.id}
                     className={cn(
-                      "px-4 py-5 flex items-start gap-2",
                       index % 2 === 1 ? "bg-muted/30" : "bg-background"
                     )}
                   >
-                    <button
-                      type="button"
-                      className="flex-1 min-w-0 min-h-14 text-left"
+                    <DsDataRow
+                      dense
                       onClick={() => onIncomeTap(i)}
-                      aria-label={`${i.description || "Income"}, ${formatCurrency(
+                      ariaLabel={`${i.description || "Income"}, ${formatCurrency(
                         i.amount
                       )}, ${formatDate(i.date)}`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-base font-medium text-foreground truncate">
-                            {i.description || "—"}
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-0.5">
-                            {formatDate(i.date)} · {i.category || "Uncategorized"}
-                          </div>
-                        </div>
+                      title={i.description || "—"}
+                      subtitle={`${formatDate(i.date)} · ${i.category || "Uncategorized"}`}
+                      trailing={
                         <div className="text-base font-semibold shrink-0">
                           {formatCurrency(i.amount)}
                         </div>
-                      </div>
-                    </button>
+                      }
+                    />
                   </div>
                 ))}
               </div>

@@ -2,9 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +17,7 @@ import { CategoryOption } from "@/lib/categoryColors";
 import type { ExpenseSource } from "@/types/core";
 import type { FiltersAndActionsDialogProps } from "@/types/transactions";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
+import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { FiltersAndActionsDialogProps };
 
@@ -55,12 +53,10 @@ export function FiltersAndActionsDialog({
        
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col"
       >
-        <SheetHeader className="px-4 pt-5 pb-3">
-          <SheetTitle>{t("transactions.filtersActionsTitle")}</SheetTitle>
-          <SheetDescription>
-            {t("transactions.filtersActionsDesc")}
-          </SheetDescription>
-        </SheetHeader>
+        <DsSheetHeader
+          title={t("transactions.filtersActionsTitle")}
+          description={t("transactions.filtersActionsDesc")}
+        />
         <div className="grid gap-6 px-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
           {/* Filters */}
           <section className="space-y-4">
@@ -182,16 +178,17 @@ export function FiltersAndActionsDialog({
           </section>
 
         </div>
-        <div className="border-t px-4 py-3">
+        <DsSheetActions className="py-3">
           <Button
             type="button"
             variant="outline"
+            density="compact"
             onClick={handleCancel}
             className="h-11 w-full"
           >
             {t("common.cancel")}
           </Button>
-        </div>
+        </DsSheetActions>
       </SheetContent>
     </Sheet>
   );

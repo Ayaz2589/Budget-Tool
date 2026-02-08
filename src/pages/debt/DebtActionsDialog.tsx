@@ -2,8 +2,6 @@ import { useState } from "react";
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import {
   Dialog,
@@ -27,6 +25,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import type { DebtPayment } from "@/types/core";
 import { cn } from "@/lib/utils";
 import type { DebtActionsDialogProps } from "@/types/debt";
+import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { DebtActionsDialogProps };
 
@@ -66,11 +65,7 @@ export function DebtActionsDialog({
         showCloseButton={true}
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col overflow-hidden"
       >
-        <SheetHeader className="p-4 pb-2">
-          <SheetTitle className="text-left truncate pr-8">
-            {debt.name}
-          </SheetTitle>
-        </SheetHeader>
+        <DsSheetHeader className="p-4 pb-2" title={debt.name} />
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
@@ -146,9 +141,10 @@ export function DebtActionsDialog({
             </div>
           )}
         </div>
-        <div className="border-t px-4 py-3">
+        <DsSheetActions className="py-3">
           <div className="flex items-center gap-2">
             <Button
+              density="compact"
               className="h-11 flex-1 justify-center text-center"
               onClick={handleAddPayment}
               disabled={balance <= 0}
@@ -157,6 +153,7 @@ export function DebtActionsDialog({
             </Button>
             <Button
               variant="destructive"
+              density="compact"
               className="h-11 flex-1 justify-center text-center"
               onClick={handleDelete}
             >
@@ -164,7 +161,7 @@ export function DebtActionsDialog({
               Delete debt
             </Button>
           </div>
-        </div>
+        </DsSheetActions>
       </SheetContent>
       <Dialog
         open={paymentToRemove !== null}

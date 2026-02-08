@@ -331,7 +331,7 @@ export function Layout() {
       </header>
 
       {/* Desktop sidebar: fixed width so it doesn't change with language */}
-      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 border-r bg-muted/30 p-2 flex-col gap-1 w-[220px] overflow-hidden">
+      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 border-r border-[var(--border-subtle)] bg-[var(--surface-1)]/70 p-2 flex-col gap-1 w-[220px] overflow-hidden backdrop-blur-sm">
         <SidebarContent
           location={location}
           t={t}
@@ -345,7 +345,7 @@ export function Layout() {
       </nav>
       <main
         className={cn(
-          "flex-1 flex flex-col pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-6 md:ml-[220px] md:w-[calc(100%-220px)]",
+          "flex-1 flex flex-col pb-[calc(6.25rem+env(safe-area-inset-bottom))] md:pb-6 md:ml-[220px] md:w-[calc(100%-220px)]",
           location.pathname === "/dashboard/transactions" ||
             location.pathname === "/dashboard/income" ||
             location.pathname === "/dashboard/debt" ||
@@ -366,7 +366,7 @@ export function Layout() {
 
       {/* Mobile bottom nav */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 py-3 safe-area-pb"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-[var(--border-subtle)] bg-[var(--surface-0)]/95 backdrop-blur supports-backdrop-filter:bg-[var(--surface-0)]/80 py-3.5 min-h-[84px] safe-area-pb"
         aria-label={t("layout.navigation")}
       >
         {bottomNavItems.map(({ to, labelKey, icon: Icon }) => (
@@ -374,7 +374,7 @@ export function Layout() {
             key={to}
             to={to}
             className={cn(
-              "flex flex-col items-center gap-1 px-4 py-1.5 rounded-md text-xs font-medium transition-colors min-w-0 flex-1 max-w-[33%]",
+              "flex flex-col items-center gap-1 px-4 py-1.5 rounded-md text-xs font-medium transition-colors min-w-0 flex-1 max-w-[33%] ds-label",
               location.pathname === to
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground",
@@ -388,7 +388,7 @@ export function Layout() {
           type="button"
           onClick={() => setMoreOpen(true)}
           className={cn(
-            "flex flex-col items-center gap-1 px-4 py-1.5 rounded-md text-xs font-medium transition-colors min-w-0 flex-1 max-w-[33%] text-muted-foreground hover:text-foreground",
+            "flex flex-col items-center gap-1 px-4 py-1.5 rounded-md text-xs font-medium transition-colors min-w-0 flex-1 max-w-[33%] text-muted-foreground hover:text-foreground ds-label",
             moreNavItems.some(({ to }) => location.pathname === to)
               ? "text-primary"
               : "",

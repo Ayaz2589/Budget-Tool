@@ -17,6 +17,7 @@ import { TransactionsPage } from "@/pages/transactions/TransactionsPage";
 import { IncomePage } from "@/pages/income/IncomePage";
 import { PresetsPage } from "@/pages/presets/PresetsPage";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
+import { InvestmentsPage } from "@/pages/investments/InvestmentsPage";
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
@@ -30,6 +31,7 @@ function AppContent() {
           <Route path="dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="import" element={<ImportPage />} />
+            <Route path="investments" element={<InvestmentsPage />} />
             <Route path="transactions" element={<TransactionsPage />} />
             <Route path="income" element={<IncomePage />} />
             <Route path="debt" element={<DebtPage />} />

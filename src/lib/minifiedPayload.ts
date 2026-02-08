@@ -12,6 +12,7 @@ import type {
   MinifiedPayloadInput,
   ExpandedPayload,
 } from "@/types/payload";
+import type { InvestmentPortfolio } from "@/types/investments";
 
 export type { CategoryWithColorPayload, MinifiedPayloadInput, ExpandedPayload };
 
@@ -35,6 +36,7 @@ export function buildMinifiedPayload(
   incomeCategoriesWithColors: CategoryWithColorPayload[],
   owners?: string[],
   cardSources?: string[],
+  investmentPortfolios?: InvestmentPortfolio[],
 ): Record<string, unknown> {
   return {
     e: expenses.map((x) =>
@@ -87,6 +89,10 @@ export function buildMinifiedPayload(
     ic: incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color })),
     o: Array.isArray(owners) && owners.length > 0 ? owners : undefined,
     sc: Array.isArray(cardSources) && cardSources.length > 0 ? cardSources : undefined,
+    ip:
+      Array.isArray(investmentPortfolios) && investmentPortfolios.length > 0
+        ? investmentPortfolios
+        : undefined,
   };
 }
 
@@ -185,6 +191,9 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
   const owners = Array.isArray(raw.owners ?? raw.o)
     ? (raw.owners ?? raw.o) as string[]
     : undefined;
+  const investmentPortfolios = Array.isArray(raw.investmentPortfolios ?? raw.ip)
+    ? ((raw.investmentPortfolios ?? raw.ip) as InvestmentPortfolio[])
+    : undefined;
 
   return {
     expenses,
@@ -196,6 +205,7 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
     incomeCategoriesWithColors,
     owners,
     cardSources,
+    investmentPortfolios,
   };
 }
 
@@ -211,6 +221,7 @@ export function serializeToBlob(input: MinifiedPayloadInput): string {
     input.incomeCategoriesWithColors ?? [],
     input.owners,
     input.cardSources,
+    input.investmentPortfolios,
   );
   const jsonString = JSON.stringify(payload);
   const compressed = pako.gzip(new TextEncoder().encode(jsonString));

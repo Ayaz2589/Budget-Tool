@@ -16,6 +16,7 @@ import {
   Landmark,
   Globe,
   MoreHorizontal,
+  LineChart,
 } from "lucide-react";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,7 @@ const nav = [
   { to: "/dashboard/debt", labelKey: "nav.debt", icon: CreditCard },
   { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
   { to: "/dashboard/import", labelKey: "nav.import", icon: Database },
+  { to: "/dashboard/investments", labelKey: "nav.investments", icon: LineChart },
   { to: "/dashboard/presets", labelKey: "nav.presets", icon: ListOrdered },
   { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
@@ -92,6 +94,7 @@ const moreNavItems = [
   { to: "/dashboard/debt", labelKey: "nav.debt", icon: CreditCard },
   { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
   { to: "/dashboard/import", labelKey: "nav.import", icon: Database },
+  { to: "/dashboard/investments", labelKey: "nav.investments", icon: LineChart },
   { to: "/dashboard/presets", labelKey: "nav.presets", icon: ListOrdered },
   { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
@@ -349,6 +352,7 @@ export function Layout() {
             location.pathname === "/dashboard/mortgage" ||
             location.pathname === "/dashboard/presets" ||
             location.pathname === "/dashboard/import" ||
+            location.pathname === "/dashboard/investments" ||
             location.pathname === "/dashboard/settings"
             ? "p-0 md:p-6"
             : "p-0 md:p-6",

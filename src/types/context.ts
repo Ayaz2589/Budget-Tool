@@ -2,6 +2,8 @@ import type { Debt, DebtPayment, Expense, Income } from "./core";
 import type { BudgetState } from "./budget";
 import type { PresetTransaction } from "./core";
 import type { UiFormatSettings } from "@/lib/format";
+import type { InvestmentHolding } from "./investments";
+import type { InvestmentPortfolio } from "./investments";
 
 export interface BudgetContextValue extends BudgetState {
   addExpenses: (expenses: Expense[]) => void;
@@ -32,6 +34,20 @@ export interface BudgetContextValue extends BudgetState {
   setUiFormatSettings: (settings: UiFormatSettings) => void;
   useDummyData: boolean;
   setUseDummyData: (value: boolean) => void;
+  addPortfolio: (name: string) => void;
+  renamePortfolio: (id: string, name: string) => void;
+  deletePortfolio: (id: string) => void;
+  addHolding: (
+    portfolioId: string,
+    holding: Omit<InvestmentHolding, "id">,
+  ) => void;
+  updateHolding: (
+    portfolioId: string,
+    holdingId: string,
+    updates: Partial<InvestmentHolding>,
+  ) => void;
+  removeHolding: (portfolioId: string, holdingId: string) => void;
+  setInvestmentPortfolios: (portfolios: InvestmentPortfolio[]) => void;
 }
 
 export interface PresetTransactionsContextValue {

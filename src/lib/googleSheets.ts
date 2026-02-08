@@ -6,6 +6,7 @@ import type {
   ExpenseSource,
   PresetTransaction,
 } from "@/types/core";
+import type { InvestmentPortfolio } from "@/types/investments";
 import type { MonthTotals } from "@/types/totals";
 import type { SheetIds } from "@/types/sheets";
 
@@ -517,6 +518,50 @@ export async function readPresetsFromSheet(
   return presets;
 }
 
+export async function readInvestmentsFromSheet(
+  accessToken: string,
+  spreadsheetId: string
+): Promise<InvestmentPortfolio[]> {
+  const rows = await getSheetValues(
+    accessToken,
+    spreadsheetId,
+    "Investments!A2:G",
+    "UNFORMATTED_VALUE",
+  );
+  const byPortfolio = new Map<string, InvestmentPortfolio>();
+  for (const row of rows) {
+    const portfolioId = String(row[0] ?? "").trim();
+    const portfolioName = String(row[1] ?? "").trim();
+    const symbol = String(row[2] ?? "").trim().toUpperCase();
+    const quantity = parseAmount(row[3]);
+    const investedAmount = parseAmount(row[4]);
+    const updatedAt = String(row[6] ?? "").trim() || new Date().toISOString();
+    if (!portfolioId || !portfolioName || !symbol || quantity == null || investedAmount == null) {
+      continue;
+    }
+    if (!byPortfolio.has(portfolioId)) {
+      byPortfolio.set(portfolioId, {
+        id: portfolioId,
+        name: portfolioName,
+        createdAt: updatedAt,
+        updatedAt,
+        holdings: [],
+      });
+    }
+    const portfolio = byPortfolio.get(portfolioId)!;
+    portfolio.holdings.push({
+      id: generateId(),
+      symbol,
+      quantity,
+      investedAmount,
+      currency: "USD",
+      name: undefined,
+    });
+    portfolio.updatedAt = updatedAt;
+  }
+  return Array.from(byPortfolio.values());
+}
+
 /** Write the minified V2 blob to the Data sheet (single cell A1). */
 export async function writeDataBlob(
   accessToken: string,
@@ -736,6 +781,36 @@ function buildTotalsValues(months: MonthTotals[], grandTotal: MonthTotals): unkn
   ];
 }
 
+function buildInvestmentsValues(investmentPortfolios: InvestmentPortfolio[]): unknown[][] {
+  const headers = [
+    [
+      "Portfolio ID",
+      "Portfolio Name",
+      "Symbol",
+      "Quantity",
+      "Invested Amount",
+      "Avg Cost",
+      "Updated At",
+    ],
+  ];
+  const rows: unknown[][] = [];
+  for (const portfolio of investmentPortfolios) {
+    for (const h of portfolio.holdings) {
+      const avgCost = h.quantity > 0 ? h.investedAmount / h.quantity : 0;
+      rows.push([
+        portfolio.id,
+        portfolio.name,
+        h.symbol,
+        h.quantity,
+        h.investedAmount,
+        avgCost,
+        portfolio.updatedAt,
+      ]);
+    }
+  }
+  return [...headers, ...rows];
+}
+
 export async function syncAllSheetsBatch(
   accessToken: string,
   spreadsheetId: string,
@@ -746,6 +821,7 @@ export async function syncAllSheetsBatch(
     debts: Debt[];
     debtPayments: DebtPayment[];
     presetTransactions: PresetTransaction[];
+    investmentPortfolios?: InvestmentPortfolio[];
     dataBlob: string;
     months: MonthTotals[];
     grandTotal: MonthTotals;
@@ -765,6 +841,7 @@ export async function syncAllSheetsBatch(
         "Debts!A1:E10000",
         "DebtPayments!A1:E10000",
         "PresetTransactions!A1:E10000",
+        "Investments!A1:G10000",
         "Data!A1:A1",
         "Totals!A1:O1000",
       ],
@@ -793,6 +870,10 @@ export async function syncAllSheetsBatch(
         {
           range: "PresetTransactions!A1:E",
           values: buildPresetsValues(payload.presetTransactions),
+        },
+        {
+          range: "Investments!A1:G",
+          values: buildInvestmentsValues(payload.investmentPortfolios ?? []),
         },
         { range: "Data!A1", values: [[payload.dataBlob]] },
         { range: "Totals!A1:O1000", values: totalsValues },
@@ -876,6 +957,7 @@ export async function getSheetIds(
   const debtPayments = byTitle["DebtPayments"];
   const mortgage = byTitle["Mortgage"];
   const presetTransactions = byTitle["PresetTransactions"];
+  const investments = byTitle["Investments"];
   if (
     expenses == null ||
     income == null ||
@@ -883,10 +965,20 @@ export async function getSheetIds(
     debts == null ||
     debtPayments == null ||
     mortgage == null ||
-    presetTransactions == null
+    presetTransactions == null ||
+    investments == null
   )
     return null;
-  return { expenses, income, totals, debts, debtPayments, mortgage, presetTransactions };
+  return {
+    expenses,
+    income,
+    totals,
+    debts,
+    debtPayments,
+    mortgage,
+    presetTransactions,
+    investments,
+  };
 }
 
 export async function ensureSheetsExist(
@@ -910,6 +1002,7 @@ export async function ensureSheetsExist(
     "DebtPayments",
     "Mortgage",
     "PresetTransactions",
+    "Investments",
     "Data",
   ];
   const toAdd = needed.filter((t) => !titles.has(t));

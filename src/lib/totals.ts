@@ -12,14 +12,19 @@ function getMonthKey(date: string): string {
   return date.slice(0, 7);
 }
 
-export function getMonthLabel(monthKey: string): string {
-  const [y, m] = monthKey.split("-");
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
-  ];
-  const monthName = months[parseInt(m!, 10) - 1] ?? monthKey;
-  return `${monthName} ${y}`;
+export function getMonthLabel(monthKey: string, locale = "en-US"): string {
+  const [y, m] = monthKey.split("-").map(Number);
+  if (!Number.isFinite(y) || !Number.isFinite(m)) return monthKey;
+  const date = new Date(Date.UTC(y, m - 1, 1));
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(date);
+  } catch {
+    return monthKey;
+  }
 }
 
 export function computeMonthTotals(

@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { useBudget } from "@/context/BudgetContext";
 import type { Debt, DebtPayment } from "@/lib/types";
 import {
@@ -19,6 +20,7 @@ import { DebtListMobile } from "./DebtListMobile";
 import { DebtActionsDialog } from "./DebtActionsDialog";
 
 export function DebtPage() {
+  const location = useLocation();
   const {
     debts,
     debtPayments,
@@ -36,6 +38,18 @@ export function DebtPage() {
     null,
   );
   const [debtForActions, setDebtForActions] = useState<Debt | null>(null);
+  const handledDebtIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const targetDebtId = new URLSearchParams(location.search).get("debtId");
+    if (!targetDebtId) return;
+    if (handledDebtIdRef.current === targetDebtId) return;
+    const target = debts.find((debt) => debt.id === targetDebtId);
+    if (target) {
+      setDebtForActions(target);
+      handledDebtIdRef.current = targetDebtId;
+    }
+  }, [debts, location.search]);
 
   const paymentsByDebt = useMemo(() => {
     const map = new Map<string, DebtPayment[]>();

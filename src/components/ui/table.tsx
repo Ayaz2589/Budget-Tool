@@ -6,9 +6,12 @@ import { cn } from "@/lib/utils"
 const tableDensityVariants = cva("", {
   variants: {
     density: {
-      compact: "",
-      default: "",
-      comfortable: "",
+      compact:
+        "[&_[data-slot=table-head]]:h-10 [&_[data-slot=table-head]]:px-3 [&_[data-slot=table-head]]:text-xs [&_[data-slot=table-cell]]:px-3 [&_[data-slot=table-cell]]:py-2.5",
+      default:
+        "[&_[data-slot=table-head]]:h-11 [&_[data-slot=table-head]]:px-3 [&_[data-slot=table-cell]]:px-3 [&_[data-slot=table-cell]]:py-3",
+      comfortable:
+        "[&_[data-slot=table-head]]:h-12 [&_[data-slot=table-head]]:px-4 [&_[data-slot=table-head]]:text-sm [&_[data-slot=table-cell]]:px-4 [&_[data-slot=table-cell]]:py-3.5",
     },
   },
   defaultVariants: {
@@ -25,11 +28,15 @@ function Table({
     <div
       data-slot="table-container"
       data-density={density}
-      className="relative w-full overflow-x-auto"
+      className="relative w-full overflow-x-auto rounded-[var(--radius-control)] border border-[var(--control-border)] bg-[var(--surface-1)]"
     >
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm", tableDensityVariants({ density }), className)}
+        className={cn(
+          "w-full caption-bottom text-sm",
+          tableDensityVariants({ density }),
+          className
+        )}
         {...props}
       />
     </div>
@@ -40,7 +47,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
+      className={cn("[&_tr]:border-b [&_tr]:border-[var(--border-subtle)]", className)}
       {...props}
     />
   )
@@ -61,7 +68,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
     <tfoot
       data-slot="table-footer"
       className={cn(
-        "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
+        "bg-[var(--control-surface)] border-t border-[var(--border-subtle)] font-medium [&>tr]:last:border-b-0",
         className
       )}
       {...props}
@@ -74,7 +81,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors min-h-[44px]",
+        "border-b border-[var(--border-subtle)] transition-colors min-h-[44px] hover:bg-[var(--control-hover)] data-[state=selected]:bg-[var(--control-active)]",
         className
       )}
       {...props}
@@ -87,7 +94,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "text-foreground h-11 px-3 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] ds-label",
+        "bg-[var(--control-surface)] text-[var(--text-secondary)] text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] ds-label",
         className
       )}
       {...props}
@@ -100,7 +107,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "p-3 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "align-middle whitespace-nowrap text-[var(--text-primary)] [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
       {...props}

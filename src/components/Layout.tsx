@@ -15,6 +15,7 @@ import {
   LogOut,
   Landmark,
   Globe,
+  ChevronDown,
   MoreHorizontal,
   LineChart,
 } from "lucide-react";
@@ -33,9 +34,20 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { persistLocale } from "@/i18n";
 import i18n from "@/i18n";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
+import {
+  DsSidebarBrand,
+  DsSidebarNavItem,
+  DS_SIDEBAR_LANGUAGE_TRIGGER_CLASS,
+  DS_SIDEBAR_ACCOUNT_TRIGGER_CLASS,
+} from "@/components/ds";
 
 function Avatar({
   userProfile,
@@ -120,88 +132,88 @@ function SidebarContent({
   signOut: () => void;
   onNavClick?: () => void;
 }) {
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+
   return (
     <>
-      <Link
+      <DsSidebarBrand
+        title={t("layout.appName")}
         to="/dashboard"
         onClick={onNavClick}
-        className="flex items-center gap-2 px-3 py-2.5 shrink-0 border-b border-border/50 mb-1 md:mb-2"
-      >
-        <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-          <Landmark className="size-5 text-primary" />
-        </div>
-        <span className="font-semibold text-base tracking-tight">
-          {t("layout.appName")}
-        </span>
-      </Link>
-      <div className="flex flex-1 md:flex-col gap-1 overflow-x-auto md:overflow-x-visible md:overflow-y-auto">
+      />
+      <div className="flex flex-1 md:flex-col gap-1.5 overflow-x-auto md:overflow-x-visible md:overflow-y-auto pt-1">
         {nav.map(({ to, labelKey, icon: Icon }) => (
-          <Link
+          <DsSidebarNavItem
             key={to}
             to={to}
+            label={t(labelKey)}
+            icon={Icon}
             onClick={onNavClick}
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors min-w-0",
-              location.pathname === to
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-          >
-            <Icon className="size-4 shrink-0" />
-            <span className="truncate">{t(labelKey)}</span>
-          </Link>
+            active={location.pathname === to}
+          />
         ))}
       </div>
-      <div className="shrink-0 border-t md:border-t pt-2 mt-2 flex flex-col gap-1">
-        <Select value={currentLng} onValueChange={handleLanguageChange}>
-          <SelectTrigger className="h-8 gap-1.5 px-2 text-xs font-medium text-muted-foreground border-0 bg-transparent shadow-none hover:bg-muted focus:ring-2 w-full justify-start">
-            <Globe className="size-3.5" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="max-h-[280px]!">
-            <SelectItem value="en">{t("common.english")}</SelectItem>
-            <SelectItem value="es">{t("common.spanish")}</SelectItem>
-            <SelectItem value="bn">{t("common.bangla")}</SelectItem>
-            <SelectItem value="zh">{t("common.chinese")}</SelectItem>
-            <SelectItem value="ko">{t("common.korean")}</SelectItem>
-            <SelectItem value="hi">{t("common.hindi")}</SelectItem>
-            <SelectItem value="ja">{t("common.japanese")}</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="shrink-0 mt-3 pt-3">
+        <div className="px-1">
+          <Select value={currentLng} onValueChange={handleLanguageChange}>
+            <SelectTrigger className={DS_SIDEBAR_LANGUAGE_TRIGGER_CLASS}>
+              <Globe className="size-3.5" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="max-h-[280px]!">
+              <SelectItem value="en">{t("common.english")}</SelectItem>
+              <SelectItem value="es">{t("common.spanish")}</SelectItem>
+              <SelectItem value="bn">{t("common.bangla")}</SelectItem>
+              <SelectItem value="zh">{t("common.chinese")}</SelectItem>
+              <SelectItem value="ko">{t("common.korean")}</SelectItem>
+              <SelectItem value="hi">{t("common.hindi")}</SelectItem>
+              <SelectItem value="ja">{t("common.japanese")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-      <div className="shrink-0 border-t md:border-t pt-2 mt-2 md:mt-auto flex flex-col gap-1">
+      <div className="shrink-0 pt-3 mt-3 md:mt-auto flex flex-col gap-2">
         {isSignedIn ? (
-          <>
-            <div className="flex items-center gap-2 px-2 min-w-0">
-              {userProfile ? (
-                <>
-                  <Avatar userProfile={userProfile} />
-                  <span
-                    className="text-sm font-medium truncate"
-                    title={userProfile.email}
-                  >
-                    {userProfile.name}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <div className="size-8 rounded-full shrink-0 bg-muted" />
-                  <span className="text-sm text-muted-foreground truncate">
-                    {t("layout.loading")}
-                  </span>
-                </>
-              )}
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="justify-start gap-2 text-muted-foreground hover:text-foreground"
-              onClick={signOut}
-            >
-              <LogOut className="size-4" />
-              {t("layout.signOut")}
-            </Button>
-          </>
+          <Popover open={accountMenuOpen} onOpenChange={setAccountMenuOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className={DS_SIDEBAR_ACCOUNT_TRIGGER_CLASS}
+                aria-label={userProfile?.email ?? t("layout.loading")}
+              >
+                {userProfile ? (
+                  <>
+                    <Avatar userProfile={userProfile} />
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--text-primary)]">
+                      {userProfile.name}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <div className="size-8 rounded-full shrink-0 bg-muted" />
+                    <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                      {t("layout.loading")}
+                    </span>
+                  </>
+                )}
+                <ChevronDown className="size-4 shrink-0 text-[var(--text-secondary)]" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-44 p-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 min-h-0 w-full justify-start gap-2 text-[var(--text-secondary)] hover:bg-[var(--control-hover)] hover:text-[var(--interactive-danger)]"
+                onClick={() => {
+                  setAccountMenuOpen(false);
+                  signOut();
+                }}
+              >
+                <LogOut className="size-4" />
+                {t("layout.signOut")}
+              </Button>
+            </PopoverContent>
+          </Popover>
         ) : (
           <Button
             variant="outline"
@@ -331,7 +343,7 @@ export function Layout() {
       </header>
 
       {/* Desktop sidebar: fixed width so it doesn't change with language */}
-      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 border-r border-[var(--border-subtle)] bg-[var(--surface-1)]/70 p-2 flex-col gap-1 w-[220px] overflow-hidden backdrop-blur-sm shadow-[1px_0_12px_rgba(15,23,42,0.1)] dark:shadow-[1px_0_14px_rgba(0,0,0,0.32)]">
+      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 border-r border-[var(--border-subtle)] bg-[var(--surface-1)]/92 p-3 flex-col gap-1 w-[220px] overflow-hidden backdrop-blur-sm shadow-[1px_0_10px_rgba(15,23,42,0.08)] dark:shadow-[1px_0_12px_rgba(0,0,0,0.24)]">
         <SidebarContent
           location={location}
           t={t}
@@ -426,7 +438,7 @@ export function Layout() {
                 </Link>
               </DialogClose>
             ))}
-            <div className="border-t my-2 pt-3 flex flex-col gap-2">
+            <div className="my-2 pt-2 flex flex-col gap-2">
               <div className="px-2 text-xs font-medium text-muted-foreground">
                 {t("layout.language")}
               </div>
@@ -446,27 +458,30 @@ export function Layout() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="border-t pt-3">
+            <div className="pt-2">
               {isSignedIn ? (
                 <>
-                  <div className="flex items-center gap-2 px-3 py-2 min-w-0 mb-1">
+                  <div className="flex items-center gap-2 px-2 py-1 min-w-0">
                     {userProfile ? (
                       <>
                         <Avatar userProfile={userProfile} />
-                        <span className="text-sm font-medium truncate">
+                        <span className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--text-primary)]">
                           {userProfile.name}
                         </span>
                       </>
                     ) : (
-                      <span className="text-sm text-muted-foreground">
-                        {t("layout.loading")}
-                      </span>
+                      <>
+                        <div className="size-8 rounded-full shrink-0 bg-muted" />
+                        <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                          {t("layout.loading")}
+                        </span>
+                      </>
                     )}
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start gap-2 text-muted-foreground"
+                    className="w-full justify-start gap-2 text-[var(--text-secondary)] hover:bg-[var(--control-hover)] hover:text-[var(--interactive-danger)]"
                     onClick={() => {
                       signOut();
                       setMoreOpen(false);

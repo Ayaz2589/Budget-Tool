@@ -90,10 +90,19 @@
   --color-viz-series-3: var(--viz-series-3);
   --color-viz-series-4: var(--viz-series-4);
   --color-viz-series-5: var(--viz-series-5);
+  --color-control-surface: var(--control-surface);
+  --color-control-hover: var(--control-hover);
+  --color-control-active: var(--control-active);
+  --color-control-border: var(--control-border);
+  --color-interactive-primary-hover: var(--interactive-primary-hover);
+  --color-interactive-primary-active: var(--interactive-primary-active);
+  --color-interactive-danger-hover: var(--interactive-danger-hover);
+  --color-interactive-danger-active: var(--interactive-danger-active);
 }
 
 :root {
   --radius: 0.625rem;
+  --radius-control: 0.875rem;
   --background: oklch(0.95 0.02 85);
   --foreground: oklch(0.24 0.015 80);
   --card: oklch(0.975 0.014 82);
@@ -108,7 +117,7 @@
   --muted-foreground: oklch(0.5 0.013 80);
   --accent: oklch(0.88 0.014 80);
   --accent-foreground: oklch(0.27 0.016 75);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: oklch(0.58 0.15 24);
   --border: oklch(0.8 0.012 82);
   --input: oklch(0.84 0.012 82);
   --ring: oklch(0.58 0.018 78);
@@ -133,10 +142,20 @@
   --text-tertiary: oklch(0.6 0.012 80);
   --interactive-primary: oklch(0.34 0.02 70);
   --interactive-primary-foreground: oklch(0.97 0.01 80);
+  --interactive-primary-hover: oklch(0.3 0.02 70);
+  --interactive-primary-active: oklch(0.27 0.02 70);
   --interactive-danger: var(--destructive);
+  --interactive-danger-hover: oklch(0.54 0.14 24);
+  --interactive-danger-active: oklch(0.5 0.14 24);
   --focus-ring: var(--ring);
   --border-subtle: oklch(0.8 0.012 82 / 75%);
   --border-strong: oklch(0.68 0.014 78 / 85%);
+  --control-surface: oklch(0.925 0.014 83);
+  --control-hover: oklch(0.9 0.014 83);
+  --control-active: oklch(0.875 0.014 83);
+  --control-border: oklch(0.69 0.013 79 / 85%);
+  --field-surface: oklch(0.91 0.014 83);
+  --field-shadow: 0 0 0 rgba(0, 0, 0, 0);
   --viz-income: #1d4ed8;
   --viz-expense: #b91c1c;
   --viz-debt: #a16207;
@@ -203,10 +222,20 @@
   --text-tertiary: oklch(0.62 0 0);
   --interactive-primary: oklch(0.96 0 0);
   --interactive-primary-foreground: oklch(0.205 0 0);
+  --interactive-primary-hover: oklch(0.9 0 0);
+  --interactive-primary-active: oklch(0.84 0 0);
   --interactive-danger: oklch(0.704 0.191 22.216);
+  --interactive-danger-hover: oklch(0.66 0.188 22.216);
+  --interactive-danger-active: oklch(0.62 0.185 22.216);
   --focus-ring: oklch(0.62 0 0);
   --border-subtle: oklch(1 0 0 / 12%);
   --border-strong: oklch(1 0 0 / 24%);
+  --control-surface: oklch(0.25 0 0);
+  --control-hover: oklch(0.29 0 0);
+  --control-active: oklch(0.33 0 0);
+  --control-border: oklch(1 0 0 / 24%);
+  --field-surface: oklch(0.26 0 0);
+  --field-shadow: 0 0 0 rgba(0, 0, 0, 0);
   --viz-income: #3b82f6;
   --viz-expense: #ef4444;
   --viz-debt: #eab308;

@@ -331,7 +331,7 @@ export function Layout() {
       </header>
 
       {/* Desktop sidebar: fixed width so it doesn't change with language */}
-      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 border-r border-[var(--border-subtle)] bg-[var(--surface-1)]/70 p-2 flex-col gap-1 w-[220px] overflow-hidden backdrop-blur-sm">
+      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 border-r border-[var(--border-subtle)] bg-[var(--surface-1)]/70 p-2 flex-col gap-1 w-[220px] overflow-hidden backdrop-blur-sm shadow-[1px_0_12px_rgba(15,23,42,0.1)] dark:shadow-[1px_0_14px_rgba(0,0,0,0.32)]">
         <SidebarContent
           location={location}
           t={t}

@@ -1,13 +1,43 @@
 import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+const cardVariants = cva(
+  "text-card-foreground flex flex-col rounded-xl border",
+  {
+    variants: {
+      surface: {
+        flat: "bg-transparent shadow-none",
+        raised: "bg-[var(--surface-1)] shadow-sm",
+        glass: "bg-background/60 backdrop-blur-sm shadow-sm",
+      },
+      density: {
+        compact: "gap-4 py-3",
+        default: "gap-6 py-6",
+        comfortable: "gap-7 py-7",
+      },
+    },
+    defaultVariants: {
+      surface: "raised",
+      density: "default",
+    },
+  },
+)
+
+function Card({
+  className,
+  surface = "raised",
+  density = "default",
+  ...props
+}: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
   return (
     <div
       data-slot="card"
+      data-surface={surface}
+      data-density={density}
       className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
+        cardVariants({ surface, density }),
         className
       )}
       {...props}

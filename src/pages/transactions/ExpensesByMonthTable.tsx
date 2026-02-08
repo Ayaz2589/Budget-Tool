@@ -75,7 +75,7 @@ export function ExpensesByMonthTable({
             </span>
           </AccordionTrigger>
           <AccordionContent className="px-0 pb-0">
-            <Table>
+            <Table density="comfortable">
               <TableHeader>
                 <TableRow>
                   <TableHead>

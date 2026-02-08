@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Plus, Trash2 } from "lucide-react";
+import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
 import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
 import { DebtList } from "./DebtList";
@@ -67,31 +68,20 @@ export function DebtPage() {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
-        <div className="space-y-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">{t("debt.title")}</h1>
-          </div>
-          <p className="text-sm text-muted-foreground">{t("debt.subtitle")}</p>
-        </div>
-        <Button
-         
-         
-          onClick={() => setAddDebtOpen(true)}
-        >
-          <Plus className="size-4" />
-          {t("debt.addDebt")}
-        </Button>
-      </div>
-      <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
-        <div className="px-0 py-3 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold">{t("debt.title")}</h1>
-            <p className="text-xs text-muted-foreground">
-              {t("debt.subtitle")}
-            </p>
-          </div>
-        </div>
+      <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
+        <DsSectionHeader
+          title={t("debt.title")}
+          subtitle={t("debt.subtitle")}
+          actions={
+            <Button
+              className="hidden md:inline-flex"
+              onClick={() => setAddDebtOpen(true)}
+            >
+              <Plus className="size-4" />
+              {t("debt.addDebt")}
+            </Button>
+          }
+        />
       </div>
 
       <AddDebtDialog
@@ -111,12 +101,10 @@ export function DebtPage() {
       >
         <div className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           {debts.length === 0 ? (
-            <div className="text-center text-muted-foreground py-10 px-4 flex flex-col items-center gap-3">
-              <CreditCard className="size-8 text-muted-foreground/70" />
-              <p className="text-sm font-medium text-foreground/80">
-                {t("debt.noDebtsYet")}
-              </p>
-            </div>
+            <DsEmptyState
+              icon={<CreditCard className="size-8" />}
+              title={t("debt.noDebtsYet")}
+            />
           ) : (
             <>
               <div className="hidden md:block">
@@ -138,20 +126,17 @@ export function DebtPage() {
         </div>
       </div>
 
-      <div className="md:hidden fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-30 px-4 pb-3 pointer-events-none">
-        <div className="pointer-events-auto flex items-center justify-end">
-          <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
+      <DsActionBar>
             <Button
               onClick={() => setAddDebtOpen(true)}
+              density="compact"
              
               className="h-11 w-11 rounded-full p-0"
               aria-label={t("debt.addDebt")}
             >
               <Plus className="size-4" />
             </Button>
-          </div>
-        </div>
-      </div>
+      </DsActionBar>
 
       <Dialog
         open={deleteConfirmDebtId !== null}

@@ -1,0 +1,22 @@
+import type * as React from "react";
+import { cn } from "@/lib/utils";
+
+interface DsChartCardProps {
+  title: React.ReactNode;
+  children: React.ReactNode;
+  actions?: React.ReactNode;
+  className?: string;
+}
+
+export function DsChartCard({ title, children, actions, className }: DsChartCardProps) {
+  return (
+    <section className={cn("min-w-0 space-y-2", className)}>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-base font-semibold ds-heading-4">{title}</h2>
+        {actions ? <div className="shrink-0">{actions}</div> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+

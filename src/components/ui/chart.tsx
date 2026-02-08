@@ -26,12 +26,19 @@ function ChartContainer({
   className,
   children,
   config,
+  heightMobile = 220,
+  heightDesktop = 280,
+  legendMode = "below",
+  style,
   ...props
 }: React.ComponentProps<"div"> & {
   config: ChartConfig;
   children: React.ComponentProps<
     typeof RechartsPrimitive.ResponsiveContainer
   >["children"];
+  heightMobile?: number;
+  heightDesktop?: number;
+  legendMode?: "inline" | "below";
 }) {
   const uniqueId = React.useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
@@ -41,10 +48,18 @@ function ChartContainer({
       <div
         data-slot="chart"
         data-chart={chartId}
+        data-legend-mode={legendMode}
         className={cn(
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex h-[var(--chart-h-mobile)] md:h-[var(--chart-h-desktop)] justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
           className
         )}
+        style={
+          {
+            "--chart-h-mobile": `${heightMobile}px`,
+            "--chart-h-desktop": `${heightDesktop}px`,
+            ...(style ?? {}),
+          } as React.CSSProperties
+        }
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
@@ -113,12 +128,12 @@ function ChartTooltipContent({
     indicator?: "line" | "dot" | "dashed";
     nameKey?: string;
     labelKey?: string;
-    valueFormatter?: (
+  valueFormatter?: (
       value: number | string,
       name: string,
-      item: any,
+      item: unknown,
       index: number,
-      payload: any,
+      payload: unknown,
     ) => React.ReactNode;
   }) {
   const { config } = useChart();
@@ -261,10 +276,12 @@ function ChartLegendContent({
   payload,
   verticalAlign = "bottom",
   nameKey,
+  legendMode = "below",
 }: React.ComponentProps<"div"> &
   Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
     hideIcon?: boolean;
     nameKey?: string;
+    legendMode?: "inline" | "below";
   }) {
   const { config } = useChart();
 
@@ -276,6 +293,7 @@ function ChartLegendContent({
     <div
       className={cn(
         "flex items-center justify-center gap-4",
+        legendMode === "inline" && "justify-start flex-wrap gap-2",
         verticalAlign === "top" ? "pb-3" : "pt-3",
         className
       )}

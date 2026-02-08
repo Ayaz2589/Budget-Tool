@@ -5,6 +5,7 @@ import type { Income } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Wallet } from "lucide-react";
+import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
 import { AddIncomeDialog } from "./AddIncomeDialog";
 import { EditIncomeDialog } from "./EditIncomeDialog";
 import { IncomeTable } from "./IncomeTable";
@@ -56,31 +57,20 @@ export function IncomePage() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
-        <div className="space-y-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">{t("income.title")}</h1>
-          </div>
-          <p className="text-sm text-muted-foreground">{t("income.subtitle")}</p>
-        </div>
-        <Button
-         
-         
-          onClick={() => setAddOpen(true)}
-        >
-          <Plus className="size-4" />
-          {t("income.addIncome")}
-        </Button>
-      </div>
-      <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
-        <div className="px-0 py-3 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold">{t("income.title")}</h1>
-            <p className="text-xs text-muted-foreground">
-              {t("income.subtitle")}
-            </p>
-          </div>
-        </div>
+      <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
+        <DsSectionHeader
+          title={t("income.title")}
+          subtitle={t("income.subtitle")}
+          actions={
+            <Button
+              className="hidden md:inline-flex"
+              onClick={() => setAddOpen(true)}
+            >
+              <Plus className="size-4" />
+              {t("income.addIncome")}
+            </Button>
+          }
+        />
       </div>
 
       <AddIncomeDialog
@@ -95,12 +85,10 @@ export function IncomePage() {
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           {sortedIncome.length === 0 ? (
-            <div className="text-center text-muted-foreground py-10 px-4 flex flex-col items-center gap-3">
-              <Wallet className="size-8 text-muted-foreground/70" />
-              <p className="text-sm font-medium text-foreground/80">
-                {t("income.noIncomeEntries")}
-              </p>
-            </div>
+            <DsEmptyState
+              icon={<Wallet className="size-8" />}
+              title={t("income.noIncomeEntries")}
+            />
           ) : (
             <>
               <div className="hidden md:block">
@@ -122,20 +110,17 @@ export function IncomePage() {
         </CardContent>
       </Card>
 
-      <div className="md:hidden fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-30 px-4 pb-3 pointer-events-none">
-        <div className="pointer-events-auto flex items-center justify-end">
-          <div className="flex items-center gap-2 rounded-full border border-border/60 bg-background/20 shadow-lg shadow-black/30 backdrop-blur px-2 py-2">
+      <DsActionBar>
             <Button
               onClick={() => setAddOpen(true)}
+              density="compact"
              
               className="h-11 w-11 rounded-full p-0"
               aria-label={t("income.addIncome")}
             >
               <Plus className="size-4" />
             </Button>
-          </div>
-        </div>
-      </div>
+      </DsActionBar>
 
       <IncomeActionsDialog
         income={incomeForActions}

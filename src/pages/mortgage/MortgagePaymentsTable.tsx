@@ -28,7 +28,7 @@ export function MortgagePaymentsTable({
   }
 
   return (
-    <Table>
+    <Table density="comfortable">
       <TableHeader>
         <TableRow>
           <TableHead>{t("common.date")}</TableHead>

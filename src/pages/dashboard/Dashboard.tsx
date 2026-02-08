@@ -16,9 +16,17 @@ import {
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { formatCurrency } from "@/lib/format";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  DsChartCard,
+  DsDataRow,
+  DsEmptyState,
+  DsLegendList,
+  DsMetricCard,
+  DsSectionHeader,
+  DsSplitToggle,
+} from "@/components/ds";
 import {
   buildCashFlowRows,
   buildCategoryBreakdown,
@@ -42,22 +50,22 @@ import {
 import type { DashboardExpenseScope, DashboardRange } from "@/types/dashboard";
 
 const INCOME_OWNER_COLORS = [
-  "#3B82F6",
-  "#8B5CF6",
-  "#22C55E",
-  "#F59E0B",
-  "#06B6D4",
+  "var(--viz-series-1)",
+  "var(--viz-series-2)",
+  "var(--viz-series-3)",
+  "var(--viz-series-4)",
+  "var(--viz-series-5)",
   "#EC4899",
 ];
 
 const DONUT_COLORS = [
-  "#3B82F6",
-  "#F59E0B",
-  "#22C55E",
-  "#A855F7",
-  "#06B6D4",
-  "#EF4444",
-  "#EAB308",
+  "var(--viz-series-1)",
+  "var(--viz-series-4)",
+  "var(--viz-series-3)",
+  "var(--viz-series-2)",
+  "var(--viz-series-5)",
+  "var(--viz-expense)",
+  "var(--viz-debt)",
 ];
 
 function asNumber(value: unknown): number {
@@ -202,53 +210,33 @@ export function Dashboard() {
     <div className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
       <div className="min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.healthQuestion")}
-            </p>
-          </div>
+          <DsSectionHeader
+            title={t("dashboard.title")}
+            subtitle={t("dashboard.healthQuestion")}
+          />
           <div className="flex w-full flex-col items-start gap-2 md:w-auto md:items-end">
             <div className="w-full md:w-auto">
-              <div className="grid w-full grid-cols-3 rounded-2xl bg-zinc-900/80 p-1 ring-1 ring-white/10 md:min-w-[430px]">
-                {[
+              <DsSplitToggle
+                className="md:min-w-[430px]"
+                options={[
                   { value: "current", label: t("dashboard.rangeCurrent") },
                   { value: "6", label: t("dashboard.range6") },
                   { value: "12", label: t("dashboard.range12") },
-                ].map((option) => {
-                  const isActive = range === option.value;
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      className={`h-10 rounded-xl px-2 text-sm font-medium transition-colors ${isActive ? "bg-white text-black" : "text-zinc-400 hover:text-zinc-100"}`}
-                      onClick={() => setRange(option.value as DashboardRange)}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-              </div>
+                ]}
+                value={range}
+                onChange={(next) => setRange(next as DashboardRange)}
+              />
             </div>
             <div className="w-full md:w-auto">
-              <div className="grid w-full grid-cols-2 rounded-2xl bg-zinc-900/80 p-1 ring-1 ring-white/10 md:min-w-[320px]">
-                {[
+              <DsSplitToggle
+                className="md:min-w-[320px]"
+                options={[
                   { value: "all", label: t("dashboard.scopeAllExpenses") },
                   { value: "exclude-mortgage", label: t("dashboard.scopeExcludeMortgage") },
-                ].map((option) => {
-                  const isActive = expenseScope === option.value;
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      className={`h-10 rounded-xl px-2 text-sm font-medium transition-colors ${isActive ? "bg-white text-black" : "text-zinc-400 hover:text-zinc-100"}`}
-                      onClick={() => setExpenseScope(option.value as DashboardExpenseScope)}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-              </div>
+                ]}
+                value={expenseScope}
+                onChange={(next) => setExpenseScope(next as DashboardExpenseScope)}
+              />
             </div>
             {expenseScope === "exclude-mortgage" ? (
               <p className="text-xs text-muted-foreground">
@@ -259,58 +247,37 @@ export function Dashboard() {
         </div>
 
         <div className="grid grid-cols-2 gap-1.5 md:grid-cols-2 md:gap-3 xl:grid-cols-4">
-          <Card>
-            <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
-              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">{t("dashboard.kpiNetCashFlowMtd")}</CardTitle>
-            </CardHeader>
-            <CardContent className="px-2 pb-2 md:px-6 md:pb-6">
-              <p className={kpis.netCashFlow >= 0 ? "text-base md:text-2xl font-semibold text-green-400" : "text-base md:text-2xl font-semibold text-destructive"}>
-                {formatCurrency(kpis.netCashFlow)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
-              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">{t("dashboard.kpiTotalSpentMtd")}</CardTitle>
-            </CardHeader>
-            <CardContent className="px-2 pb-2 md:px-6 md:pb-6 space-y-0.5 md:space-y-1">
-              <p className="text-base md:text-2xl font-semibold">{formatCurrency(kpis.totalSpent)}</p>
-              <p className="text-xs text-muted-foreground">
-                {t("dashboard.vsLastMonth")}: {formatSpentDeltaLabel(kpis.spentVsLastMonthPct)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
-              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">{t("dashboard.kpiTotalIncomeMtd")}</CardTitle>
-            </CardHeader>
-            <CardContent className="px-2 pb-2 md:px-6 md:pb-6">
-              <p className="text-base md:text-2xl font-semibold">{formatCurrency(kpis.totalIncome)}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
-              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">{t("dashboard.kpiTotalDebtOutstanding")}</CardTitle>
-            </CardHeader>
-            <CardContent className="px-2 pb-2 md:px-6 md:pb-6 space-y-0.5 md:space-y-1">
-              <p className="text-base md:text-2xl font-semibold">{formatCurrency(kpis.debtOutstanding)}</p>
-              <p className="text-xs text-muted-foreground">
-                {formatDebtPaidSubtitle(kpis.debtPaidThisMonth, t)}
-              </p>
-            </CardContent>
-          </Card>
+          <DsMetricCard
+            title={t("dashboard.kpiNetCashFlowMtd")}
+            value={formatCurrency(kpis.netCashFlow)}
+            tone={kpis.netCashFlow >= 0 ? "positive" : "negative"}
+          />
+          <DsMetricCard
+            title={t("dashboard.kpiTotalSpentMtd")}
+            value={formatCurrency(kpis.totalSpent)}
+            subtitle={`${t("dashboard.vsLastMonth")}: ${formatSpentDeltaLabel(kpis.spentVsLastMonthPct)}`}
+          />
+          <DsMetricCard
+            title={t("dashboard.kpiTotalIncomeMtd")}
+            value={formatCurrency(kpis.totalIncome)}
+          />
+          <DsMetricCard
+            title={t("dashboard.kpiTotalDebtOutstanding")}
+            value={formatCurrency(kpis.debtOutstanding)}
+            subtitle={formatDebtPaidSubtitle(kpis.debtPaidThisMonth, t)}
+          />
         </div>
 
         <div className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <section className="min-w-0 space-y-2">
-            <h2 className="text-base font-semibold">{t("dashboard.chartIncomeVsExpenses")}</h2>
+          <DsChartCard title={t("dashboard.chartIncomeVsExpenses")} className="min-w-0">
           <div className="hidden md:block">
             <ChartContainer
               config={{
-                expenses: { label: t("dashboard.chartExpenses"), color: "#EF4444" },
-                debtPayments: { label: t("dashboard.chartDebtPayments"), color: "#EAB308" },
+                expenses: { label: t("dashboard.chartExpenses"), color: "var(--viz-expense)" },
+                debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" },
               }}
-              className="h-[280px]"
+              heightMobile={220}
+              heightDesktop={280}
             >
               <BarChart data={cashFlowRows}>
                 <CartesianGrid vertical={false} />
@@ -338,9 +305,9 @@ export function Dashboard() {
                 <Bar
                   dataKey="expensesTotal"
                   name={t("dashboard.chartExpenses")}
-                  fill="var(--color-expenses)"
+                  fill="var(--viz-expense)"
                 />
-                <Bar dataKey="debtPaymentsTotal" name={t("dashboard.chartDebtPayments")} fill="var(--color-debtPayments)" />
+                <Bar dataKey="debtPaymentsTotal" name={t("dashboard.chartDebtPayments")} fill="var(--viz-debt)" />
               </BarChart>
             </ChartContainer>
           </div>
@@ -348,10 +315,11 @@ export function Dashboard() {
             <ChartContainer
               config={{
                 income: { label: t("dashboard.chartIncome"), color: INCOME_OWNER_COLORS[0] },
-                expenses: { label: t("dashboard.chartExpenses"), color: "#EF4444" },
-                debtPayments: { label: t("dashboard.chartDebtPayments"), color: "#EAB308" },
+                expenses: { label: t("dashboard.chartExpenses"), color: "var(--viz-expense)" },
+                debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" },
               }}
-              className="h-[220px]"
+              heightMobile={220}
+              heightDesktop={280}
             >
               <BarChart
                 data={cashFlowRows}
@@ -389,29 +357,28 @@ export function Dashboard() {
                     />
                   }
                 />
-                <Bar dataKey="incomeTotal" name={t("dashboard.chartIncome")} fill="var(--color-income)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="incomeTotal" name={t("dashboard.chartIncome")} fill="var(--viz-income)" radius={[4, 4, 0, 0]} />
                 <Bar
                   dataKey="expensesTotal"
                   name={t("dashboard.chartExpenses")}
-                  fill="var(--color-expenses)"
+                  fill="var(--viz-expense)"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
                   dataKey="debtPaymentsTotal"
                   name={t("dashboard.chartDebtPayments")}
-                  fill="var(--color-debtPayments)"
+                  fill="var(--viz-debt)"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
             </ChartContainer>
           </div>
             {cashFlowRows.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("dashboard.chartNoDataRange")}</p>
+              <DsEmptyState title={t("dashboard.chartNoDataRange")} className="py-4" />
             ) : null}
-          </section>
+          </DsChartCard>
 
-          <section className="min-w-0 space-y-2">
-            <h2 className="text-base font-semibold">{t("dashboard.chartNetCashFlowTrend")}</h2>
+          <DsChartCard title={t("dashboard.chartNetCashFlowTrend")} className="min-w-0">
             {range === "current" ? (
               <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-3">
                 <p className="text-xs text-muted-foreground">{t("dashboard.chartCurrentMonthNetCashFlow")}</p>
@@ -433,9 +400,10 @@ export function Dashboard() {
                 <div className="hidden md:block">
                 <ChartContainer
                   config={{
-                    netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "#22D3EE" },
+                    netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "var(--viz-series-5)" },
                   }}
-                  className="h-[280px]"
+                  heightMobile={220}
+                  heightDesktop={280}
                 >
                     <LineChart data={netCashFlowRows}>
                       <CartesianGrid vertical={false} />
@@ -455,7 +423,7 @@ export function Dashboard() {
                         type="monotone"
                         dataKey="netCashFlow"
                         name={t("dashboard.chartNetCashFlow")}
-                        stroke="var(--color-netCashFlow)"
+                        stroke="var(--viz-series-5)"
                         strokeWidth={2.5}
                         dot={{ r: 3 }}
                         activeDot={{ r: 5 }}
@@ -466,9 +434,10 @@ export function Dashboard() {
                 <div className="md:hidden">
                 <ChartContainer
                   config={{
-                    netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "#22D3EE" },
+                    netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "var(--viz-series-5)" },
                   }}
-                  className="h-[220px]"
+                  heightMobile={220}
+                  heightDesktop={280}
                 >
                   <LineChart
                     data={netCashFlowRows}
@@ -511,7 +480,7 @@ export function Dashboard() {
                         type="monotone"
                         dataKey="netCashFlow"
                         name={t("dashboard.chartNetCashFlow")}
-                        stroke="var(--color-netCashFlow)"
+                        stroke="var(--viz-series-5)"
                         strokeWidth={2.25}
                         dot={{ r: 2.5 }}
                         activeDot={{ r: 4 }}
@@ -522,20 +491,19 @@ export function Dashboard() {
               </>
             )}
             {netCashFlowRows.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("dashboard.chartNoNetCashFlowData")}</p>
+              <DsEmptyState title={t("dashboard.chartNoNetCashFlowData")} className="py-4" />
             ) : null}
-          </section>
+          </DsChartCard>
         </div>
 
         <section className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="min-w-0 space-y-2">
-            <h2 className="text-base font-semibold">{t("dashboard.chartSpendingBreakdown")}</h2>
+          <DsChartCard title={t("dashboard.chartSpendingBreakdown")} className="min-w-0">
             {categorySlices.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("dashboard.chartNoSpendingCategories")}</p>
+              <DsEmptyState title={t("dashboard.chartNoSpendingCategories")} className="py-4" />
             ) : (
               <>
                 <div className="hidden md:block">
-                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} className="h-[260px]">
+                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} heightMobile={210} heightDesktop={260}>
                     <PieChart>
                       <Pie
                         data={categorySlices}
@@ -560,7 +528,7 @@ export function Dashboard() {
                   </ChartContainer>
                 </div>
                 <div className="md:hidden space-y-2">
-                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} className="h-[210px]">
+                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} heightMobile={210} heightDesktop={260}>
                     <PieChart>
                       <Pie
                         data={categorySlices}
@@ -584,36 +552,26 @@ export function Dashboard() {
                       />
                     </PieChart>
                   </ChartContainer>
-                  <div className="space-y-1">
-                    {categorySlices.slice(0, 4).map((slice, index) => (
-                      <div
-                        key={slice.label}
-                        className="w-full flex items-center justify-between text-left text-xs text-muted-foreground"
-                      >
-                        <span className="inline-flex items-center gap-2 truncate">
-                          <span
-                            className="h-2.5 w-2.5 rounded-sm shrink-0"
-                            style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
-                          />
-                          {slice.label}
-                        </span>
-                        <span className="font-medium text-foreground">{formatCurrency(slice.value)}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <DsLegendList
+                    items={categorySlices.slice(0, 4).map((slice, index) => ({
+                      key: slice.label,
+                      label: slice.label,
+                      value: formatCurrency(slice.value),
+                      color: DONUT_COLORS[index % DONUT_COLORS.length]!,
+                    }))}
+                  />
                 </div>
               </>
             )}
-          </div>
+          </DsChartCard>
 
-          <div className="min-w-0 space-y-2">
-            <h2 className="text-base font-semibold">{t("dashboard.chartSharedVsIndividualSpending")}</h2>
+          <DsChartCard title={t("dashboard.chartSharedVsIndividualSpending")} className="min-w-0">
             {ownerSlices.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("dashboard.chartNoOwnerSplitData")}</p>
+              <DsEmptyState title={t("dashboard.chartNoOwnerSplitData")} className="py-4" />
             ) : (
               <>
                 <div className="hidden md:block">
-                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} className="h-[260px]">
+                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} heightMobile={210} heightDesktop={260}>
                     <PieChart>
                       <Pie
                         data={ownerSlices}
@@ -638,7 +596,7 @@ export function Dashboard() {
                   </ChartContainer>
                 </div>
                 <div className="md:hidden space-y-2">
-                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} className="h-[210px]">
+                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} heightMobile={210} heightDesktop={260}>
                     <PieChart>
                       <Pie
                         data={ownerSlices}
@@ -662,56 +620,44 @@ export function Dashboard() {
                       />
                     </PieChart>
                   </ChartContainer>
-                  <div className="space-y-1">
-                    {ownerSlices.map((slice, index) => (
-                      <div
-                        key={slice.key}
-                        className="w-full flex items-center justify-between text-left text-xs text-muted-foreground"
-                      >
-                        <span className="inline-flex items-center gap-2 truncate">
-                          <span
-                            className="h-2.5 w-2.5 rounded-sm shrink-0"
-                            style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
-                          />
-                          {slice.label}
-                        </span>
-                        <span className="font-medium text-foreground">{formatCurrency(slice.value)}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <DsLegendList
+                    items={ownerSlices.map((slice, index) => ({
+                      key: slice.key,
+                      label: slice.label,
+                      value: formatCurrency(slice.value),
+                      color: DONUT_COLORS[index % DONUT_COLORS.length]!,
+                    }))}
+                  />
                 </div>
               </>
             )}
-          </div>
+          </DsChartCard>
         </section>
 
         <section className="space-y-2">
           <h2 className="text-base font-semibold">{t("dashboard.sectionDebtSnapshot")}</h2>
           {debtRows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("dashboard.sectionNoActiveDebts")}</p>
+            <DsEmptyState title={t("dashboard.sectionNoActiveDebts")} className="py-4" />
           ) : (
-            <div className="divide-y border-t border-border">
+            <div className="border-t border-[var(--border-subtle)]">
               {debtRows.map((row, index) => (
-                <div
+                <DsDataRow
                   key={row.id}
-                  className={`w-full text-left px-2 py-4 ${index % 2 === 1 ? "bg-muted/30" : ""}`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="font-medium truncate">{row.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {row.owner || t("common.noOwner")}
+                  title={row.name}
+                  subtitle={row.owner || t("common.noOwner")}
+                  trailing={<p className="font-semibold">{formatCurrency(row.remaining)}</p>}
+                  meta={
+                    <>
+                      <div className="mt-2 h-2 rounded bg-muted">
+                        <div className="h-2 rounded bg-primary" style={{ width: `${Math.min(100, Math.max(0, row.progress * 100))}%` }} />
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {formatCurrency(row.paid)} / {formatCurrency(row.initialAmount)}
                       </p>
-                    </div>
-                    <p className="font-semibold">{formatCurrency(row.remaining)}</p>
-                  </div>
-                  <div className="mt-2 h-2 rounded bg-muted">
-                    <div className="h-2 rounded bg-primary" style={{ width: `${Math.min(100, Math.max(0, row.progress * 100))}%` }} />
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {formatCurrency(row.paid)} / {formatCurrency(row.initialAmount)}
-                  </p>
-                </div>
+                    </>
+                  }
+                  className={index % 2 === 1 ? "bg-muted/30" : ""}
+                />
               ))}
             </div>
           )}
@@ -726,22 +672,18 @@ export function Dashboard() {
         <section className="space-y-2">
           <h2 className="text-base font-semibold">{t("dashboard.sectionRecentActivity")}</h2>
           {recentActivity.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("dashboard.sectionNoRecentTransactions")}</p>
+            <DsEmptyState title={t("dashboard.sectionNoRecentTransactions")} className="py-4" />
           ) : (
-            <div className="divide-y border-t border-border">
+            <div className="border-t border-[var(--border-subtle)]">
               {recentActivity.map((item, index) => (
-                <div
+                <DsDataRow
                   key={item.id}
-                  className={`w-full text-left px-2 py-4 ${index % 2 === 1 ? "bg-muted/30" : ""}`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="truncate font-medium">{item.description || "—"}</p>
-                    <p className="font-semibold">{formatCurrency(item.amount)}</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {(item.category || t("common.uncategorized")) + " · " + (item.owner || t("common.noOwner"))}
-                  </p>
-                </div>
+                  title={item.description || "—"}
+                  subtitle={(item.category || t("common.uncategorized")) + " · " + (item.owner || t("common.noOwner"))}
+                  trailing={<p className="font-semibold">{formatCurrency(item.amount)}</p>}
+                  className={index % 2 === 1 ? "bg-muted/30" : ""}
+                  dense
+                />
               ))}
             </div>
           )}
@@ -750,7 +692,7 @@ export function Dashboard() {
         <section className="space-y-2 pb-4">
           <h2 className="text-base font-semibold">{t("dashboard.sectionSmartInsightsAlerts")}</h2>
           {insights.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("dashboard.sectionNoAlerts")}</p>
+            <DsEmptyState title={t("dashboard.sectionNoAlerts")} className="py-4" />
           ) : (
             <div className="space-y-2">
               {insights.map((insight) => (
@@ -762,6 +704,7 @@ export function Dashboard() {
                   <Button
                     variant="ghost"
                     size="sm"
+                    density="compact"
                     className="h-8 px-2 text-xs"
                     onClick={() => dismissInsight(insight.id)}
                   >

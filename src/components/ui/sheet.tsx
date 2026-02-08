@@ -53,7 +53,7 @@ const SheetContent = ({
       <SheetOverlay />
       <SheetPrimitive.Content
         className={cn(
-          "fixed z-50 bg-background shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out duration-200",
+          "fixed z-50 bg-[var(--surface-0)] shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out duration-200",
           sheetVariants[effectiveSide],
           className,
           useMobileTopSheet &&
@@ -68,10 +68,10 @@ const SheetContent = ({
         {children}
         {showCloseButton && (
           <SheetPrimitive.Close
-            className="absolute right-3 top-3 inline-flex size-10 items-center justify-center rounded-md text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus:ring-2 focus:ring-offset-2 focus:outline-none"
+            className="absolute right-3 top-3 inline-flex size-11 items-center justify-center rounded-lg text-foreground/80 transition-colors hover:bg-[var(--surface-2)] hover:text-foreground focus:ring-2 focus:ring-[var(--focus-ring)]/45 focus:ring-offset-2 focus:outline-none"
             aria-label="Close"
           >
-            <XIcon className="size-5" />
+            <XIcon className="size-6" />
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Content>

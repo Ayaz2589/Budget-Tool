@@ -71,6 +71,25 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-interactive-primary: var(--interactive-primary);
+  --color-interactive-danger: var(--interactive-danger);
+  --color-focus-ring: var(--focus-ring);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-viz-income: var(--viz-income);
+  --color-viz-expense: var(--viz-expense);
+  --color-viz-debt: var(--viz-debt);
+  --color-viz-series-1: var(--viz-series-1);
+  --color-viz-series-2: var(--viz-series-2);
+  --color-viz-series-3: var(--viz-series-3);
+  --color-viz-series-4: var(--viz-series-4);
+  --color-viz-series-5: var(--viz-series-5);
 }
 
 :root {
@@ -106,6 +125,42 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --surface-0: var(--background);
+  --surface-1: var(--card);
+  --surface-2: oklch(0.97 0 0);
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted-foreground);
+  --text-tertiary: oklch(0.46 0 0);
+  --interactive-primary: oklch(0.25 0 0);
+  --interactive-primary-foreground: oklch(0.985 0 0);
+  --interactive-danger: var(--destructive);
+  --focus-ring: var(--ring);
+  --border-subtle: oklch(0.922 0 0 / 70%);
+  --border-strong: oklch(0.76 0 0 / 85%);
+  --viz-income: #3b82f6;
+  --viz-expense: #ef4444;
+  --viz-debt: #eab308;
+  --viz-series-1: #3b82f6;
+  --viz-series-2: #8b5cf6;
+  --viz-series-3: #22c55e;
+  --viz-series-4: #f59e0b;
+  --viz-series-5: #06b6d4;
+  --font-size-display: clamp(1.75rem, 2.8vw, 2.5rem);
+  --font-size-heading-1: clamp(1.25rem, 2vw, 1.875rem);
+  --font-size-heading-2: clamp(1.125rem, 1.2vw, 1.5rem);
+  --font-size-body: 1rem;
+  --font-size-body-sm: 0.875rem;
+  --font-size-caption: 0.75rem;
+  --line-height-tight: 1.2;
+  --line-height-regular: 1.45;
+  --space-compact-1: 0.25rem;
+  --space-compact-2: 0.5rem;
+  --space-compact-3: 0.75rem;
+  --space-regular-1: 1rem;
+  --space-regular-2: 1.25rem;
+  --space-regular-3: 1.5rem;
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.18);
+  --shadow-strong: 0 10px 24px rgba(0, 0, 0, 0.28);
 }
 
 .dark {
@@ -140,6 +195,26 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --surface-0: oklch(0.145 0 0);
+  --surface-1: oklch(0.205 0 0);
+  --surface-2: oklch(0.26 0 0);
+  --text-primary: oklch(0.985 0 0);
+  --text-secondary: oklch(0.75 0 0);
+  --text-tertiary: oklch(0.62 0 0);
+  --interactive-primary: oklch(0.96 0 0);
+  --interactive-primary-foreground: oklch(0.205 0 0);
+  --interactive-danger: oklch(0.704 0.191 22.216);
+  --focus-ring: oklch(0.62 0 0);
+  --border-subtle: oklch(1 0 0 / 12%);
+  --border-strong: oklch(1 0 0 / 24%);
+  --viz-income: #3b82f6;
+  --viz-expense: #ef4444;
+  --viz-debt: #eab308;
+  --viz-series-1: #3b82f6;
+  --viz-series-2: #8b5cf6;
+  --viz-series-3: #22c55e;
+  --viz-series-4: #f59e0b;
+  --viz-series-5: #06b6d4;
 }
 
 @layer base {
@@ -156,6 +231,53 @@
   }
   *::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@layer utilities {
+  .ds-display {
+    font-size: var(--font-size-display);
+    line-height: var(--line-height-tight);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .ds-heading-1 {
+    font-size: var(--font-size-heading-1);
+    line-height: var(--line-height-tight);
+    font-weight: 650;
+    letter-spacing: -0.015em;
+  }
+  .ds-heading-2 {
+    font-size: var(--font-size-heading-2);
+    line-height: var(--line-height-tight);
+    font-weight: 620;
+  }
+  .ds-heading-3 {
+    font-size: clamp(1rem, 0.95rem + 0.4vw, 1.25rem);
+    line-height: var(--line-height-tight);
+    font-weight: 600;
+  }
+  .ds-heading-4 {
+    font-size: 1rem;
+    line-height: var(--line-height-tight);
+    font-weight: 600;
+  }
+  .ds-body {
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-regular);
+  }
+  .ds-body-sm {
+    font-size: var(--font-size-body-sm);
+    line-height: var(--line-height-regular);
+  }
+  .ds-label {
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    font-weight: 550;
+  }
+  .ds-caption {
+    font-size: var(--font-size-caption);
+    line-height: 1.35;
   }
 }
 

@@ -25,10 +25,6 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import {
   Select,
@@ -40,6 +36,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
+import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 function defaultRow(
   defaultSource: ExpenseSource = "manual",
@@ -219,16 +216,15 @@ export function AddTransactionDialog({
         className="flex flex-col h-full w-[90vw] max-w-md border-l p-0 gap-0 overflow-hidden rounded-l-2xl md:w-[720px] md:max-w-[720px]"
         onOpenAutoFocus={(event) => event.preventDefault()}
       >
-        <SheetHeader className="shrink-0 gap-1 px-4 pt-4 pb-2 border-b border-border/60">
-          <SheetTitle className="text-xl">
-            {rows.length > 1
+        <DsSheetHeader
+          className="shrink-0"
+          title={
+            rows.length > 1
               ? t("addTransaction.newTransactions")
-              : t("addTransaction.newTransaction")}
-          </SheetTitle>
-          <SheetDescription className="text-sm">
-            {t("addTransaction.dialogDesc")}
-          </SheetDescription>
-        </SheetHeader>
+              : t("addTransaction.newTransaction")
+          }
+          description={t("addTransaction.dialogDesc")}
+        />
         <form
           onSubmit={handleSubmit}
           className="flex flex-col flex-1 min-h-0 gap-0 overflow-hidden"
@@ -513,7 +509,7 @@ export function AddTransactionDialog({
               </div>
             ))}
           </div>
-          <div className="shrink-0 flex flex-col gap-2 pt-2 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] border-t border-border/60 bg-background">
+          <DsSheetActions className="shrink-0 flex flex-col gap-2 pt-2 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
             <Button
               type="button"
               className="h-11 w-full bg-white text-black hover:bg-white/90"
@@ -522,7 +518,7 @@ export function AddTransactionDialog({
               <Plus className="size-4" />
               {t("addTransaction.addRow")}
             </Button>
-            <SheetFooter className="flex-row gap-2 p-0">
+            <div className="flex flex-row gap-2 p-0">
               <Button
                 type="button"
                 variant="outline"
@@ -540,8 +536,8 @@ export function AddTransactionDialog({
                       count: validCount,
                     })}
               </Button>
-            </SheetFooter>
-          </div>
+            </div>
+          </DsSheetActions>
         </form>
       </SheetContent>
     </Sheet>

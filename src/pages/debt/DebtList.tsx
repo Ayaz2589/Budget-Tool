@@ -29,7 +29,7 @@ export function DebtList({
   }
 
   return (
-    <Table>
+    <Table density="comfortable">
       <TableHeader>
         <TableRow>
           <TableHead>{t("common.description")}</TableHead>

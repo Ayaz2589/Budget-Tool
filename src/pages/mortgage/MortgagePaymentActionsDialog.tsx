@@ -1,8 +1,6 @@
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -17,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { MortgagePaymentActionsDialogProps } from "@/types/mortgage";
+import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { MortgagePaymentActionsDialogProps };
 
@@ -44,11 +43,7 @@ export function MortgagePaymentActionsDialog({
         showCloseButton={true}
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-hidden flex flex-col"
       >
-        <SheetHeader className="px-4 pt-5 pb-3">
-          <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
-            {formatDate(payment.date)} · {formatCurrency(payment.amount)}
-          </SheetTitle>
-        </SheetHeader>
+        <DsSheetHeader title={`${formatDate(payment.date)} · ${formatCurrency(payment.amount)}`} />
         <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-6">
           <div className="grid gap-5">
             <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
@@ -95,16 +90,17 @@ export function MortgagePaymentActionsDialog({
             </div>
           </div>
         </div>
-        <div className="border-t border-border/60 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)] bg-background">
+        <DsSheetActions>
           <Button
             variant="destructive"
+            density="compact"
             className={actionButtonClass}
             onClick={handleRemove}
           >
             <Trash2 className="size-4" />
             {t("common.remove")}
           </Button>
-        </div>
+        </DsSheetActions>
       </SheetContent>
     </Sheet>
   );

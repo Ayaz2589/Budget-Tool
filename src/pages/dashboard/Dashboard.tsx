@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Line,
-  LineChart,
+  AreaChart,
+  Area,
   Bar,
   BarChart,
   CartesianGrid,
@@ -400,12 +400,19 @@ export function Dashboard() {
                 <div className="hidden md:block">
                 <ChartContainer
                   config={{
-                    netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "var(--viz-series-5)" },
+                    netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "var(--viz-series-3)" },
                   }}
                   heightMobile={220}
                   heightDesktop={280}
                 >
-                    <LineChart data={netCashFlowRows}>
+                    <AreaChart data={netCashFlowRows}>
+                      <defs>
+                        <linearGradient id="netCashFlowAreaDesktop" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.35} />
+                          <stop offset="75%" stopColor="var(--viz-series-3)" stopOpacity={0.14} />
+                          <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.03} />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid vertical={false} />
                       <XAxis dataKey="monthLabel" />
                       <YAxis />
@@ -419,30 +426,39 @@ export function Dashboard() {
                           />
                         }
                       />
-                      <Line
+                      <Area
                         type="monotone"
                         dataKey="netCashFlow"
                         name={t("dashboard.chartNetCashFlow")}
-                        stroke="var(--viz-series-5)"
-                        strokeWidth={2.5}
-                        dot={{ r: 3 }}
+                        stroke="var(--viz-series-3)"
+                        fill="url(#netCashFlowAreaDesktop)"
+                        strokeWidth={2.2}
+                        dot={false}
                         activeDot={{ r: 5 }}
+                        isAnimationActive={false}
                       />
-                    </LineChart>
+                    </AreaChart>
                   </ChartContainer>
                 </div>
                 <div className="md:hidden">
                 <ChartContainer
                   config={{
-                    netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "var(--viz-series-5)" },
+                    netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "var(--viz-series-3)" },
                   }}
                   heightMobile={220}
                   heightDesktop={280}
                 >
-                  <LineChart
+                  <AreaChart
                     data={netCashFlowRows}
                     margin={{ top: 4, right: 24, left: -6, bottom: 2 }}
                   >
+                      <defs>
+                        <linearGradient id="netCashFlowAreaMobile" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.3} />
+                          <stop offset="75%" stopColor="var(--viz-series-3)" stopOpacity={0.12} />
+                          <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.02} />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid vertical={false} />
                     <XAxis
                       dataKey="monthLabel"
@@ -476,16 +492,18 @@ export function Dashboard() {
                           />
                         }
                       />
-                      <Line
+                      <Area
                         type="monotone"
                         dataKey="netCashFlow"
                         name={t("dashboard.chartNetCashFlow")}
-                        stroke="var(--viz-series-5)"
-                        strokeWidth={2.25}
-                        dot={{ r: 2.5 }}
+                        stroke="var(--viz-series-3)"
+                        fill="url(#netCashFlowAreaMobile)"
+                        strokeWidth={2}
+                        dot={false}
                         activeDot={{ r: 4 }}
+                        isAnimationActive={false}
                       />
-                    </LineChart>
+                    </AreaChart>
                   </ChartContainer>
                 </div>
               </>

@@ -39,5 +39,5 @@ export interface GoogleSheetsCardProps {
   setSyncConfirmOpen: (open: boolean) => void;
   restoreConfirmOpen: boolean;
   setRestoreConfirmOpen: (open: boolean) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }

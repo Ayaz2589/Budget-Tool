@@ -1,12 +1,10 @@
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
+import { DsSectionHeader } from "@/components/ds";
 
 function PdfExportIcon({
   className = "",
@@ -41,6 +39,9 @@ export function ImportSourceCard({
   isPdfExport,
   cardSources,
   t,
+  statusText,
+  showPrimaryAction = true,
+  primaryActionLabel,
 }: ImportSourceCardProps) {
   const sourceOptions = [
     {
@@ -81,13 +82,32 @@ export function ImportSourceCard({
     previewIncomeCount > 0 ||
     previewDebtsCount > 0 ||
     previewDebtPaymentsCount > 0;
+  const previewCount = isPdfExport
+    ? previewExpensesCount +
+      previewIncomeCount +
+      previewDebtsCount +
+      previewDebtPaymentsCount
+    : previewExpensesCount;
+  const fallbackStatus = lastDetected
+    ? `${sourceLabel} · ${t("import.rowsToAddSummary", { count: previewCount })}${
+        isPdfExport
+          ? ` (${t("import.existingIdsOmitted")})`
+          : skippedDuplicates > 0
+            ? ` (${t("import.duplicatesSkipped", { count: skippedDuplicates })})`
+            : ""
+      }`
+    : "";
 
   return (
     <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-      <CardHeader className="px-4 md:px-0">
-        <CardTitle>{t("import.uploadStatement")}</CardTitle>
-        <CardDescription>{t("import.uploadStatementDesc")}</CardDescription>
-      </CardHeader>
+      <div className="px-4 py-4 md:px-0 md:py-0">
+        <DsSectionHeader
+          title={t("import.uploadStatement")}
+          subtitle={t("import.uploadStatementDesc")}
+          titleClassName="text-lg md:text-xl"
+          subtitleClassName="text-xs md:text-sm"
+        />
+      </div>
       <CardContent className="space-y-4 px-4 md:px-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {filteredSourceOptions.map((opt) => {
@@ -106,7 +126,7 @@ export function ImportSourceCard({
                   }
                 }}
                 className={cn(
-                  "flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors text-left",
+                  "flex min-h-11 flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors text-left",
                   "hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   selectedSource === opt.value
                     ? "border-primary bg-primary/5"
@@ -137,26 +157,11 @@ export function ImportSourceCard({
           <span className="text-sm text-destructive block">{importError}</span>
         )}
         {lastDetected && !importError && (
-          <span className="text-sm text-muted-foreground block">
-            {sourceLabel}
-            {isPdfExport
-              ? ` · ${previewExpensesCount} expenses, ${previewIncomeCount} income${
-                  previewDebtsCount > 0 ? `, ${previewDebtsCount} debts` : ""
-                }${
-                  previewDebtPaymentsCount > 0
-                    ? `, ${previewDebtPaymentsCount} debt payments`
-                    : ""
-                } to add (existing IDs omitted)`
-              : ` · ${previewExpensesCount} rows${
-                  skippedDuplicates > 0
-                    ? ` (${skippedDuplicates} duplicates skipped)`
-                    : ""
-                }`}
-          </span>
+          <span className="text-sm text-muted-foreground block">{statusText || fallbackStatus}</span>
         )}
-        {hasPreview && (
+        {hasPreview && showPrimaryAction && (
           <Button onClick={onAddToTransactions} className="w-full md:w-auto">
-            {isPdfExport ? "Add all" : "Add to transactions"}
+            {primaryActionLabel ?? t(isPdfExport ? "import.addAll" : "import.addToTransactions")}
           </Button>
         )}
       </CardContent>

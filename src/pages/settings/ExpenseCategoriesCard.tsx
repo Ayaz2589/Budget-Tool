@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DsSectionHeader } from "@/components/ds";
 import type { ExpenseCategoriesCardProps } from "@/types/settings";
 
 export type { ExpenseCategoriesCardProps };
@@ -42,9 +43,12 @@ export function ExpenseCategoriesCard({
 
   return (
     <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-      <CardHeader className="px-4 md:px-0">
-        <CardTitle>{t("settings.expenseCategories")}</CardTitle>
-      </CardHeader>
+      <div className="px-4 py-4 md:px-0 md:py-0">
+        <DsSectionHeader
+          title={t("settings.expenseCategories")}
+          titleClassName="text-lg md:text-xl"
+        />
+      </div>
       <CardContent className="space-y-3 pb-6 px-4 md:px-0">
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {categories.map((category) => (

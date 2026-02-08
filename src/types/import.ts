@@ -18,7 +18,7 @@ export interface ImportPreviewCardProps {
   expenseCategories: string[];
   onUpdateCategory: (id: string, category: string) => void;
   lastDetected: string;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }
 
 export interface ImportSourceCardProps {
@@ -38,5 +38,8 @@ export interface ImportSourceCardProps {
   onAddToTransactions: () => void;
   isPdfExport: boolean;
   cardSources: string[];
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  statusText?: string;
+  showPrimaryAction?: boolean;
+  primaryActionLabel?: string;
 }

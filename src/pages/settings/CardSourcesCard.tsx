@@ -7,12 +7,10 @@ import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SourceIcon } from "@/components/cards";
+import { DsSectionHeader } from "@/components/ds";
 
 export function CardSourcesCard() {
   const { t } = useTranslation();
@@ -42,10 +40,14 @@ export function CardSourcesCard() {
 
   return (
     <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-      <CardHeader className="px-4 md:px-0">
-        <CardTitle>{t("settings.cardSources")}</CardTitle>
-        <CardDescription>{t("settings.cardSourcesDesc")}</CardDescription>
-      </CardHeader>
+      <div className="px-4 py-4 md:px-0 md:py-0">
+        <DsSectionHeader
+          title={t("settings.cardSources")}
+          subtitle={t("settings.cardSourcesDesc")}
+          titleClassName="text-lg md:text-xl"
+          subtitleClassName="text-xs md:text-sm"
+        />
+      </div>
       <CardContent className="space-y-3 px-4 md:px-0">
         <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
           {ALL_EXPENSE_SOURCES.map((sourceId) => {

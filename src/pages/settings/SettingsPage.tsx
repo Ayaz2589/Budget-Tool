@@ -24,6 +24,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { DsSectionHeader } from "@/components/ds";
 import { GoogleSheetsCard } from "./GoogleSheetsCard";
 import { CardSourcesCard } from "./CardSourcesCard";
 import { ExpenseCategoriesCard } from "./ExpenseCategoriesCard";
@@ -80,8 +82,8 @@ export function SettingsPage() {
     const { fixedExpenses, fixedIncome } = repairCorruptedDates();
     setRepairResult(
       fixedExpenses > 0 || fixedIncome > 0
-        ? `Repaired ${fixedExpenses} expense(s) and ${fixedIncome} income entry(ies).`
-        : "No corrupted dates found.",
+        ? t("settings.repairResultFixed", { fixedExpenses, fixedIncome })
+        : t("settings.repairResultNone"),
     );
     setTimeout(() => setRepairResult(null), 5000);
   };
@@ -151,25 +153,13 @@ export function SettingsPage() {
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
-        <div className="space-y-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold sm:text-2xl">{t("settings.title")}</h1>
-          </div>
-          <p className="text-sm text-muted-foreground">{t("settings.subtitle")}</p>
-        </div>
+      <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
+        <DsSectionHeader
+          title={t("settings.title")}
+          subtitle={t("settings.subtitle")}
+        />
       </div>
-      <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
-        <div className="px-0 py-3 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold">{t("settings.title")}</h1>
-            <p className="text-xs text-muted-foreground">
-              {t("settings.subtitle")}
-            </p>
-          </div>
-        </div>
-      </div>
-      <div className="space-y-4 sm:space-y-6 pb-24 md:pb-0">
+      <div className="space-y-4 sm:space-y-6 pb-24 md:pb-0 px-4 md:px-0">
 
       <div>
         <GoogleSheetsCard
@@ -200,7 +190,8 @@ export function SettingsPage() {
       </div>
 
       {import.meta.env.DEV && (
-        <div className="rounded-lg border border-border/60 p-4">
+        <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+          <CardContent className="rounded-lg border border-border/60 p-4">
           <div className="flex items-start gap-3">
             <Checkbox
               id="dummy-data"
@@ -209,18 +200,19 @@ export function SettingsPage() {
             />
             <div className="space-y-1">
               <Label htmlFor="dummy-data" className="text-sm font-medium">
-                Use dummy data (dev only)
+                {t("settings.useDummyData")}
               </Label>
               <p className="text-xs text-muted-foreground">
-                Loads sample data across the entire app without touching your real
-                storage.
+                {t("settings.useDummyDataDesc")}
               </p>
             </div>
           </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
-      <div className="rounded-lg border border-border/60 p-4 space-y-3">
+      <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+        <CardContent className="rounded-lg border border-border/60 p-4 space-y-3">
         <div className="space-y-1">
           <h3 className="text-sm font-semibold">{t("settings.dateFormatTitle")}</h3>
           <p className="text-xs text-muted-foreground">
@@ -252,7 +244,8 @@ export function SettingsPage() {
             date: formatDate("2026-02-06"),
           })}
         </p>
-      </div>
+        </CardContent>
+      </Card>
 
       <div className="space-y-4 sm:space-y-6">
         <CardSourcesCard />

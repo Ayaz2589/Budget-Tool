@@ -1,9 +1,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { GoogleSheetsCardProps } from "@/types/settings";
+import { DsSectionHeader } from "@/components/ds";
 
 export type { GoogleSheetsCardProps };
 
@@ -48,18 +46,22 @@ export function GoogleSheetsCard({
 }: GoogleSheetsCardProps) {
   return (
     <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-      <CardHeader className="px-4 md:px-0">
-        <CardTitle>{t("settings.googleSheets")}</CardTitle>
-        <CardDescription>{t("settings.googleSheetsDesc")}</CardDescription>
-      </CardHeader>
+      <div className="px-4 py-4 md:px-0 md:py-0">
+        <DsSectionHeader
+          title={t("settings.googleSheets")}
+          subtitle={t("settings.googleSheetsDesc")}
+          titleClassName="text-lg md:text-xl"
+          subtitleClassName="text-xs md:text-sm"
+        />
+      </div>
       <CardContent className="space-y-5 px-4 md:px-0">
         {!isSignedIn ? (
           <div className="flex flex-col gap-3">
             <Button onClick={signIn} className="h-11 w-full sm:w-auto">
-              Connect Google
+              {t("settings.connectGoogle")}
             </Button>
             <p className="text-xs text-muted-foreground">
-              We’ll only use this to sync your data to a spreadsheet you choose.
+              {t("settings.connectGoogleDesc")}
             </p>
           </div>
         ) : (
@@ -73,39 +75,39 @@ export function GoogleSheetsCard({
                 />
                 <div className="space-y-1">
                   <Label htmlFor="auto-sync-toggle" className="text-sm font-medium">
-                    Auto sync changes
+                    {t("settings.autoSyncTitle")}
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Automatically syncs after edits with a short delay.
+                    {t("settings.autoSyncDesc")}
                   </p>
                 </div>
               </div>
               <div className="mt-2 text-xs text-muted-foreground">
                 <span>
-                  Health:{" "}
+                  {t("settings.syncHealthLabel")}{" "}
                   {syncHealth === "healthy"
-                    ? "Healthy"
+                    ? t("settings.syncHealthHealthy")
                     : syncHealth === "warning"
-                      ? "Pending changes"
-                      : "Needs attention"}
+                      ? t("settings.syncHealthWarning")
+                      : t("settings.syncHealthError")}
                 </span>
                 {lastSyncAt && (
                   <span className="ml-3">
-                    Last sync: {new Date(lastSyncAt).toLocaleString()}
+                    {t("settings.lastSyncAt", { date: new Date(lastSyncAt).toLocaleString() })}
                   </span>
                 )}
                 {hasUnsyncedChanges && (
-                  <span className="ml-3">Unsynced updates detected</span>
+                  <span className="ml-3">{t("settings.unsyncedUpdatesDetected")}</span>
                 )}
               </div>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Status
+                  {t("settings.status")}
                 </span>
                 <span className="rounded-full border border-border/60 bg-muted/30 px-2 py-1 text-xs">
-                  Connected
+                  {t("settings.signedIn")}
                 </span>
               </div>
               <Button
@@ -113,14 +115,14 @@ export function GoogleSheetsCard({
                 onClick={signOut}
                 className="h-11"
               >
-                Disconnect
+                {t("settings.disconnect")}
               </Button>
             </div>
             <div className="space-y-2">
-              <Label>Spreadsheet ID or URL</Label>
+              <Label>{t("settings.spreadsheetIdOrUrl")}</Label>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <Input
-                  placeholder="Paste spreadsheet URL or ID"
+                  placeholder={t("settings.spreadsheetPlaceholder")}
                   value={sheetIdInput}
                   onChange={(e) => onSheetIdChange(e.target.value)}
                   className="min-w-0"
@@ -130,7 +132,7 @@ export function GoogleSheetsCard({
                   onClick={onSetSheetId}
                   className="h-11 shrink-0 w-full sm:w-auto"
                 >
-                  Set
+                  {t("settings.set")}
                 </Button>
               </div>
               {spreadsheetId && (
@@ -138,7 +140,7 @@ export function GoogleSheetsCard({
                   className="text-xs text-muted-foreground break-all font-mono"
                   title={spreadsheetId}
                 >
-                  Using: {spreadsheetId}
+                  {t("settings.using")}: {spreadsheetId}
                 </p>
               )}
             </div>
@@ -152,8 +154,8 @@ export function GoogleSheetsCard({
                     className="h-11 w-full"
                   >
                     {syncStatus === "syncing"
-                      ? "Syncing..."
-                      : "Restore from Sheet"}
+                      ? t("settings.syncing")
+                      : t("settings.restoreFromSheet")}
                   </Button>
                   <Button
                     onClick={() => setSyncConfirmOpen(true)}
@@ -161,16 +163,16 @@ export function GoogleSheetsCard({
                     className="h-11 w-full"
                   >
                     {syncStatus === "syncing"
-                      ? "Syncing..."
-                      : "Sync to Google Sheets"}
+                      ? t("settings.syncing")
+                      : t("settings.syncToGoogleSheets")}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={onRepairDates}
-                    title="Fix dates that were corrupted (e.g. from Google Sheets formatting)"
+                    title={t("settings.repairCorruptedDatesTitle")}
                     className="h-11 w-full sm:col-span-2"
                   >
-                    Repair corrupted dates
+                    {t("settings.repairCorruptedDates")}
                   </Button>
                 </div>
                 {repairResult && (
@@ -185,11 +187,9 @@ export function GoogleSheetsCard({
                 >
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Sync to Google Sheets?</DialogTitle>
+                      <DialogTitle>{t("settings.syncConfirmTitle")}</DialogTitle>
                       <DialogDescription>
-                        This will overwrite your spreadsheet with the app&apos;s
-                        current expenses, income, and totals. Your sheet data
-                        will be replaced. This cannot be undone.
+                        {t("settings.syncConfirmDesc")}
                       </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -197,7 +197,7 @@ export function GoogleSheetsCard({
                         variant="outline"
                         onClick={() => setSyncConfirmOpen(false)}
                       >
-                        Cancel
+                        {t("common.cancel")}
                       </Button>
                       <Button
                         onClick={() => {
@@ -205,7 +205,7 @@ export function GoogleSheetsCard({
                           syncToSheets();
                         }}
                       >
-                        Sync to Google Sheets
+                        {t("settings.syncToGoogleSheets")}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -217,12 +217,9 @@ export function GoogleSheetsCard({
                 >
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Restore from Sheet?</DialogTitle>
+                      <DialogTitle>{t("settings.restoreConfirmTitle")}</DialogTitle>
                       <DialogDescription>
-                        This will load data from the spreadsheet into the app
-                        and merge with existing transactions and income. Any
-                        matching rows will be skipped; new rows from the sheet
-                        will be added.
+                        {t("settings.restoreConfirmDesc")}
                       </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -230,7 +227,7 @@ export function GoogleSheetsCard({
                         variant="outline"
                         onClick={() => setRestoreConfirmOpen(false)}
                       >
-                        Cancel
+                        {t("common.cancel")}
                       </Button>
                       <Button
                         onClick={() => {
@@ -238,26 +235,24 @@ export function GoogleSheetsCard({
                           pullFromSheet();
                         }}
                       >
-                        Restore from Sheet
+                        {t("settings.restoreFromSheet")}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Restore from Sheet: load data from the spreadsheet into the
-                  app (e.g. after clearing local storage). Sync to Google
-                  Sheets: pull then push so app and sheet stay in sync.
+                  {t("settings.restoreSyncNote")}
                 </p>
               </>
             )}
             {syncStatus === "success" && (
               <p className="text-sm text-green-600 dark:text-green-400">
-                Sync complete.
+                {t("settings.syncComplete")}
               </p>
             )}
             {syncStatus === "error" && (
               <p className="text-sm text-destructive">
-                {syncErrorMessage ?? "Sync failed."}
+                {syncErrorMessage ?? t("settings.syncFailed")}
               </p>
             )}
           </>

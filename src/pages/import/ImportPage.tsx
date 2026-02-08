@@ -33,10 +33,8 @@ import { buildExportString, downloadExportString } from "@/lib/exportString";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
+import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
 
 export function ImportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -233,9 +231,7 @@ export function ImportPage() {
             parsed.presetTransactions.length === 0 &&
             text.trim().length > 0
           ) {
-            setImportError(
-              "This doesn't look like an exported transactions PDF."
-            );
+            setImportError(t("import.exportedPdfInvalid"));
             setPreviewExpenses([]);
             setPreviewIncome([]);
             setLastDetected("");
@@ -245,7 +241,7 @@ export function ImportPage() {
           handleParsedExport(parsed, t("import.exportedPdf"));
         } catch (err) {
           setImportError(
-            err instanceof Error ? err.message : "PDF import failed"
+            err instanceof Error ? err.message : t("import.pdfImportFailed")
           );
           setPreviewExpenses([]);
           setPreviewIncome([]);
@@ -285,7 +281,7 @@ export function ImportPage() {
           setSourceLabel(label);
           setLastDetected(selectedSource);
         } catch (err) {
-          setImportError(err instanceof Error ? err.message : "Import failed");
+          setImportError(err instanceof Error ? err.message : t("import.importFailed"));
           setPreviewExpenses([]);
           setPreviewIncome([]);
           setLastDetected("");
@@ -303,7 +299,7 @@ export function ImportPage() {
     setImportError("");
     const raw = exportString.trim();
     if (!raw) {
-      setExportStringError("Paste an export string first.");
+      setExportStringError(t("import.exportStringPasteFirst"));
       return;
     }
     try {
@@ -322,13 +318,13 @@ export function ImportPage() {
           parsed.debtPayments.length === 0 &&
           parsed.presetTransactions.length === 0)
       ) {
-        setExportStringError("Export string not recognized.");
+        setExportStringError(t("import.exportStringNotRecognized"));
         return;
       }
       handleParsedExport(parsed, t("import.importExportString"));
     } catch (err) {
       setExportStringError(
-        err instanceof Error ? err.message : "Export string import failed"
+        err instanceof Error ? err.message : t("import.exportStringImportFailed")
       );
     }
   };
@@ -350,13 +346,13 @@ export function ImportPage() {
           parsed.debtPayments.length === 0 &&
           parsed.presetTransactions.length === 0
         ) {
-          setJsonImportError("JSON export contained no data.");
+          setJsonImportError(t("import.jsonNoData"));
           return;
         }
         handleParsedExport(parsed, t("import.importJson"));
       } catch (err) {
         setJsonImportError(
-          err instanceof Error ? err.message : "JSON import failed"
+          err instanceof Error ? err.message : t("import.jsonImportFailed")
         );
       }
     };
@@ -516,30 +512,43 @@ export function ImportPage() {
     previewIncome.length > 0 ||
     previewDebts.length > 0 ||
     previewDebtPayments.length > 0;
+  const primaryAddLabel = t(
+    lastDetected === "pdf-export" ? "import.addAll" : "import.addToTransactions",
+  );
+  const importStatusText = lastDetected
+    ? `${sourceLabel} · ${t("import.rowsToAddSummary", {
+        count:
+          lastDetected === "pdf-export"
+            ? previewExpenses.length +
+              previewIncome.length +
+              previewDebts.length +
+              previewDebtPayments.length
+            : previewExpenses.length,
+      })}${
+        lastDetected === "pdf-export"
+          ? ` (${t("import.existingIdsOmitted")})`
+          : skippedDuplicates > 0
+            ? ` (${t("import.duplicatesSkipped", { count: skippedDuplicates })})`
+            : ""
+      }`
+    : "";
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
-        <div className="space-y-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">{t("import.title")}</h1>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {t("import.subtitle")}
-          </p>
-        </div>
+      <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
+        <DsSectionHeader
+          title={t("import.title")}
+          subtitle={t("import.subtitle")}
+          actions={
+            hasPreview ? (
+              <Button className="hidden md:inline-flex" onClick={addToTransactions}>
+                {primaryAddLabel}
+              </Button>
+            ) : undefined
+          }
+        />
       </div>
-      <div className="md:hidden mb-3 px-4 pt-4 shrink-0 bg-background/95 backdrop-blur">
-        <div className="px-0 py-3 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold">{t("import.title")}</h1>
-            <p className="text-xs text-muted-foreground">
-              {t("import.subtitle")}
-            </p>
-          </div>
-        </div>
-      </div>
-      <div className="space-y-6 pb-24 md:pb-0 md:px-0">
+      <div className="space-y-6 pb-24 md:pb-0 px-4 md:px-0">
       <div>
         <ImportSourceCard
           selectedSource={selectedSource}
@@ -559,13 +568,20 @@ export function ImportPage() {
           isPdfExport={lastDetected === "pdf-export"}
           cardSources={cardSources}
           t={t}
+          statusText={importStatusText}
+          showPrimaryAction={false}
+          primaryActionLabel={primaryAddLabel}
         />
       </div>
       <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-        <CardHeader className="px-4 md:px-0">
-          <CardTitle>{t("import.exportStringTitle")}</CardTitle>
-          <CardDescription>{t("import.exportStringDesc")}</CardDescription>
-        </CardHeader>
+        <div className="px-4 py-4 md:px-0 md:py-0">
+          <DsSectionHeader
+            title={t("import.exportStringTitle")}
+            subtitle={t("import.exportStringDesc")}
+            titleClassName="text-lg md:text-xl"
+            subtitleClassName="text-xs md:text-sm"
+          />
+        </div>
         <CardContent className="space-y-3 px-4 md:px-0">
           <textarea
             value={exportString}
@@ -584,10 +600,14 @@ export function ImportPage() {
         </CardContent>
       </Card>
       <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-        <CardHeader className="px-4 md:px-0">
-          <CardTitle>{t("import.jsonImportTitle")}</CardTitle>
-          <CardDescription>{t("import.jsonImportDesc")}</CardDescription>
-        </CardHeader>
+        <div className="px-4 py-4 md:px-0 md:py-0">
+          <DsSectionHeader
+            title={t("import.jsonImportTitle")}
+            subtitle={t("import.jsonImportDesc")}
+            titleClassName="text-lg md:text-xl"
+            subtitleClassName="text-xs md:text-sm"
+          />
+        </div>
         <CardContent className="space-y-3 px-4 md:px-0">
           <input
             ref={jsonInputRef}
@@ -610,10 +630,14 @@ export function ImportPage() {
         </CardContent>
       </Card>
       <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-        <CardHeader className="px-4 md:px-0">
-          <CardTitle>{t("import.exportTitle")}</CardTitle>
-          <CardDescription>{t("import.exportDesc")}</CardDescription>
-        </CardHeader>
+        <div className="px-4 py-4 md:px-0 md:py-0">
+          <DsSectionHeader
+            title={t("import.exportTitle")}
+            subtitle={t("import.exportDesc")}
+            titleClassName="text-lg md:text-xl"
+            subtitleClassName="text-xs md:text-sm"
+          />
+        </div>
         <CardContent className="flex flex-col md:flex-row gap-2 px-4 md:px-0">
           <Button
             variant="outline"
@@ -652,6 +676,16 @@ export function ImportPage() {
           />
         </div>
       )}
+      {!hasPreview && !importError && !jsonImportError && !exportStringError ? (
+        <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
+          <CardContent className="px-0">
+            <DsEmptyState
+              title={t("import.previewTitle")}
+              description={t("import.emptyStateDescription")}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Dialog open={missingMetaOpen} onOpenChange={setMissingMetaOpen}>
         <DialogContent>
@@ -696,6 +730,11 @@ export function ImportPage() {
         </DialogContent>
       </Dialog>
       </div>
+      {hasPreview ? (
+        <DsActionBar>
+          <Button onClick={addToTransactions}>{primaryAddLabel}</Button>
+        </DsActionBar>
+      ) : null}
     </div>
   );
 }

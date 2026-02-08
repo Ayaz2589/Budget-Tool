@@ -19,10 +19,8 @@ test("ImportPreviewCard shows Preview title and description when empty", () => {
       t={mockT}
     />,
   );
-  expect(screen.getByText("Preview")).toBeInTheDocument();
-  expect(
-    screen.getByText(/transactions matching existing entries/i),
-  ).toBeInTheDocument();
+  expect(screen.getByText("import.previewTitle")).toBeInTheDocument();
+  expect(screen.getByText("import.previewDescriptionCsv")).toBeInTheDocument();
 });
 
 test("ImportPreviewCard renders expense rows and category selector for csv imports", () => {
@@ -47,9 +45,9 @@ test("ImportPreviewCard renders expense rows and category selector for csv impor
       t={mockT}
     />,
   );
-  expect(screen.getByText("Expenses to add")).toBeInTheDocument();
-  expect(screen.getByText("Coffee")).toBeInTheDocument();
-  expect(screen.getByRole("combobox")).toBeInTheDocument();
+  expect(screen.getAllByText("import.expensesToAdd").length).toBeGreaterThan(0);
+  expect(screen.getAllByText("Coffee").length).toBeGreaterThan(0);
+  expect(screen.getAllByRole("combobox").length).toBeGreaterThan(0);
 });
 
 test("ImportPreviewCard shows debts section for PDF export", () => {
@@ -73,6 +71,6 @@ test("ImportPreviewCard shows debts section for PDF export", () => {
       t={mockT}
     />,
   );
-  expect(screen.getByText("Debts to add")).toBeInTheDocument();
+  expect(screen.getAllByText("import.debtsToAdd").length).toBeGreaterThan(0);
   expect(screen.getAllByText("Loan").length).toBeGreaterThan(0);
 });

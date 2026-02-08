@@ -24,6 +24,11 @@ test("GoogleSheetsCard shows card title and Connect Google when signed out", () 
         pullFromSheet={() => {}}
         syncStatus="idle"
         syncErrorMessage={undefined}
+        isAutoSyncEnabled={false}
+        onAutoSyncToggle={() => {}}
+        lastSyncAt={null}
+        hasUnsyncedChanges={false}
+        syncHealth="healthy"
         onRepairDates={() => {}}
         repairResult={null}
         syncConfirmOpen={false}
@@ -36,6 +41,6 @@ test("GoogleSheetsCard shows card title and Connect Google when signed out", () 
   );
   expect(screen.getByText("settings.googleSheets")).toBeInTheDocument();
   expect(
-    screen.getByRole("button", { name: /connect google/i }),
+    screen.getByRole("button", { name: /settings\.connectgoogle/i }),
   ).toBeInTheDocument();
 });

@@ -59,8 +59,10 @@ test("ImportSourceCard hides unavailable sources and shows add button for previe
       t={mockT}
     />,
   );
-  expect(screen.getByText("MasterCard · 2 rows (1 duplicates skipped)")).toBeInTheDocument();
-  const addButton = screen.getByRole("button", { name: /add to transactions/i });
+  expect(
+    screen.getByText("MasterCard · import.rowsToAddSummary (import.duplicatesSkipped)"),
+  ).toBeInTheDocument();
+  const addButton = screen.getByRole("button", { name: /import\.addtotransactions/i });
   fireEvent.click(addButton);
   expect(onAddToTransactions).toHaveBeenCalledTimes(1);
 });

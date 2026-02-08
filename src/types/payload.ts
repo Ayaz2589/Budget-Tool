@@ -5,6 +5,7 @@ import type {
   Income,
   PresetTransaction,
 } from "./core";
+import type { InvestmentPortfolio } from "./investments";
 
 /** Category name + color for payload (used in PDF and Sheets). */
 export interface CategoryWithColorPayload {
@@ -22,6 +23,7 @@ export interface MinifiedPayloadInput {
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
   owners?: string[];
   cardSources?: string[];
+  investmentPortfolios?: InvestmentPortfolio[];
 }
 
 export interface ExpandedPayload {
@@ -34,4 +36,5 @@ export interface ExpandedPayload {
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
   owners?: string[];
   cardSources?: string[];
+  investmentPortfolios?: InvestmentPortfolio[];
 }

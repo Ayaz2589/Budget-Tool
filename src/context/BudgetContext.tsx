@@ -28,6 +28,10 @@ import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 import { buildDummyBudget, type DummyBudgetData } from "@/lib/dummyData";
 import type { BudgetState } from "@/types/budget";
 import type { BudgetContextValue } from "@/types/context";
+import type {
+  InvestmentHolding,
+  InvestmentPortfolio,
+} from "@/types/investments";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
 const DUMMY_STORAGE_KEY = "budget-tool-dummy-mode";
@@ -39,6 +43,10 @@ const BudgetContext = createContext<BudgetContextValue | null>(null);
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function nowIso(): string {
+  return new Date().toISOString();
 }
 
 function getCurrentMonthKey(): string {
@@ -71,6 +79,7 @@ function loadStoredBudget(): {
   expenseCategories: string[];
   incomeCategories: string[];
   owners: string[];
+  investmentPortfolios: InvestmentPortfolio[];
 } {
   try {
     const raw = localStorage.getItem(BUDGET_STORAGE_KEY);
@@ -85,6 +94,7 @@ function loadStoredBudget(): {
         expenseCategories?: string[];
         incomeCategories?: string[];
         owners?: string[];
+        investmentPortfolios?: InvestmentPortfolio[];
       };
       const cardSources = Array.isArray(data.cardSources)
         ? (() => {
@@ -113,6 +123,9 @@ function loadStoredBudget(): {
         data.owners.every((o) => typeof o === "string")
           ? data.owners
           : [];
+      const investmentPortfolios = Array.isArray(data.investmentPortfolios)
+        ? (data.investmentPortfolios as InvestmentPortfolio[])
+        : [];
       return {
         expenses: Array.isArray(data.expenses)
           ? data.expenses.map((e) => ({
@@ -135,6 +148,7 @@ function loadStoredBudget(): {
         expenseCategories,
         incomeCategories,
         owners,
+        investmentPortfolios,
       };
     }
   } catch {
@@ -150,6 +164,7 @@ function loadStoredBudget(): {
     expenseCategories: [],
     incomeCategories: [],
     owners: [],
+    investmentPortfolios: [],
   };
 }
 
@@ -172,6 +187,9 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const [cardSources, setCardSourcesState] = useState<string[]>(
     stored.cardSources
   );
+  const [investmentPortfolios, setInvestmentPortfolios] = useState<
+    InvestmentPortfolio[]
+  >(stored.investmentPortfolios);
   const [iOweNova, setIOweNovaState] = useState<Record<string, number>>(
     stored.iOweNova
   );
@@ -235,6 +253,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
           expenseCategories,
           incomeCategories,
           owners,
+          investmentPortfolios,
         })
       );
     } catch {
@@ -251,6 +270,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     expenseCategories,
     incomeCategories,
     owners,
+    investmentPortfolios,
   ]);
 
   const addExpenses = useCallback(
@@ -720,6 +740,131 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     setUiFormatSettingsState(settings);
   }, []);
 
+  const addPortfolio = useCallback(
+    (name: string) => {
+      const normalized = name.trim();
+      if (!normalized) return;
+      const now = nowIso();
+      const portfolio: InvestmentPortfolio = {
+        id: generateId(),
+        name: normalized,
+        createdAt: now,
+        updatedAt: now,
+        holdings: [],
+      };
+      if (useDummyData) return;
+      setInvestmentPortfolios((prev) => [...prev, portfolio]);
+    },
+    [useDummyData]
+  );
+
+  const renamePortfolio = useCallback(
+    (id: string, name: string) => {
+      const normalized = name.trim();
+      if (!normalized) return;
+      if (useDummyData) return;
+      setInvestmentPortfolios((prev) =>
+        prev.map((p) =>
+          p.id === id ? { ...p, name: normalized, updatedAt: nowIso() } : p
+        )
+      );
+    },
+    [useDummyData]
+  );
+
+  const deletePortfolio = useCallback(
+    (id: string) => {
+      if (useDummyData) return;
+      setInvestmentPortfolios((prev) => prev.filter((p) => p.id !== id));
+    },
+    [useDummyData]
+  );
+
+  const addHolding = useCallback(
+    (portfolioId: string, holding: Omit<InvestmentHolding, "id">) => {
+      if (useDummyData) return;
+      const symbol = holding.symbol.trim().toUpperCase();
+      if (!symbol || holding.quantity <= 0 || holding.investedAmount <= 0) return;
+      setInvestmentPortfolios((prev) =>
+        prev.map((p) =>
+          p.id !== portfolioId
+            ? p
+            : {
+                ...p,
+                updatedAt: nowIso(),
+                holdings: [
+                  ...p.holdings,
+                  {
+                    ...holding,
+                    id: generateId(),
+                    symbol,
+                    currency: "USD",
+                  },
+                ],
+              }
+        )
+      );
+    },
+    [useDummyData]
+  );
+
+  const updateHolding = useCallback(
+    (
+      portfolioId: string,
+      holdingId: string,
+      updates: Partial<InvestmentHolding>,
+    ) => {
+      if (useDummyData) return;
+      setInvestmentPortfolios((prev) =>
+        prev.map((p) =>
+          p.id !== portfolioId
+            ? p
+            : {
+                ...p,
+                updatedAt: nowIso(),
+                holdings: p.holdings.map((h) =>
+                  h.id !== holdingId
+                    ? h
+                    : {
+                        ...h,
+                        ...updates,
+                        symbol: (updates.symbol ?? h.symbol).trim().toUpperCase(),
+                        currency: "USD",
+                      }
+                ),
+              }
+        )
+      );
+    },
+    [useDummyData]
+  );
+
+  const removeHolding = useCallback(
+    (portfolioId: string, holdingId: string) => {
+      if (useDummyData) return;
+      setInvestmentPortfolios((prev) =>
+        prev.map((p) =>
+          p.id !== portfolioId
+            ? p
+            : {
+                ...p,
+                updatedAt: nowIso(),
+                holdings: p.holdings.filter((h) => h.id !== holdingId),
+              }
+        )
+      );
+    },
+    [useDummyData]
+  );
+
+  const setInvestmentPortfoliosList = useCallback(
+    (portfolios: InvestmentPortfolio[]) => {
+      if (useDummyData) return;
+      setInvestmentPortfolios(portfolios);
+    },
+    [useDummyData]
+  );
+
   const repairCorruptedDates = useCallback(() => {
     const activeExpenses = useDummyData ? dummyState.expenses : expenses;
     const activeIncome = useDummyData ? dummyState.income : income;
@@ -780,6 +925,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         : incomeCategories,
       owners: useDummyData ? dummyState.owners : owners,
       cardSources: useDummyData ? dummyState.cardSources : cardSources,
+      investmentPortfolios: useDummyData ? [] : investmentPortfolios,
       addExpenses,
       addExpense,
       updateExpense,
@@ -808,6 +954,13 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       setUiFormatSettings,
       useDummyData,
       setUseDummyData,
+      addPortfolio,
+      renamePortfolio,
+      deletePortfolio,
+      addHolding,
+      updateHolding,
+      removeHolding,
+      setInvestmentPortfolios: setInvestmentPortfoliosList,
     }),
     [
       addDebt,
@@ -819,6 +972,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       addIncome,
       addIncomes,
       cardSources,
+      investmentPortfolios,
       debtPayments,
       debts,
       dummyState,
@@ -847,6 +1001,13 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       updateIncome,
       useDummyData,
       setUseDummyData,
+      addPortfolio,
+      renamePortfolio,
+      deletePortfolio,
+      addHolding,
+      updateHolding,
+      removeHolding,
+      setInvestmentPortfoliosList,
     ]
   );
 

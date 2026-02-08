@@ -120,24 +120,28 @@ export function buildCashFlowRows({
   income,
   debtPayments,
   scope,
+  unassignedOwnerLabel = "Unassigned",
+  locale = "en-US",
 }: {
   monthKeys: string[];
   expenses: Expense[];
   income: Income[];
   debtPayments: DebtPayment[];
   scope: DashboardExpenseScope;
+  unassignedOwnerLabel?: string;
+  locale?: string;
 }): DashboardCashFlowRow[] {
   return monthKeys.map((monthKey) => {
     const incomeByOwner: Record<string, number> = {};
     for (const row of income) {
       if (!isValidDate(row.date) || monthFromDate(row.date) !== monthKey) continue;
-      const ownerKey = (row.owner || "Unassigned").trim() || "Unassigned";
+      const ownerKey = (row.owner || "").trim() || unassignedOwnerLabel;
       incomeByOwner[ownerKey] = (incomeByOwner[ownerKey] ?? 0) + row.amount;
     }
 
     return {
       monthKey,
-      monthLabel: getMonthLabel(monthKey),
+      monthLabel: getMonthLabel(monthKey, locale),
       incomeTotal: sumIncomeForMonth(income, monthKey),
       expensesTotal: sumExpensesForMonth(expenses, monthKey, scope),
       debtPaymentsTotal: sumDebtPaymentsForMonth(debtPayments, monthKey),
@@ -150,16 +154,18 @@ export function buildCategoryBreakdown({
   expenses,
   currentMonthKey,
   scope,
+  uncategorizedLabel = "Uncategorized",
 }: {
   expenses: Expense[];
   currentMonthKey: string;
   scope: DashboardExpenseScope;
+  uncategorizedLabel?: string;
 }): DashboardCategorySlice[] {
   const byCategory = new Map<string, number>();
   for (const expense of expenses) {
     if (!isValidDate(expense.date) || monthFromDate(expense.date) !== currentMonthKey) continue;
     if (!shouldIncludeExpense(expense, scope)) continue;
-    const category = (expense.category || "").trim() || "Uncategorized";
+    const category = (expense.category || "").trim() || uncategorizedLabel;
     byCategory.set(category, (byCategory.get(category) ?? 0) + expense.amount);
   }
 
@@ -173,15 +179,17 @@ export function buildOwnerSplit({
   currentMonthKey,
   scope,
   owners,
+  sharedLabel = "Shared",
+  unassignedLabel = "Unassigned",
 }: {
   expenses: Expense[];
   currentMonthKey: string;
   scope: DashboardExpenseScope;
   owners: string[];
+  sharedLabel?: string;
+  unassignedLabel?: string;
 }): DashboardOwnerSlice[] {
   const ownerValues = new Map<string, number>();
-  const sharedLabel = "Shared";
-  const unassignedLabel = "Unassigned";
   let shared = 0;
   let unassigned = 0;
 

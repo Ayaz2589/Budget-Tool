@@ -45,7 +45,8 @@ export type DashboardInsightType =
 export interface DashboardInsight {
   id: string;
   type: DashboardInsightType;
-  message: string;
+  messageKey: string;
+  messageValues?: Record<string, string | number>;
 }
 
 export interface DashboardCashFlowRow {

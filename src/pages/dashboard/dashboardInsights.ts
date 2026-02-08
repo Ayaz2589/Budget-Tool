@@ -44,7 +44,10 @@ export function buildDashboardInsights(input: DashboardInsightInput): DashboardI
       insights.push({
         id: `spending_spike:${currentMonthKey}`,
         type: "spending_spike",
-        message: `Spending is up ${(pct * 100).toFixed(0)}% vs last month.`,
+        messageKey: "dashboard.insightSpendingSpike",
+        messageValues: {
+          percent: `${(pct * 100).toFixed(0)}%`,
+        },
       });
     }
   }
@@ -62,7 +65,10 @@ export function buildDashboardInsights(input: DashboardInsightInput): DashboardI
     insights.push({
       id: `mortgage_confirmation:${latest.id}`,
       type: "mortgage_confirmation",
-      message: `Mortgage paid on ${formatDate(latest.date)}.`,
+      messageKey: "dashboard.insightMortgagePaidOn",
+      messageValues: {
+        date: formatDate(latest.date),
+      },
     });
   }
 
@@ -78,7 +84,10 @@ export function buildDashboardInsights(input: DashboardInsightInput): DashboardI
         insights.push({
           id: `upcoming_debt_payment:${currentMonthKey}:${debt.id}`,
           type: "upcoming_debt_payment",
-          message: `No payment logged for ${debt.name} this month.`,
+          messageKey: "dashboard.insightNoDebtPaymentThisMonth",
+          messageValues: {
+            name: debt.name,
+          },
         });
       }
     }
@@ -91,7 +100,7 @@ export function buildDashboardInsights(input: DashboardInsightInput): DashboardI
     insights.push({
       id: `missing_income:${currentMonthKey}`,
       type: "missing_income",
-      message: "No income entry recorded this month.",
+      messageKey: "dashboard.insightNoIncomeThisMonth",
     });
   }
 
@@ -123,6 +132,9 @@ export function formatSpentDeltaLabel(pct: number | null): string {
   return `${direction}${(pct * 100).toFixed(1)}%`;
 }
 
-export function formatDebtPaidSubtitle(value: number): string {
-  return `↓ ${formatCurrency(value)} paid this month`;
+export function formatDebtPaidSubtitle(
+  value: number,
+  translate: (key: string, values?: Record<string, string | number>) => string,
+): string {
+  return translate("dashboard.debtPaidThisMonth", { amount: formatCurrency(value) });
 }

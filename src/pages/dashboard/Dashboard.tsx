@@ -70,7 +70,7 @@ function asNumber(value: unknown): number {
 }
 
 export function Dashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { expenses, income, debts, debtPayments, owners } = useBudget();
   const { presetTransactions } = usePresetTransactions();
   const [range, setRange] = useState<DashboardRange>("current");
@@ -107,8 +107,10 @@ export function Dashboard() {
         income,
         debtPayments,
         scope: expenseScope,
+        unassignedOwnerLabel: t("dashboard.unassigned"),
+        locale: i18n.resolvedLanguage || i18n.language,
       }),
-    [monthKeys, expenses, income, debtPayments, expenseScope],
+    [monthKeys, expenses, income, debtPayments, expenseScope, t, i18n.language, i18n.resolvedLanguage],
   );
 
   const categorySlices = useMemo(
@@ -117,8 +119,9 @@ export function Dashboard() {
         expenses,
         currentMonthKey,
         scope: expenseScope,
+        uncategorizedLabel: t("common.uncategorized"),
       }),
-    [expenses, currentMonthKey, expenseScope],
+    [expenses, currentMonthKey, expenseScope, t],
   );
 
   const ownerSlices = useMemo(
@@ -128,8 +131,10 @@ export function Dashboard() {
         currentMonthKey,
         scope: expenseScope,
         owners,
+        sharedLabel: t("dashboard.shared"),
+        unassignedLabel: t("dashboard.unassigned"),
       }),
-    [expenses, currentMonthKey, expenseScope, owners],
+    [expenses, currentMonthKey, expenseScope, owners, t],
   );
 
   const debtRows = useMemo(
@@ -200,7 +205,7 @@ export function Dashboard() {
           <div>
             <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
             <p className="text-sm text-muted-foreground">
-              Are we financially okay this month?
+              {t("dashboard.healthQuestion")}
             </p>
           </div>
           <div className="flex w-full flex-col items-start gap-2 md:w-auto md:items-end">
@@ -228,8 +233,8 @@ export function Dashboard() {
             <div className="w-full md:w-auto">
               <div className="grid w-full grid-cols-2 rounded-2xl bg-zinc-900/80 p-1 ring-1 ring-white/10 md:min-w-[320px]">
                 {[
-                  { value: "all", label: "All Expenses" },
-                  { value: "exclude-mortgage", label: "Exclude Mortgage" },
+                  { value: "all", label: t("dashboard.scopeAllExpenses") },
+                  { value: "exclude-mortgage", label: t("dashboard.scopeExcludeMortgage") },
                 ].map((option) => {
                   const isActive = expenseScope === option.value;
                   return (
@@ -247,7 +252,7 @@ export function Dashboard() {
             </div>
             {expenseScope === "exclude-mortgage" ? (
               <p className="text-xs text-muted-foreground">
-                Mortgage excluded from expense totals
+                {t("dashboard.scopeMortgageExcludedHint")}
               </p>
             ) : null}
           </div>
@@ -256,7 +261,7 @@ export function Dashboard() {
         <div className="grid grid-cols-2 gap-1.5 md:grid-cols-2 md:gap-3 xl:grid-cols-4">
           <Card>
             <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
-              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">Net Cash Flow (MTD)</CardTitle>
+              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">{t("dashboard.kpiNetCashFlowMtd")}</CardTitle>
             </CardHeader>
             <CardContent className="px-2 pb-2 md:px-6 md:pb-6">
               <p className={kpis.netCashFlow >= 0 ? "text-base md:text-2xl font-semibold text-green-400" : "text-base md:text-2xl font-semibold text-destructive"}>
@@ -266,18 +271,18 @@ export function Dashboard() {
           </Card>
           <Card>
             <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
-              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">Total Spent (MTD)</CardTitle>
+              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">{t("dashboard.kpiTotalSpentMtd")}</CardTitle>
             </CardHeader>
             <CardContent className="px-2 pb-2 md:px-6 md:pb-6 space-y-0.5 md:space-y-1">
               <p className="text-base md:text-2xl font-semibold">{formatCurrency(kpis.totalSpent)}</p>
               <p className="text-xs text-muted-foreground">
-                vs last month: {formatSpentDeltaLabel(kpis.spentVsLastMonthPct)}
+                {t("dashboard.vsLastMonth")}: {formatSpentDeltaLabel(kpis.spentVsLastMonthPct)}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
-              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">Total Income (MTD)</CardTitle>
+              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">{t("dashboard.kpiTotalIncomeMtd")}</CardTitle>
             </CardHeader>
             <CardContent className="px-2 pb-2 md:px-6 md:pb-6">
               <p className="text-base md:text-2xl font-semibold">{formatCurrency(kpis.totalIncome)}</p>
@@ -285,23 +290,25 @@ export function Dashboard() {
           </Card>
           <Card>
             <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
-              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">Total Debt Outstanding</CardTitle>
+              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">{t("dashboard.kpiTotalDebtOutstanding")}</CardTitle>
             </CardHeader>
             <CardContent className="px-2 pb-2 md:px-6 md:pb-6 space-y-0.5 md:space-y-1">
               <p className="text-base md:text-2xl font-semibold">{formatCurrency(kpis.debtOutstanding)}</p>
-              <p className="text-xs text-muted-foreground">{formatDebtPaidSubtitle(kpis.debtPaidThisMonth)}</p>
+              <p className="text-xs text-muted-foreground">
+                {formatDebtPaidSubtitle(kpis.debtPaidThisMonth, t)}
+              </p>
             </CardContent>
           </Card>
         </div>
 
         <div className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <section className="min-w-0 space-y-2">
-            <h2 className="text-base font-semibold">Income vs Expenses</h2>
+            <h2 className="text-base font-semibold">{t("dashboard.chartIncomeVsExpenses")}</h2>
           <div className="hidden md:block">
             <ChartContainer
               config={{
-                expenses: { label: "Expenses", color: "#EF4444" },
-                debtPayments: { label: "Debt Payments", color: "#EAB308" },
+                expenses: { label: t("dashboard.chartExpenses"), color: "#EF4444" },
+                debtPayments: { label: t("dashboard.chartDebtPayments"), color: "#EAB308" },
               }}
               className="h-[280px]"
             >
@@ -322,7 +329,7 @@ export function Dashboard() {
                   <Bar
                     key={owner}
                     dataKey={(row) => row.incomeByOwner[owner] ?? 0}
-                    name={`Income (${owner})`}
+                    name={t("dashboard.chartIncomeOwner", { owner })}
                     fill={INCOME_OWNER_COLORS[index % INCOME_OWNER_COLORS.length]}
                     stackId="income"
                     radius={index === incomeOwnerKeys.length - 1 ? [4, 4, 0, 0] : 0}
@@ -330,19 +337,19 @@ export function Dashboard() {
                 ))}
                 <Bar
                   dataKey="expensesTotal"
-                  name="Expenses"
+                  name={t("dashboard.chartExpenses")}
                   fill="var(--color-expenses)"
                 />
-                <Bar dataKey="debtPaymentsTotal" name="Debt Payments" fill="var(--color-debtPayments)" />
+                <Bar dataKey="debtPaymentsTotal" name={t("dashboard.chartDebtPayments")} fill="var(--color-debtPayments)" />
               </BarChart>
             </ChartContainer>
           </div>
           <div className="md:hidden">
             <ChartContainer
               config={{
-                income: { label: "Income", color: INCOME_OWNER_COLORS[0] },
-                expenses: { label: "Expenses", color: "#EF4444" },
-                debtPayments: { label: "Debt Payments", color: "#EAB308" },
+                income: { label: t("dashboard.chartIncome"), color: INCOME_OWNER_COLORS[0] },
+                expenses: { label: t("dashboard.chartExpenses"), color: "#EF4444" },
+                debtPayments: { label: t("dashboard.chartDebtPayments"), color: "#EAB308" },
               }}
               className="h-[220px]"
             >
@@ -382,16 +389,16 @@ export function Dashboard() {
                     />
                   }
                 />
-                <Bar dataKey="incomeTotal" name="Income" fill="var(--color-income)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="incomeTotal" name={t("dashboard.chartIncome")} fill="var(--color-income)" radius={[4, 4, 0, 0]} />
                 <Bar
                   dataKey="expensesTotal"
-                  name="Expenses"
+                  name={t("dashboard.chartExpenses")}
                   fill="var(--color-expenses)"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
                   dataKey="debtPaymentsTotal"
-                  name="Debt Payments"
+                  name={t("dashboard.chartDebtPayments")}
                   fill="var(--color-debtPayments)"
                   radius={[4, 4, 0, 0]}
                 />
@@ -399,15 +406,15 @@ export function Dashboard() {
             </ChartContainer>
           </div>
             {cashFlowRows.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No data for selected range.</p>
+              <p className="text-sm text-muted-foreground">{t("dashboard.chartNoDataRange")}</p>
             ) : null}
           </section>
 
           <section className="min-w-0 space-y-2">
-            <h2 className="text-base font-semibold">Net Cash Flow Trend</h2>
+            <h2 className="text-base font-semibold">{t("dashboard.chartNetCashFlowTrend")}</h2>
             {range === "current" ? (
               <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-3">
-                <p className="text-xs text-muted-foreground">Current month net cash flow</p>
+                <p className="text-xs text-muted-foreground">{t("dashboard.chartCurrentMonthNetCashFlow")}</p>
                 <p
                   className={
                     (netCashFlowRows[0]?.netCashFlow ?? 0) >= 0
@@ -418,7 +425,7 @@ export function Dashboard() {
                   {formatCurrency(netCashFlowRows[0]?.netCashFlow ?? 0)}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Switch to Last 6 months or Last 12 months to view trend.
+                  {t("dashboard.chartTrendSwitchHint")}
                 </p>
               </div>
             ) : (
@@ -426,7 +433,7 @@ export function Dashboard() {
                 <div className="hidden md:block">
                 <ChartContainer
                   config={{
-                    netCashFlow: { label: "Net Cash Flow", color: "#22D3EE" },
+                    netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "#22D3EE" },
                   }}
                   className="h-[280px]"
                 >
@@ -447,7 +454,7 @@ export function Dashboard() {
                       <Line
                         type="monotone"
                         dataKey="netCashFlow"
-                        name="Net Cash Flow"
+                        name={t("dashboard.chartNetCashFlow")}
                         stroke="var(--color-netCashFlow)"
                         strokeWidth={2.5}
                         dot={{ r: 3 }}
@@ -459,7 +466,7 @@ export function Dashboard() {
                 <div className="md:hidden">
                 <ChartContainer
                   config={{
-                    netCashFlow: { label: "Net Cash Flow", color: "#22D3EE" },
+                    netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "#22D3EE" },
                   }}
                   className="h-[220px]"
                 >
@@ -503,7 +510,7 @@ export function Dashboard() {
                       <Line
                         type="monotone"
                         dataKey="netCashFlow"
-                        name="Net Cash Flow"
+                        name={t("dashboard.chartNetCashFlow")}
                         stroke="var(--color-netCashFlow)"
                         strokeWidth={2.25}
                         dot={{ r: 2.5 }}
@@ -515,20 +522,20 @@ export function Dashboard() {
               </>
             )}
             {netCashFlowRows.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No net cash flow data for selected range.</p>
+              <p className="text-sm text-muted-foreground">{t("dashboard.chartNoNetCashFlowData")}</p>
             ) : null}
           </section>
         </div>
 
         <section className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="min-w-0 space-y-2">
-            <h2 className="text-base font-semibold">Spending Breakdown</h2>
+            <h2 className="text-base font-semibold">{t("dashboard.chartSpendingBreakdown")}</h2>
             {categorySlices.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No spending categories this month.</p>
+              <p className="text-sm text-muted-foreground">{t("dashboard.chartNoSpendingCategories")}</p>
             ) : (
               <>
                 <div className="hidden md:block">
-                  <ChartContainer config={{ value: { label: "Amount", color: DONUT_COLORS[0]! } }} className="h-[260px]">
+                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} className="h-[260px]">
                     <PieChart>
                       <Pie
                         data={categorySlices}
@@ -553,7 +560,7 @@ export function Dashboard() {
                   </ChartContainer>
                 </div>
                 <div className="md:hidden space-y-2">
-                  <ChartContainer config={{ value: { label: "Amount", color: DONUT_COLORS[0]! } }} className="h-[210px]">
+                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} className="h-[210px]">
                     <PieChart>
                       <Pie
                         data={categorySlices}
@@ -600,13 +607,13 @@ export function Dashboard() {
           </div>
 
           <div className="min-w-0 space-y-2">
-            <h2 className="text-base font-semibold">Shared vs Individual Spending</h2>
+            <h2 className="text-base font-semibold">{t("dashboard.chartSharedVsIndividualSpending")}</h2>
             {ownerSlices.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No owner split data this month.</p>
+              <p className="text-sm text-muted-foreground">{t("dashboard.chartNoOwnerSplitData")}</p>
             ) : (
               <>
                 <div className="hidden md:block">
-                  <ChartContainer config={{ value: { label: "Amount", color: DONUT_COLORS[0]! } }} className="h-[260px]">
+                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} className="h-[260px]">
                     <PieChart>
                       <Pie
                         data={ownerSlices}
@@ -631,7 +638,7 @@ export function Dashboard() {
                   </ChartContainer>
                 </div>
                 <div className="md:hidden space-y-2">
-                  <ChartContainer config={{ value: { label: "Amount", color: DONUT_COLORS[0]! } }} className="h-[210px]">
+                  <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} className="h-[210px]">
                     <PieChart>
                       <Pie
                         data={ownerSlices}
@@ -679,9 +686,9 @@ export function Dashboard() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-base font-semibold">Debt Snapshot</h2>
+          <h2 className="text-base font-semibold">{t("dashboard.sectionDebtSnapshot")}</h2>
           {debtRows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No active debts.</p>
+            <p className="text-sm text-muted-foreground">{t("dashboard.sectionNoActiveDebts")}</p>
           ) : (
             <div className="divide-y border-t border-border">
               {debtRows.map((row, index) => (
@@ -711,15 +718,15 @@ export function Dashboard() {
         </section>
 
         <section className="space-y-1">
-          <h2 className="text-base font-semibold">Fixed Obligations (MTD)</h2>
+          <h2 className="text-base font-semibold">{t("dashboard.sectionFixedObligationsMtd")}</h2>
           <p className="text-2xl font-semibold">{formatCurrency(fixedObligations)}</p>
-          <p className="text-xs text-muted-foreground">Includes mortgage, utilities, and debt payments.</p>
+          <p className="text-xs text-muted-foreground">{t("dashboard.sectionFixedObligationsHint")}</p>
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-base font-semibold">Recent Activity</h2>
+          <h2 className="text-base font-semibold">{t("dashboard.sectionRecentActivity")}</h2>
           {recentActivity.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No recent transactions.</p>
+            <p className="text-sm text-muted-foreground">{t("dashboard.sectionNoRecentTransactions")}</p>
           ) : (
             <div className="divide-y border-t border-border">
               {recentActivity.map((item, index) => (
@@ -732,7 +739,7 @@ export function Dashboard() {
                     <p className="font-semibold">{formatCurrency(item.amount)}</p>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {(item.category || "Uncategorized") + " · " + (item.owner || t("common.noOwner"))}
+                    {(item.category || t("common.uncategorized")) + " · " + (item.owner || t("common.noOwner"))}
                   </p>
                 </div>
               ))}
@@ -741,9 +748,9 @@ export function Dashboard() {
         </section>
 
         <section className="space-y-2 pb-4">
-          <h2 className="text-base font-semibold">Smart Insights & Alerts</h2>
+          <h2 className="text-base font-semibold">{t("dashboard.sectionSmartInsightsAlerts")}</h2>
           {insights.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No alerts</p>
+            <p className="text-sm text-muted-foreground">{t("dashboard.sectionNoAlerts")}</p>
           ) : (
             <div className="space-y-2">
               {insights.map((insight) => (
@@ -751,14 +758,14 @@ export function Dashboard() {
                   key={insight.id}
                   className="flex items-start justify-between gap-3 border border-border/60 rounded-md px-3 py-2"
                 >
-                  <p className="text-sm">{insight.message}</p>
+                  <p className="text-sm">{t(insight.messageKey, insight.messageValues)}</p>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="h-8 px-2 text-xs"
                     onClick={() => dismissInsight(insight.id)}
                   >
-                    Dismiss
+                    {t("dashboard.dismiss")}
                   </Button>
                 </div>
               ))}

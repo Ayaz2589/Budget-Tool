@@ -38,6 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
 
 function defaultRow(
@@ -206,8 +207,8 @@ export function AddTransactionDialog({
     }
   };
 
-  const fieldClass = "h-11 w-full min-w-0";
-  const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
+  const fieldClass = "h-10 w-full min-w-0";
+  const selectTriggerClass = "h-10 w-full data-[size=default]:h-10";
   const sheetSide = "right";
 
   return (
@@ -215,10 +216,10 @@ export function AddTransactionDialog({
       <SheetContent
         side={sheetSide}
        
-        className="flex flex-col h-full w-[90vw] max-w-md border-l p-4 gap-3 overflow-hidden rounded-l-2xl md:w-[720px] md:max-w-[720px]"
+        className="flex flex-col h-full w-[90vw] max-w-md border-l p-0 gap-0 overflow-hidden rounded-l-2xl md:w-[720px] md:max-w-[720px]"
         onOpenAutoFocus={(event) => event.preventDefault()}
       >
-        <SheetHeader className="shrink-0 gap-2">
+        <SheetHeader className="shrink-0 gap-1 px-4 pt-4 pb-2 border-b border-border/60">
           <SheetTitle className="text-xl">
             {rows.length > 1
               ? t("addTransaction.newTransactions")
@@ -230,11 +231,17 @@ export function AddTransactionDialog({
         </SheetHeader>
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col flex-1 min-h-0 gap-3 overflow-hidden"
+          className="flex flex-col flex-1 min-h-0 gap-0 overflow-hidden"
         >
-          <div className="flex-1 min-h-0 overflow-auto space-y-4">
+          <div className="flex-1 min-h-0 overflow-auto divide-y">
             {rows.map((row, index) => (
-              <div key={row.id} className="rounded-xl border p-4 space-y-4">
+              <div
+                key={row.id}
+                className={cn(
+                  "px-2 py-2 md:px-3",
+                  index % 2 === 1 ? "bg-muted/20" : "bg-background"
+                )}
+              >
                 <div
                   role="button"
                   tabIndex={0}
@@ -248,7 +255,7 @@ export function AddTransactionDialog({
                   className="w-full flex items-center justify-between gap-2 text-left cursor-pointer"
                 >
                   <div className="min-w-0">
-                    <div className="text-base font-medium">
+                    <div className="text-sm font-semibold">
                       {t("addTransaction.transaction")} {index + 1}
                     </div>
                     {activeRowIndex !== index && (
@@ -266,7 +273,7 @@ export function AddTransactionDialog({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="size-9"
+                      className="size-8"
                       onClick={(e) => {
                         e.stopPropagation();
                         copyRow(index);
@@ -280,7 +287,7 @@ export function AddTransactionDialog({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="size-9 text-destructive hover:text-destructive"
+                        className="size-8 text-destructive hover:text-destructive"
                         onClick={(e) => {
                           e.stopPropagation();
                           removeRow(index);
@@ -299,10 +306,10 @@ export function AddTransactionDialog({
                 </div>
 
                 {activeRowIndex === index && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 pt-2 border-t border-border/60">
                   {presetTransactions.length > 0 &&
                     expenseCategories.length > 0 && (
-                      <div className="space-y-1 md:col-span-2">
+                      <div className="space-y-0.5 md:col-span-2">
                         <div className="text-xs text-muted-foreground">
                           {t("addTransaction.preset")}
                         </div>
@@ -355,7 +362,7 @@ export function AddTransactionDialog({
                       </div>
                     )}
 
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <div className="text-xs text-muted-foreground">
                       {t("addTransaction.source")}
                     </div>
@@ -394,7 +401,7 @@ export function AddTransactionDialog({
                     </Select>
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <div className="text-xs text-muted-foreground">
                       {t("addTransaction.date")}
                     </div>
@@ -416,7 +423,7 @@ export function AddTransactionDialog({
                     />
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <div className="text-xs text-muted-foreground">
                       {t("addTransaction.amount")}
                     </div>
@@ -433,7 +440,7 @@ export function AddTransactionDialog({
                     />
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <div className="text-xs text-muted-foreground">
                       {t("addTransaction.category")}
                     </div>
@@ -462,7 +469,7 @@ export function AddTransactionDialog({
                     </Select>
                   </div>
 
-                  <div className="space-y-1 md:col-span-2">
+                  <div className="space-y-0.5 md:col-span-2">
                     <div className="text-xs text-muted-foreground">
                       {t("addTransaction.description")}
                     </div>
@@ -476,7 +483,7 @@ export function AddTransactionDialog({
                     />
                   </div>
 
-                  <div className="space-y-1 md:col-span-2">
+                  <div className="space-y-0.5 md:col-span-2">
                     <div className="text-xs text-muted-foreground">
                       {t("common.owner")}
                     </div>
@@ -506,21 +513,15 @@ export function AddTransactionDialog({
               </div>
             ))}
           </div>
-          <div className="shrink-0 flex flex-col gap-3 pt-3 border-t">
-            <div className="flex items-center justify-between gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="h-11"
-                onClick={addRow}
-              >
-                <Plus className="size-4" />
-                {t("addTransaction.addRow")}
-              </Button>
-              <span className="text-xs text-muted-foreground">
-                {t("addTransaction.withValidAmount", { count: validCount })}
-              </span>
-            </div>
+          <div className="shrink-0 flex flex-col gap-2 pt-2 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] border-t border-border/60 bg-background">
+            <Button
+              type="button"
+              className="h-11 w-full bg-white text-black hover:bg-white/90"
+              onClick={addRow}
+            >
+              <Plus className="size-4" />
+              {t("addTransaction.addRow")}
+            </Button>
             <SheetFooter className="flex-row gap-2 p-0">
               <Button
                 type="button"

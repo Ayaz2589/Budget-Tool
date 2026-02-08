@@ -1,8 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { DebtListMobileProps } from "@/types/debt";
 
@@ -11,91 +9,53 @@ export type { DebtListMobileProps };
 export function DebtListMobile({
   debts,
   paymentsByDebt,
-  onAddPayment,
-  onDelete,
+  onDebtTap,
 }: DebtListMobileProps) {
   const { t } = useTranslation();
   return (
-    <div className="space-y-3 px-4 pb-2">
+    <div className="space-y-0">
       {debts.map((debt, index) => {
         const payments = paymentsByDebt.get(debt.id) ?? [];
         const balance = getDebtBalance(debt, payments);
         return (
-          <div
-            key={debt.id}
-            className="rounded-xl border border-border/60 overflow-hidden"
-          >
-            <div
+          <div key={debt.id} className="border-t border-border">
+            <button
+              type="button"
+              onClick={() => onDebtTap(debt)}
               className={cn(
-                "px-4 py-3 flex items-start gap-2",
-                index % 2 === 1 ? "bg-muted/20" : "bg-background"
+                "w-full px-4 py-5 flex items-start gap-2 text-left",
+                index % 2 === 1 ? "bg-muted/30" : "bg-background"
               )}
+              aria-label={`${debt.name}, ${formatCurrency(balance)}, ${
+                debt.owner || t("common.noOwner")
+              }`}
             >
-              <div className="flex-1 min-w-0 text-left">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="truncate text-base font-medium text-foreground">
-                    {debt.name}
-                  </span>
-                  <span className="shrink-0 text-base font-semibold">
-                    {formatCurrency(balance)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
-                  <span>
-                    {debt.owner || "No Owner"}
-                    {debt.startDate ? ` · ${formatDate(debt.startDate)}` : ""}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="px-4 pb-3">
-              <div className="mb-2 flex items-center gap-2">
-                <Button
-                  type="button"
-                  onClick={() => onAddPayment(debt.id)}
-                  disabled={balance <= 0}
-                  className="h-11 flex-1"
-                  aria-label={`${t("debt.makePayment")} ${debt.name}`}
-                >
-                  {t("debt.makePayment")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => onDelete(debt.id)}
-                  className="h-11 flex-1"
-                  aria-label={`${t("debt.deleteDebt")} ${debt.name}`}
-                >
-                  <Trash2 className="size-4" />
-                  {t("debt.deleteDebt")}
-                </Button>
-              </div>
-              <div className="text-xs text-muted-foreground mb-2">
-                {t("debt.paymentHistory")}
-              </div>
-              {payments.length === 0 ? (
-                <div className="text-xs text-muted-foreground">
-                  {t("debt.noPaymentsYet")}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {payments.map((p) => (
-                    <div
-                      key={p.id}
-                      className="flex items-center justify-between text-xs"
-                    >
-                      <div className="text-muted-foreground">
-                        {formatDate(p.date)}
-                        {p.note ? ` · ${p.note}` : ""}
-                      </div>
-                      <div className="font-medium">
-                        {formatCurrency(p.amount)}
-                      </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="truncate text-base font-medium text-foreground">
+                      {debt.name}
                     </div>
-                  ))}
+                    <div className="truncate text-xs text-muted-foreground">
+                      {debt.owner || t("common.noOwner")}
+                      {debt.startDate ? ` · ${formatDate(debt.startDate)}` : ""}
+                    </div>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <div className="text-base font-semibold">
+                      {formatCurrency(balance)}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {payments.length === 1
+                        ? t("transactions.transaction_one", { count: 1 })
+                        : t("transactions.transaction_other", {
+                            count: payments.length,
+                      })}
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            </button>
           </div>
         );
       })}

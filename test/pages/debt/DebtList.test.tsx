@@ -9,11 +9,7 @@ test("DebtList shows empty state when no debts", () => {
     <DebtList
       debts={[]}
       paymentsByDebt={new Map()}
-      onAddPayment={() => {}}
-      onUpdateOwner={() => {}}
-      ownerOptions={[]}
-      onDelete={() => {}}
-      onRemovePayment={() => {}}
+      onDebtTap={() => {}}
     />,
   );
   expect(
@@ -22,10 +18,8 @@ test("DebtList shows empty state when no debts", () => {
   ).toBeGreaterThan(0);
 });
 
-test("DebtList triggers payment and delete actions", () => {
-  const onAddPayment = mock(() => {});
-  const onDelete = mock(() => {});
-  const onRemovePayment = mock(() => {});
+test("DebtList triggers row tap action", () => {
+  const onDebtTap = mock(() => {});
   render(
     <DebtList
       debts={[
@@ -45,19 +39,13 @@ test("DebtList triggers payment and delete actions", () => {
           ],
         ])
       }
-      onAddPayment={onAddPayment}
-      onUpdateOwner={() => {}}
-      ownerOptions={["Ayaz"]}
-      onDelete={onDelete}
-      onRemovePayment={onRemovePayment}
+      onDebtTap={onDebtTap}
     />,
   );
 
-  fireEvent.click(screen.getByRole("button", { name: "Make payment" }));
-  fireEvent.click(screen.getByRole("button", { name: "Delete debt" }));
-  fireEvent.click(screen.getByRole("button", { name: "Remove" }));
+  fireEvent.click(screen.getByRole("button", { name: /credit card/i }));
 
-  expect(onAddPayment).toHaveBeenCalledWith("d1");
-  expect(onDelete).toHaveBeenCalledWith("d1");
-  expect(onRemovePayment).toHaveBeenCalledWith("p1");
+  expect(onDebtTap).toHaveBeenCalledWith(
+    expect.objectContaining({ id: "d1" }),
+  );
 });

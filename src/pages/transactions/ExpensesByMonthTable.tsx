@@ -12,20 +12,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
-import { CategoryOption } from "@/lib/categoryColors";
 import { SourceIcon } from "@/components/cards";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type {
   SortColumn,
   ExpensesByMonthTableProps,
@@ -56,12 +47,7 @@ export function ExpensesByMonthTable({
   sortBy,
   sortDir,
   onSort,
-  onUpdateCategory,
-  onUpdateOwner,
-  expenseCategories,
-  ownerOptions = [],
-  onEditOne,
-  onDeleteOne,
+  onExpenseTap,
   sourceLabelKeys,
   t,
 }: ExpensesByMonthTableProps) {
@@ -176,24 +162,38 @@ export function ExpensesByMonthTable({
                       />
                     </button>
                   </TableHead>
-                  <TableHead className="w-[80px]">
-                    {t("common.actions")}
-                  </TableHead>
                 </TableRow>
               </TableHeader>
-                <TableBody>
-                  {monthExpenses.map((e, index) => (
-                    <TableRow
-                      key={e.id}
-                      className={index % 2 === 1 ? "bg-muted/30" : undefined}
-                    >
-                    <TableCell className="whitespace-nowrap">
+              <TableBody>
+                {monthExpenses.map((e, index) => (
+                  <TableRow
+                    key={e.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => onExpenseTap(e)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onExpenseTap(e);
+                      }
+                    }}
+                    className={cn(
+                      "cursor-pointer [&>td]:py-4",
+                      index % 2 === 1 ? "bg-muted/30" : undefined
+                    )}
+                    aria-label={`${e.description || "—"}, ${formatCurrency(
+                      e.amount
+                    )}, ${formatDate(e.date)}`}
+                  >
+                    <TableCell className="whitespace-nowrap text-muted-foreground">
                       {formatDate(e.date)}
                     </TableCell>
-                    <TableCell className="max-w-[220px] truncate">
-                      {e.description}
+                    <TableCell className="max-w-[260px] truncate font-medium">
+                      {e.description || "—"}
                     </TableCell>
-                    <TableCell>{formatCurrency(e.amount)}</TableCell>
+                    <TableCell className="font-semibold">
+                      {formatCurrency(e.amount)}
+                    </TableCell>
                     <TableCell className="text-muted-foreground">
                       <span className="flex items-center gap-2">
                         <SourceIcon source={e.source} size={20} />
@@ -203,73 +203,10 @@ export function ExpensesByMonthTable({
                       </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      <Select
-                        value={e.owner || "_none"}
-                        onValueChange={(v) =>
-                          onUpdateOwner(e.id, v === "_none" ? "" : v)
-                        }
-                      >
-                        <SelectTrigger className="w-[160px] min-w-[140px]">
-                          <SelectValue placeholder={t("common.noOwner")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="_none">
-                            {t("common.noOwner")}
-                          </SelectItem>
-                          {ownerOptions.map((name) => (
-                            <SelectItem key={name} value={name}>
-                              {name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      {e.owner || t("common.noOwner")}
                     </TableCell>
-                    <TableCell>
-                      <Select
-                        value={e.category || "_"}
-                        onValueChange={(v) =>
-                          onUpdateCategory(e.id, v === "_" ? "" : v)
-                        }
-                      >
-                        <SelectTrigger className="w-[220px] min-w-[200px]">
-                          <SelectValue placeholder="Category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="_">
-                            <CategoryOption
-                              name="Uncategorized"
-                              type="expense"
-                            />
-                          </SelectItem>
-                          {expenseCategories.map((c) => (
-                            <SelectItem key={c} value={c}>
-                              <CategoryOption name={c} type="expense" />
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onEditOne(e)}
-                          className="size-8"
-                          aria-label={t("common.edit")}
-                        >
-                          <Pencil className="size-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onDeleteOne(e)}
-                          className="size-8 text-destructive hover:text-destructive"
-                          aria-label={t("common.delete")}
-                        >
-                          <Trash2 className="size-4 text-destructive" />
-                        </Button>
-                      </div>
+                    <TableCell className="text-muted-foreground">
+                      {e.category || t("common.uncategorized")}
                     </TableCell>
                   </TableRow>
                 ))}

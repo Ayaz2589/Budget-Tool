@@ -3,9 +3,7 @@ import type { UiFormatSettings } from "@/lib/format";
 
 export interface MortgagePaymentsTableProps {
   payments: Expense[];
-  onRemove: (expense: Expense) => void;
-  onUpdateOwner: (id: string, owner: string) => void;
-  ownerOptions: string[];
+  onPaymentTap: (expense: Expense) => void;
 }
 
 export interface MortgagePaymentActionsDialogProps {

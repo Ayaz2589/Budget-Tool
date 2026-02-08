@@ -6,18 +6,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import type { DebtListProps } from "@/types/debt";
 
 export type { DebtListProps };
@@ -25,11 +17,7 @@ export type { DebtListProps };
 export function DebtList({
   debts,
   paymentsByDebt,
-  onAddPayment,
-  onUpdateOwner,
-  ownerOptions = [],
-  onDelete,
-  onRemovePayment,
+  onDebtTap,
 }: DebtListProps) {
   const { t } = useTranslation();
   if (debts.length === 0) {
@@ -41,138 +29,66 @@ export function DebtList({
   }
 
   return (
-    <>
-      <div className="space-y-6">
-        {debts.map((debt) => {
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>{t("common.description")}</TableHead>
+          <TableHead>{t("common.owner")}</TableHead>
+          <TableHead>{t("common.amount")}</TableHead>
+          <TableHead>{t("debt.balance")}</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {debts.map((debt, index) => {
           const payments = paymentsByDebt.get(debt.id) ?? [];
           const balance = getDebtBalance(debt, payments);
           return (
-            <div
+            <TableRow
               key={debt.id}
-              className="pb-6 border-b border-border/60 last:border-b-0 space-y-4"
+              role="button"
+              tabIndex={0}
+              onClick={() => onDebtTap(debt)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onDebtTap(debt);
+                }
+              }}
+              className={cn(
+                "cursor-pointer",
+                index % 2 === 1 ? "bg-muted/30" : undefined
+              )}
             >
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div className="space-y-2 min-w-0">
-                  <h3 className="font-semibold text-lg">{debt.name}</h3>
-                  <div className="flex flex-wrap items-center gap-2 text-muted-foreground text-sm">
-                    <Select
-                      value={debt.owner || "_none"}
-                      onValueChange={(v) =>
-                        onUpdateOwner(debt.id, v === "_none" ? "" : v)
-                      }
-                    >
-                      <SelectTrigger className="h-9 w-[220px]">
-                        <SelectValue placeholder="No Owner" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="_none">No Owner</SelectItem>
-                        {ownerOptions.map((o) => (
-                          <SelectItem key={o} value={o}>
-                            {o}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {debt.startDate ? <span>Started {formatDate(debt.startDate)}</span> : null}
-                  </div>
+              <TableCell className="font-medium">{debt.name}</TableCell>
+              <TableCell className="text-muted-foreground">
+                <div className="flex items-center gap-1 whitespace-nowrap">
+                  <span>{debt.owner || t("common.noOwner")}</span>
+                  {debt.startDate ? (
+                    <span className="text-muted-foreground">
+                      · {formatDate(debt.startDate)}
+                    </span>
+                  ) : null}
                 </div>
-
-                <div className="grid grid-cols-2 gap-8 lg:min-w-[320px]">
-                  <div>
-                    <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
-                      Initial
-                    </p>
-                    <p className="text-sm font-medium mt-0.5">
-                      {formatCurrency(debt.initialAmount)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
-                      Balance
-                    </p>
-                    <p className="text-lg font-semibold mt-0.5">
-                      {formatCurrency(balance)}
-                    </p>
-                  </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex flex-col leading-tight">
+                  <span>{formatCurrency(debt.initialAmount)}</span>
+                  <span className="text-xs text-muted-foreground mt-0.5">
+                    {payments.length === 1
+                      ? t("transactions.transaction_one", { count: 1 })
+                      : t("transactions.transaction_other", {
+                          count: payments.length,
+                        })}
+                  </span>
                 </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/40">
-                <div className="ml-auto flex items-center gap-2">
-                  <Button
-                    type="button"
-                    className="h-11"
-                    onClick={() => onAddPayment(debt.id)}
-                    disabled={balance <= 0}
-                  >
-                    Make payment
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-11 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() => onDelete(debt.id)}
-                  >
-                    <Trash2 className="size-4 text-destructive" />
-                    Delete debt
-                  </Button>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-border/40">
-                <h4 className="text-sm font-medium text-muted-foreground mb-2">
-                  Payment history
-                </h4>
-                {payments.length === 0 ? (
-                  <p className="text-muted-foreground text-sm py-3">
-                    No payments yet.
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto rounded-md border border-border/60">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="hover:bg-transparent">
-                          <TableHead className="text-xs">Date</TableHead>
-                          <TableHead className="text-xs">Amount</TableHead>
-                          <TableHead className="text-xs">Note</TableHead>
-                          <TableHead className="w-[72px] text-right text-xs">
-                            Actions
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {payments.map((p) => (
-                          <TableRow key={p.id}>
-                            <TableCell className="text-sm">{formatDate(p.date)}</TableCell>
-                            <TableCell className="text-sm font-medium">
-                              {formatCurrency(p.amount)}
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">
-                              {p.note ?? "—"}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
-                                onClick={() => onRemovePayment(p.id)}
-                                aria-label="Remove"
-                              >
-                                <Trash2 className="size-4 text-destructive" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </div>
-            </div>
+              </TableCell>
+              <TableCell className="font-semibold">
+                {formatCurrency(balance)}
+              </TableCell>
+            </TableRow>
           );
         })}
-      </div>
-    </>
+      </TableBody>
+    </Table>
   );
 }

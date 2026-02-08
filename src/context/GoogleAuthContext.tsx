@@ -801,20 +801,50 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         (i) => !appIncomeKeys.has(incomeKey(i))
       );
 
-      const expenseCatSet = new Set(budget.expenseCategories);
-      const incomeCatSet = new Set(budget.incomeCategories);
-      const normalizeExpenseCategory = (category: string) =>
-        expenseCatSet.has(category) ? category : "";
-      const normalizeIncomeCategory = (category: string) =>
-        incomeCatSet.has(category) ? category : "";
+      const additionalExpenseCategories = [
+        ...new Set(
+          sheetExpenses
+            .map((e) => (e.category || "").trim())
+            .filter(
+              (category) =>
+                category.length > 0 &&
+                category.toLowerCase() !== "mortgage" &&
+                !budget.expenseCategories.includes(category)
+            )
+        ),
+      ];
+      if (additionalExpenseCategories.length > 0) {
+        budget.setExpenseCategories([
+          ...budget.expenseCategories,
+          ...additionalExpenseCategories,
+        ]);
+      }
+
+      const additionalIncomeCategories = [
+        ...new Set(
+          sheetIncome
+            .map((i) => (i.category || "").trim())
+            .filter(
+              (category) =>
+                category.length > 0 &&
+                !budget.incomeCategories.includes(category)
+            )
+        ),
+      ];
+      if (additionalIncomeCategories.length > 0) {
+        budget.setIncomeCategories([
+          ...budget.incomeCategories,
+          ...additionalIncomeCategories,
+        ]);
+      }
 
       const normalizedNewExpenses = newExpenses.map((e) => ({
         ...e,
-        category: normalizeExpenseCategory(e.category || ""),
+        category: e.category || "",
       }));
       const normalizedNewMortgage = newMortgage.map((e) => ({
         ...e,
-        category: normalizeExpenseCategory(e.category || ""),
+        category: "Mortgage",
       }));
 
       if (
@@ -833,7 +863,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
             date: i.date,
             amount: i.amount,
             description: i.description,
-            category: normalizeIncomeCategory(i.category || ""),
+            category: i.category || "",
+            owner: i.owner,
           });
         }
       }
@@ -883,6 +914,10 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.addDebtPayments,
     budget.setCardSources,
     budget.setInvestmentPortfolios,
+    budget.expenseCategories,
+    budget.incomeCategories,
+    budget.setExpenseCategories,
+    budget.setIncomeCategories,
   ]);
 
   const value = useMemo<GoogleAuthContextValue>(

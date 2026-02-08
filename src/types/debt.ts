@@ -4,18 +4,13 @@ import type { UiFormatSettings } from "@/lib/format";
 export interface DebtListProps {
   debts: Debt[];
   paymentsByDebt: Map<string, DebtPayment[]>;
-  onAddPayment: (debtId: string) => void;
-  onUpdateOwner: (debtId: string, owner: Owner) => void;
-  ownerOptions: string[];
-  onDelete: (debtId: string) => void;
-  onRemovePayment: (paymentId: string) => void;
+  onDebtTap: (debt: Debt) => void;
 }
 
 export interface DebtListMobileProps {
   debts: Debt[];
   paymentsByDebt: Map<string, DebtPayment[]>;
-  onAddPayment: (debtId: string) => void;
-  onDelete: (debtId: string) => void;
+  onDebtTap: (debt: Debt) => void;
 }
 
 export interface AddDebtPayload {

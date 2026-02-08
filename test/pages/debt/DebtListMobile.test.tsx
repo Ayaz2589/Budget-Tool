@@ -5,8 +5,7 @@ import { DebtListMobile } from "@/pages/debt/DebtListMobile";
 afterEach(() => cleanup());
 
 test("DebtListMobile renders debts and triggers actions", () => {
-  const onAddPayment = mock(() => {});
-  const onDelete = mock(() => {});
+  const onDebtTap = mock(() => {});
 
   render(
     <DebtListMobile
@@ -27,14 +26,11 @@ test("DebtListMobile renders debts and triggers actions", () => {
           ],
         ])
       }
-      onAddPayment={onAddPayment}
-      onDelete={onDelete}
+      onDebtTap={onDebtTap}
     />,
   );
 
   expect(screen.getByText("Loan")).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: /make payment loan/i }));
-  fireEvent.click(screen.getByRole("button", { name: /delete debt loan/i }));
-  expect(onAddPayment).toHaveBeenCalledWith("d1");
-  expect(onDelete).toHaveBeenCalledWith("d1");
+  fireEvent.click(screen.getByRole("button", { name: /loan,/i }));
+  expect(onDebtTap).toHaveBeenCalledWith(expect.objectContaining({ id: "d1" }));
 });

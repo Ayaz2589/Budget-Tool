@@ -149,7 +149,7 @@ export function DebtActionsDialog({
         <div className="border-t px-4 py-3">
           <div className="flex items-center gap-2">
             <Button
-              className="h-11 flex-1 justify-start"
+              className="h-11 flex-1 justify-center text-center"
               onClick={handleAddPayment}
               disabled={balance <= 0}
             >
@@ -157,7 +157,7 @@ export function DebtActionsDialog({
             </Button>
             <Button
               variant="destructive"
-              className="h-11 flex-1 justify-start"
+              className="h-11 flex-1 justify-center text-center"
               onClick={handleDelete}
             >
               <Trash2 className="size-4 text-destructive" />

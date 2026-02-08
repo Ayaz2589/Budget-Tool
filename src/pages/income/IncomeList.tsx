@@ -41,13 +41,13 @@ export function IncomeList({
                   <div
                     key={i.id}
                     className={cn(
-                      "px-4 py-3 flex items-start gap-2",
+                      "px-4 py-5 flex items-start gap-2",
                       index % 2 === 1 ? "bg-muted/30" : "bg-background"
                     )}
                   >
                     <button
                       type="button"
-                      className="flex-1 min-w-0 text-left"
+                      className="flex-1 min-w-0 min-h-14 text-left"
                       onClick={() => onIncomeTap(i)}
                       aria-label={`${i.description || "Income"}, ${formatCurrency(
                         i.amount

@@ -14,13 +14,13 @@ export function MortgagePaymentsList({
         <div key={e.id} className="border-t border-border">
           <div
             className={cn(
-              "px-4 py-3 flex items-start gap-2",
+              "px-4 py-5 flex items-start gap-2",
               index % 2 === 1 ? "bg-muted/30" : "bg-background"
             )}
           >
             <button
               type="button"
-              className="flex-1 min-w-0 text-left"
+              className="flex-1 min-w-0 min-h-14 text-left"
               onClick={() => onPaymentTap(e)}
               aria-label={`${formatDate(e.date)}, ${formatCurrency(e.amount)}`}
             >

@@ -41,7 +41,7 @@ export function IncomeActionsDialog({
   t,
 }: IncomeActionsDialogProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const fieldClass = "h-11 w-full";
+  const actionButtonClass = "h-11 w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
   if (income === null) return null;
@@ -67,95 +67,99 @@ export function IncomeActionsDialog({
         <SheetContent
           side="right"
           showCloseButton={true}
-          className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
+          className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-hidden flex flex-col"
         >
           <SheetHeader className="px-4 pt-5 pb-3">
             <SheetTitle className="text-left pr-8 break-words text-xl leading-snug">
               {income.description || t("income.defaultDescription")}
             </SheetTitle>
           </SheetHeader>
-          <div className="grid gap-5 px-4 pb-8 overflow-y-auto overscroll-contain">
-            <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
-              <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
-                <span>{t("common.date")}</span>
-                <span>{formatDate(income.date)}</span>
+          <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-6">
+            <div className="grid gap-5">
+              <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
+                <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
+                  <span>{t("common.date")}</span>
+                  <span>{formatDate(income.date)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                    {t("common.amount")}
+                  </span>
+                  <span className="text-lg font-semibold text-foreground">
+                    {formatCurrency(income.amount)}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                  {t("common.amount")}
-                </span>
-                <span className="text-lg font-semibold text-foreground">
-                  {formatCurrency(income.amount)}
-                </span>
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">
+                  {t("common.category")}
+                </Label>
+                <Select
+                  value={income.category || "_"}
+                  onValueChange={(v) =>
+                    onUpdateCategory(income.id, v === "_" ? "" : v)
+                  }
+                >
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue>
+                      <CategoryOption
+                        name={income.category || t("common.uncategorized")}
+                        type="income"
+                      />
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_">
+                      <CategoryOption
+                        name={t("common.uncategorized")}
+                        type="income"
+                      />
+                    </SelectItem>
+                    {incomeCategories.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        <CategoryOption name={c} type="income" />
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">
+                  {t("common.owner")}
+                </Label>
+                <Select
+                  value={income.owner || "_none"}
+                  onValueChange={(v) =>
+                    onUpdateOwner(income.id, v === "_none" ? "" : v)
+                  }
+                >
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                    {ownerOptions.map((o) => (
+                      <SelectItem key={o} value={o}>
+                        {o}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">
-                {t("common.category")}
-              </Label>
-              <Select
-                value={income.category || "_"}
-                onValueChange={(v) =>
-                  onUpdateCategory(income.id, v === "_" ? "" : v)
-                }
-              >
-                <SelectTrigger className={selectTriggerClass}>
-                  <SelectValue>
-                    <CategoryOption
-                      name={income.category || t("common.uncategorized")}
-                      type="income"
-                    />
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_">
-                    <CategoryOption
-                      name={t("common.uncategorized")}
-                      type="income"
-                    />
-                  </SelectItem>
-                  {incomeCategories.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      <CategoryOption name={c} type="income" />
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">
-                {t("common.owner")}
-              </Label>
-              <Select
-                value={income.owner || "_none"}
-                onValueChange={(v) =>
-                  onUpdateOwner(income.id, v === "_none" ? "" : v)
-                }
-              >
-                <SelectTrigger className={selectTriggerClass}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
-                  {ownerOptions.map((o) => (
-                    <SelectItem key={o} value={o}>
-                      {o}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
+          </div>
+          <div className="border-t border-border/60 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)] bg-background">
+            <div className="grid grid-cols-2 gap-2">
               <Button
                 variant="outline"
-                className={fieldClass}
+                className={actionButtonClass}
                 onClick={handleEdit}
               >
                 {t("common.edit")}
               </Button>
               <Button
                 variant="destructive"
-                className={fieldClass}
+                className={actionButtonClass}
                 onClick={handleDeleteClick}
               >
                 <Trash2 className="size-4" />

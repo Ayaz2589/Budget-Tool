@@ -43,12 +43,7 @@ export interface IncomeListProps {
 export interface IncomeTableProps {
   byMonth: [string, Income[]][];
   defaultOpenMonth: string;
-  incomeCategories: string[];
-  ownerOptions: string[];
-  onEdit: (income: Income) => void;
-  onDelete: (id: string) => void;
-  onUpdateCategory: (id: string, category: string) => void;
-  onUpdateOwner: (id: string, owner: Owner) => void;
+  onIncomeTap: (income: Income) => void;
 }
 
 export interface IncomeActionsDialogProps {

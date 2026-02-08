@@ -102,6 +102,7 @@ function ChartTooltipContent({
   labelFormatter,
   labelClassName,
   formatter,
+  valueFormatter,
   color,
   nameKey,
   labelKey,
@@ -112,6 +113,13 @@ function ChartTooltipContent({
     indicator?: "line" | "dot" | "dashed";
     nameKey?: string;
     labelKey?: string;
+    valueFormatter?: (
+      value: number | string,
+      name: string,
+      item: any,
+      index: number,
+      payload: any,
+    ) => React.ReactNode;
   }) {
   const { config } = useChart();
 
@@ -221,9 +229,17 @@ function ChartTooltipContent({
                           {itemConfig?.label || item.name}
                         </span>
                       </div>
-                      {item.value && (
+                      {item.value !== undefined && item.value !== null && (
                         <span className="text-foreground font-mono font-medium tabular-nums">
-                          {item.value.toLocaleString()}
+                          {valueFormatter
+                            ? valueFormatter(
+                                item.value as number | string,
+                                String(item.name ?? ""),
+                                item,
+                                index,
+                                item.payload,
+                              )
+                            : item.value.toLocaleString()}
                         </span>
                       )}
                     </div>

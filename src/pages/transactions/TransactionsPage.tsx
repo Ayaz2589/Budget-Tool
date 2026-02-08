@@ -1,5 +1,6 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { useBudget } from "@/context/BudgetContext";
 import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
@@ -18,6 +19,7 @@ import { DeleteOneTransactionDialog } from "./DeleteTransactionDialogs";
 
 export function TransactionsPage() {
   const { t } = useTranslation();
+  const location = useLocation();
   const {
     expenses,
     updateExpense,
@@ -42,6 +44,8 @@ export function TransactionsPage() {
   );
   const [filtersPopupOpen, setFiltersPopupOpen] = useState(false);
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
+  const pendingHighlightIdRef = useRef<string | null>(null);
+  const pendingOpenEditIdRef = useRef<string | null>(null);
 
   const ownerOptions = useMemo(() => {
     if (owners.length > 0) return owners;
@@ -52,6 +56,16 @@ export function TransactionsPage() {
     ].sort();
     return fromExpenses;
   }, [owners, expenses]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setMonthFilter(params.get("month") ?? "");
+    setSourceFilter(params.get("source") ?? "all");
+    setCategoryFilter(params.get("category") ?? "");
+    setOwnerFilter(params.get("owner") ?? "all");
+    pendingHighlightIdRef.current = params.get("highlight");
+    pendingOpenEditIdRef.current = params.get("openEdit");
+  }, [location.search]);
 
   const filtered = useMemo(() => {
     let list = [...expenses]
@@ -77,6 +91,11 @@ export function TransactionsPage() {
     if (ownerFilter && ownerFilter !== "all") {
       if (ownerFilter === "_none") {
         list = list.filter((e) => !e.owner);
+      } else if (ownerFilter === "_shared") {
+        list = list.filter(
+          (e) =>
+            (e.category || "").trim().toLowerCase() === "50/50" || !e.owner,
+        );
       } else {
         list = list.filter((e) => (e.owner ?? "") === ownerFilter);
       }
@@ -170,6 +189,25 @@ export function TransactionsPage() {
     }
   }, [deleteOneExpense, removeExpense]);
 
+  useEffect(() => {
+    const openEditId = pendingOpenEditIdRef.current;
+    if (openEditId) {
+      const target = filtered.find((e) => e.id === openEditId);
+      if (target) {
+        setEditExpense(target);
+        pendingOpenEditIdRef.current = null;
+      }
+    }
+    const highlightId = pendingHighlightIdRef.current;
+    if (highlightId) {
+      const target = filtered.find((e) => e.id === highlightId);
+      if (target) {
+        setExpenseForActions(target);
+        pendingHighlightIdRef.current = null;
+      }
+    }
+  }, [filtered]);
+
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="hidden md:flex flex-wrap items-start justify-between gap-2 shrink-0 mb-4">
@@ -228,7 +266,7 @@ export function TransactionsPage() {
               t={t}
             />
 
-            <div className="flex-1 md:border md:rounded-md">
+            <div className="flex-1">
               {filtered.length === 0 ? (
                 <div className="text-center text-muted-foreground py-12 px-4 flex flex-col items-center gap-3">
                   <Receipt className="size-8 text-muted-foreground/70" />
@@ -245,16 +283,7 @@ export function TransactionsPage() {
                       sortBy={sortBy}
                       sortDir={sortDir}
                       onSort={toggleSort}
-                      onUpdateCategory={(id, category) =>
-                        updateExpense(id, { category })
-                      }
-                      onUpdateOwner={(id, owner) =>
-                        updateExpense(id, { owner: owner || undefined })
-                      }
-                      expenseCategories={expenseCategories}
-                      ownerOptions={ownerOptions}
-                      onEditOne={setEditExpense}
-                      onDeleteOne={setDeleteOneExpense}
+                      onExpenseTap={setExpenseForActions}
                       sourceLabelKeys={SOURCE_LABEL_KEYS}
                       t={t}
                     />

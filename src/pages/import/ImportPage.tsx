@@ -587,7 +587,7 @@ export function ImportPage() {
             value={exportString}
             onChange={(e) => setExportString(e.target.value)}
             placeholder={t("import.exportStringPlaceholder")}
-            className="min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="min-h-[120px] w-full rounded-md border border-input bg-[var(--field-surface)] px-3 py-2 text-sm shadow-[var(--field-shadow)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--focus-ring)]/45"
           />
           {exportStringError && (
             <span className="text-sm text-destructive block">

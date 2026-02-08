@@ -5,13 +5,11 @@ import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { searchSymbols } from "@/lib/marketData";
 import type { InvestmentHolding, SymbolSearchResult } from "@/types/investments";
+import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 interface HoldingDialogProps {
   open: boolean;
@@ -107,13 +105,12 @@ export function HoldingDialog({
             : "h-[calc(100vh-64px)] mt-0 rounded-none p-0 flex flex-col"
         }
       >
-        <SheetHeader className="p-4 pb-2">
-          <SheetTitle>
-            {initialHolding ? t("investments.editHolding") : t("investments.addHolding")}
-          </SheetTitle>
-          <SheetDescription>{t("investments.holdingDescription")}</SheetDescription>
-        </SheetHeader>
-        <div className="flex-1 overflow-auto px-4 pb-4 space-y-4">
+        <DsSheetHeader
+          className="p-4"
+          title={initialHolding ? t("investments.editHolding") : t("investments.addHolding")}
+          description={t("investments.holdingDescription")}
+        />
+        <div className="flex-1 overflow-auto px-4 pt-4 pb-4 space-y-4">
           <div className="space-y-1">
             <Label>{t("investments.symbol")}</Label>
             <Input
@@ -177,16 +174,15 @@ export function HoldingDialog({
             </div>
           </div>
         </div>
-        <div className="p-4 border-t flex gap-2">
+        <DsSheetActions className="p-4 grid grid-cols-2 gap-2">
           <Button className="h-11 flex-1" variant="outline" onClick={() => onOpenChange(false)}>
             {t("common.cancel")}
           </Button>
           <Button className="h-11 flex-1" onClick={save} disabled={!canSave}>
             {t("common.save")}
           </Button>
-        </div>
+        </DsSheetActions>
       </SheetContent>
     </Sheet>
   );
 }
-

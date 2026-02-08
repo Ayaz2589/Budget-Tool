@@ -517,7 +517,7 @@ export function PresetsPage() {
           {presetForActions ? (
             <>
               <DsSheetHeader title={presetForActions.description || "—"} />
-              <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-6">
+              <div className="flex-1 overflow-y-auto overscroll-contain px-4 pt-4 pb-6">
                 <div className="grid gap-5">
                   <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
                     <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">

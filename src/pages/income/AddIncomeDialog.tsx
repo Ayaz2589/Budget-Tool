@@ -1,10 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +30,7 @@ import type {
   AddIncomeFormPayload,
   AddIncomeDialogProps,
 } from "@/types/income";
+import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { AddIncomeFormPayload, AddIncomeDialogProps };
 
@@ -43,25 +42,24 @@ export function AddIncomeDialog({
   dateFormat = "YYYY/MM/DD",
   onSubmit,
 }: AddIncomeDialogProps) {
+  const { t } = useTranslation();
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-       
-        className="flex flex-col h-full w-[85vw] max-w-sm border-l p-4 gap-3 overflow-hidden rounded-l-2xl"
+        className="flex flex-col h-full w-[85vw] max-w-sm border-l p-0 gap-0 overflow-hidden rounded-l-2xl"
       >
-        <SheetHeader className="gap-2">
-          <SheetTitle>New income</SheetTitle>
-          <SheetDescription>
-            Enter the date, amount, description, and category.
-          </SheetDescription>
-        </SheetHeader>
+        <DsSheetHeader
+          title={t("income.newIncome")}
+          description={t("income.newIncomeDesc")}
+        />
         <AddIncomeForm
           incomeCategories={incomeCategories}
           owners={owners}
           dateFormat={dateFormat}
           onSubmit={onSubmit}
           onCancel={() => onOpenChange(false)}
+          t={t}
         />
       </SheetContent>
     </Sheet>
@@ -74,12 +72,14 @@ function AddIncomeForm({
   dateFormat = "YYYY/MM/DD",
   onSubmit,
   onCancel,
+  t,
 }: {
   incomeCategories: string[];
   owners?: string[];
   dateFormat?: "YYYY/MM/DD" | "MM/DD/YYYY";
   onSubmit: (payload: AddIncomeFormPayload) => void;
   onCancel: () => void;
+  t: (key: string) => string;
 }) {
   const [date, setDate] = useState(() =>
     isoToDateInput(new Date().toISOString().slice(0, 10), dateFormat)
@@ -99,7 +99,7 @@ function AddIncomeForm({
     onSubmit({
       date: isoDate,
       amount: num,
-      description: description.trim() || "Income",
+      description: description.trim() || t("income.defaultDescription"),
       category: category || "",
       owner: owner || "",
     });
@@ -108,11 +108,11 @@ function AddIncomeForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden"
+      className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden px-4 py-3"
     >
       <div className="flex-1 min-h-0 overflow-auto space-y-4">
         <div className="space-y-2">
-          <Label>Date</Label>
+          <Label>{t("income.date")}</Label>
           <Input
             type="text"
             inputMode="numeric"
@@ -127,7 +127,7 @@ function AddIncomeForm({
           />
         </div>
         <div className="space-y-2">
-          <Label>Amount</Label>
+          <Label>{t("income.amount")}</Label>
           <Input
             type="text"
             placeholder="0.00"
@@ -138,16 +138,16 @@ function AddIncomeForm({
           />
         </div>
         <div className="space-y-2">
-          <Label>Description</Label>
+          <Label>{t("income.description")}</Label>
           <Input
-            placeholder="e.g. Paycheck, Basement Rent"
+            placeholder={t("income.placeholderDescription")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className={fieldClass}
           />
         </div>
         <div className="space-y-2">
-          <Label>Category</Label>
+          <Label>{t("income.category")}</Label>
           <Select
             value={category || "_"}
             onValueChange={(v) => setCategory(v === "_" ? "" : v)}
@@ -157,7 +157,7 @@ function AddIncomeForm({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="_">
-                <CategoryOption name="Uncategorized" type="income" />
+                <CategoryOption name={t("common.uncategorized")} type="income" />
               </SelectItem>
               {incomeCategories.map((c) => (
                 <SelectItem key={c} value={c}>
@@ -168,7 +168,7 @@ function AddIncomeForm({
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>Owner</Label>
+          <Label>{t("income.owner")}</Label>
           <Select
             value={owner || "_none"}
             onValueChange={(v) => setOwner(v === "_none" ? "" : v)}
@@ -177,7 +177,7 @@ function AddIncomeForm({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="_none">No Owner</SelectItem>
+              <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
               {owners.map((o) => (
                 <SelectItem key={o} value={o}>
                   {o}
@@ -187,19 +187,19 @@ function AddIncomeForm({
           </Select>
         </div>
       </div>
-      <div className="flex items-center gap-2 pt-2">
+      <DsSheetActions className="grid grid-cols-2 gap-2 pt-2">
         <Button
           type="button"
           variant="outline"
           onClick={onCancel}
-          className="h-11 flex-1"
+          className="h-11 w-full"
         >
-          Cancel
+          {t("common.cancel")}
         </Button>
-        <Button type="submit" className="h-11 flex-1">
-          Add
+        <Button type="submit" className="h-11 w-full">
+          {t("common.add")}
         </Button>
-      </div>
+      </DsSheetActions>
     </form>
   );
 }

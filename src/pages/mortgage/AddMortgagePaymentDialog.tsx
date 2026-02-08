@@ -1,9 +1,6 @@
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +15,8 @@ import {
 import { formatCurrencyInput } from "@/lib/currencyInput";
 import { formatDateInput, getDateInputPlaceholder } from "@/lib/dateInput";
 import type { AddMortgagePaymentDialogProps } from "@/types/mortgage";
+import { useTranslation } from "react-i18next";
+import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { AddMortgagePaymentDialogProps };
 
@@ -34,28 +33,26 @@ export function AddMortgagePaymentDialog({
   ownerOptions = [],
   onSubmit,
 }: AddMortgagePaymentDialogProps) {
+  const { t } = useTranslation();
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-       
-        className="flex flex-col h-full w-[85vw] max-w-sm border-l p-4 gap-3 overflow-hidden rounded-l-2xl"
+        className="flex flex-col h-full w-[85vw] max-w-sm border-l p-0 gap-0 overflow-hidden rounded-l-2xl"
       >
-        <SheetHeader className="gap-2">
-          <SheetTitle>Add mortgage payment</SheetTitle>
-          <SheetDescription>
-            Enter the payment date and amount.
-          </SheetDescription>
-        </SheetHeader>
+        <DsSheetHeader
+          title={t("mortgage.addMortgagePayment")}
+          description={t("mortgage.addMortgagePaymentDesc")}
+        />
         <form
           onSubmit={onSubmit}
-          className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden"
+          className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden px-4 py-3"
         >
           <div className="flex-1 min-h-0 overflow-auto space-y-4">
             <div className="space-y-2">
-              <Label>Date</Label>
+              <Label>{t("common.date")}</Label>
               <Input
                 type="text"
                 inputMode="numeric"
@@ -70,7 +67,7 @@ export function AddMortgagePaymentDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Amount</Label>
+              <Label>{t("common.amount")}</Label>
               <Input
                 type="text"
                 placeholder="0.00"
@@ -81,16 +78,16 @@ export function AddMortgagePaymentDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Owner</Label>
+              <Label>{t("common.owner")}</Label>
               <Select
                 value={owner || "_none"}
                 onValueChange={(v) => onOwnerChange(v === "_none" ? "" : v)}
               >
                 <SelectTrigger className={selectTriggerClass}>
-                  <SelectValue placeholder="No Owner" />
+                  <SelectValue placeholder={t("common.noOwner")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="_none">No Owner</SelectItem>
+                  <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
                   {ownerOptions.map((o) => (
                     <SelectItem key={o} value={o}>
                       {o}
@@ -100,19 +97,19 @@ export function AddMortgagePaymentDialog({
               </Select>
             </div>
           </div>
-          <div className="flex items-center gap-2 pt-2">
+          <DsSheetActions className="grid grid-cols-2 gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="h-11 flex-1"
+              className="h-11 w-full"
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
-            <Button type="submit" className="h-11 flex-1">
-              Add
+            <Button type="submit" className="h-11 w-full">
+              {t("common.add")}
             </Button>
-          </div>
+          </DsSheetActions>
         </form>
       </SheetContent>
     </Sheet>

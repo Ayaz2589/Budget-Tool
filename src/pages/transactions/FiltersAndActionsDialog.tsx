@@ -57,7 +57,7 @@ export function FiltersAndActionsDialog({
           title={t("transactions.filtersActionsTitle")}
           description={t("transactions.filtersActionsDesc")}
         />
-        <div className="grid gap-6 px-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
+        <div className="grid gap-6 px-4 pt-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
           {/* Filters */}
           <section className="space-y-4">
             <div className="flex items-center justify-between gap-2">

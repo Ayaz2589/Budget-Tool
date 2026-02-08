@@ -8,14 +8,15 @@ interface DsSheetActionsProps {
 
 export function DsSheetActions({ className, children }: DsSheetActionsProps) {
   return (
-    <div
-      className={cn(
-        "border-t border-[var(--border-subtle)] px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)] bg-[var(--surface-0)]",
-        className,
-      )}
-    >
-      {children}
+    <div className="border-t border-[var(--border-subtle)] bg-[var(--surface-0)]">
+      <div
+        className={cn(
+          "px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)]",
+          className,
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 }
-

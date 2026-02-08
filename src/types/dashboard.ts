@@ -1,0 +1,80 @@
+import type { Expense, Debt, DebtPayment, Income, PresetTransaction } from "@/types/core";
+
+export type DashboardRange = "current" | "6" | "12";
+export type DashboardExpenseScope = "all" | "exclude-mortgage";
+
+export interface DashboardKpis {
+  netCashFlow: number;
+  totalSpent: number;
+  totalIncome: number;
+  debtOutstanding: number;
+  debtPaidThisMonth: number;
+  spentVsLastMonthPct: number | null;
+}
+
+export interface DashboardCategorySlice {
+  label: string;
+  value: number;
+}
+
+export interface DashboardOwnerSlice {
+  key: string;
+  label: string;
+  value: number;
+  owner?: string;
+}
+
+export interface DashboardDebtRow {
+  id: string;
+  name: string;
+  owner?: string;
+  initialAmount: number;
+  remaining: number;
+  paid: number;
+  progress: number;
+}
+
+export interface DashboardRecentItem extends Expense {}
+
+export type DashboardInsightType =
+  | "spending_spike"
+  | "mortgage_confirmation"
+  | "upcoming_debt_payment"
+  | "missing_income";
+
+export interface DashboardInsight {
+  id: string;
+  type: DashboardInsightType;
+  message: string;
+}
+
+export interface DashboardCashFlowRow {
+  monthKey: string;
+  monthLabel: string;
+  incomeTotal: number;
+  expensesTotal: number;
+  debtPaymentsTotal: number;
+  incomeByOwner: Record<string, number>;
+}
+
+export interface DashboardSelectorInput {
+  currentMonthKey: string;
+  range: DashboardRange;
+  scope: DashboardExpenseScope;
+  expenses: Expense[];
+  income: Income[];
+  debts: Debt[];
+  debtPayments: DebtPayment[];
+  owners: string[];
+}
+
+export interface DashboardInsightInput {
+  currentMonthKey: string;
+  previousMonthKey: string;
+  scope: DashboardExpenseScope;
+  expenses: Expense[];
+  income: Income[];
+  debts: Debt[];
+  debtPayments: DebtPayment[];
+  presetTransactions: PresetTransaction[];
+}

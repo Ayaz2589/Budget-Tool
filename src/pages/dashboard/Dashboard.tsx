@@ -1,1161 +1,771 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Line,
+  LineChart,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  Line,
-  LineChart,
   Pie,
   PieChart,
+  ReferenceLine,
   XAxis,
   YAxis,
 } from "recharts";
 import { useBudget } from "@/context/BudgetContext";
-import { getDebtBalance } from "@/lib/debtUtils";
-import { formatCurrency, formatPercent } from "@/lib/format";
-import { computeMonthTotals, getMonthLabel, isValidDate } from "@/lib/totals";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { usePresetTransactions } from "@/context/PresetTransactionsContext";
+import { formatCurrency } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  buildCashFlowRows,
+  buildCategoryBreakdown,
+  buildDashboardKpis,
+  buildDebtSnapshot,
+  buildFixedObligations,
+  buildOwnerSplit,
+  buildRecentActivity,
+  getCurrentMonthKey,
+  getPreviousMonthKey,
+  getRangeMonthKeys,
+} from "@/pages/dashboard/dashboardSelectors";
+import {
+  buildDashboardInsights,
+  formatDebtPaidSubtitle,
+  formatSpentDeltaLabel,
+  getInsightStorageKey,
+  parseDismissedInsightIds,
+  serializeDismissedInsightIds,
+} from "@/pages/dashboard/dashboardInsights";
+import type { DashboardExpenseScope, DashboardRange } from "@/types/dashboard";
 
-type RangeKey = "current" | "6" | "12";
-type SplitMode = "all" | "owners";
-
-const CATEGORY_PALETTE = [
-  "oklch(0.65 0.2 25)",
-  "oklch(0.7 0.18 55)",
-  "oklch(0.65 0.2 280)",
-  "oklch(0.6 0.2 160)",
-  "oklch(0.6 0.18 200)",
-  "oklch(0.7 0.12 95)",
-  "oklch(0.62 0.16 320)",
-  "oklch(0.65 0.14 145)",
+const INCOME_OWNER_COLORS = [
+  "#3B82F6",
+  "#8B5CF6",
+  "#22C55E",
+  "#F59E0B",
+  "#06B6D4",
+  "#EC4899",
 ];
 
-const SERIES_PALETTE = [
-  "oklch(0.7 0.2 25)",
-  "oklch(0.68 0.2 55)",
-  "oklch(0.7 0.18 200)",
-  "oklch(0.62 0.2 160)",
-  "oklch(0.68 0.18 280)",
-  "oklch(0.7 0.12 95)",
-  "oklch(0.65 0.14 145)",
-  "oklch(0.62 0.16 320)",
+const DONUT_COLORS = [
+  "#3B82F6",
+  "#F59E0B",
+  "#22C55E",
+  "#A855F7",
+  "#06B6D4",
+  "#EF4444",
+  "#EAB308",
 ];
 
-function getCurrentMonthKey(): string {
-  return new Date().toISOString().slice(0, 7);
-}
-
-function getRecentMonthKeys(count: number): string[] {
-  const out: string[] = [];
-  const now = new Date();
-  for (let i = 0; i < count; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    out.push(d.toISOString().slice(0, 7));
+function asNumber(value: unknown): number {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
   }
-  return out;
-}
-
-function daysInMonth(monthKey: string): number {
-  const [year, month] = monthKey.split("-").map((n) => Number(n));
-  return new Date(year ?? 0, month ?? 0, 0).getDate();
-}
-
-function normalizeCategory(category: string | undefined): string {
-  const trimmed = (category || "").trim();
-  return trimmed.length > 0 ? trimmed : "Uncategorized";
-}
-
-function matchOwnerFromCategory(category: string, owners: string[]): string | null {
-  const normalized = category.trim().toLowerCase();
-  for (const owner of owners) {
-    const lower = owner.toLowerCase();
-    if (normalized === `${lower}'s purchases` || normalized === `${lower} purchases`) {
-      return owner;
-    }
-  }
-  return null;
+  return 0;
 }
 
 export function Dashboard() {
   const { t } = useTranslation();
-  const { expenses, income, debts, debtPayments, owners, iOweNova } = useBudget();
+  const { expenses, income, debts, debtPayments, owners } = useBudget();
+  const { presetTransactions } = usePresetTransactions();
+  const [range, setRange] = useState<DashboardRange>("current");
+  const [expenseScope, setExpenseScope] = useState<DashboardExpenseScope>("all");
+  const [dismissedInsightIds, setDismissedInsightIds] = useState<string[]>(() =>
+    parseDismissedInsightIds(sessionStorage.getItem(getInsightStorageKey())),
+  );
+
   const currentMonthKey = getCurrentMonthKey();
-  const [range, setRange] = useState<RangeKey>("current");
-  const [splitMode, setSplitMode] = useState<SplitMode>("all");
+  const previousMonthKey = getPreviousMonthKey(currentMonthKey);
+  const monthKeys = useMemo(
+    () => getRangeMonthKeys(range, currentMonthKey),
+    [range, currentMonthKey],
+  );
 
-  const ownerOptions = owners ?? [];
-  const showOwnerSplit = ownerOptions.length > 0 && splitMode === "owners";
-
-  const monthKeys = useMemo(() => {
-    if (range === "current") return [currentMonthKey];
-    return getRecentMonthKeys(range === "6" ? 6 : 12);
-  }, [range, currentMonthKey]);
-
-  const monthKeySet = useMemo(() => new Set(monthKeys), [monthKeys]);
-  const orderedMonthKeys = useMemo(() => [...monthKeys].reverse(), [monthKeys]);
-
-  const monthTotals = useMemo(
+  const kpis = useMemo(
     () =>
-      monthKeys.map((monthKey) =>
-        computeMonthTotals(
-          monthKey,
-          expenses,
-          income,
-          iOweNova[monthKey] ?? 0,
-          0,
-          0
-        )
-      ),
-    [monthKeys, expenses, income, iOweNova]
+      buildDashboardKpis({
+        currentMonthKey,
+        expenses,
+        income,
+        debts,
+        debtPayments,
+        scope: expenseScope,
+      }),
+    [currentMonthKey, expenses, income, debts, debtPayments, expenseScope],
   );
 
-  const expensesInRange = useMemo(
+  const cashFlowRows = useMemo(
     () =>
-      expenses.filter(
-        (e) => isValidDate(e.date) && monthKeySet.has(e.date.slice(0, 7))
-      ),
-    [expenses, monthKeySet]
+      buildCashFlowRows({
+        monthKeys,
+        expenses,
+        income,
+        debtPayments,
+        scope: expenseScope,
+      }),
+    [monthKeys, expenses, income, debtPayments, expenseScope],
   );
 
-  const incomeInRange = useMemo(
+  const categorySlices = useMemo(
     () =>
-      income.filter(
-        (i) => isValidDate(i.date) && monthKeySet.has(i.date.slice(0, 7))
-      ),
-    [income, monthKeySet]
+      buildCategoryBreakdown({
+        expenses,
+        currentMonthKey,
+        scope: expenseScope,
+      }),
+    [expenses, currentMonthKey, expenseScope],
   );
 
-  const debtPaymentsInRange = useMemo(
+  const ownerSlices = useMemo(
     () =>
-      debtPayments.filter(
-        (p) => isValidDate(p.date) && monthKeySet.has(p.date.slice(0, 7))
-      ),
-    [debtPayments, monthKeySet]
+      buildOwnerSplit({
+        expenses,
+        currentMonthKey,
+        scope: expenseScope,
+        owners,
+      }),
+    [expenses, currentMonthKey, expenseScope, owners],
   );
 
-  const totals = useMemo(() => {
-    const totalIncome = monthTotals.reduce((s, m) => s + m.totalEarned, 0);
-    const totalExpenses = monthTotals.reduce((s, m) => s + m.totalSpent, 0);
-    const spentNoMortgage = monthTotals.reduce(
-      (s, m) => s + m.totalSpentWithoutMortgage,
-      0
-    );
-    const net = totalIncome - totalExpenses;
-    const savingsRate = totalIncome > 0 ? net / totalIncome : 0;
-    const debtRemaining = debts.reduce(
-      (s, d) => s + getDebtBalance(d, debtPayments),
-      0
-    );
-    return {
-      totalIncome,
-      totalExpenses,
-      net,
-      savingsRate,
-      spentNoMortgage,
-      debtRemaining,
-    };
-  }, [monthTotals, debts, debtPayments]);
-
-  const daysInRange = useMemo(() => {
-    if (range === "current") {
-      return new Date().getDate();
-    }
-    return orderedMonthKeys.reduce((sum, key) => sum + daysInMonth(key), 0);
-  }, [orderedMonthKeys, range]);
-
-  const avgDailySpend = useMemo(
-    () => (daysInRange > 0 ? totals.totalExpenses / daysInRange : 0),
-    [daysInRange, totals.totalExpenses]
+  const debtRows = useMemo(
+    () => buildDebtSnapshot({ debts, debtPayments }),
+    [debts, debtPayments],
   );
 
-  const largestExpense = useMemo(
+  const fixedObligations = useMemo(
+    () => buildFixedObligations({ expenses, debtPayments, currentMonthKey }),
+    [expenses, debtPayments, currentMonthKey],
+  );
+
+  const recentActivity = useMemo(() => buildRecentActivity(expenses), [expenses]);
+
+  const insights = useMemo(
     () =>
-      expensesInRange.reduce((max, e) => (e.amount > max ? e.amount : max), 0),
-    [expensesInRange]
+      buildDashboardInsights({
+        currentMonthKey,
+        previousMonthKey,
+        scope: expenseScope,
+        expenses,
+        income,
+        debts,
+        debtPayments,
+        presetTransactions,
+      }).filter((insight) => !dismissedInsightIds.includes(insight.id)),
+    [
+      currentMonthKey,
+      previousMonthKey,
+      expenseScope,
+      expenses,
+      income,
+      debts,
+      debtPayments,
+      presetTransactions,
+      dismissedInsightIds,
+    ],
   );
 
-  const essentialsTotal = useMemo(() => {
-    const expenseEssentials = expensesInRange.reduce((sum, e) => {
-      const category = (e.category || "").trim().toLowerCase();
-      if (category === "mortgage" || category === "utilities") {
-        return sum + e.amount;
-      }
-      return sum;
-    }, 0);
-    const debtEssential = debtPaymentsInRange.reduce(
-      (sum, p) => sum + p.amount,
-      0
-    );
-    return expenseEssentials + debtEssential;
-  }, [expensesInRange, debtPaymentsInRange]);
+  const incomeOwnerKeys = useMemo(() => {
+    const keys = new Set<string>();
+    for (const row of cashFlowRows) {
+      Object.keys(row.incomeByOwner).forEach((key) => keys.add(key));
+    }
+    return Array.from(keys).sort((a, b) => a.localeCompare(b));
+  }, [cashFlowRows]);
 
-  const incomeCoverage = useMemo(
-    () => totals.totalIncome - essentialsTotal,
-    [totals.totalIncome, essentialsTotal]
-  );
-
-  const kpiCardClass = "gap-2 py-3 md:gap-6 md:py-6";
-  const kpiHeaderClass = "px-4 md:px-6 pb-1 pt-0";
-  const kpiContentBase = "px-4 md:px-6 pb-2 md:pb-3";
-
-  const trendData = useMemo(
+  const netCashFlowRows = useMemo(
     () =>
-      [...monthTotals]
-        .reverse()
-        .map((m) => ({
-          month: m.monthLabel,
-          income: m.totalEarned,
-          expense: m.totalSpent,
-        })),
-    [monthTotals]
+      cashFlowRows.map((row) => ({
+        monthKey: row.monthKey,
+        monthLabel: row.monthLabel,
+        netCashFlow: row.incomeTotal - row.expensesTotal - row.debtPaymentsTotal,
+      })),
+    [cashFlowRows],
   );
 
-  const categoryTrend = useMemo(() => {
-    const totalsByCategory = new Map<string, number>();
-    for (const e of expensesInRange) {
-      const category = normalizeCategory(e.category);
-      if (category.toLowerCase() === "mortgage") continue;
-      totalsByCategory.set(category, (totalsByCategory.get(category) ?? 0) + e.amount);
-    }
-
-    const sorted = Array.from(totalsByCategory.entries())
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
-    const top = sorted.slice(0, 5);
-    const rest = sorted.slice(5);
-    const otherTotal = rest.reduce((sum, entry) => sum + entry.value, 0);
-    const series = top.map((entry, index) => ({
-      key: `cat${index}`,
-      name: entry.name,
-      color: SERIES_PALETTE[index % SERIES_PALETTE.length] ?? SERIES_PALETTE[0],
-    }));
-    if (otherTotal > 0) {
-      series.push({
-        key: "other",
-        name: "Other",
-        color: "oklch(0.6 0.12 200)",
-      });
-    }
-
-    const data = orderedMonthKeys.map((monthKey) => {
-      const row: Record<string, number | string> = {
-        month: getMonthLabel(monthKey),
-      };
-      for (const s of series) {
-        row[s.key] = 0;
-      }
-      for (const e of expensesInRange) {
-        if (e.date.slice(0, 7) !== monthKey) continue;
-        const category = normalizeCategory(e.category);
-        if (category.toLowerCase() === "mortgage") continue;
-        const topIndex = top.findIndex((entry) => entry.name === category);
-        if (topIndex >= 0) {
-          const key = series[topIndex]?.key;
-          if (key) row[key] = Number(row[key] ?? 0) + e.amount;
-        } else if (otherTotal > 0) {
-          row.other = Number(row.other ?? 0) + e.amount;
-        }
-      }
-      return row;
-    });
-
-    const config = series.reduce<Record<string, { label: string; color: string }>>(
-      (acc, s) => {
-        acc[s.key] = { label: s.name, color: s.color };
-        return acc;
-      },
-      {}
-    );
-
-    return { data, series, config };
-  }, [expensesInRange, orderedMonthKeys]);
-
-  const ownerTrend = useMemo(() => {
-    const ownerSeries = ownerOptions.map((name, index) => ({
-      key: `owner${index}`,
-      name,
-      color: SERIES_PALETTE[index % SERIES_PALETTE.length] ?? SERIES_PALETTE[0],
-    }));
-    const unassignedKey = "unassigned";
-    let hasUnassigned = false;
-    const data = orderedMonthKeys.map((monthKey) => {
-      const row: Record<string, number | string> = {
-        month: getMonthLabel(monthKey),
-      };
-      for (const s of ownerSeries) {
-        row[s.key] = 0;
-      }
-      row[unassignedKey] = 0;
-      return row;
-    });
-
-    const rowByMonth = new Map(
-      orderedMonthKeys.map((key, index) => [key, data[index]!])
-    );
-
-    for (const e of expensesInRange) {
-      const monthKey = e.date.slice(0, 7);
-      const row = rowByMonth.get(monthKey);
-      if (!row) continue;
-
-      const category = (e.category || "").trim();
-      if (category.toLowerCase() === "50/50" && ownerOptions.length >= 2) {
-        const split = e.amount / 2;
-        const firstKey = ownerSeries[0]?.key;
-        const secondKey = ownerSeries[1]?.key;
-        if (firstKey) row[firstKey] = Number(row[firstKey] ?? 0) + split;
-        if (secondKey) row[secondKey] = Number(row[secondKey] ?? 0) + split;
-        continue;
-      }
-
-      const explicit = (e.owner || "").trim();
-      const inferred = !explicit ? matchOwnerFromCategory(category, ownerOptions) : null;
-      const owner = explicit || inferred || "";
-      const index = ownerOptions.findIndex((o) => o === owner);
-      if (index >= 0) {
-        const key = ownerSeries[index]?.key;
-        if (key) row[key] = Number(row[key] ?? 0) + e.amount;
-      } else {
-        row[unassignedKey] = Number(row[unassignedKey] ?? 0) + e.amount;
-        hasUnassigned = true;
-      }
-    }
-
-    const series = hasUnassigned
-      ? [
-          ...ownerSeries,
-          {
-            key: unassignedKey,
-            name: t("dashboard.unassigned"),
-            color: "oklch(0.62 0.1 210)",
-          },
-        ]
-      : ownerSeries;
-
-    const config = series.reduce<Record<string, { label: string; color: string }>>(
-      (acc, s) => {
-        acc[s.key] = { label: s.name, color: s.color };
-        return acc;
-      },
-      {}
-    );
-
-    return { data, series, config };
-  }, [expensesInRange, orderedMonthKeys, ownerOptions, t]);
-
-  const spendingByCategory = useMemo(() => {
-    const byCategory = new Map<string, number>();
-    for (const e of expensesInRange) {
-      if ((e.category || "").toLowerCase() === "mortgage") continue;
-      const cat = normalizeCategory(e.category);
-      byCategory.set(cat, (byCategory.get(cat) ?? 0) + e.amount);
-    }
-    const sorted = Array.from(byCategory.entries())
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
-    const top = sorted.slice(0, 7);
-    const rest = sorted.slice(7);
-    const otherTotal = rest.reduce((s, x) => s + x.value, 0);
-    if (otherTotal > 0) top.push({ name: "Other", value: otherTotal });
-    return top.map((item, i) => ({
-      ...item,
-      fill: CATEGORY_PALETTE[i % CATEGORY_PALETTE.length] ?? CATEGORY_PALETTE[0],
-    }));
-  }, [expensesInRange]);
-
-  const ownerSplitData = useMemo(() => {
-    if (!showOwnerSplit) return [];
-    const rows = new Map<string, { name: string; income: number; expense: number }>();
-    const ensureRow = (name: string) => {
-      if (!rows.has(name)) rows.set(name, { name, income: 0, expense: 0 });
-      return rows.get(name)!;
-    };
-    let unassignedIncome = 0;
-    let unassignedExpense = 0;
-
-    for (const i of incomeInRange) {
-      const explicit = (i.owner || "").trim();
-      const inferred = !explicit ? matchOwnerFromCategory(i.category || "", ownerOptions) : null;
-      const owner = explicit || inferred || "";
-      if (owner) ensureRow(owner).income += i.amount;
-      else unassignedIncome += i.amount;
-    }
-
-    for (const e of expensesInRange) {
-      const category = (e.category || "").trim();
-      if (category.toLowerCase() === "50/50" && ownerOptions.length >= 2) {
-        const split = e.amount / 2;
-        ensureRow(ownerOptions[0]!).expense += split;
-        ensureRow(ownerOptions[1]!).expense += split;
-        continue;
-      }
-      const explicit = (e.owner || "").trim();
-      const inferred = !explicit ? matchOwnerFromCategory(category, ownerOptions) : null;
-      const owner = explicit || inferred || "";
-      if (owner) ensureRow(owner).expense += e.amount;
-      else unassignedExpense += e.amount;
-    }
-
-    if (unassignedIncome > 0 || unassignedExpense > 0) {
-      rows.set("Unassigned", {
-        name: t("dashboard.unassigned"),
-        income: unassignedIncome,
-        expense: unassignedExpense,
-      });
-    }
-
-    return Array.from(rows.values()).filter(
-      (row) => row.income > 0 || row.expense > 0
-    );
-  }, [showOwnerSplit, incomeInRange, expensesInRange, ownerOptions, t]);
-
-  const ownerSplitConfig = {
-    income: {
-      label: t("dashboard.totalIncome"),
-      theme: { light: "oklch(0.6 0.18 160)", dark: "oklch(0.7 0.16 160)" },
-    },
-    expense: {
-      label: t("dashboard.totalExpenses"),
-      theme: { light: "oklch(0.7 0.18 55)", dark: "oklch(0.78 0.16 55)" },
-    },
+  const dismissInsight = (id: string) => {
+    const next = [...dismissedInsightIds, id];
+    setDismissedInsightIds(next);
+    sessionStorage.setItem(getInsightStorageKey(), serializeDismissedInsightIds(next));
   };
 
-  const trendConfig = ownerSplitConfig;
-
-  const debtSnapshot = useMemo(() => {
-    const remaining = debts.reduce(
-      (s, d) => s + getDebtBalance(d, debtPayments),
-      0
-    );
-    const paid = debtPayments.reduce((s, p) => s + p.amount, 0);
-    return [
-      { name: t("dashboard.remaining"), value: remaining, fill: "oklch(0.65 0.16 35)" },
-      { name: t("dashboard.paid"), value: paid, fill: "oklch(0.6 0.2 160)" },
-    ];
-  }, [debts, debtPayments, t]);
-
-  const insights = useMemo(() => {
-    const highlights: string[] = [];
-    const alerts: string[] = [];
-
-    const categoryTotals = new Map<string, number>();
-    for (const e of expensesInRange) {
-      const category = normalizeCategory(e.category);
-      if (category.toLowerCase() === "mortgage") continue;
-      categoryTotals.set(category, (categoryTotals.get(category) ?? 0) + e.amount);
-    }
-    const biggestCategory = Array.from(categoryTotals.entries()).sort(
-      (a, b) => b[1] - a[1]
-    )[0];
-    if (biggestCategory) {
-      highlights.push(
-        t("dashboard.insightBiggestCategory", {
-          category: biggestCategory[0],
-          amount: formatCurrency(biggestCategory[1]),
-        })
-      );
-    }
-
-    const ownerTotals = new Map<string, number>();
-    for (const e of expensesInRange) {
-      const category = (e.category || "").trim();
-      if (category.toLowerCase() === "50/50" && ownerOptions.length >= 2) {
-        const split = e.amount / 2;
-        ownerTotals.set(
-          ownerOptions[0]!,
-          (ownerTotals.get(ownerOptions[0]!) ?? 0) + split
-        );
-        ownerTotals.set(
-          ownerOptions[1]!,
-          (ownerTotals.get(ownerOptions[1]!) ?? 0) + split
-        );
-        continue;
-      }
-      const explicit = (e.owner || "").trim();
-      const inferred = !explicit ? matchOwnerFromCategory(category, ownerOptions) : null;
-      const owner = explicit || inferred || "";
-      if (owner) {
-        ownerTotals.set(owner, (ownerTotals.get(owner) ?? 0) + e.amount);
-      }
-    }
-    const biggestOwner = Array.from(ownerTotals.entries()).sort(
-      (a, b) => b[1] - a[1]
-    )[0];
-    if (biggestOwner) {
-      highlights.push(
-        t("dashboard.insightBiggestOwner", {
-          owner: biggestOwner[0],
-          amount: formatCurrency(biggestOwner[1]),
-        })
-      );
-    }
-
-    if (monthTotals.length > 1) {
-      const current = monthTotals[0]?.totalSpent ?? 0;
-      const previous = monthTotals[1]?.totalSpent ?? 0;
-      const delta = current - previous;
-      if (Math.abs(delta) < 1) {
-        highlights.push(t("dashboard.insightMomFlat"));
-      } else if (delta > 0) {
-        highlights.push(
-          t("dashboard.insightMomUp", {
-            amount: formatCurrency(delta),
-          })
-        );
-      } else {
-        highlights.push(
-          t("dashboard.insightMomDown", {
-            amount: formatCurrency(Math.abs(delta)),
-          })
-        );
-      }
-    }
-
-    if (totals.totalExpenses > totals.totalIncome) {
-      alerts.push(t("dashboard.alertSpendOverIncome"));
-    }
-
-    if (totals.totalIncome > 0) {
-      const essentialsRatio = essentialsTotal / totals.totalIncome;
-      if (essentialsRatio > 0.6) {
-        alerts.push(
-          t("dashboard.alertEssentialsHigh", {
-            percent: formatPercent(essentialsRatio),
-          })
-        );
-      }
-    }
-
-    return { highlights, alerts };
-  }, [
-    essentialsTotal,
-    expensesInRange,
-    monthTotals,
-    ownerOptions,
-    totals.totalExpenses,
-    totals.totalIncome,
-    t,
-  ]);
-
   return (
-    <div className="space-y-6 min-w-0 overflow-x-hidden pb-24 md:pb-0">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="space-y-1 min-w-0">
-          <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="space-y-1">
-          <p className="text-xs font-medium text-muted-foreground">
-            {t("dashboard.timeRange")}
-          </p>
-          <Tabs value={range} onValueChange={(v) => setRange(v as RangeKey)}>
-            <TabsList className="grid grid-cols-3 w-full max-w-[320px]">
-              <TabsTrigger value="current">{t("dashboard.rangeCurrent")}</TabsTrigger>
-              <TabsTrigger value="6">{t("dashboard.range6")}</TabsTrigger>
-              <TabsTrigger value="12">{t("dashboard.range12")}</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        {ownerOptions.length > 0 && (
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground">
-              {t("dashboard.splitView")}
+    <div className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
+      <div className="min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
+            <p className="text-sm text-muted-foreground">
+              Are we financially okay this month?
             </p>
-            <Tabs value={splitMode} onValueChange={(v) => setSplitMode(v as SplitMode)}>
-              <TabsList className="grid grid-cols-2 w-full max-w-[240px]">
-                <TabsTrigger value="all">{t("dashboard.splitAll")}</TabsTrigger>
-                <TabsTrigger value="owners">{t("dashboard.splitOwners")}</TabsTrigger>
-              </TabsList>
-            </Tabs>
           </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
-        <Card className={kpiCardClass}>
-          <CardHeader className={kpiHeaderClass}>
-            <CardTitle className="text-[11px] font-medium text-muted-foreground">
-              {t("dashboard.totalIncome")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
-            {formatCurrency(totals.totalIncome)}
-          </CardContent>
-        </Card>
-        <Card className={kpiCardClass}>
-          <CardHeader className={kpiHeaderClass}>
-            <CardTitle className="text-[11px] font-medium text-muted-foreground">
-              {t("dashboard.totalExpenses")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
-            {formatCurrency(totals.totalExpenses)}
-          </CardContent>
-        </Card>
-        <Card className={kpiCardClass}>
-          <CardHeader className={kpiHeaderClass}>
-            <CardTitle className="text-[11px] font-medium text-muted-foreground">
-              {t("dashboard.netCashflow")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
-            {formatCurrency(totals.net)}
-          </CardContent>
-        </Card>
-        <Card className={kpiCardClass}>
-          <CardHeader className={kpiHeaderClass}>
-            <CardTitle className="text-[11px] font-medium text-muted-foreground">
-              {t("dashboard.avgDailySpend")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
-            {formatCurrency(avgDailySpend)}
-          </CardContent>
-        </Card>
-        <Card className={kpiCardClass}>
-          <CardHeader className={kpiHeaderClass}>
-            <CardTitle className="text-[11px] font-medium text-muted-foreground">
-              {t("dashboard.largestExpense")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
-            {formatCurrency(largestExpense)}
-          </CardContent>
-        </Card>
-        <Card className={kpiCardClass}>
-          <CardHeader className={kpiHeaderClass}>
-            <CardTitle className="text-[11px] font-medium text-muted-foreground">
-              {t("dashboard.incomeCoverage")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className={`${kpiContentBase} space-y-1`}>
-            <div className="text-base font-semibold sm:text-lg">
-              {formatCurrency(incomeCoverage)}
+          <div className="flex w-full flex-col items-start gap-2 md:w-auto md:items-end">
+            <div className="w-full md:w-auto">
+              <div className="grid w-full grid-cols-3 rounded-2xl bg-zinc-900/80 p-1 ring-1 ring-white/10 md:min-w-[430px]">
+                {[
+                  { value: "current", label: t("dashboard.rangeCurrent") },
+                  { value: "6", label: t("dashboard.range6") },
+                  { value: "12", label: t("dashboard.range12") },
+                ].map((option) => {
+                  const isActive = range === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={`h-10 rounded-xl px-2 text-sm font-medium transition-colors ${isActive ? "bg-white text-black" : "text-zinc-400 hover:text-zinc-100"}`}
+                      onClick={() => setRange(option.value as DashboardRange)}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="text-[11px] text-muted-foreground">
-              {essentialsTotal > 0
-                ? `${t("dashboard.essentials")}: ${formatCurrency(essentialsTotal)}`
-                : t("dashboard.noEssentials")}
+            <div className="w-full md:w-auto">
+              <div className="grid w-full grid-cols-2 rounded-2xl bg-zinc-900/80 p-1 ring-1 ring-white/10 md:min-w-[320px]">
+                {[
+                  { value: "all", label: "All Expenses" },
+                  { value: "exclude-mortgage", label: "Exclude Mortgage" },
+                ].map((option) => {
+                  const isActive = expenseScope === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={`h-10 rounded-xl px-2 text-sm font-medium transition-colors ${isActive ? "bg-white text-black" : "text-zinc-400 hover:text-zinc-100"}`}
+                      onClick={() => setExpenseScope(option.value as DashboardExpenseScope)}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card className={kpiCardClass}>
-          <CardHeader className={kpiHeaderClass}>
-            <CardTitle className="text-[11px] font-medium text-muted-foreground">
-              {t("dashboard.savingsRate")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
-            {formatPercent(totals.savingsRate)}
-          </CardContent>
-        </Card>
-        <Card className={kpiCardClass}>
-          <CardHeader className={kpiHeaderClass}>
-            <CardTitle className="text-[11px] font-medium text-muted-foreground">
-              {t("dashboard.spentNoMortgage")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
-            {formatCurrency(totals.spentNoMortgage)}
-          </CardContent>
-        </Card>
-        <Card className={kpiCardClass}>
-          <CardHeader className={kpiHeaderClass}>
-            <CardTitle className="text-[11px] font-medium text-muted-foreground">
-              {t("dashboard.debtRemaining")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className={`${kpiContentBase} text-base font-semibold sm:text-lg`}>
-            {formatCurrency(totals.debtRemaining)}
-          </CardContent>
-        </Card>
-      </div>
+            {expenseScope === "exclude-mortgage" ? (
+              <p className="text-xs text-muted-foreground">
+                Mortgage excluded from expense totals
+              </p>
+            ) : null}
+          </div>
+        </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t("dashboard.incomeVsExpense")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-hidden min-w-0">
-            {trendData.some((d) => d.income > 0 || d.expense > 0) ? (
-              <ChartContainer
-                config={trendConfig}
-                className="h-[220px] w-full max-w-full aspect-auto"
-              >
-                {range === "current" ? (
-                  <BarChart data={trendData} margin={{ left: 8, right: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="month"
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(value) =>
-                        String(value).split(" ")[0]?.slice(0, 3) ?? value
-                      }
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(v) => formatCurrency(v)}
-                    />
-                  <ChartTooltip
-                    content={({ active, payload, label }) => {
-                      if (!active || !payload?.length) return null;
-                      return (
-                        <div className="border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl">
-                          <div className="font-medium">{label}</div>
-                          <div className="grid gap-1.5">
-                            {payload.map((item) => {
-                              const key = String(item.dataKey ?? item.name ?? "value");
-                              const labelText =
-                                categoryTrend.config[
-                                  key as keyof typeof categoryTrend.config
-                                ]?.label ?? key;
-                              return (
-                                <div
-                                  key={key}
-                                  className="flex items-center gap-2"
-                                >
-                                  <span
-                                    className="h-2.5 w-2.5 rounded-[2px]"
-                                    style={{ background: item.color ?? item.payload?.fill }}
-                                  />
-                                  <span className="text-muted-foreground">
-                                    {labelText}
-                                  </span>
-                                  <span className="ml-auto">
-                                    {formatCurrency(Number(item.value ?? 0))}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    }}
-                  />
-                    <Bar
-                      dataKey="income"
-                      fill="var(--color-income)"
-                      radius={[6, 6, 0, 0]}
-                    />
-                    <Bar
-                      dataKey="expense"
-                      fill="var(--color-expense)"
-                      radius={[6, 6, 0, 0]}
-                    />
-                  </BarChart>
-                ) : (
-                  <LineChart data={trendData} margin={{ left: 8, right: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="month"
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(value) =>
-                        String(value).split(" ")[0]?.slice(0, 3) ?? value
-                      }
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(v) => formatCurrency(v)}
-                    />
-                    <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          formatter={(value, name) =>
-                            `${name}: ${formatCurrency(Number(value))}`
-                          }
-                        />
-                      }
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="income"
-                      stroke="var(--color-income)"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="expense"
-                      stroke="var(--color-expense)"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                )}
-              </ChartContainer>
-            ) : (
-              <div className="text-sm text-muted-foreground py-12 text-center">
-                {t("dashboard.noData")}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t("dashboard.spendingByCategory")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-hidden min-w-0">
-            {spendingByCategory.length > 0 ? (
-              <ChartContainer
-                config={{ value: { label: "Amount" } }}
-                className="h-[220px] w-full max-w-full aspect-auto"
-              >
-                <PieChart>
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        formatter={(value, name) =>
-                          `${name}: ${formatCurrency(Number(value))}`
-                        }
-                        nameKey="name"
-                      />
-                    }
-                  />
-                  <Pie
-                    data={spendingByCategory}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={60}
-                    outerRadius={90}
-                    stroke="transparent"
-                  >
-                    {spendingByCategory.map((entry, index) => (
-                      <Cell key={index} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ChartContainer>
-            ) : (
-              <div className="text-sm text-muted-foreground py-12 text-center">
-                {t("dashboard.noData")}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t("dashboard.categoryTrend")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-hidden min-w-0">
-            {categoryTrend.series.length > 0 ? (
-              <ChartContainer
-                config={categoryTrend.config}
-                className="h-[240px] w-full max-w-full aspect-auto"
-              >
-                {range === "current" ? (
-                  <BarChart
-                    data={categoryTrend.series.map((series) => ({
-                      name: series.name,
-                      value: Number(categoryTrend.data[0]?.[series.key] ?? 0),
-                    }))}
-                    margin={{ left: 8, right: 8 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="name"
-                      tickLine={false}
-                      axisLine={false}
-                      height={40}
-                      angle={-20}
-                      textAnchor="end"
-                      tickFormatter={(value) => {
-                        const s = String(value);
-                        return s.length > 10 ? `${s.slice(0, 10)}…` : s;
-                      }}
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(v) => formatCurrency(v)}
-                    />
-                    <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          formatter={(value, name) =>
-                            `${name}: ${formatCurrency(Number(value))}`
-                          }
-                        />
-                      }
-                    />
-                    <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                      {categoryTrend.series.map((series) => (
-                        <Cell
-                          key={series.key}
-                          fill={`var(--color-${series.key})`}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                ) : (
-                  <LineChart data={categoryTrend.data} margin={{ left: 8, right: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="month"
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(value) =>
-                        String(value).split(" ")[0]?.slice(0, 3) ?? value
-                      }
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(v) => formatCurrency(v)}
-                    />
-                    <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          formatter={(value, name) =>
-                            `${name}: ${formatCurrency(Number(value))}`
-                          }
-                        />
-                      }
-                    />
-                    {categoryTrend.series.map((series) => (
-                      <Line
-                        key={series.key}
-                        type="monotone"
-                        dataKey={series.key}
-                        stroke={`var(--color-${series.key})`}
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    ))}
-                  </LineChart>
-                )}
-              </ChartContainer>
-            ) : (
-              <div className="text-sm text-muted-foreground py-12 text-center">
-                {t("dashboard.noData")}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t("dashboard.ownerTrend")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-hidden min-w-0">
-            {ownerTrend.series.length > 0 ? (
-              <ChartContainer
-                config={ownerTrend.config}
-                className="h-[240px] w-full max-w-full aspect-auto"
-              >
-                <BarChart data={ownerTrend.data} margin={{ left: 8, right: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value) =>
-                      String(value).split(" ")[0]?.slice(0, 3) ?? value
-                    }
-                  />
-                  <YAxis
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(v) => formatCurrency(v)}
-                  />
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        formatter={(value, name) =>
-                          `${name}: ${formatCurrency(Number(value))}`
-                        }
-                      />
-                    }
-                  />
-                  {ownerTrend.series.map((series) => (
-                    <Bar
-                      key={series.key}
-                      dataKey={series.key}
-                      stackId="owners"
-                      fill={`var(--color-${series.key})`}
-                      radius={[4, 4, 0, 0]}
-                    />
-                  ))}
-                </BarChart>
-              </ChartContainer>
-            ) : (
-              <div className="text-sm text-muted-foreground py-12 text-center">
-                {t("dashboard.noData")}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {showOwnerSplit && (
-          <Card className="lg:col-span-2">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t("dashboard.ownerSplit")}
-              </CardTitle>
+        <div className="grid grid-cols-2 gap-1.5 md:grid-cols-2 md:gap-3 xl:grid-cols-4">
+          <Card>
+            <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
+              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">Net Cash Flow (MTD)</CardTitle>
             </CardHeader>
-            <CardContent className="overflow-hidden min-w-0">
-              {ownerSplitData.length > 0 ? (
-                <ChartContainer
-                  config={ownerSplitConfig}
-                  className="h-[240px] w-full max-w-full aspect-auto"
-                >
-                  <BarChart data={ownerSplitData} margin={{ left: 8, right: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="name"
-                      tickLine={false}
-                      axisLine={false}
-                      height={30}
-                      angle={-20}
-                      textAnchor="end"
-                      tickFormatter={(value) => {
-                        const s = String(value);
-                        return s.length > 10 ? `${s.slice(0, 10)}…` : s;
-                      }}
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(v) => formatCurrency(v)}
-                    />
-                    <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          formatter={(value, name) =>
-                            `${name}: ${formatCurrency(Number(value))}`
-                          }
-                        />
-                      }
-                    />
-                    <Bar dataKey="income" fill="var(--color-income)" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="expense" fill="var(--color-expense)" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ChartContainer>
-              ) : (
-                <div className="text-sm text-muted-foreground py-12 text-center">
-                  {t("dashboard.noData")}
-                </div>
-              )}
+            <CardContent className="px-2 pb-2 md:px-6 md:pb-6">
+              <p className={kpis.netCashFlow >= 0 ? "text-base md:text-2xl font-semibold text-green-400" : "text-base md:text-2xl font-semibold text-destructive"}>
+                {formatCurrency(kpis.netCashFlow)}
+              </p>
             </CardContent>
           </Card>
-        )}
+          <Card>
+            <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
+              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">Total Spent (MTD)</CardTitle>
+            </CardHeader>
+            <CardContent className="px-2 pb-2 md:px-6 md:pb-6 space-y-0.5 md:space-y-1">
+              <p className="text-base md:text-2xl font-semibold">{formatCurrency(kpis.totalSpent)}</p>
+              <p className="text-xs text-muted-foreground">
+                vs last month: {formatSpentDeltaLabel(kpis.spentVsLastMonthPct)}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
+              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">Total Income (MTD)</CardTitle>
+            </CardHeader>
+            <CardContent className="px-2 pb-2 md:px-6 md:pb-6">
+              <p className="text-base md:text-2xl font-semibold">{formatCurrency(kpis.totalIncome)}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="px-2 pt-2 pb-0.5 md:px-6 md:pt-6 md:pb-1">
+              <CardTitle className="text-[11px] md:text-sm text-muted-foreground">Total Debt Outstanding</CardTitle>
+            </CardHeader>
+            <CardContent className="px-2 pb-2 md:px-6 md:pb-6 space-y-0.5 md:space-y-1">
+              <p className="text-base md:text-2xl font-semibold">{formatCurrency(kpis.debtOutstanding)}</p>
+              <p className="text-xs text-muted-foreground">{formatDebtPaidSubtitle(kpis.debtPaidThisMonth)}</p>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t("dashboard.debtSnapshot")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-hidden min-w-0">
-            {(debtSnapshot[0]?.value ?? 0) + (debtSnapshot[1]?.value ?? 0) > 0 ? (
-              <div className="space-y-3">
-                <div className="text-lg font-semibold">
-                  {formatCurrency(totals.debtRemaining)}
-                </div>
-                <ChartContainer
-                  config={{ value: { label: "Amount" } }}
-                  className="h-[200px] w-full max-w-full aspect-auto"
-                >
-                  <PieChart>
-                    <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          formatter={(value, name) =>
-                            `${name}: ${formatCurrency(Number(value))}`
-                          }
-                          nameKey="name"
-                        />
-                      }
+        <div className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <section className="min-w-0 space-y-2">
+            <h2 className="text-base font-semibold">Income vs Expenses</h2>
+          <div className="hidden md:block">
+            <ChartContainer
+              config={{
+                expenses: { label: "Expenses", color: "#EF4444" },
+                debtPayments: { label: "Debt Payments", color: "#EAB308" },
+              }}
+              className="h-[280px]"
+            >
+              <BarChart data={cashFlowRows}>
+                <CartesianGrid vertical={false} />
+                <XAxis dataKey="monthLabel" />
+                <YAxis />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      className="min-w-[16rem] px-4 py-3 text-sm"
+                      labelClassName="text-sm font-semibold"
+                      valueFormatter={(value) => formatCurrency(asNumber(value))}
                     />
-                    <Pie
-                      data={debtSnapshot}
-                      dataKey="value"
-                      nameKey="name"
-                      innerRadius={50}
-                      outerRadius={80}
-                      stroke="transparent"
-                    >
-                      {debtSnapshot.map((entry, index) => (
-                        <Cell key={index} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ChartContainer>
-              </div>
-            ) : (
-              <div className="text-sm text-muted-foreground py-12 text-center">
-                {t("dashboard.noData")}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                  }
+                />
+                {incomeOwnerKeys.map((owner, index) => (
+                  <Bar
+                    key={owner}
+                    dataKey={(row) => row.incomeByOwner[owner] ?? 0}
+                    name={`Income (${owner})`}
+                    fill={INCOME_OWNER_COLORS[index % INCOME_OWNER_COLORS.length]}
+                    stackId="income"
+                    radius={index === incomeOwnerKeys.length - 1 ? [4, 4, 0, 0] : 0}
+                  />
+                ))}
+                <Bar
+                  dataKey="expensesTotal"
+                  name="Expenses"
+                  fill="var(--color-expenses)"
+                />
+                <Bar dataKey="debtPaymentsTotal" name="Debt Payments" fill="var(--color-debtPayments)" />
+              </BarChart>
+            </ChartContainer>
+          </div>
+          <div className="md:hidden">
+            <ChartContainer
+              config={{
+                income: { label: "Income", color: INCOME_OWNER_COLORS[0] },
+                expenses: { label: "Expenses", color: "#EF4444" },
+                debtPayments: { label: "Debt Payments", color: "#EAB308" },
+              }}
+              className="h-[220px]"
+            >
+              <BarChart
+                data={cashFlowRows}
+                margin={{ top: 4, right: 24, left: -4, bottom: 2 }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="monthLabel"
+                  tick={{ fontSize: 11 }}
+                  tickMargin={8}
+                  minTickGap={18}
+                  interval="preserveStartEnd"
+                  padding={{ left: 0, right: 8 }}
+                  tickFormatter={(value) => {
+                    const label = String(value ?? "");
+                    const month = label.split(" ")[0] ?? label;
+                    return month.slice(0, 3);
+                  }}
+                />
+                <YAxis
+                  tick={{ fontSize: 11 }}
+                  width={34}
+                  tickFormatter={(value) => {
+                    const abs = Math.abs(Number(value));
+                    if (abs >= 1000) return `${Math.round(Number(value) / 1000)}k`;
+                    return String(Math.round(Number(value)));
+                  }}
+                />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      className="min-w-[16rem] px-4 py-3 text-sm"
+                      labelClassName="text-sm font-semibold"
+                      valueFormatter={(value) => formatCurrency(asNumber(value))}
+                    />
+                  }
+                />
+                <Bar dataKey="incomeTotal" name="Income" fill="var(--color-income)" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="expensesTotal"
+                  name="Expenses"
+                  fill="var(--color-expenses)"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="debtPaymentsTotal"
+                  name="Debt Payments"
+                  fill="var(--color-debtPayments)"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ChartContainer>
+          </div>
+            {cashFlowRows.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No data for selected range.</p>
+            ) : null}
+          </section>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {t("dashboard.insightsTitle")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <div className="text-xs font-medium text-muted-foreground">
-              {t("dashboard.highlights")}
-            </div>
-            {insights.highlights.length > 0 ? (
-              <ul className="list-disc pl-4 text-sm space-y-1">
-                {insights.highlights.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                {t("dashboard.noData")}
+          <section className="min-w-0 space-y-2">
+            <h2 className="text-base font-semibold">Net Cash Flow Trend</h2>
+            {range === "current" ? (
+              <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-3">
+                <p className="text-xs text-muted-foreground">Current month net cash flow</p>
+                <p
+                  className={
+                    (netCashFlowRows[0]?.netCashFlow ?? 0) >= 0
+                      ? "mt-1 text-2xl font-semibold text-green-400"
+                      : "mt-1 text-2xl font-semibold text-destructive"
+                  }
+                >
+                  {formatCurrency(netCashFlowRows[0]?.netCashFlow ?? 0)}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Switch to Last 6 months or Last 12 months to view trend.
+                </p>
               </div>
+            ) : (
+              <>
+                <div className="hidden md:block">
+                <ChartContainer
+                  config={{
+                    netCashFlow: { label: "Net Cash Flow", color: "#22D3EE" },
+                  }}
+                  className="h-[280px]"
+                >
+                    <LineChart data={netCashFlowRows}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="monthLabel" />
+                      <YAxis />
+                      <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            labelClassName="text-sm font-semibold"
+                            valueFormatter={(value) => formatCurrency(asNumber(value))}
+                          />
+                        }
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="netCashFlow"
+                        name="Net Cash Flow"
+                        stroke="var(--color-netCashFlow)"
+                        strokeWidth={2.5}
+                        dot={{ r: 3 }}
+                        activeDot={{ r: 5 }}
+                      />
+                    </LineChart>
+                  </ChartContainer>
+                </div>
+                <div className="md:hidden">
+                <ChartContainer
+                  config={{
+                    netCashFlow: { label: "Net Cash Flow", color: "#22D3EE" },
+                  }}
+                  className="h-[220px]"
+                >
+                  <LineChart
+                    data={netCashFlowRows}
+                    margin={{ top: 4, right: 24, left: -6, bottom: 2 }}
+                  >
+                      <CartesianGrid vertical={false} />
+                    <XAxis
+                      dataKey="monthLabel"
+                      tick={{ fontSize: 11 }}
+                      tickMargin={8}
+                      minTickGap={18}
+                      interval="preserveStartEnd"
+                      padding={{ left: 0, right: 10 }}
+                      tickFormatter={(value) => {
+                        const label = String(value ?? "");
+                        const month = label.split(" ")[0] ?? label;
+                        return month.slice(0, 3);
+                      }}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 11 }}
+                      width={34}
+                      tickFormatter={(value) => {
+                        const abs = Math.abs(Number(value));
+                        if (abs >= 1000) return `${Math.round(Number(value) / 1000)}k`;
+                        return String(Math.round(Number(value)));
+                      }}
+                    />
+                      <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            labelClassName="text-sm font-semibold"
+                            valueFormatter={(value) => formatCurrency(asNumber(value))}
+                          />
+                        }
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="netCashFlow"
+                        name="Net Cash Flow"
+                        stroke="var(--color-netCashFlow)"
+                        strokeWidth={2.25}
+                        dot={{ r: 2.5 }}
+                        activeDot={{ r: 4 }}
+                      />
+                    </LineChart>
+                  </ChartContainer>
+                </div>
+              </>
+            )}
+            {netCashFlowRows.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No net cash flow data for selected range.</p>
+            ) : null}
+          </section>
+        </div>
+
+        <section className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="min-w-0 space-y-2">
+            <h2 className="text-base font-semibold">Spending Breakdown</h2>
+            {categorySlices.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No spending categories this month.</p>
+            ) : (
+              <>
+                <div className="hidden md:block">
+                  <ChartContainer config={{ value: { label: "Amount", color: DONUT_COLORS[0]! } }} className="h-[260px]">
+                    <PieChart>
+                      <Pie
+                        data={categorySlices}
+                        dataKey="value"
+                        nameKey="label"
+                        outerRadius={90}
+                      >
+                        {categorySlices.map((slice, index) => (
+                          <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            labelClassName="text-sm font-semibold"
+                            valueFormatter={(value) => formatCurrency(asNumber(value))}
+                          />
+                        }
+                      />
+                    </PieChart>
+                  </ChartContainer>
+                </div>
+                <div className="md:hidden space-y-2">
+                  <ChartContainer config={{ value: { label: "Amount", color: DONUT_COLORS[0]! } }} className="h-[210px]">
+                    <PieChart>
+                      <Pie
+                        data={categorySlices}
+                        dataKey="value"
+                        nameKey="label"
+                        innerRadius={42}
+                        outerRadius={70}
+                      >
+                        {categorySlices.map((slice, index) => (
+                          <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            labelClassName="text-sm font-semibold"
+                            valueFormatter={(value) => formatCurrency(asNumber(value))}
+                          />
+                        }
+                      />
+                    </PieChart>
+                  </ChartContainer>
+                  <div className="space-y-1">
+                    {categorySlices.slice(0, 4).map((slice, index) => (
+                      <div
+                        key={slice.label}
+                        className="w-full flex items-center justify-between text-left text-xs text-muted-foreground"
+                      >
+                        <span className="inline-flex items-center gap-2 truncate">
+                          <span
+                            className="h-2.5 w-2.5 rounded-sm shrink-0"
+                            style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
+                          />
+                          {slice.label}
+                        </span>
+                        <span className="font-medium text-foreground">{formatCurrency(slice.value)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
           </div>
-          <div className="space-y-2">
-            <div className="text-xs font-medium text-muted-foreground">
-              {t("dashboard.alerts")}
-            </div>
-            {insights.alerts.length > 0 ? (
-              <ul className="list-disc pl-4 text-sm space-y-1">
-                {insights.alerts.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
+
+          <div className="min-w-0 space-y-2">
+            <h2 className="text-base font-semibold">Shared vs Individual Spending</h2>
+            {ownerSlices.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No owner split data this month.</p>
             ) : (
-              <div className="text-sm text-muted-foreground">
-                {t("dashboard.noAlerts")}
-              </div>
+              <>
+                <div className="hidden md:block">
+                  <ChartContainer config={{ value: { label: "Amount", color: DONUT_COLORS[0]! } }} className="h-[260px]">
+                    <PieChart>
+                      <Pie
+                        data={ownerSlices}
+                        dataKey="value"
+                        nameKey="label"
+                        outerRadius={90}
+                      >
+                        {ownerSlices.map((slice, index) => (
+                          <Cell key={slice.key} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            labelClassName="text-sm font-semibold"
+                            valueFormatter={(value) => formatCurrency(asNumber(value))}
+                          />
+                        }
+                      />
+                    </PieChart>
+                  </ChartContainer>
+                </div>
+                <div className="md:hidden space-y-2">
+                  <ChartContainer config={{ value: { label: "Amount", color: DONUT_COLORS[0]! } }} className="h-[210px]">
+                    <PieChart>
+                      <Pie
+                        data={ownerSlices}
+                        dataKey="value"
+                        nameKey="label"
+                        innerRadius={42}
+                        outerRadius={70}
+                      >
+                        {ownerSlices.map((slice, index) => (
+                          <Cell key={slice.key} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            labelClassName="text-sm font-semibold"
+                            valueFormatter={(value) => formatCurrency(asNumber(value))}
+                          />
+                        }
+                      />
+                    </PieChart>
+                  </ChartContainer>
+                  <div className="space-y-1">
+                    {ownerSlices.map((slice, index) => (
+                      <div
+                        key={slice.key}
+                        className="w-full flex items-center justify-between text-left text-xs text-muted-foreground"
+                      >
+                        <span className="inline-flex items-center gap-2 truncate">
+                          <span
+                            className="h-2.5 w-2.5 rounded-sm shrink-0"
+                            style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
+                          />
+                          {slice.label}
+                        </span>
+                        <span className="font-medium text-foreground">{formatCurrency(slice.value)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="text-base font-semibold">Debt Snapshot</h2>
+          {debtRows.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No active debts.</p>
+          ) : (
+            <div className="divide-y border-t border-border">
+              {debtRows.map((row, index) => (
+                <div
+                  key={row.id}
+                  className={`w-full text-left px-2 py-4 ${index % 2 === 1 ? "bg-muted/30" : ""}`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{row.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {row.owner || t("common.noOwner")}
+                      </p>
+                    </div>
+                    <p className="font-semibold">{formatCurrency(row.remaining)}</p>
+                  </div>
+                  <div className="mt-2 h-2 rounded bg-muted">
+                    <div className="h-2 rounded bg-primary" style={{ width: `${Math.min(100, Math.max(0, row.progress * 100))}%` }} />
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {formatCurrency(row.paid)} / {formatCurrency(row.initialAmount)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="space-y-1">
+          <h2 className="text-base font-semibold">Fixed Obligations (MTD)</h2>
+          <p className="text-2xl font-semibold">{formatCurrency(fixedObligations)}</p>
+          <p className="text-xs text-muted-foreground">Includes mortgage, utilities, and debt payments.</p>
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="text-base font-semibold">Recent Activity</h2>
+          {recentActivity.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No recent transactions.</p>
+          ) : (
+            <div className="divide-y border-t border-border">
+              {recentActivity.map((item, index) => (
+                <div
+                  key={item.id}
+                  className={`w-full text-left px-2 py-4 ${index % 2 === 1 ? "bg-muted/30" : ""}`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="truncate font-medium">{item.description || "—"}</p>
+                    <p className="font-semibold">{formatCurrency(item.amount)}</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {(item.category || "Uncategorized") + " · " + (item.owner || t("common.noOwner"))}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="space-y-2 pb-4">
+          <h2 className="text-base font-semibold">Smart Insights & Alerts</h2>
+          {insights.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No alerts</p>
+          ) : (
+            <div className="space-y-2">
+              {insights.map((insight) => (
+                <div
+                  key={insight.id}
+                  className="flex items-start justify-between gap-3 border border-border/60 rounded-md px-3 py-2"
+                >
+                  <p className="text-sm">{insight.message}</p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs"
+                    onClick={() => dismissInsight(insight.id)}
+                  >
+                    Dismiss
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

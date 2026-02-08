@@ -96,12 +96,16 @@ function seedBudget(expenses: ExpenseFixture[] = DEFAULT_EXPENSES) {
   );
 }
 
-function TestWrapper() {
+function TestWrapper({
+  initialEntry = "/dashboard/transactions",
+}: {
+  initialEntry?: string;
+}) {
   return (
     <BudgetProvider>
       <PresetTransactionsProvider>
         <GoogleAuthProviderFallback>
-          <MemoryRouter initialEntries={["/dashboard/transactions"]}>
+          <MemoryRouter initialEntries={[initialEntry]}>
             <Routes>
               <Route path="/dashboard" element={<Layout />}>
                 <Route path="transactions" element={<TransactionsPage />} />
@@ -241,4 +245,13 @@ test("TransactionsPage shows empty state when no valid non-mortgage expenses", (
   expect(
     screen.getByText("No transactions yet. Import a CSV or add one manually."),
   ).toBeInTheDocument();
+});
+
+test("TransactionsPage applies URL query filters and highlight", () => {
+  render(
+    <TestWrapper initialEntry="/dashboard/transactions?month=2026-02&category=Bills&highlight=e3" />,
+  );
+
+  expect(screen.getAllByText("Gamma utilities").length).toBeGreaterThan(0);
+  expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
 });

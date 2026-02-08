@@ -351,7 +351,7 @@ export function Layout() {
             location.pathname === "/dashboard/import" ||
             location.pathname === "/dashboard/settings"
             ? "p-0 md:p-6"
-            : "p-4 md:p-6",
+            : "p-0 md:p-6",
           location.pathname !== "/dashboard" && "flatten-mobile-cards",
         )}
       >

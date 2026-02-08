@@ -6,6 +6,7 @@ import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { extractSpreadsheetId } from "@/lib/googleSheets";
 import { formatDate } from "@/lib/format";
+import { useTheme } from "@/hooks/useTheme";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -71,6 +72,7 @@ export function SettingsPage() {
   } = useGoogleAuth();
   const { presetTransactions, setPresets } = usePresetTransactions();
   const { t } = useTranslation();
+  const { theme, setTheme } = useTheme();
 
   const [sheetIdInput, setSheetIdInput] = useState(spreadsheetId ?? "");
   const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
@@ -213,6 +215,31 @@ export function SettingsPage() {
 
       <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
         <CardContent className="rounded-lg border border-border/60 p-4 space-y-3">
+        <div className="space-y-1">
+          <h3 className="text-sm font-semibold">{t("settings.themeTitle")}</h3>
+          <p className="text-xs text-muted-foreground">
+            {t("settings.themeDesc")}
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label>{t("settings.themeLabel")}</Label>
+          <Select
+            value={theme}
+            onValueChange={(value: "light" | "dark" | "system") =>
+              setTheme(value)
+            }
+          >
+            <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="dark">{t("settings.themeDark")}</SelectItem>
+              <SelectItem value="light">{t("settings.themeLight")}</SelectItem>
+              <SelectItem value="system">{t("settings.themeSystem")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="space-y-1">
           <h3 className="text-sm font-semibold">{t("settings.dateFormatTitle")}</h3>
           <p className="text-xs text-muted-foreground">

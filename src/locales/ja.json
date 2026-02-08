@@ -504,7 +504,13 @@
     "repairResultFixed": "Repaired {{fixedExpenses}} expense(s) and {{fixedIncome}} income entry(ies).",
     "repairResultNone": "No corrupted dates found.",
     "useDummyData": "Use dummy data (dev only)",
-    "useDummyDataDesc": "Loads sample data across the entire app without touching your real storage."
+    "useDummyDataDesc": "Loads sample data across the entire app without touching your real storage.",
+    "themeTitle": "Theme",
+    "themeDesc": "Choose how Ortho appears across the app.",
+    "themeLabel": "Color mode",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "themeSystem": "System"
   },
   "transactions": {
     "add": "追加",

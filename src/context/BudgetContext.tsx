@@ -25,6 +25,7 @@ import {
   setUiFormatSettings as applyUiFormatSettings,
   type UiFormatSettings,
 } from "@/lib/format";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 import { buildDummyBudget, type DummyBudgetData } from "@/lib/dummyData";
 import type { BudgetState } from "@/types/budget";
@@ -694,7 +695,9 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         setDummyState((prev) => ({
           ...prev,
           expenses: prev.expenses.map((e) =>
-            e.category && !categories.includes(e.category)
+            e.category &&
+            !isMortgageCategory(e.category) &&
+            !categories.includes(e.category)
               ? { ...e, category: "" }
               : e
           ),
@@ -704,7 +707,9 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       }
       setExpenses((prev) =>
         prev.map((e) =>
-          e.category && !categories.includes(e.category)
+          e.category &&
+          !isMortgageCategory(e.category) &&
+          !categories.includes(e.category)
             ? { ...e, category: "" }
             : e
         )

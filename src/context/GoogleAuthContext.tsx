@@ -822,6 +822,13 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       const newExpenses = sheetExpenses.filter(
         (e) => !appExpenseKeys.has(expenseKey(e))
       );
+      const mortgageSheetKeys = new Set(sheetMortgage.map((e) => expenseKey(e)));
+      const mortgageRepairs = budget.expenses.filter(
+        (e) => mortgageSheetKeys.has(expenseKey(e)) && !isMortgageCategory(e.category),
+      );
+      for (const repair of mortgageRepairs) {
+        budget.updateExpense(repair.id, { category: "Mortgage" });
+      }
       const newMortgage = sheetMortgage.filter(
         (e) => !appExpenseKeys.has(expenseKey(e))
       );
@@ -954,6 +961,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.addDebts,
     budget.addDebtPayments,
     budget.addOwnerTransfer,
+    budget.updateExpense,
     budget.setCardSources,
     budget.setInvestmentPortfolios,
     budget.expenseCategories,

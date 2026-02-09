@@ -133,8 +133,12 @@ function SidebarContent({
   onNavClick?: () => void;
 }) {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-  const isActivePath = (to: string) =>
-    location.pathname === to || location.pathname.startsWith(`${to}/`);
+  const isActivePath = (to: string) => {
+    if (to === "/dashboard") {
+      return location.pathname === "/dashboard";
+    }
+    return location.pathname === to || location.pathname.startsWith(`${to}/`);
+  };
 
   return (
     <>
@@ -249,8 +253,12 @@ export function Layout() {
   const currentLng = i18n.language;
   const showSyncStatusUi = location.pathname !== "/dashboard";
   const [moreOpen, setMoreOpen] = useState(false);
-  const isActivePath = (to: string) =>
-    location.pathname === to || location.pathname.startsWith(`${to}/`);
+  const isActivePath = (to: string) => {
+    if (to === "/dashboard") {
+      return location.pathname === "/dashboard";
+    }
+    return location.pathname === to || location.pathname.startsWith(`${to}/`);
+  };
   const [showSyncComplete, setShowSyncComplete] = useState(false);
   const prevSignedInRef = useRef(isSignedIn);
   const syncingStartedAtRef = useRef<number | null>(null);

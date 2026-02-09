@@ -391,7 +391,6 @@ export function Dashboard() {
                     : 0;
                 const isExpanded = expandedOwnerKey === row.owner;
                 const ownerItems = ownerExpenseItemsByOwner.get(row.owner) ?? [];
-                const ownerItemsPreview = ownerItems.slice(0, 4);
                 const netToneClass =
                   row.net >= 0 ? "text-foreground" : "text-destructive";
                 return (
@@ -444,7 +443,7 @@ export function Dashboard() {
                             </p>
                           ) : (
                             <div className="space-y-1">
-                              {ownerItemsPreview.map((item) => (
+                              {ownerItems.map((item) => (
                                 <div
                                   key={`${row.owner}-${item.id}`}
                                   className="flex items-start justify-between gap-2 rounded-md bg-muted/30 px-2 py-1.5 text-xs"
@@ -470,13 +469,6 @@ export function Dashboard() {
                                   </div>
                                 </div>
                               ))}
-                              {ownerItems.length > ownerItemsPreview.length ? (
-                                <p className="pt-1 text-[11px] text-muted-foreground">
-                                  {t("dashboard.moreItemsCount", {
-                                    count: ownerItems.length - ownerItemsPreview.length,
-                                  })}
-                                </p>
-                              ) : null}
                             </div>
                           )}
                         </div>

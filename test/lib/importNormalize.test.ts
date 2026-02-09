@@ -76,3 +76,29 @@ test("normalizeImportedData clears unknown categories and owners", () => {
   expect(normalized.presetTransactions[0]?.category).toBe("");
   expect(normalized.presetTransactions[0]?.owner).toBe("");
 });
+
+test("normalizeImportedData keeps Mortgage expenses categorized as Mortgage", () => {
+  const normalized = normalizeImportedData(
+    {
+      expenses: [
+        {
+          id: "exp-mortgage",
+          date: "2025-01-10",
+          amount: 1500,
+          description: "Mortgage",
+          category: "Mortgage",
+          source: "manual",
+          owner: "AYAZ UDDIN",
+        },
+      ],
+      income: [],
+      debts: [],
+      presetTransactions: [],
+    },
+    ["My Purchase", "Utilities"],
+    [],
+    ["AYAZ UDDIN"],
+  );
+
+  expect(normalized.expenses[0]?.category).toBe("Mortgage");
+});

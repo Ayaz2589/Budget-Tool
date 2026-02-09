@@ -11,7 +11,8 @@ export type { ExpensesByMonthListProps };
 export function ExpensesByMonthList({
   byMonth,
   defaultOpenMonth,
-  onExpenseTap,
+  onRowTap,
+  t,
 }: ExpensesByMonthListProps) {
   const [openMonth, setOpenMonth] = useState<string>(defaultOpenMonth);
 
@@ -66,28 +67,38 @@ export function ExpensesByMonthList({
             </button>
             {isOpen && (
               <div className="divide-y">
-                {monthExpenses.map((e, index) => (
+                {monthExpenses.map((row, index) => (
                   <div
-                    key={e.id}
+                    key={`${row.kind}-${row.id}`}
                     className={cn(
                       index % 2 === 1 ? "bg-muted/30" : "bg-background"
                     )}
                   >
                     <DsDataRow
                       dense
-                      onClick={() => onExpenseTap(e)}
-                      ariaLabel={`${e.description}, ${formatCurrency(
-                        e.amount
-                      )}, ${formatDate(e.date)}`}
-                      title={e.description || "—"}
-                      subtitle={`${formatDate(e.date)} · ${e.category || "Uncategorized"}`}
+                      onClick={() => onRowTap(row)}
+                      ariaLabel={`${row.description}, ${formatCurrency(
+                        row.amount
+                      )}, ${formatDate(row.date)}`}
+                      title={
+                        row.kind === "owner-transfer"
+                          ? `${t("transactions.transfer")}: ${row.transferFromOwner} -> ${row.transferToOwner}`
+                          : row.description || "—"
+                      }
+                      subtitle={
+                        row.kind === "owner-transfer"
+                          ? `${formatDate(row.date)} · ${row.transferNote || t("transactions.typeTransfer")}`
+                          : `${formatDate(row.date)} · ${row.category || t("common.uncategorized")}`
+                      }
                       trailing={
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
-                            {getSourceBadge(e.source)}
+                            {row.kind === "owner-transfer"
+                              ? t("transactions.typeTransfer")
+                              : getSourceBadge(row.source)}
                           </span>
                           <div className="text-base font-semibold">
-                            {formatCurrency(e.amount)}
+                            {formatCurrency(row.amount)}
                           </div>
                         </div>
                       }

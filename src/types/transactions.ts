@@ -1,7 +1,14 @@
-import type { Expense, ExpenseAllocation, ExpenseSource } from "./core";
+import type {
+  Expense,
+  ExpenseAllocation,
+  ExpenseSource,
+  LedgerEntryType,
+  OwnerTransfer,
+} from "./core";
 
 export interface TransactionRow {
   id: string;
+  entryType: LedgerEntryType;
   date: string;
   amount: string;
   description: string;
@@ -12,6 +19,9 @@ export interface TransactionRow {
   allocationMode: "single" | "equal" | "custom";
   allocationOwners: string[];
   allocationPercents: Record<string, string>;
+  transferFromOwner: string;
+  transferToOwner: string;
+  transferNote: string;
   presetId?: string;
 }
 
@@ -29,20 +39,20 @@ export type SortColumn =
   | "owner";
 
 export interface ExpensesByMonthTableProps {
-  byMonth: [string, Expense[]][];
+  byMonth: [string, TransactionLedgerRow[]][];
   defaultOpenMonth: string;
   sortBy: SortColumn;
   sortDir: "asc" | "desc";
   onSort: (col: SortColumn) => void;
-  onExpenseTap: (expense: Expense) => void;
+  onRowTap: (row: TransactionLedgerRow) => void;
   sourceLabelKeys: Record<string, string>;
   t: (key: string, opts?: { count?: number }) => string;
 }
 
 export interface ExpensesByMonthListProps {
-  byMonth: [string, Expense[]][];
+  byMonth: [string, TransactionLedgerRow[]][];
   defaultOpenMonth: string;
-  onExpenseTap: (expense: Expense) => void;
+  onRowTap: (row: TransactionLedgerRow) => void;
   t: (key: string, opts?: { count?: number }) => string;
 }
 
@@ -57,6 +67,8 @@ export interface FiltersAndActionsDialogProps {
   onCategoryFilterChange: (value: string) => void;
   ownerFilter: string;
   onOwnerFilterChange: (value: string) => void;
+  typeFilter: "all" | "expense" | "transfer";
+  onTypeFilterChange: (value: "all" | "expense" | "transfer") => void;
   searchFilter: string;
   onSearchFilterChange: (value: string) => void;
   expenseCategories: string[];
@@ -76,6 +88,14 @@ export interface ExpenseActionsDialogProps {
   onDelete: (expense: Expense) => void;
   expenseCategories: string[];
   ownerOptions: string[];
+  t: (key: string) => string;
+}
+
+export interface TransferActionsDialogProps {
+  transfer: OwnerTransfer | null;
+  onClose: () => void;
+  onEdit: (transfer: OwnerTransfer) => void;
+  onDelete: (transfer: OwnerTransfer) => void;
   t: (key: string) => string;
 }
 
@@ -99,6 +119,39 @@ export interface EditTransactionDialogProps {
   expenseCategories: string[];
   ownerOptions: string[];
   cardSources: string[];
+}
+
+export interface EditTransferDialogProps {
+  transfer: OwnerTransfer | null;
+  onClose: () => void;
+  onSubmit: (
+    id: string,
+    updates: {
+      date: string;
+      amount: number;
+      fromOwner: string;
+      toOwner: string;
+      note?: string;
+    },
+  ) => void;
+  ownerOptions: string[];
+  t: (key: string) => string;
+}
+
+export interface TransactionLedgerRow {
+  kind: "expense" | "owner-transfer";
+  id: string;
+  date: string;
+  amount: number;
+  description: string;
+  source: ExpenseSource;
+  owner?: string;
+  category?: string;
+  transferFromOwner?: string;
+  transferToOwner?: string;
+  transferNote?: string;
+  expense?: Expense;
+  transfer?: OwnerTransfer;
 }
 
 export interface DeleteOneTransactionDialogProps {

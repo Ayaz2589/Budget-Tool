@@ -1,4 +1,4 @@
-import type { Expense, Debt, DebtPayment, Income, PresetTransaction } from "@/types/core";
+import type { Expense, Debt, DebtPayment, Income, OwnerTransfer, PresetTransaction } from "@/types/core";
 
 export type DashboardRange = "current" | "6" | "12";
 export type DashboardExpenseScope = "all" | "exclude-mortgage";
@@ -45,6 +45,7 @@ export interface DashboardDebtRow {
 }
 
 export type DashboardRecentItem = Expense;
+export type DashboardOwnerTransferItem = OwnerTransfer;
 
 export type DashboardInsightType =
   | "spending_spike"

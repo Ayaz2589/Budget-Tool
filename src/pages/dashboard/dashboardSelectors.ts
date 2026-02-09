@@ -182,6 +182,7 @@ export function buildCategoryBreakdown({
 export function buildOwnerSplit({
   expenses,
   currentMonthKey,
+  monthKeys,
   scope,
   owners,
   sharedLabel = "Shared",
@@ -189,17 +190,26 @@ export function buildOwnerSplit({
 }: {
   expenses: Expense[];
   currentMonthKey: string;
+  monthKeys?: string[];
   scope: DashboardExpenseScope;
   owners: string[];
   sharedLabel?: string;
   unassignedLabel?: string;
 }): DashboardOwnerSlice[] {
+  const allowedMonthKeys =
+    monthKeys && monthKeys.length > 0 ? new Set(monthKeys) : null;
   const ownerValues = new Map<string, number>();
   let shared = 0;
   let unassigned = 0;
 
   for (const expense of expenses) {
-    if (!isValidDate(expense.date) || monthFromDate(expense.date) !== currentMonthKey) continue;
+    if (!isValidDate(expense.date)) continue;
+    const monthKey = monthFromDate(expense.date);
+    if (allowedMonthKeys) {
+      if (!allowedMonthKeys.has(monthKey)) continue;
+    } else if (monthKey !== currentMonthKey) {
+      continue;
+    }
     if (!shouldIncludeExpense(expense, scope)) continue;
     const allocation = normalizeExpenseAllocation(expense, owners);
     if (isSharedExpenseByAllocation(allocation)) {
@@ -236,19 +246,29 @@ export function buildOwnerSplit({
 export function buildOwnerExpenseItems({
   expenses,
   currentMonthKey,
+  monthKeys,
   scope,
   owners,
   owner,
 }: {
   expenses: Expense[];
   currentMonthKey: string;
+  monthKeys?: string[];
   scope: DashboardExpenseScope;
   owners: string[];
   owner: string;
 }): DashboardOwnerExpenseItem[] {
+  const allowedMonthKeys =
+    monthKeys && monthKeys.length > 0 ? new Set(monthKeys) : null;
   const items: DashboardOwnerExpenseItem[] = [];
   for (const expense of expenses) {
-    if (!isValidDate(expense.date) || monthFromDate(expense.date) !== currentMonthKey) continue;
+    if (!isValidDate(expense.date)) continue;
+    const monthKey = monthFromDate(expense.date);
+    if (allowedMonthKeys) {
+      if (!allowedMonthKeys.has(monthKey)) continue;
+    } else if (monthKey !== currentMonthKey) {
+      continue;
+    }
     if (!shouldIncludeExpense(expense, scope)) continue;
     const allocation = normalizeExpenseAllocation(expense, owners);
     const allocatedAmount = allocation
@@ -323,6 +343,21 @@ export function buildRecentActivity(expenses: Expense[]): DashboardRecentItem[] 
     .filter((expense) => isValidDate(expense.date))
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 5);
+}
+
+export function buildOwnerTransfersMtd({
+  ownerTransfers,
+  currentMonthKey,
+  limit = 5,
+}: {
+  ownerTransfers: { id: string; date: string; fromOwner: string; toOwner: string; amount: number; note?: string }[];
+  currentMonthKey: string;
+  limit?: number;
+}) {
+  return [...ownerTransfers]
+    .filter((row) => isValidDate(row.date) && monthFromDate(row.date) === currentMonthKey)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, limit);
 }
 
 export function getOwnerDrilldownParam(slice: DashboardOwnerSlice): string {

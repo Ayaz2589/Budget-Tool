@@ -72,6 +72,17 @@ export interface DebtPayment {
   note?: string;
 }
 
+export type LedgerEntryType = "expense" | "owner-transfer";
+
+export interface OwnerTransfer {
+  id: string;
+  date: string; // ISO date YYYY-MM-DD
+  fromOwner: string;
+  toOwner: string;
+  amount: number;
+  note?: string;
+}
+
 export interface PresetTransaction {
   id: string;
   source: ExpenseSource;

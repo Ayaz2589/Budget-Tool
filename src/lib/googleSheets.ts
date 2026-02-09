@@ -3,6 +3,7 @@ import type {
   DebtPayment,
   Expense,
   Income,
+  OwnerTransfer,
   ExpenseSource,
   PresetTransaction,
 } from "@/types/core";
@@ -296,6 +297,37 @@ export async function readDebtPaymentsFromSheet(
     });
   }
   return payments;
+}
+
+export async function readOwnerTransfersFromSheet(
+  accessToken: string,
+  spreadsheetId: string,
+): Promise<OwnerTransfer[]> {
+  const rows = await getSheetValues(
+    accessToken,
+    spreadsheetId,
+    "OwnerTransfers!A2:F",
+    "UNFORMATTED_VALUE",
+  );
+  const transfers: OwnerTransfer[] = [];
+  for (const row of rows) {
+    const id = String(row[0] ?? "").trim() || generateId();
+    const date = normalizeDate(row[1]);
+    const fromOwner = String(row[2] ?? "").trim();
+    const toOwner = String(row[3] ?? "").trim();
+    const amount = parseAmount(row[4]);
+    const note = String(row[5] ?? "").trim() || undefined;
+    if (!date || !fromOwner || !toOwner || amount == null || amount <= 0) continue;
+    transfers.push({
+      id,
+      date,
+      fromOwner,
+      toOwner,
+      amount,
+      note,
+    });
+  }
+  return transfers;
 }
 
 export async function appendExpenses(
@@ -714,6 +746,19 @@ function buildDebtPaymentsValues(debtPayments: DebtPayment[]): unknown[][] {
   return [...headers, ...rows];
 }
 
+function buildOwnerTransfersValues(ownerTransfers: OwnerTransfer[]): unknown[][] {
+  const headers = [["Id", "Date", "From Owner", "To Owner", "Amount", "Note"]];
+  const rows = ownerTransfers.map((row) => [
+    row.id,
+    row.date,
+    row.fromOwner,
+    row.toOwner,
+    row.amount,
+    row.note ?? "",
+  ]);
+  return [...headers, ...rows];
+}
+
 function buildPresetsValues(presetTransactions: PresetTransaction[]): unknown[][] {
   const headers = [["Id", "Source", "Description", "Category", "Owner"]];
   const rows = presetTransactions.map((p) => [
@@ -822,6 +867,7 @@ export async function syncAllSheetsBatch(
     income: Income[];
     debts: Debt[];
     debtPayments: DebtPayment[];
+    ownerTransfers?: OwnerTransfer[];
     presetTransactions: PresetTransaction[];
     investmentPortfolios?: InvestmentPortfolio[];
     dataBlob: string;
@@ -842,6 +888,7 @@ export async function syncAllSheetsBatch(
         "Income!A1:E10000",
         "Debts!A1:E10000",
         "DebtPayments!A1:E10000",
+        "OwnerTransfers!A1:F10000",
         "PresetTransactions!A1:E10000",
         "Investments!A1:G10000",
         "Data!A1:A1",
@@ -869,6 +916,10 @@ export async function syncAllSheetsBatch(
         { range: "Income!A1:E", values: buildIncomeValues(payload.income) },
         { range: "Debts!A1:E", values: buildDebtsValues(payload.debts) },
         { range: "DebtPayments!A1:E", values: buildDebtPaymentsValues(payload.debtPayments) },
+        {
+          range: "OwnerTransfers!A1:F",
+          values: buildOwnerTransfersValues(payload.ownerTransfers ?? []),
+        },
         {
           range: "PresetTransactions!A1:E",
           values: buildPresetsValues(payload.presetTransactions),
@@ -958,6 +1009,7 @@ export async function getSheetIds(
   const debts = byTitle["Debts"];
   const debtPayments = byTitle["DebtPayments"];
   const mortgage = byTitle["Mortgage"];
+  const ownerTransfers = byTitle["OwnerTransfers"];
   const presetTransactions = byTitle["PresetTransactions"];
   const investments = byTitle["Investments"];
   if (
@@ -967,6 +1019,7 @@ export async function getSheetIds(
     debts == null ||
     debtPayments == null ||
     mortgage == null ||
+    ownerTransfers == null ||
     presetTransactions == null ||
     investments == null
   )
@@ -978,6 +1031,7 @@ export async function getSheetIds(
     debts,
     debtPayments,
     mortgage,
+    ownerTransfers,
     presetTransactions,
     investments,
   };
@@ -1003,6 +1057,7 @@ export async function ensureSheetsExist(
     "Debts",
     "DebtPayments",
     "Mortgage",
+    "OwnerTransfers",
     "PresetTransactions",
     "Investments",
     "Data",
@@ -1276,6 +1331,44 @@ export async function applySheetsFormatting(
       10000,
       3,
       4,
+      {
+        horizontalAlignment: "LEFT",
+        numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },
+      },
+      currencyFields
+    )
+  );
+
+  // OwnerTransfers: header bold + larger, all left align (A–F), column E currency
+  requests.push(
+    repeatCellRequest(
+      sheetIds.ownerTransfers,
+      0,
+      1,
+      0,
+      6,
+      { bold: true, fontSize: 12, horizontalAlignment: "LEFT" },
+      headerFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.ownerTransfers,
+      0,
+      10000,
+      0,
+      6,
+      { horizontalAlignment: "LEFT" },
+      leftAlignFields
+    )
+  );
+  requests.push(
+    repeatCellRequest(
+      sheetIds.ownerTransfers,
+      1,
+      10000,
+      4,
+      5,
       {
         horizontalAlignment: "LEFT",
         numberFormat: { type: "CURRENCY", pattern: "$#,##0.00" },

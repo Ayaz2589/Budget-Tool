@@ -230,7 +230,15 @@
     "sectionExpenseByOwner": "Expense by Owner",
     "sectionNoOwnerExpenses": "No owner expenses this month.",
     "ofTotalSpent": "{{percent}} of total spent",
-    "sectionNoOwnerExpenseItems": "No expense entries for this owner in this month."
+    "sectionNoOwnerExpenseItems": "No expense entries for this owner in this month.",
+    "ownerTransfersMtd": "Owner Transfers (MTD)",
+    "noOwnerTransfersMtd": "No owner transfers this month.",
+    "grossExpenseByOwner": "Gross Expense by Owner",
+    "netAfterTransfers": "Net After Transfers",
+    "transfersSent": "Transfers Sent",
+    "transfersReceived": "Transfers Received",
+    "grossShort": "Gross",
+    "netShort": "Net"
   },
   "dashboardDebt": {
     "addDebt": "Add a debt",
@@ -566,7 +574,16 @@
     "syncing": "Syncing...",
     "title": "Transactions",
     "transaction_one": "{{count}} transaction",
-    "transaction_other": "{{count}} transactions"
+    "transaction_other": "{{count}} transactions",
+    "type": "Type",
+    "typeAll": "All types",
+    "typeExpense": "Expense",
+    "typeTransfer": "Owner Transfer",
+    "transfer": "Owner Transfer",
+    "transferFrom": "From owner",
+    "transferTo": "To owner",
+    "transferNote": "Note",
+    "transferValidationOwnersDifferent": "From owner and to owner must be different"
   },
   "investments": {
     "title": "Investments",

@@ -3,6 +3,7 @@ import type {
   DebtPayment,
   Expense,
   Income,
+  OwnerTransfer,
   PresetTransaction,
 } from "./core";
 import type { InvestmentPortfolio } from "./investments";
@@ -13,6 +14,7 @@ export interface ParsedExportedPdf {
   income: Income[];
   debts: Debt[];
   debtPayments: DebtPayment[];
+  ownerTransfers?: OwnerTransfer[];
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];

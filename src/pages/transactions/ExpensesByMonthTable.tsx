@@ -47,7 +47,7 @@ export function ExpensesByMonthTable({
   sortBy,
   sortDir,
   onSort,
-  onExpenseTap,
+  onRowTap,
   sourceLabelKeys,
   t,
 }: ExpensesByMonthTableProps) {
@@ -165,48 +165,60 @@ export function ExpensesByMonthTable({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {monthExpenses.map((e, index) => (
+                {monthExpenses.map((row, index) => (
                   <TableRow
-                    key={e.id}
+                    key={`${row.kind}-${row.id}`}
                     role="button"
                     tabIndex={0}
-                    onClick={() => onExpenseTap(e)}
+                    onClick={() => onRowTap(row)}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        onExpenseTap(e);
+                        onRowTap(row);
                       }
                     }}
                     className={cn(
                       "cursor-pointer [&>td]:py-4",
                       index % 2 === 1 ? "bg-muted/30" : undefined
                     )}
-                    aria-label={`${e.description || "—"}, ${formatCurrency(
-                      e.amount
-                    )}, ${formatDate(e.date)}`}
+                    aria-label={`${row.description || "—"}, ${formatCurrency(
+                      row.amount
+                    )}, ${formatDate(row.date)}`}
                   >
                     <TableCell className="whitespace-nowrap text-muted-foreground">
-                      {formatDate(e.date)}
+                      {formatDate(row.date)}
                     </TableCell>
                     <TableCell className="max-w-[260px] truncate font-medium">
-                      {e.description || "—"}
+                      {row.kind === "owner-transfer"
+                        ? `${t("transactions.transfer")}: ${row.transferFromOwner} -> ${row.transferToOwner}`
+                        : row.description || "—"}
                     </TableCell>
                     <TableCell className="font-semibold">
-                      {formatCurrency(e.amount)}
+                      {formatCurrency(row.amount)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      <span className="flex items-center gap-2">
-                        <SourceIcon source={e.source} size={20} />
-                        {sourceLabelKeys[e.source]
-                          ? t(sourceLabelKeys[e.source])
-                          : e.source}
-                      </span>
+                      {row.kind === "owner-transfer" ? (
+                        <span className="text-xs font-medium text-primary">
+                          {t("transactions.typeTransfer")}
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <SourceIcon source={row.source} size={20} />
+                          {sourceLabelKeys[row.source]
+                            ? t(sourceLabelKeys[row.source])
+                            : row.source}
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {e.owner || t("common.noOwner")}
+                      {row.kind === "owner-transfer"
+                        ? `${row.transferFromOwner} -> ${row.transferToOwner}`
+                        : row.owner || t("common.noOwner")}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {e.category || t("common.uncategorized")}
+                      {row.kind === "owner-transfer"
+                        ? row.transferNote || t("transactions.typeTransfer")
+                        : row.category || t("common.uncategorized")}
                     </TableCell>
                   </TableRow>
                 ))}

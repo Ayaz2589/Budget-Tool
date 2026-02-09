@@ -3,6 +3,7 @@ import type {
   DebtPayment,
   Expense,
   Income,
+  OwnerTransfer,
 } from "@/types/core";
 import {
   ALL_EXPENSE_SOURCES,
@@ -15,6 +16,7 @@ export type DummyBudgetData = {
   income: Income[];
   debts: Debt[];
   debtPayments: DebtPayment[];
+  ownerTransfers: OwnerTransfer[];
   iOweNova: Record<string, number>;
   cardSources: string[];
   expenseCategories: string[];
@@ -164,6 +166,7 @@ export function buildDummyBudget(currentMonthKey: string): DummyBudgetData {
     income,
     debts,
     debtPayments,
+    ownerTransfers: [],
     iOweNova: {
       [currentKey]: 320,
       [prevKey]: 180,

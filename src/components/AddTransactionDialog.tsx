@@ -44,6 +44,7 @@ function defaultRow(
 ): TransactionRow {
   return {
     id: crypto.randomUUID(),
+    entryType: "expense",
     date: dateValue,
     amount: "",
     description: "",
@@ -54,6 +55,9 @@ function defaultRow(
     allocationMode: "single",
     allocationOwners: [],
     allocationPercents: {},
+    transferFromOwner: "",
+    transferToOwner: "",
+    transferNote: "",
   };
 }
 
@@ -110,6 +114,7 @@ export function AddTransactionDialog({
   const {
     expenses,
     addExpense,
+    addOwnerTransfer,
     expenseCategories,
     cardSources,
     owners,
@@ -196,7 +201,8 @@ export function AddTransactionDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const toAdd = rows.flatMap((row) => {
+    const expensesToAdd = rows.flatMap((row) => {
+      if (row.entryType !== "expense") return [];
       const num = parseCurrencyInput(row.amount);
       if (Number.isNaN(num) || num <= 0) return [];
       const isoDate = dateInputToIso(row.date, uiFormatSettings.dateFormat);
@@ -219,8 +225,30 @@ export function AddTransactionDialog({
         },
       ];
     });
-    toAdd.forEach((expense) => addExpense(expense));
-    const added = toAdd.length;
+    const transfersToAdd = rows.flatMap((row) => {
+      if (row.entryType !== "owner-transfer") return [];
+      const num = parseCurrencyInput(row.amount);
+      if (Number.isNaN(num) || num <= 0) return [];
+      const isoDate = dateInputToIso(row.date, uiFormatSettings.dateFormat);
+      if (!isoDate) return [];
+      const fromOwner = row.transferFromOwner.trim();
+      const toOwner = row.transferToOwner.trim();
+      if (!fromOwner || !toOwner || fromOwner === toOwner) return [];
+      return [
+        {
+          date: isoDate,
+          fromOwner,
+          toOwner,
+          amount: num,
+          note: row.transferNote.trim() || undefined,
+        },
+      ];
+    });
+
+    expensesToAdd.forEach((expense) => addExpense(expense));
+    transfersToAdd.forEach((transfer) => addOwnerTransfer(transfer));
+
+    const added = expensesToAdd.length + transfersToAdd.length;
     if (added > 0) {
       setRows([
         defaultRow(
@@ -232,9 +260,13 @@ export function AddTransactionDialog({
     }
   };
 
-  const validCount = rows.filter((r) => {
-    const n = parseCurrencyInput(r.amount);
-    return !Number.isNaN(n) && n > 0;
+  const validCount = rows.filter((row) => {
+    const n = parseCurrencyInput(row.amount);
+    if (Number.isNaN(n) || n <= 0) return false;
+    if (row.entryType !== "owner-transfer") return true;
+    const fromOwner = row.transferFromOwner.trim();
+    const toOwner = row.transferToOwner.trim();
+    return fromOwner.length > 0 && toOwner.length > 0 && fromOwner !== toOwner;
   }).length;
 
   const PRESET_NONE_VALUE = "_none";
@@ -247,6 +279,7 @@ export function AddTransactionDialog({
     const preset = presetTransactions.find((p) => p.id === presetId);
     if (preset) {
       updateRow(index, {
+        entryType: "expense",
         source: preset.source,
         description: preset.description,
         amount:
@@ -363,6 +396,143 @@ export function AddTransactionDialog({
 
                 {activeRowIndex === index && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 pt-2 border-t border-border/60">
+                  <div className="space-y-0.5 md:col-span-2">
+                    <div className="text-xs text-muted-foreground">
+                      {t("transactions.type")}
+                    </div>
+                    <Select
+                      value={row.entryType}
+                      onValueChange={(value) =>
+                        updateRow(index, {
+                          entryType: value as "expense" | "owner-transfer",
+                        })
+                      }
+                    >
+                      <SelectTrigger className={selectTriggerClass}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="expense">
+                          {t("transactions.typeExpense")}
+                        </SelectItem>
+                        <SelectItem value="owner-transfer">
+                          {t("transactions.typeTransfer")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {row.entryType === "owner-transfer" ? (
+                    <>
+                      <div className="space-y-0.5">
+                        <div className="text-xs text-muted-foreground">
+                          {t("addTransaction.date")}
+                        </div>
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          placeholder={getDateInputPlaceholder(uiFormatSettings.dateFormat)}
+                          maxLength={10}
+                          className={fieldClass}
+                          value={row.date}
+                          onChange={(e) =>
+                            updateRow(index, {
+                              date: formatDateInput(
+                                e.target.value,
+                                uiFormatSettings.dateFormat
+                              ),
+                            })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-0.5">
+                        <div className="text-xs text-muted-foreground">
+                          {t("addTransaction.amount")}
+                        </div>
+                        <Input
+                          type="text"
+                          placeholder={t("addTransaction.placeholderAmount")}
+                          className={fieldClass}
+                          value={row.amount}
+                          onChange={(e) =>
+                            updateRow(index, {
+                              amount: formatCurrencyInput(e.target.value),
+                            })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-0.5">
+                        <div className="text-xs text-muted-foreground">
+                          {t("transactions.transferFrom")}
+                        </div>
+                        <Select
+                          value={row.transferFromOwner || "_none"}
+                          onValueChange={(value) =>
+                            updateRow(index, {
+                              transferFromOwner: value === "_none" ? "" : value,
+                            })
+                          }
+                        >
+                          <SelectTrigger className={selectTriggerClass}>
+                            <SelectValue placeholder={t("common.noOwner")} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                            {ownerOptions.map((name) => (
+                              <SelectItem key={name} value={name}>
+                                {name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-0.5">
+                        <div className="text-xs text-muted-foreground">
+                          {t("transactions.transferTo")}
+                        </div>
+                        <Select
+                          value={row.transferToOwner || "_none"}
+                          onValueChange={(value) =>
+                            updateRow(index, {
+                              transferToOwner: value === "_none" ? "" : value,
+                            })
+                          }
+                        >
+                          <SelectTrigger className={selectTriggerClass}>
+                            <SelectValue placeholder={t("common.noOwner")} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                            {ownerOptions.map((name) => (
+                              <SelectItem key={name} value={name}>
+                                {name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-0.5 md:col-span-2">
+                        <div className="text-xs text-muted-foreground">
+                          {t("transactions.transferNote")}
+                        </div>
+                        <Input
+                          placeholder={t("common.note")}
+                          className={fieldClass}
+                          value={row.transferNote}
+                          onChange={(e) =>
+                            updateRow(index, { transferNote: e.target.value })
+                          }
+                        />
+                      </div>
+                      {row.transferFromOwner &&
+                      row.transferToOwner &&
+                      row.transferFromOwner === row.transferToOwner ? (
+                        <p className="md:col-span-2 text-xs text-destructive">
+                          {t("transactions.transferValidationOwnersDifferent")}
+                        </p>
+                      ) : null}
+                    </>
+                  ) : (
+                    <>
                   {presetTransactions.length > 0 &&
                     expenseCategories.length > 0 && (
                       <div className="space-y-0.5 md:col-span-2">
@@ -697,6 +867,8 @@ export function AddTransactionDialog({
                       </div>
                     </div>
                   ) : null}
+                    </>
+                  )}
                 </div>
                 )}
               </div>

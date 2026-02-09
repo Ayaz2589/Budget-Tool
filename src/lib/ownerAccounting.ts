@@ -1,4 +1,4 @@
-import type { Expense, ExpenseAllocation } from "@/types/core";
+import type { Expense, ExpenseAllocation, OwnerTransfer } from "@/types/core";
 
 const UNASSIGNED_OWNER_KEY = "__unassigned__";
 
@@ -6,6 +6,15 @@ export interface NormalizedAllocation {
   owner: string;
   amount: number;
   isUnassigned?: boolean;
+}
+
+export interface OwnerBalanceRow {
+  owner: string;
+  paid: number;
+  allocated: number;
+  sent: number;
+  received: number;
+  balance: number;
 }
 
 function round2(value: number): number {
@@ -132,4 +141,60 @@ export function isSharedExpenseByAllocation(entries: NormalizedAllocation[]): bo
     entries.filter((entry) => !entry.isUnassigned).map((entry) => entry.owner),
   );
   return participatingOwners.size > 1;
+}
+
+export function buildOwnerBalances(args: {
+  expenses: Expense[];
+  owners: string[];
+  transfers?: OwnerTransfer[];
+}): OwnerBalanceRow[] {
+  const { expenses, owners, transfers = [] } = args;
+  const ownerSet = new Set(owners.map((owner) => owner.trim()).filter(Boolean));
+  for (const transfer of transfers) {
+    if (transfer.fromOwner?.trim()) ownerSet.add(transfer.fromOwner.trim());
+    if (transfer.toOwner?.trim()) ownerSet.add(transfer.toOwner.trim());
+  }
+
+  const rows = new Map<string, OwnerBalanceRow>();
+  for (const owner of ownerSet) {
+    rows.set(owner, {
+      owner,
+      paid: 0,
+      allocated: 0,
+      sent: 0,
+      received: 0,
+      balance: 0,
+    });
+  }
+
+  for (const expense of expenses) {
+    const paidByOwner = resolveExpensePaidByOwner(expense);
+    if (paidByOwner && rows.has(paidByOwner)) {
+      rows.get(paidByOwner)!.paid += positive(expense.amount);
+    }
+
+    const allocation = normalizeExpenseAllocation(expense, owners);
+    for (const item of allocation) {
+      if (item.isUnassigned || !rows.has(item.owner)) continue;
+      rows.get(item.owner)!.allocated += positive(item.amount);
+    }
+  }
+
+  for (const transfer of transfers) {
+    const amount = positive(transfer.amount);
+    const from = transfer.fromOwner?.trim();
+    const to = transfer.toOwner?.trim();
+    if (from && rows.has(from)) rows.get(from)!.sent += amount;
+    if (to && rows.has(to)) rows.get(to)!.received += amount;
+  }
+
+  for (const row of rows.values()) {
+    row.paid = round2(row.paid);
+    row.allocated = round2(row.allocated);
+    row.sent = round2(row.sent);
+    row.received = round2(row.received);
+    row.balance = round2(row.paid - row.allocated + row.received - row.sent);
+  }
+
+  return Array.from(rows.values()).sort((a, b) => b.balance - a.balance);
 }

@@ -36,6 +36,7 @@ import {
   buildFixedObligations,
   buildOwnerExpenseItems,
   buildOwnerSplit,
+  buildOwnerTransfersMtd,
   buildRecentActivity,
   getCurrentMonthKey,
   getPreviousMonthKey,
@@ -81,7 +82,7 @@ function asNumber(value: unknown): number {
 
 export function Dashboard() {
   const { t, i18n } = useTranslation();
-  const { expenses, income, debts, debtPayments, owners } = useBudget();
+  const { expenses, income, debts, debtPayments, owners, ownerTransfers } = useBudget();
   const { presetTransactions } = usePresetTransactions();
   const [range, setRange] = useState<DashboardRange>("current");
   const [expenseScope, setExpenseScope] = useState<DashboardExpenseScope>("all");
@@ -139,12 +140,13 @@ export function Dashboard() {
       buildOwnerSplit({
         expenses,
         currentMonthKey,
+        monthKeys,
         scope: expenseScope,
         owners,
         sharedLabel: t("dashboard.shared"),
         unassignedLabel: t("dashboard.unassigned"),
       }),
-    [expenses, currentMonthKey, expenseScope, owners, t],
+    [expenses, currentMonthKey, monthKeys, expenseScope, owners, t],
   );
   const ownerExpenseRows = useMemo(
     () => ownerSlices.filter((slice) => Boolean(slice.owner)),
@@ -168,6 +170,7 @@ export function Dashboard() {
         buildOwnerExpenseItems({
           expenses,
           currentMonthKey,
+          monthKeys,
           scope: expenseScope,
           owners,
           owner: row.owner,
@@ -175,7 +178,48 @@ export function Dashboard() {
       );
     }
     return map;
-  }, [ownerExpenseRows, expenses, currentMonthKey, expenseScope, owners]);
+  }, [ownerExpenseRows, expenses, currentMonthKey, monthKeys, expenseScope, owners]);
+  const totalSpentForSelectedRange = useMemo(
+    () => cashFlowRows.reduce((sum, row) => sum + row.expensesTotal, 0),
+    [cashFlowRows],
+  );
+  const ownerNetRows = useMemo(() => {
+    const monthKeySet = new Set(monthKeys);
+    const grossByOwner = new Map<string, number>();
+    ownerExpenseRows.forEach((row) => {
+      if (!row.owner) return;
+      grossByOwner.set(row.owner, row.value);
+    });
+
+    const sentByOwner = new Map<string, number>();
+    const receivedByOwner = new Map<string, number>();
+    ownerTransfers.forEach((row) => {
+      if (!monthKeySet.has(row.date.slice(0, 7))) return;
+      sentByOwner.set(row.fromOwner, (sentByOwner.get(row.fromOwner) ?? 0) + row.amount);
+      receivedByOwner.set(row.toOwner, (receivedByOwner.get(row.toOwner) ?? 0) + row.amount);
+    });
+
+    const ownersWithValues = new Set<string>([
+      ...grossByOwner.keys(),
+      ...sentByOwner.keys(),
+      ...receivedByOwner.keys(),
+    ]);
+
+    return Array.from(ownersWithValues)
+      .map((owner) => {
+        const gross = grossByOwner.get(owner) ?? 0;
+        const sent = sentByOwner.get(owner) ?? 0;
+        const received = receivedByOwner.get(owner) ?? 0;
+        return {
+          owner,
+          gross,
+          net: gross - received + sent,
+          sent,
+          received,
+        };
+      })
+      .sort((a, b) => b.gross - a.gross);
+  }, [ownerExpenseRows, ownerTransfers, monthKeys]);
 
   const debtRows = useMemo(
     () => buildDebtSnapshot({ debts, debtPayments }),
@@ -185,6 +229,19 @@ export function Dashboard() {
   const fixedObligations = useMemo(
     () => buildFixedObligations({ expenses, debtPayments, currentMonthKey }),
     [expenses, debtPayments, currentMonthKey],
+  );
+  const ownerTransfersMtd = useMemo(
+    () =>
+      buildOwnerTransfersMtd({
+        ownerTransfers,
+        currentMonthKey,
+        limit: 5,
+      }),
+    [ownerTransfers, currentMonthKey],
+  );
+  const ownerTransfersMtdTotal = useMemo(
+    () => ownerTransfersMtd.reduce((sum, row) => sum + row.amount, 0),
+    [ownerTransfersMtd],
   );
 
   const recentActivity = useMemo(() => buildRecentActivity(expenses), [expenses]);
@@ -302,26 +359,44 @@ export function Dashboard() {
 
         <section className="space-y-2">
           <h2 className="text-base font-semibold">{t("dashboard.sectionExpenseByOwner")}</h2>
-          {ownerExpenseRows.length === 0 ? (
+          {ownerNetRows.length === 0 ? (
             <DsEmptyState title={t("dashboard.sectionNoOwnerExpenses")} className="py-4" />
           ) : (
             <div className="border-t border-[var(--border-subtle)]">
-              {ownerExpenseRows.map((row, index) => {
-                const percentOfTotal = kpis.totalSpent > 0 ? row.value / kpis.totalSpent : 0;
-                const isExpanded = expandedOwnerKey === row.key;
-                const ownerItems = row.owner
-                  ? (ownerExpenseItemsByOwner.get(row.owner) ?? [])
-                  : [];
+              <div className="grid grid-cols-2 gap-2 px-2 py-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+                <p>{t("dashboard.grossExpenseByOwner")}</p>
+                <p className="text-right">{t("dashboard.netAfterTransfers")}</p>
+              </div>
+              {ownerNetRows.map((row, index) => {
+                const percentOfTotal =
+                  totalSpentForSelectedRange > 0
+                    ? row.gross / totalSpentForSelectedRange
+                    : 0;
+                const isExpanded = expandedOwnerKey === row.owner;
+                const ownerItems = ownerExpenseItemsByOwner.get(row.owner) ?? [];
+                const netToneClass =
+                  row.net >= 0 ? "text-foreground" : "text-destructive";
                 return (
                   <DsDataRow
-                    key={row.key}
-                    title={row.label}
+                    key={row.owner}
+                    title={row.owner}
                     subtitle={t("dashboard.ofTotalSpent", {
                       percent: percentFormatter.format(percentOfTotal),
                     })}
                     trailing={
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold">{formatCurrency(row.value)}</p>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right space-y-0.5">
+                          <p className="text-[11px] text-muted-foreground">
+                            {t("dashboard.grossShort")}
+                          </p>
+                          <p className="text-sm font-semibold">{formatCurrency(row.gross)}</p>
+                          <p className="text-[11px] text-muted-foreground">
+                            {t("dashboard.netShort")}
+                          </p>
+                          <p className={`text-xs font-medium ${netToneClass}`}>
+                            {formatCurrency(row.net)}
+                          </p>
+                        </div>
                         {isExpanded ? (
                           <ChevronUp className="size-4 text-muted-foreground" />
                         ) : (
@@ -330,45 +405,56 @@ export function Dashboard() {
                       </div>
                     }
                     onClick={() =>
-                      setExpandedOwnerKey((prev) => (prev === row.key ? null : row.key))
+                      setExpandedOwnerKey((prev) => (prev === row.owner ? null : row.owner))
                     }
-                    ariaLabel={row.label}
+                    ariaLabel={row.owner}
                     meta={
                       isExpanded ? (
-                        ownerItems.length === 0 ? (
-                          <p className="text-xs text-muted-foreground">
-                            {t("dashboard.sectionNoOwnerExpenseItems")}
-                          </p>
-                        ) : (
-                          <div className="space-y-1">
-                            {ownerItems.map((item) => (
-                              <div
-                                key={`${row.key}-${item.id}`}
-                                className="flex items-start justify-between gap-2 rounded-md bg-muted/30 px-2 py-1.5 text-xs"
-                              >
-                                <div className="min-w-0">
-                                  <p className="truncate font-medium text-foreground">
-                                    {item.description || "—"}
-                                  </p>
-                                  <p className="truncate text-muted-foreground">
-                                    {formatDate(item.date)} ·{" "}
-                                    {item.category || t("common.uncategorized")} ·{" "}
-                                    {t("addTransaction.paidBy")}:{" "}
-                                    {item.paidByOwner || t("common.noOwner")}
-                                  </p>
-                                </div>
-                                <div className="shrink-0 text-right">
-                                  <p className="font-medium text-foreground">
-                                    {formatCurrency(item.allocatedAmount)}
-                                  </p>
-                                  <p className="text-[11px] text-muted-foreground">
-                                    {formatCurrency(item.totalAmount)}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                            <p>{t("dashboard.grossExpenseByOwner")}: {formatCurrency(row.gross)}</p>
+                            <p className="text-right">
+                              {t("dashboard.netAfterTransfers")}:{" "}
+                              <span className={netToneClass}>{formatCurrency(row.net)}</span>
+                            </p>
+                            <p>{t("dashboard.transfersSent")}: {formatCurrency(row.sent)}</p>
+                            <p className="text-right">{t("dashboard.transfersReceived")}: {formatCurrency(row.received)}</p>
                           </div>
-                        )
+                          {ownerItems.length === 0 ? (
+                            <p className="text-xs text-muted-foreground">
+                              {t("dashboard.sectionNoOwnerExpenseItems")}
+                            </p>
+                          ) : (
+                            <div className="space-y-1">
+                              {ownerItems.map((item) => (
+                                <div
+                                  key={`${row.owner}-${item.id}`}
+                                  className="flex items-start justify-between gap-2 rounded-md bg-muted/30 px-2 py-1.5 text-xs"
+                                >
+                                  <div className="min-w-0">
+                                    <p className="truncate font-medium text-foreground">
+                                      {item.description || "—"}
+                                    </p>
+                                    <p className="truncate text-muted-foreground">
+                                      {formatDate(item.date)} ·{" "}
+                                      {item.category || t("common.uncategorized")} ·{" "}
+                                      {t("addTransaction.paidBy")}:{" "}
+                                      {item.paidByOwner || t("common.noOwner")}
+                                    </p>
+                                  </div>
+                                  <div className="shrink-0 text-right">
+                                    <p className="font-medium text-foreground">
+                                      {formatCurrency(item.allocatedAmount)}
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground">
+                                      {formatCurrency(item.totalAmount)}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       ) : undefined
                     }
                     className={index % 2 === 1 ? "bg-muted/30" : ""}
@@ -797,6 +883,29 @@ export function Dashboard() {
           <h2 className="text-base font-semibold">{t("dashboard.sectionFixedObligationsMtd")}</h2>
           <p className="text-2xl font-semibold">{formatCurrency(fixedObligations)}</p>
           <p className="text-xs text-muted-foreground">{t("dashboard.sectionFixedObligationsHint")}</p>
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="text-base font-semibold">{t("dashboard.ownerTransfersMtd")}</h2>
+          {ownerTransfersMtd.length === 0 ? (
+            <DsEmptyState title={t("dashboard.noOwnerTransfersMtd")} className="py-4" />
+          ) : (
+            <div className="border-t border-[var(--border-subtle)]">
+              <div className="px-0 py-2">
+                <p className="text-xl font-semibold">{formatCurrency(ownerTransfersMtdTotal)}</p>
+              </div>
+              {ownerTransfersMtd.map((row, index) => (
+                <DsDataRow
+                  key={row.id}
+                  title={`${row.fromOwner} → ${row.toOwner}`}
+                  subtitle={`${formatDate(row.date)}${row.note ? ` · ${row.note}` : ""}`}
+                  trailing={<p className="font-semibold">{formatCurrency(row.amount)}</p>}
+                  className={index % 2 === 1 ? "bg-muted/30" : ""}
+                  dense
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="space-y-2">

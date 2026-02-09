@@ -3,6 +3,7 @@ import type {
   DebtPayment,
   Expense,
   Income,
+  OwnerTransfer,
   PresetTransaction,
 } from "./core";
 import type { InvestmentPortfolio } from "./investments";
@@ -18,6 +19,7 @@ export interface MinifiedPayloadInput {
   income: Income[];
   debts: Debt[];
   debtPayments: DebtPayment[];
+  ownerTransfers?: OwnerTransfer[];
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
@@ -31,6 +33,7 @@ export interface ExpandedPayload {
   income: Income[];
   debts: Debt[];
   debtPayments: DebtPayment[];
+  ownerTransfers?: OwnerTransfer[];
   presetTransactions: PresetTransaction[];
   expenseCategoriesWithColors?: CategoryWithColorPayload[];
   incomeCategoriesWithColors?: CategoryWithColorPayload[];

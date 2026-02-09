@@ -32,6 +32,16 @@ export interface Expense {
   category: string;
   source: ExpenseSource;
   owner?: string; // optional owner label (from settings)
+  /** Preferred payer field for new records. Falls back to legacy `owner`. */
+  paidByOwner?: string;
+  allocationMode?: "single" | "equal" | "custom";
+  allocation?: ExpenseAllocation[];
+}
+
+export interface ExpenseAllocation {
+  owner: string;
+  amount?: number;
+  percent?: number;
 }
 
 export interface Income {

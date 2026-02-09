@@ -31,7 +31,15 @@
     "sourceTd": "TD Bank",
     "transaction": "거래",
     "uncategorized": "미분류",
-    "withValidAmount": "유효한 금액 {{count}}개"
+    "withValidAmount": "유효한 금액 {{count}}개",
+    "paidBy": "결제한 사람",
+    "splitMode": "분할 방식",
+    "splitSingle": "단일 소유자",
+    "splitEqual": "균등 분할",
+    "splitCustom": "사용자 지정 분할",
+    "splitOwner": "청구 대상 소유자",
+    "splitOwners": "소유자 간 분할",
+    "customSplitHint": "소유자별 사용자 지정 비율"
   },
   "auth": {
     "createAccountHeading": "Ortho 계정 만들기",
@@ -218,7 +226,11 @@
     "insightMortgagePaidOn": "{{date}}에 모기지 납부가 완료되었습니다.",
     "insightNoDebtPaymentThisMonth": "이번 달 {{name}}에 대한 상환 기록이 없습니다.",
     "insightNoIncomeThisMonth": "이번 달 수입 기록이 없습니다.",
-    "debtPaidThisMonth": "↓ 이번 달 {{amount}} 상환"
+    "debtPaidThisMonth": "↓ 이번 달 {{amount}} 상환",
+    "sectionExpenseByOwner": "Expense by Owner",
+    "sectionNoOwnerExpenses": "No owner expenses this month.",
+    "ofTotalSpent": "{{percent}} of total spent",
+    "sectionNoOwnerExpenseItems": "No expense entries for this owner in this month."
   },
   "dashboardDebt": {
     "addDebt": "부채 추가",

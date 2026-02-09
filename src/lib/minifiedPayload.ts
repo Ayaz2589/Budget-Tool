@@ -3,6 +3,7 @@ import type {
   Debt,
   DebtPayment,
   Expense,
+  ExpenseAllocation,
   Income,
   ExpenseSource,
   PresetTransaction,
@@ -23,6 +24,38 @@ function omitEmpty<T extends Record<string, unknown>>(obj: T): Record<string, un
     if (v !== undefined && v !== null && v !== "") out[k] = v;
   }
   return out;
+}
+
+function minifyAllocation(allocation: ExpenseAllocation[] | undefined): Record<string, unknown>[] | undefined {
+  if (!Array.isArray(allocation) || allocation.length === 0) return undefined;
+  const mapped = allocation
+    .map((row) =>
+      omitEmpty({
+        o: row.owner,
+        a: row.amount,
+        p: row.percent,
+      }),
+    )
+    .filter((row) => typeof row.o === "string" && String(row.o).trim().length > 0);
+  return mapped.length > 0 ? mapped : undefined;
+}
+
+function expandAllocation(raw: unknown): ExpenseAllocation[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const rows = raw
+    .map((entry) => {
+      const value = entry as Record<string, unknown>;
+      const owner = String(value.owner ?? value.o ?? "").trim();
+      if (!owner) return null;
+      const amount = Number(value.amount ?? value.a);
+      const percent = Number(value.percent ?? value.p);
+      const next: ExpenseAllocation = { owner };
+      if (Number.isFinite(amount)) next.amount = amount;
+      if (Number.isFinite(percent)) next.percent = percent;
+      return next;
+    })
+    .filter((row): row is ExpenseAllocation => row !== null);
+  return rows.length > 0 ? rows : undefined;
 }
 
 /** Build minified payload with short keys and omitted optional fields. */
@@ -48,6 +81,9 @@ export function buildMinifiedPayload(
         c: x.category || undefined,
         s: x.source,
         o: x.owner,
+        po: x.paidByOwner,
+        am: x.allocationMode,
+        al: minifyAllocation(x.allocation),
       }),
     ),
     i: income.map((x) =>
@@ -115,6 +151,16 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
         (get("owner", "o", undefined) as string | undefined) ??
         (get("cardMember", "cm", undefined) as string | undefined) ??
         undefined,
+      paidByOwner:
+        (get("paidByOwner", "po", undefined) as string | undefined) ??
+        (get("owner", "o", undefined) as string | undefined) ??
+        undefined,
+      allocationMode: get("allocationMode", "am", undefined) as
+        | "single"
+        | "equal"
+        | "custom"
+        | undefined,
+      allocation: expandAllocation(get("allocation", "al", undefined)),
     } as Expense;
   });
 

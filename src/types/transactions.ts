@@ -1,4 +1,4 @@
-import type { Expense, ExpenseSource } from "./core";
+import type { Expense, ExpenseAllocation, ExpenseSource } from "./core";
 
 export interface TransactionRow {
   id: string;
@@ -8,6 +8,10 @@ export interface TransactionRow {
   category: string;
   source: ExpenseSource;
   owner: string;
+  paidByOwner: string;
+  allocationMode: "single" | "equal" | "custom";
+  allocationOwners: string[];
+  allocationPercents: Record<string, string>;
   presetId?: string;
 }
 
@@ -87,6 +91,9 @@ export interface EditTransactionDialogProps {
       category: string;
       source: ExpenseSource;
       owner?: string;
+      paidByOwner?: string;
+      allocationMode?: "single" | "equal" | "custom";
+      allocation?: ExpenseAllocation[];
     },
   ) => void;
   expenseCategories: string[];

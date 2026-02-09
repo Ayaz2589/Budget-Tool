@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -15,7 +16,7 @@ import {
 } from "recharts";
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
@@ -33,6 +34,7 @@ import {
   buildDashboardKpis,
   buildDebtSnapshot,
   buildFixedObligations,
+  buildOwnerExpenseItems,
   buildOwnerSplit,
   buildRecentActivity,
   getCurrentMonthKey,
@@ -144,6 +146,36 @@ export function Dashboard() {
       }),
     [expenses, currentMonthKey, expenseScope, owners, t],
   );
+  const ownerExpenseRows = useMemo(
+    () => ownerSlices.filter((slice) => Boolean(slice.owner)),
+    [ownerSlices],
+  );
+  const [expandedOwnerKey, setExpandedOwnerKey] = useState<string | null>(null);
+  const percentFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(i18n.resolvedLanguage || i18n.language || "en-US", {
+        style: "percent",
+        maximumFractionDigits: 1,
+      }),
+    [i18n.language, i18n.resolvedLanguage],
+  );
+  const ownerExpenseItemsByOwner = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof buildOwnerExpenseItems>>();
+    for (const row of ownerExpenseRows) {
+      if (!row.owner) continue;
+      map.set(
+        row.owner,
+        buildOwnerExpenseItems({
+          expenses,
+          currentMonthKey,
+          scope: expenseScope,
+          owners,
+          owner: row.owner,
+        }),
+      );
+    }
+    return map;
+  }, [ownerExpenseRows, expenses, currentMonthKey, expenseScope, owners]);
 
   const debtRows = useMemo(
     () => buildDebtSnapshot({ debts, debtPayments }),
@@ -267,6 +299,86 @@ export function Dashboard() {
             subtitle={formatDebtPaidSubtitle(kpis.debtPaidThisMonth, t)}
           />
         </div>
+
+        <section className="space-y-2">
+          <h2 className="text-base font-semibold">{t("dashboard.sectionExpenseByOwner")}</h2>
+          {ownerExpenseRows.length === 0 ? (
+            <DsEmptyState title={t("dashboard.sectionNoOwnerExpenses")} className="py-4" />
+          ) : (
+            <div className="border-t border-[var(--border-subtle)]">
+              {ownerExpenseRows.map((row, index) => {
+                const percentOfTotal = kpis.totalSpent > 0 ? row.value / kpis.totalSpent : 0;
+                const isExpanded = expandedOwnerKey === row.key;
+                const ownerItems = row.owner
+                  ? (ownerExpenseItemsByOwner.get(row.owner) ?? [])
+                  : [];
+                return (
+                  <DsDataRow
+                    key={row.key}
+                    title={row.label}
+                    subtitle={t("dashboard.ofTotalSpent", {
+                      percent: percentFormatter.format(percentOfTotal),
+                    })}
+                    trailing={
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold">{formatCurrency(row.value)}</p>
+                        {isExpanded ? (
+                          <ChevronUp className="size-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronDown className="size-4 text-muted-foreground" />
+                        )}
+                      </div>
+                    }
+                    onClick={() =>
+                      setExpandedOwnerKey((prev) => (prev === row.key ? null : row.key))
+                    }
+                    ariaLabel={row.label}
+                    meta={
+                      isExpanded ? (
+                        ownerItems.length === 0 ? (
+                          <p className="text-xs text-muted-foreground">
+                            {t("dashboard.sectionNoOwnerExpenseItems")}
+                          </p>
+                        ) : (
+                          <div className="space-y-1">
+                            {ownerItems.map((item) => (
+                              <div
+                                key={`${row.key}-${item.id}`}
+                                className="flex items-start justify-between gap-2 rounded-md bg-muted/30 px-2 py-1.5 text-xs"
+                              >
+                                <div className="min-w-0">
+                                  <p className="truncate font-medium text-foreground">
+                                    {item.description || "—"}
+                                  </p>
+                                  <p className="truncate text-muted-foreground">
+                                    {formatDate(item.date)} ·{" "}
+                                    {item.category || t("common.uncategorized")} ·{" "}
+                                    {t("addTransaction.paidBy")}:{" "}
+                                    {item.paidByOwner || t("common.noOwner")}
+                                  </p>
+                                </div>
+                                <div className="shrink-0 text-right">
+                                  <p className="font-medium text-foreground">
+                                    {formatCurrency(item.allocatedAmount)}
+                                  </p>
+                                  <p className="text-[11px] text-muted-foreground">
+                                    {formatCurrency(item.totalAmount)}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      ) : undefined
+                    }
+                    className={index % 2 === 1 ? "bg-muted/30" : ""}
+                    dense
+                  />
+                );
+              })}
+            </div>
+          )}
+        </section>
 
         <div className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <DsChartCard title={t("dashboard.chartIncomeVsExpenses")} className="min-w-0">

@@ -729,7 +729,15 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
             budget.setOwners(expanded.owners);
           }
         } catch {
-          const [expenses, mortgage, income, debts, payments, presets, investments] =
+          const [
+            expenses,
+            mortgage,
+            income,
+            debts,
+            payments,
+            presets,
+            investments,
+          ] =
             await Promise.all([
               readExpensesFromSheet(accessToken, spreadsheetId),
               readMortgageFromSheet(accessToken, spreadsheetId),

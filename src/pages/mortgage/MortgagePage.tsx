@@ -148,7 +148,12 @@ export function MortgagePage() {
           setDeleteConfirm(exp);
         }}
         onUpdateOwner={(id, owner) =>
-          updateExpense(id, { owner: owner || undefined })
+          updateExpense(id, {
+            owner: owner || undefined,
+            paidByOwner: owner || undefined,
+            allocationMode: owner ? "single" : undefined,
+            allocation: owner ? [{ owner, percent: 100 }] : undefined,
+          })
         }
         ownerOptions={owners}
         t={t}

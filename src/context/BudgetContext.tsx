@@ -134,6 +134,11 @@ function loadStoredBudget(): {
                 (e as Expense & { cardMember?: string }).owner ??
                 (e as Expense & { cardMember?: string }).cardMember ??
                 undefined,
+              paidByOwner:
+                e.paidByOwner ??
+                (e as Expense & { cardMember?: string }).owner ??
+                (e as Expense & { cardMember?: string }).cardMember ??
+                undefined,
             }))
           : [],
         income: Array.isArray(data.income) ? data.income : [],
@@ -279,7 +284,11 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         setDummyState((prev) => {
           const byId = new Map(prev.expenses.map((e) => [e.id, e]));
           for (const e of newExpenses) {
-            if (!byId.has(e.id)) byId.set(e.id, e);
+            if (!byId.has(e.id))
+              byId.set(e.id, {
+                ...e,
+                paidByOwner: e.paidByOwner ?? e.owner,
+              });
           }
           return {
             ...prev,
@@ -293,7 +302,11 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       setExpenses((prev) => {
         const byId = new Map(prev.map((e) => [e.id, e]));
         for (const e of newExpenses) {
-          if (!byId.has(e.id)) byId.set(e.id, e);
+          if (!byId.has(e.id))
+            byId.set(e.id, {
+              ...e,
+              paidByOwner: e.paidByOwner ?? e.owner,
+            });
         }
         return Array.from(byId.values()).sort((a, b) =>
           b.date.localeCompare(a.date)
@@ -305,7 +318,11 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
 
   const addExpense = useCallback(
     (entry: Omit<Expense, "id">) => {
-      const newExpense: Expense = { ...entry, id: generateId() };
+      const newExpense: Expense = {
+        ...entry,
+        id: generateId(),
+        paidByOwner: entry.paidByOwner ?? entry.owner,
+      };
       if (useDummyData) {
         setDummyState((prev) => ({
           ...prev,
@@ -324,17 +341,21 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
 
   const updateExpense = useCallback(
     (id: string, updates: Partial<Expense>) => {
+      const normalizedUpdates: Partial<Expense> =
+        "owner" in updates && !("paidByOwner" in updates)
+          ? { ...updates, paidByOwner: updates.owner }
+          : updates;
       if (useDummyData) {
         setDummyState((prev) => ({
           ...prev,
           expenses: prev.expenses.map((e) =>
-            e.id === id ? { ...e, ...updates } : e
+            e.id === id ? { ...e, ...normalizedUpdates } : e
           ),
         }));
         return;
       }
       setExpenses((prev) =>
-        prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+        prev.map((e) => (e.id === id ? { ...e, ...normalizedUpdates } : e))
       );
     },
     [useDummyData]
@@ -660,8 +681,19 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         setDummyState((prev) => ({
           ...prev,
           expenses: prev.expenses.map((e) =>
-            e.owner && !normalized.includes(e.owner)
-              ? { ...e, owner: undefined }
+            (e.owner && !normalized.includes(e.owner)) ||
+            (e.paidByOwner && !normalized.includes(e.paidByOwner))
+              ? {
+                  ...e,
+                  owner: e.owner && !normalized.includes(e.owner) ? undefined : e.owner,
+                  paidByOwner:
+                    e.paidByOwner && !normalized.includes(e.paidByOwner)
+                      ? undefined
+                      : e.paidByOwner,
+                  allocation: e.allocation?.filter((a) =>
+                    normalized.includes(a.owner),
+                  ),
+                }
               : e
           ),
           income: prev.income.map((i) =>
@@ -680,7 +712,18 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       }
       setExpenses((prev) =>
         prev.map((e) =>
-          e.owner && !normalized.includes(e.owner) ? { ...e, owner: undefined } : e
+          (e.owner && !normalized.includes(e.owner)) ||
+          (e.paidByOwner && !normalized.includes(e.paidByOwner))
+            ? {
+                ...e,
+                owner: e.owner && !normalized.includes(e.owner) ? undefined : e.owner,
+                paidByOwner:
+                  e.paidByOwner && !normalized.includes(e.paidByOwner)
+                    ? undefined
+                    : e.paidByOwner,
+                allocation: e.allocation?.filter((a) => normalized.includes(a.owner)),
+              }
+            : e
         )
       );
       setIncome((prev) =>

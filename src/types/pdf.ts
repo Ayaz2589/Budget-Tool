@@ -1,4 +1,10 @@
-import type { Debt, DebtPayment, Expense, Income, PresetTransaction } from "./core";
+import type {
+  Debt,
+  DebtPayment,
+  Expense,
+  Income,
+  PresetTransaction,
+} from "./core";
 import type { InvestmentPortfolio } from "./investments";
 import type { CategoryWithColorPayload } from "./payload";
 

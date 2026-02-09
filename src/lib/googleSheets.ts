@@ -139,6 +139,7 @@ export async function readExpensesFromSheet(
       category,
       source,
       owner,
+      paidByOwner: owner,
     });
   }
   return expenses;
@@ -195,6 +196,7 @@ export async function readMortgageFromSheet(
       category: "Mortgage",
       source,
       owner,
+      paidByOwner: owner,
     });
   }
   return expenses;
@@ -309,7 +311,7 @@ export async function appendExpenses(
     e.description,
     e.category || "Uncategorized",
     e.source,
-    e.owner ?? "",
+    e.paidByOwner ?? e.owner ?? "",
   ]);
   await updateSheet(accessToken, spreadsheetId, range, values, false);
 }
@@ -353,7 +355,7 @@ export async function clearAndWriteExpenses(
     e.description,
     e.category || "Uncategorized",
     e.source,
-    e.owner ?? "",
+    e.paidByOwner ?? e.owner ?? "",
   ]);
   const values = [...headers, ...rows];
   const range = "Expenses!A1:G";
@@ -386,7 +388,7 @@ export async function clearAndWriteMortgage(
     e.description,
     e.category || "Uncategorized",
     e.source,
-    e.owner ?? "",
+    e.paidByOwner ?? e.owner ?? "",
   ]);
   const values = [...headers, ...rows];
   const range = "Mortgage!A1:G";
@@ -671,7 +673,7 @@ function buildExpensesValues(expenses: Expense[]): unknown[][] {
     e.description,
     e.category || "Uncategorized",
     e.source,
-    e.owner ?? "",
+    e.paidByOwner ?? e.owner ?? "",
   ]);
   return [...headers, ...rows];
 }

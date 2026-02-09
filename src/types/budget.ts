@@ -1,4 +1,9 @@
-import type { Debt, DebtPayment, Expense, Income } from "./core";
+import type {
+  Debt,
+  DebtPayment,
+  Expense,
+  Income,
+} from "./core";
 import type { InvestmentPortfolio } from "./investments";
 
 export interface BudgetState {

@@ -31,7 +31,15 @@
     "sourceTd": "TD Bank",
     "transaction": "交易",
     "uncategorized": "未分类",
-    "withValidAmount": "{{count}} 条有效金额"
+    "withValidAmount": "{{count}} 条有效金额",
+    "paidBy": "付款人",
+    "splitMode": "分摊方式",
+    "splitSingle": "单个成员",
+    "splitEqual": "平均分摊",
+    "splitCustom": "自定义分摊",
+    "splitOwner": "记账到成员",
+    "splitOwners": "在成员间分摊",
+    "customSplitHint": "按成员设置自定义百分比"
   },
   "auth": {
     "createAccountHeading": "创建您的 Ortho 账户",
@@ -218,7 +226,11 @@
     "insightMortgagePaidOn": "房贷已于 {{date}} 支付。",
     "insightNoDebtPaymentThisMonth": "本月尚未记录 {{name}} 的还款。",
     "insightNoIncomeThisMonth": "本月尚未记录收入。",
-    "debtPaidThisMonth": "↓ 本月已还 {{amount}}"
+    "debtPaidThisMonth": "↓ 本月已还 {{amount}}",
+    "sectionExpenseByOwner": "Expense by Owner",
+    "sectionNoOwnerExpenses": "No owner expenses this month.",
+    "ofTotalSpent": "{{percent}} of total spent",
+    "sectionNoOwnerExpenseItems": "No expense entries for this owner in this month."
   },
   "dashboardDebt": {
     "addDebt": "添加债务",

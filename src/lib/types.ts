@@ -1,5 +1,6 @@
 /** Re-export core types for backward compatibility. Prefer importing from @/types. */
 export {
+  type ExpenseAllocation,
   type ExpenseSource,
   type Expense,
   type Income,

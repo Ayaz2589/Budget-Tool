@@ -327,7 +327,12 @@ export function TransactionsPage() {
         }}
         onUpdateCategory={(id, category) => updateExpense(id, { category })}
         onUpdateOwner={(id, owner) =>
-          updateExpense(id, { owner: owner || undefined })
+          updateExpense(id, {
+            owner: owner || undefined,
+            paidByOwner: owner || undefined,
+            allocationMode: owner ? "single" : undefined,
+            allocation: owner ? [{ owner, percent: 100 }] : undefined,
+          })
         }
         onDelete={(e) => {
           setExpenseForActions(null);

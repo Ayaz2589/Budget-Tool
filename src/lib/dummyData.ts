@@ -1,4 +1,9 @@
-import type { Debt, DebtPayment, Expense, Income } from "@/types/core";
+import type {
+  Debt,
+  DebtPayment,
+  Expense,
+  Income,
+} from "@/types/core";
 import {
   ALL_EXPENSE_SOURCES,
   DEFAULT_EXPENSE_CATEGORIES,

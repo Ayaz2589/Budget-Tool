@@ -122,6 +122,13 @@ export function ImportPage() {
     investmentPortfolios: expanded.investmentPortfolios,
   });
 
+  const hasParsedRows = (parsed: ParsedExportedPdf): boolean =>
+    parsed.expenses.length > 0 ||
+    parsed.income.length > 0 ||
+    parsed.debts.length > 0 ||
+    parsed.debtPayments.length > 0 ||
+    parsed.presetTransactions.length > 0;
+
   const handleParsedExport = (
     parsed: ParsedExportedPdf,
     label: string
@@ -310,14 +317,7 @@ export function ImportPage() {
         const expanded = parseFromBlob(raw);
         parsed = expandedToParsed(expanded);
       }
-      if (
-        !parsed ||
-        (parsed.expenses.length === 0 &&
-          parsed.income.length === 0 &&
-          parsed.debts.length === 0 &&
-          parsed.debtPayments.length === 0 &&
-          parsed.presetTransactions.length === 0)
-      ) {
+      if (!parsed || !hasParsedRows(parsed)) {
         setExportStringError(t("import.exportStringNotRecognized"));
         return;
       }
@@ -339,13 +339,7 @@ export function ImportPage() {
         const text = String(reader.result);
         const expanded = parseBudgetJson(text);
         const parsed = expandedToParsed(expanded);
-        if (
-          parsed.expenses.length === 0 &&
-          parsed.income.length === 0 &&
-          parsed.debts.length === 0 &&
-          parsed.debtPayments.length === 0 &&
-          parsed.presetTransactions.length === 0
-        ) {
+        if (!hasParsedRows(parsed)) {
           setJsonImportError(t("import.jsonNoData"));
           return;
         }
@@ -456,6 +450,7 @@ export function ImportPage() {
       incomeCategoriesWithColors,
       owners,
       cardSources,
+      investmentPortfolios,
     );
     downloadExportString(exportString);
   };

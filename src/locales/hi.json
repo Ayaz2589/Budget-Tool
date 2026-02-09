@@ -31,7 +31,15 @@
     "sourceTd": "TD Bank",
     "transaction": "लेनदेन",
     "uncategorized": "अश्रेणीबद्ध",
-    "withValidAmount": "{{count}} वैध राशि के साथ"
+    "withValidAmount": "{{count}} वैध राशि के साथ",
+    "paidBy": "किसने भुगतान किया",
+    "splitMode": "विभाजन मोड",
+    "splitSingle": "एक मालिक",
+    "splitEqual": "बराबर विभाजन",
+    "splitCustom": "कस्टम विभाजन",
+    "splitOwner": "जिस मालिक पर चार्ज होगा",
+    "splitOwners": "मालिकों के बीच विभाजन",
+    "customSplitHint": "प्रत्येक मालिक के लिए कस्टम प्रतिशत"
   },
   "auth": {
     "createAccountHeading": "अपना Ortho अकाउंट बनाएं",
@@ -218,7 +226,11 @@
     "insightMortgagePaidOn": "मॉर्गेज का भुगतान {{date}} को किया गया।",
     "insightNoDebtPaymentThisMonth": "इस महीने {{name}} के लिए कोई भुगतान दर्ज नहीं है।",
     "insightNoIncomeThisMonth": "इस महीने कोई आय प्रविष्टि दर्ज नहीं हुई।",
-    "debtPaidThisMonth": "↓ इस महीने {{amount}} चुकाया गया"
+    "debtPaidThisMonth": "↓ इस महीने {{amount}} चुकाया गया",
+    "sectionExpenseByOwner": "Expense by Owner",
+    "sectionNoOwnerExpenses": "No owner expenses this month.",
+    "ofTotalSpent": "{{percent}} of total spent",
+    "sectionNoOwnerExpenseItems": "No expense entries for this owner in this month."
   },
   "dashboardDebt": {
     "addDebt": "कर्ज जोड़ें",

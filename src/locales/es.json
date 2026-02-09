@@ -31,7 +31,15 @@
     "sourceTd": "TD Bank",
     "transaction": "Transacción",
     "uncategorized": "Sin categoría",
-    "withValidAmount": "{{count}} con importe válido"
+    "withValidAmount": "{{count}} con importe válido",
+    "paidBy": "Pagado por",
+    "splitMode": "Modo de reparto",
+    "splitSingle": "Un solo propietario",
+    "splitEqual": "Reparto equitativo",
+    "splitCustom": "Reparto personalizado",
+    "splitOwner": "Asignado al propietario",
+    "splitOwners": "Repartir entre propietarios",
+    "customSplitHint": "Porcentaje personalizado por propietario"
   },
   "auth": {
     "createAccountHeading": "Crea tu cuenta de Ortho",
@@ -218,7 +226,11 @@
     "insightMortgagePaidOn": "Hipoteca pagada el {{date}}.",
     "insightNoDebtPaymentThisMonth": "No se registró pago para {{name}} este mes.",
     "insightNoIncomeThisMonth": "No se registraron ingresos este mes.",
-    "debtPaidThisMonth": "↓ {{amount}} pagados este mes"
+    "debtPaidThisMonth": "↓ {{amount}} pagados este mes",
+    "sectionExpenseByOwner": "Expense by Owner",
+    "sectionNoOwnerExpenses": "No owner expenses this month.",
+    "ofTotalSpent": "{{percent}} of total spent",
+    "sectionNoOwnerExpenseItems": "No expense entries for this owner in this month."
   },
   "dashboardDebt": {
     "addDebt": "Añadir una deuda",

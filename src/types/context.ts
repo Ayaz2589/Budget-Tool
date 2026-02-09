@@ -1,4 +1,9 @@
-import type { Debt, DebtPayment, Expense, Income } from "./core";
+import type {
+  Debt,
+  DebtPayment,
+  Expense,
+  Income,
+} from "./core";
 import type { BudgetState } from "./budget";
 import type { PresetTransaction } from "./core";
 import type { UiFormatSettings } from "@/lib/format";

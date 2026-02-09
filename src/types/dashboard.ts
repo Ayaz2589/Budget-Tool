@@ -24,6 +24,16 @@ export interface DashboardOwnerSlice {
   owner?: string;
 }
 
+export interface DashboardOwnerExpenseItem {
+  id: string;
+  date: string;
+  description: string;
+  category: string;
+  paidByOwner?: string;
+  allocatedAmount: number;
+  totalAmount: number;
+}
+
 export interface DashboardDebtRow {
   id: string;
   name: string;

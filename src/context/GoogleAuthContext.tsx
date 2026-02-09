@@ -27,7 +27,6 @@ import {
   readPresetsFromSheet,
   readDebtPaymentsFromSheet,
   readOwnerTransfersFromSheet,
-  readInvestmentsFromSheet,
 } from "@/lib/googleSheets";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
@@ -416,7 +415,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         owners: budget.owners,
         cardSources: budget.cardSources,
         iOweNova: budget.iOweNova,
-        investmentPortfolios: budget.investmentPortfolios,
       }),
     [
       budget.expenses,
@@ -430,7 +428,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       budget.owners,
       budget.cardSources,
       budget.iOweNova,
-      budget.investmentPortfolios,
     ]
   );
 
@@ -461,7 +458,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       owners: budget.owners,
       cardSources: budget.cardSources,
       iOweNova: budget.iOweNova,
-      investmentPortfolios: budget.investmentPortfolios,
     };
   }, [
     budget.expenses,
@@ -475,7 +471,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.owners,
     budget.cardSources,
     budget.iOweNova,
-    budget.investmentPortfolios,
   ]);
 
   const runSync = useCallback(async () => {
@@ -523,7 +518,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         incomeCategoriesWithColors: snapshot.incomeCategoriesWithColors,
         owners: snapshot.owners,
         cardSources: snapshot.cardSources,
-        investmentPortfolios: snapshot.investmentPortfolios,
       });
       const months = computeAllTotals({
         expenses: snapshot.expenses,
@@ -539,7 +533,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         debtPayments: snapshot.debtPayments,
         ownerTransfers: snapshot.ownerTransfers,
         presetTransactions: snapshot.presetTransactions,
-        investmentPortfolios: snapshot.investmentPortfolios,
         dataBlob,
         months,
         grandTotal: grand,
@@ -701,7 +694,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       let sheetPayments: typeof budget.debtPayments;
       let sheetOwnerTransfers: typeof budget.ownerTransfers;
       let sheetPresets: typeof presetTransactions;
-      let sheetInvestmentPortfolios: typeof budget.investmentPortfolios;
 
       const blob = await readDataBlob(accessToken, spreadsheetId);
       if (blob && blob.startsWith("V2")) {
@@ -719,7 +711,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetPayments = expanded.debtPayments ?? [];
           sheetOwnerTransfers = expanded.ownerTransfers ?? [];
           sheetPresets = expanded.presetTransactions ?? [];
-          sheetInvestmentPortfolios = expanded.investmentPortfolios ?? [];
           if (
             Array.isArray(expanded.cardSources) &&
             expanded.cardSources.length > 0
@@ -748,7 +739,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
             payments,
             ownerTransfers,
             presets,
-            investments,
           ] =
             await Promise.all([
               readExpensesFromSheet(accessToken, spreadsheetId),
@@ -758,7 +748,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
               readDebtPaymentsFromSheet(accessToken, spreadsheetId),
               readOwnerTransfersFromSheet(accessToken, spreadsheetId),
               readPresetsFromSheet(accessToken, spreadsheetId),
-              readInvestmentsFromSheet(accessToken, spreadsheetId),
             ]);
           sheetExpenses = expenses;
           sheetMortgage = mortgage;
@@ -767,7 +756,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetPayments = payments;
           sheetOwnerTransfers = ownerTransfers;
           sheetPresets = presets;
-          sheetInvestmentPortfolios = investments;
           const derivedOwners = [
             ...new Set(
               [...expenses, ...mortgage]
@@ -792,7 +780,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetPayments,
           sheetOwnerTransfers,
           sheetPresets,
-          sheetInvestmentPortfolios,
         ] = await Promise.all([
           readExpensesFromSheet(accessToken, spreadsheetId),
           readMortgageFromSheet(accessToken, spreadsheetId),
@@ -801,7 +788,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           readDebtPaymentsFromSheet(accessToken, spreadsheetId),
           readOwnerTransfersFromSheet(accessToken, spreadsheetId),
           readPresetsFromSheet(accessToken, spreadsheetId),
-          readInvestmentsFromSheet(accessToken, spreadsheetId),
         ]);
         const derivedOwners = [
           ...new Set(
@@ -928,7 +914,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       if (sheetPresets.length > 0) {
         setPresets(sheetPresets);
       }
-      budget.setInvestmentPortfolios(sheetInvestmentPortfolios);
 
       setSyncStatus("success");
       setSyncErrorMessage(null);
@@ -954,7 +939,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.debts,
     budget.debtPayments,
     budget.ownerTransfers,
-    budget.investmentPortfolios,
     setPresets,
     budget.addExpenses,
     budget.addIncome,
@@ -963,7 +947,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.addOwnerTransfer,
     budget.updateExpense,
     budget.setCardSources,
-    budget.setInvestmentPortfolios,
     budget.expenseCategories,
     budget.incomeCategories,
     budget.setExpenseCategories,

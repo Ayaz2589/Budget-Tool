@@ -25,7 +25,6 @@ import { parseFromBlob } from "@/lib/minifiedPayload";
 import { parseBudgetJson } from "@/lib/jsonExport";
 import type { ExpandedPayload } from "@/types/payload";
 import type { ParsedExportedPdf } from "@/types/pdf";
-import type { InvestmentPortfolio } from "@/types/investments";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { buildExpandedPayload, downloadBudgetJson } from "@/lib/jsonExport";
@@ -67,7 +66,6 @@ export function ImportPage() {
     debtPayments: DebtPayment[];
     ownerTransfers: OwnerTransfer[];
     presetTransactions: PresetTransaction[];
-    investmentPortfolios: InvestmentPortfolio[];
     cardSources: string[];
     sourceLabel: string;
   } | null>(null);
@@ -88,9 +86,7 @@ export function ImportPage() {
     setExpenseCategories,
     setIncomeCategories,
     setOwners,
-    setInvestmentPortfolios,
     owners,
-    investmentPortfolios,
     ownerTransfers,
   } = useBudget();
   const { setPresets, presetTransactions } = usePresetTransactions();
@@ -128,7 +124,6 @@ export function ImportPage() {
     incomeCategoriesWithColors: expanded.incomeCategoriesWithColors,
     owners: expanded.owners,
     cardSources: expanded.cardSources,
-    investmentPortfolios: expanded.investmentPortfolios,
   });
 
   const hasParsedRows = (parsed: ParsedExportedPdf): boolean =>
@@ -189,7 +184,6 @@ export function ImportPage() {
         debtPayments: toAddDebtPayments,
         ownerTransfers: toAddOwnerTransfers,
         presetTransactions: parsed.presetTransactions,
-        investmentPortfolios: parsed.investmentPortfolios ?? [],
         cardSources: parsed.cardSources ?? [],
         sourceLabel: label,
       });
@@ -199,9 +193,6 @@ export function ImportPage() {
 
     if (parsed.presetTransactions.length > 0) {
       setPresets(parsed.presetTransactions);
-    }
-    if (Array.isArray(parsed.investmentPortfolios)) {
-      setInvestmentPortfolios(parsed.investmentPortfolios);
     }
     if (Array.isArray(parsed.cardSources) && parsed.cardSources.length > 0) {
       setCardSources(parsed.cardSources);
@@ -466,7 +457,6 @@ export function ImportPage() {
       incomeCategoriesWithColors,
       owners,
       cardSources,
-      investmentPortfolios,
       ownerTransfers,
     );
     downloadBudgetJson(payload);
@@ -491,7 +481,6 @@ export function ImportPage() {
       incomeCategoriesWithColors,
       owners,
       cardSources,
-      investmentPortfolios,
       ownerTransfers,
     );
     downloadExportString(exportString);
@@ -529,7 +518,6 @@ export function ImportPage() {
     if (pendingParsed.presetTransactions.length > 0) {
       setPresets(normalized.presetTransactions);
     }
-    setInvestmentPortfolios(pendingParsed.investmentPortfolios);
     if (pendingParsed.cardSources.length > 0) {
       setCardSources(pendingParsed.cardSources);
     }

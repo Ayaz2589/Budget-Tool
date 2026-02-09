@@ -348,7 +348,6 @@ function emptyParsed(): ParsedExportedPdf {
     debtPayments: [],
     presetTransactions: [],
     owners: [],
-    investmentPortfolios: [],
   };
 }
 
@@ -404,7 +403,6 @@ export function parseExportedPdfData(pdfText: string): ParsedExportedPdf {
           incomeCategoriesWithColors: expanded.incomeCategoriesWithColors,
           owners: expanded.owners,
           cardSources: expanded.cardSources,
-          investmentPortfolios: expanded.investmentPortfolios,
         };
     } catch {
       return emptyParsed();

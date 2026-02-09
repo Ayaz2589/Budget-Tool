@@ -6,7 +6,6 @@ import type {
   OwnerTransfer,
   PresetTransaction,
 } from "./core";
-import type { InvestmentPortfolio } from "./investments";
 import type { CategoryWithColorPayload } from "./payload";
 
 export interface ParsedExportedPdf {
@@ -20,5 +19,4 @@ export interface ParsedExportedPdf {
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
   owners?: string[];
   cardSources?: string[];
-  investmentPortfolios?: InvestmentPortfolio[];
 }

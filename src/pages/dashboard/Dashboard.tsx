@@ -40,7 +40,6 @@ import {
   buildCategoryBreakdown,
   buildDashboardKpis,
   buildDebtSnapshot,
-  buildFixedObligations,
   buildOwnerExpenseItems,
   buildOwnerSplit,
   buildSpendBySource,
@@ -234,10 +233,6 @@ export function Dashboard() {
     [debts, debtPayments],
   );
 
-  const fixedObligations = useMemo(
-    () => buildFixedObligations({ expenses, debtPayments, currentMonthKey }),
-    [expenses, debtPayments, currentMonthKey],
-  );
   const ownerTransfersMtd = useMemo(
     () =>
       buildOwnerTransfersMtd({
@@ -869,19 +864,9 @@ export function Dashboard() {
 
         <Accordion
           type="multiple"
-          defaultValue={["fixed-obligations", "debt", "spend-source"]}
+          defaultValue={["debt", "spend-source"]}
           className="space-y-2 pb-4"
         >
-          <AccordionItem value="fixed-obligations" className="rounded-xl border border-border/60 px-3">
-            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
-              {t("dashboard.sectionFixedObligationsMtd")}
-            </AccordionTrigger>
-            <AccordionContent className="pb-3 pt-0">
-              <p className="text-2xl font-semibold">{formatCurrency(fixedObligations)}</p>
-              <p className="text-xs text-muted-foreground">{t("dashboard.sectionFixedObligationsHint")}</p>
-            </AccordionContent>
-          </AccordionItem>
-
           <AccordionItem value="debt" className="rounded-xl border border-border/60 px-3">
             <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
               {t("dashboard.sectionDebtSnapshot")}

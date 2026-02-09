@@ -7,5 +7,4 @@ export interface SheetIds {
   mortgage: number;
   presetTransactions: number;
   ownerTransfers: number;
-  investments: number;
 }

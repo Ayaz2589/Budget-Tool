@@ -6,7 +6,6 @@ import type {
   OwnerTransfer,
   PresetTransaction,
 } from "@/types/core";
-import type { InvestmentPortfolio } from "@/types/investments";
 import type { CategoryWithColorPayload } from "@/types/payload";
 import { serializeToBlob } from "@/lib/minifiedPayload";
 
@@ -23,7 +22,6 @@ export function buildExportString(
   incomeCategoriesWithColors: CategoryWithColorPayload[],
   owners: string[] = [],
   cardSources: string[] = [],
-  investmentPortfolios: InvestmentPortfolio[] = [],
   ownerTransfers: OwnerTransfer[] = [],
 ): string {
   const blob = serializeToBlob({
@@ -37,7 +35,6 @@ export function buildExportString(
     incomeCategoriesWithColors,
     owners,
     cardSources,
-    investmentPortfolios,
   });
   return `${DATA_START_MARKER}\n${blob}\n${DATA_END_MARKER}`;
 }

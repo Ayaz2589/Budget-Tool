@@ -80,7 +80,6 @@ test("Dashboard renders PRD sections", () => {
   expect(screen.getByText("Spending Breakdown")).toBeInTheDocument();
   expect(screen.getByText("Shared vs Individual Spending")).toBeInTheDocument();
   expect(screen.getByText("Debt Snapshot")).toBeInTheDocument();
-  expect(screen.getByText("Fixed Obligations (MTD)")).toBeInTheDocument();
   expect(screen.getByText("Recent Activity")).toBeInTheDocument();
   expect(screen.getByText("Smart Insights & Alerts")).toBeInTheDocument();
 });

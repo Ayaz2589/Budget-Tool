@@ -5,7 +5,6 @@ import type {
   Income,
   OwnerTransfer,
 } from "./core";
-import type { InvestmentPortfolio } from "./investments";
 
 export interface BudgetState {
   expenses: Expense[];
@@ -18,5 +17,4 @@ export interface BudgetState {
   owners: string[];
   /** Enabled card/expense sources; used in transaction table and import. */
   cardSources: string[];
-  investmentPortfolios: InvestmentPortfolio[];
 }

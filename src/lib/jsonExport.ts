@@ -6,7 +6,6 @@ import type {
   OwnerTransfer,
   PresetTransaction,
 } from "@/types/core";
-import type { InvestmentPortfolio } from "@/types/investments";
 import type { CategoryWithColorPayload, ExpandedPayload } from "@/types/payload";
 
 export function buildExpandedPayload(
@@ -19,7 +18,6 @@ export function buildExpandedPayload(
   incomeCategoriesWithColors: CategoryWithColorPayload[] = [],
   owners: string[] = [],
   cardSources: string[] = [],
-  investmentPortfolios: InvestmentPortfolio[] = [],
   ownerTransfers: OwnerTransfer[] = [],
 ): ExpandedPayload {
   return {
@@ -33,7 +31,6 @@ export function buildExpandedPayload(
     incomeCategoriesWithColors,
     owners,
     cardSources,
-    investmentPortfolios,
   };
 }
 
@@ -74,8 +71,5 @@ export function parseBudgetJson(text: string): ExpandedPayload {
       : [],
     owners: Array.isArray(raw.owners) ? raw.owners : [],
     cardSources: Array.isArray(raw.cardSources) ? raw.cardSources : [],
-    investmentPortfolios: Array.isArray(raw.investmentPortfolios)
-      ? raw.investmentPortfolios
-      : [],
   };
 }

@@ -190,25 +190,19 @@ export function ExpensesByMonthTable({
                     </TableCell>
                     <TableCell className="max-w-[260px] truncate font-medium">
                       {row.kind === "owner-transfer"
-                        ? `${t("transactions.transfer")}: ${row.transferFromOwner} -> ${row.transferToOwner}`
+                        ? row.description
                         : row.description || "—"}
                     </TableCell>
                     <TableCell className="font-semibold">
                       {formatCurrency(row.amount)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {row.kind === "owner-transfer" ? (
-                        <span className="text-xs font-medium text-primary">
-                          {t("transactions.typeTransfer")}
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          <SourceIcon source={row.source} size={20} />
-                          {sourceLabelKeys[row.source]
-                            ? t(sourceLabelKeys[row.source])
-                            : row.source}
-                        </span>
-                      )}
+                      <span className="flex items-center gap-2">
+                        <SourceIcon source={row.source} size={20} />
+                        {sourceLabelKeys[row.source]
+                          ? t(sourceLabelKeys[row.source])
+                          : row.source}
+                      </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {row.kind === "owner-transfer"
@@ -217,7 +211,7 @@ export function ExpensesByMonthTable({
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {row.kind === "owner-transfer"
-                        ? row.transferNote || t("transactions.typeTransfer")
+                        ? t("transactions.typeTransfer")
                         : row.category || t("common.uncategorized")}
                     </TableCell>
                   </TableRow>

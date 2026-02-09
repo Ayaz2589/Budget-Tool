@@ -116,7 +116,7 @@ export function TransactionsPage() {
         id: row.id,
         date: row.date,
         amount: row.amount,
-        description: t("transactions.transfer"),
+        description: `${row.fromOwner} → ${row.toOwner}`,
         source: "manual",
         owner: row.fromOwner,
         category: t("transactions.typeTransfer"),

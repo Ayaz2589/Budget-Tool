@@ -155,6 +155,22 @@ export function AddTransactionDialog({
     return fromExpenses;
   }, [owners, expenses]);
 
+  const sortedPresetTransactions = useMemo(() => {
+    return [...presetTransactions].sort((a, b) => {
+      const categoryA = (a.category || "").trim().toLowerCase();
+      const categoryB = (b.category || "").trim().toLowerCase();
+      const categoryCompare = categoryA.localeCompare(categoryB);
+      if (categoryCompare !== 0) return categoryCompare;
+
+      const descriptionA = (a.description || "").trim().toLowerCase();
+      const descriptionB = (b.description || "").trim().toLowerCase();
+      const descriptionCompare = descriptionA.localeCompare(descriptionB);
+      if (descriptionCompare !== 0) return descriptionCompare;
+
+      return a.id.localeCompare(b.id);
+    });
+  }, [presetTransactions]);
+
   const updateRow = (index: number, updates: Partial<TransactionRow>) => {
     setRows((prev) =>
       prev.map((r, i) => (i === index ? { ...r, ...updates } : r))
@@ -552,7 +568,7 @@ export function AddTransactionDialog({
                             <SelectItem value={PRESET_NONE_VALUE}>
                               {t("addTransaction.presetNone")}
                             </SelectItem>
-                            {presetTransactions.map((preset) => {
+                            {sortedPresetTransactions.map((preset) => {
                               const sourceLabel = t(
                                 `addTransaction.${
                                   EXPENSE_SOURCE_LOCALE_KEYS[preset.source]

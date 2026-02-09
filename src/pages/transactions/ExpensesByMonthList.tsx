@@ -82,7 +82,7 @@ export function ExpensesByMonthList({
                       )}, ${formatDate(row.date)}`}
                       title={
                         row.kind === "owner-transfer"
-                          ? `${t("transactions.transfer")}: ${row.transferFromOwner} -> ${row.transferToOwner}`
+                          ? row.description
                           : row.description || "—"
                       }
                       subtitle={
@@ -93,9 +93,7 @@ export function ExpensesByMonthList({
                       trailing={
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
-                            {row.kind === "owner-transfer"
-                              ? t("transactions.typeTransfer")
-                              : getSourceBadge(row.source)}
+                            {getSourceBadge(row.source)}
                           </span>
                           <div className="text-base font-semibold">
                             {formatCurrency(row.amount)}

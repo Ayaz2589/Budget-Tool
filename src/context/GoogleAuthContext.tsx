@@ -30,6 +30,7 @@ import {
 } from "@/lib/googleSheets";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 import type { SyncHealth, SyncStatus } from "@/types/auth";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
@@ -501,10 +502,10 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       const snapshot = getSyncSnapshot();
       await ensureSheetsExist(accessToken, spreadsheetId);
       const nonMortgageExpenses = snapshot.expenses.filter(
-        (e) => (e.category || "").toLowerCase() !== "mortgage"
+        (e) => !isMortgageCategory(e.category)
       );
       const mortgageExpenses = snapshot.expenses.filter(
-        (e) => (e.category || "").toLowerCase() === "mortgage"
+        (e) => isMortgageCategory(e.category)
       );
       const dataBlob = serializeToBlob({
         expenses: snapshot.expenses,
@@ -699,10 +700,10 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           const expanded = parseFromBlob(blob);
           const allExpenses = expanded.expenses ?? [];
           sheetExpenses = allExpenses.filter(
-            (e) => (e.category || "").toLowerCase() !== "mortgage"
+            (e) => !isMortgageCategory(e.category)
           );
           sheetMortgage = allExpenses.filter(
-            (e) => (e.category || "").toLowerCase() === "mortgage"
+            (e) => isMortgageCategory(e.category)
           );
           sheetIncome = expanded.income ?? [];
           sheetDebts = expanded.debts ?? [];
@@ -816,7 +817,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
             .filter(
               (category) =>
                 category.length > 0 &&
-                category.toLowerCase() !== "mortgage" &&
+                !isMortgageCategory(category) &&
                 !budget.expenseCategories.includes(category)
             )
         ),

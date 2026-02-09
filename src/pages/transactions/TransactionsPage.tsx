@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { useBudget } from "@/context/BudgetContext";
 import type { Expense } from "@/lib/types";
 import { isValidDate } from "@/lib/totals";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -71,7 +72,7 @@ export function TransactionsPage() {
   const filtered = useMemo(() => {
     let list = [...expenses]
       .filter((e) => isValidDate(e.date))
-      .filter((e) => e.category !== "Mortgage");
+      .filter((e) => !isMortgageCategory(e.category));
     if (monthFilter) {
       list = list.filter((e) => e.date.startsWith(monthFilter));
     }

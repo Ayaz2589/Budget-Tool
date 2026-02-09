@@ -13,6 +13,7 @@ import type { ParsedExportedPdf } from "@/types/pdf";
 import { getMonthLabel, computeMonthTotals } from "@/lib/totals";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { EXPENSE_SOURCE_DISPLAY_LABELS } from "@/lib/sourceLabels";
 
 const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
@@ -106,10 +107,10 @@ export function downloadTransactionsAndIncomePdf(
       b.date.localeCompare(a.date)
     );
     const monthExpenses = monthAll.filter(
-      (e) => (e.category || "").toLowerCase() !== "mortgage"
+      (e) => !isMortgageCategory(e.category)
     );
     const monthMortgage = monthAll.filter(
-      (e) => (e.category || "").toLowerCase() === "mortgage"
+      (e) => isMortgageCategory(e.category)
     );
     const monthIncome = (incomeByMonth.get(monthKey) ?? []).sort((a, b) =>
       b.date.localeCompare(a.date)

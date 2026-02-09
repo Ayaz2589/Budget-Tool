@@ -22,10 +22,10 @@ export function DsSidebarNavItem({
       to={to}
       onClick={onClick}
       className={cn(
-        "flex cursor-pointer items-center gap-3 px-3 py-2.5 rounded-xl text-base leading-none font-medium transition-colors min-w-0",
+        "flex cursor-pointer items-center gap-3 px-3 py-2.5 rounded-[var(--radius-control)] text-sm leading-none font-medium transition-colors min-w-0 border border-transparent",
         active
-          ? "bg-[var(--interactive-primary)] text-[var(--interactive-primary-foreground)]"
-          : "text-[var(--text-secondary)] hover:bg-[var(--control-hover)] hover:text-[var(--text-primary)]",
+          ? "bg-[var(--interactive-primary)] text-[var(--interactive-primary-foreground)] border-[var(--interactive-primary)]"
+          : "text-[var(--text-secondary)] hover:bg-[var(--control-hover)] hover:text-[var(--text-primary)] hover:border-[var(--border-subtle)]",
       )}
     >
       <Icon className="size-4 shrink-0" />
@@ -33,4 +33,3 @@ export function DsSidebarNavItem({
     </Link>
   );
 }
-

@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import { useBudget } from "@/context/BudgetContext";
 import type { Expense } from "@/lib/types";
+import type { OwnerTransfer } from "@/types/core";
 import { isValidDate } from "@/lib/totals";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,14 +19,20 @@ import { ExpensesByMonthList } from "./ExpensesByMonthList";
 import { ExpenseActionsDialog } from "./ExpenseActionsDialog";
 import { EditTransactionDialog } from "./EditTransactionDialog";
 import { DeleteOneTransactionDialog } from "./DeleteTransactionDialogs";
+import type { TransactionLedgerRow } from "@/types/transactions";
+import { TransferActionsDialog } from "./TransferActionsDialog";
+import { EditTransferDialog } from "./EditTransferDialog";
 
 export function TransactionsPage() {
   const { t } = useTranslation();
   const location = useLocation();
   const {
     expenses,
+    ownerTransfers,
     updateExpense,
     removeExpense,
+    updateOwnerTransfer,
+    removeOwnerTransfer,
     expenseCategories,
     owners,
     cardSources,
@@ -34,6 +42,7 @@ export function TransactionsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [searchFilter, setSearchFilter] = useState<string>("");
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | "expense" | "transfer">("all");
   const [sortBy, setSortBy] = useState<SortColumn>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
@@ -43,6 +52,10 @@ export function TransactionsPage() {
   const [expenseForActions, setExpenseForActions] = useState<Expense | null>(
     null,
   );
+  const [transferForActions, setTransferForActions] = useState<OwnerTransfer | null>(
+    null,
+  );
+  const [editTransfer, setEditTransfer] = useState<OwnerTransfer | null>(null);
   const [filtersPopupOpen, setFiltersPopupOpen] = useState(false);
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
   const pendingHighlightIdRef = useRef<string | null>(null);
@@ -55,8 +68,17 @@ export function TransactionsPage() {
         expenses.map((e) => e.owner).filter((m): m is string => !!m),
       ),
     ].sort();
-    return fromExpenses;
-  }, [owners, expenses]);
+    const fromTransfers = [
+      ...new Set(
+        ownerTransfers
+          .flatMap((row) => [row.fromOwner, row.toOwner])
+          .filter((name): name is string => !!name),
+      ),
+    ].sort();
+    return Array.from(new Set([...fromExpenses, ...fromTransfers])).sort((a, b) =>
+      a.localeCompare(b),
+    );
+  }, [owners, expenses, ownerTransfers]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -64,45 +86,98 @@ export function TransactionsPage() {
     setSourceFilter(params.get("source") ?? "all");
     setCategoryFilter(params.get("category") ?? "");
     setOwnerFilter(params.get("owner") ?? "all");
+    const nextType = params.get("type");
+    setTypeFilter(
+      nextType === "expense" || nextType === "transfer" ? nextType : "all",
+    );
     pendingHighlightIdRef.current = params.get("highlight");
     pendingOpenEditIdRef.current = params.get("openEdit");
   }, [location.search]);
 
   const filtered = useMemo(() => {
-    let list = [...expenses]
+    const expenseRows: TransactionLedgerRow[] = expenses
       .filter((e) => isValidDate(e.date))
-      .filter((e) => e.category !== "Mortgage");
+      .filter((e) => !isMortgageCategory(e.category))
+      .map((e) => ({
+        kind: "expense",
+        id: e.id,
+        date: e.date,
+        amount: e.amount,
+        description: e.description || "—",
+        source: e.source,
+        owner: e.owner,
+        category: e.category,
+        expense: e,
+      }));
+    const transferRows: TransactionLedgerRow[] = ownerTransfers
+      .filter((row) => isValidDate(row.date))
+      .map((row) => ({
+        kind: "owner-transfer",
+        id: row.id,
+        date: row.date,
+        amount: row.amount,
+        description: t("transactions.transfer"),
+        source: "manual",
+        owner: row.fromOwner,
+        category: t("transactions.typeTransfer"),
+        transferFromOwner: row.fromOwner,
+        transferToOwner: row.toOwner,
+        transferNote: row.note,
+        transfer: row,
+      }));
+
+    let list = [...expenseRows, ...transferRows];
     if (monthFilter) {
-      list = list.filter((e) => e.date.startsWith(monthFilter));
+      list = list.filter((row) => row.date.startsWith(monthFilter));
     }
     if (sourceFilter && sourceFilter !== "all") {
-      list = list.filter((e) => e.source === sourceFilter);
+      list = list.filter((row) => row.kind !== "expense" || row.source === sourceFilter);
     }
     if (categoryFilter) {
       if (categoryFilter === "__uncategorized") {
-        list = list.filter((e) => !e.category);
+        list = list.filter((row) => row.kind === "expense" && !row.category);
       } else {
-        list = list.filter((e) => e.category === categoryFilter);
+        list = list.filter(
+          (row) => row.kind === "expense" && row.category === categoryFilter,
+        );
       }
     }
     if (searchFilter.trim()) {
       const q = searchFilter.trim().toLowerCase();
-      list = list.filter((e) => e.description.toLowerCase().includes(q));
+      list = list.filter((row) => {
+        if (row.kind === "owner-transfer") {
+          const desc = `${row.transferFromOwner ?? ""} ${row.transferToOwner ?? ""} ${
+            row.transferNote ?? ""
+          }`.toLowerCase();
+          return desc.includes(q);
+        }
+        return row.description.toLowerCase().includes(q);
+      });
+    }
+    if (typeFilter === "expense") {
+      list = list.filter((row) => row.kind === "expense");
+    } else if (typeFilter === "transfer") {
+      list = list.filter((row) => row.kind === "owner-transfer");
     }
     if (ownerFilter && ownerFilter !== "all") {
       if (ownerFilter === "_none") {
-        list = list.filter((e) => !e.owner);
+        list = list.filter((row) => row.kind === "expense" && !row.owner);
       } else if (ownerFilter === "_shared") {
-        list = list.filter(
-          (e) =>
-            (e.category || "").trim().toLowerCase() === "50/50" || !e.owner,
-        );
+        list = list.filter((row) => {
+          if (row.kind !== "expense") return false;
+          return (row.category || "").trim().toLowerCase() === "50/50" || !row.owner;
+        });
       } else {
-        list = list.filter((e) => (e.owner ?? "") === ownerFilter);
+        list = list.filter((row) => {
+          if (row.kind === "owner-transfer") {
+            return row.transferFromOwner === ownerFilter || row.transferToOwner === ownerFilter;
+          }
+          return (row.owner ?? "") === ownerFilter;
+        });
       }
     }
     const cmp = sortDir === "asc" ? 1 : -1;
-    list.sort((a, b) => {
+    list.sort((a: TransactionLedgerRow, b: TransactionLedgerRow) => {
       let diff = 0;
       switch (sortBy) {
         case "date":
@@ -118,10 +193,10 @@ export function TransactionsPage() {
           diff = a.source.localeCompare(b.source);
           break;
         case "category":
-          diff = (a.category ?? "").localeCompare(b.category ?? "");
+          diff = (a.category || "").localeCompare(b.category || "");
           break;
         case "owner":
-          diff = (a.owner ?? "").localeCompare(b.owner ?? "");
+          diff = (a.owner || "").localeCompare(b.owner || "");
           break;
         default:
           diff = a.date.localeCompare(b.date);
@@ -136,16 +211,19 @@ export function TransactionsPage() {
     categoryFilter,
     searchFilter,
     ownerFilter,
+    typeFilter,
     sortBy,
     sortDir,
+    ownerTransfers,
+    t,
   ]);
 
   const byMonth = useMemo(() => {
-    const map = new Map<string, Expense[]>();
-    for (const e of filtered) {
-      const key = e.date.slice(0, 7);
+    const map = new Map<string, TransactionLedgerRow[]>();
+    for (const row of filtered) {
+      const key = row.date.slice(0, 7);
       if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(e);
+      map.get(key)!.push(row);
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
   }, [filtered]);
@@ -160,7 +238,8 @@ export function TransactionsPage() {
     sourceFilter !== "all" ||
     categoryFilter ||
     searchFilter.trim() ||
-    ownerFilter !== "all",
+    ownerFilter !== "all" ||
+    typeFilter !== "all",
   );
 
   const clearFilters = useCallback(() => {
@@ -169,6 +248,7 @@ export function TransactionsPage() {
     setCategoryFilter("");
     setSearchFilter("");
     setOwnerFilter("all");
+    setTypeFilter("all");
   }, []);
 
   const toggleSort = useCallback(
@@ -193,17 +273,21 @@ export function TransactionsPage() {
   useEffect(() => {
     const openEditId = pendingOpenEditIdRef.current;
     if (openEditId) {
-      const target = filtered.find((e) => e.id === openEditId);
-      if (target) {
-        setEditExpense(target);
+      const target = filtered.find((row) => row.id === openEditId && row.kind === "expense");
+      if (target?.expense) {
+        setEditExpense(target.expense);
         pendingOpenEditIdRef.current = null;
       }
     }
     const highlightId = pendingHighlightIdRef.current;
     if (highlightId) {
-      const target = filtered.find((e) => e.id === highlightId);
+      const target = filtered.find((row) => row.id === highlightId);
       if (target) {
-        setExpenseForActions(target);
+        if (target.kind === "expense" && target.expense) {
+          setExpenseForActions(target.expense);
+        } else if (target.transfer) {
+          setTransferForActions(target.transfer);
+        }
         pendingHighlightIdRef.current = null;
       }
     }
@@ -241,6 +325,8 @@ export function TransactionsPage() {
               onCategoryFilterChange={setCategoryFilter}
               ownerFilter={ownerFilter}
               onOwnerFilterChange={setOwnerFilter}
+              typeFilter={typeFilter}
+              onTypeFilterChange={setTypeFilter}
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
               expenseCategories={expenseCategories}
@@ -267,7 +353,13 @@ export function TransactionsPage() {
                       sortBy={sortBy}
                       sortDir={sortDir}
                       onSort={toggleSort}
-                      onExpenseTap={setExpenseForActions}
+                      onRowTap={(row) => {
+                        if (row.kind === "owner-transfer" && row.transfer) {
+                          setTransferForActions(row.transfer);
+                        } else if (row.expense) {
+                          setExpenseForActions(row.expense);
+                        }
+                      }}
                       sourceLabelKeys={SOURCE_LABEL_KEYS}
                       t={t}
                     />
@@ -276,7 +368,13 @@ export function TransactionsPage() {
                     <ExpensesByMonthList
                       byMonth={byMonth}
                       defaultOpenMonth={defaultOpenMonth}
-                      onExpenseTap={setExpenseForActions}
+                      onRowTap={(row) => {
+                        if (row.kind === "owner-transfer" && row.transfer) {
+                          setTransferForActions(row.transfer);
+                        } else if (row.expense) {
+                          setExpenseForActions(row.expense);
+                        }
+                      }}
                       t={t}
                     />
                   </div>
@@ -327,7 +425,12 @@ export function TransactionsPage() {
         }}
         onUpdateCategory={(id, category) => updateExpense(id, { category })}
         onUpdateOwner={(id, owner) =>
-          updateExpense(id, { owner: owner || undefined })
+          updateExpense(id, {
+            owner: owner || undefined,
+            paidByOwner: owner || undefined,
+            allocationMode: owner ? "single" : undefined,
+            allocation: owner ? [{ owner, percent: 100 }] : undefined,
+          })
         }
         onDelete={(e) => {
           setExpenseForActions(null);
@@ -338,6 +441,20 @@ export function TransactionsPage() {
         t={t}
       />
 
+      <TransferActionsDialog
+        transfer={transferForActions}
+        onClose={() => setTransferForActions(null)}
+        onEdit={(transfer) => {
+          setTransferForActions(null);
+          setEditTransfer(transfer);
+        }}
+        onDelete={(transfer) => {
+          removeOwnerTransfer(transfer.id);
+          setTransferForActions(null);
+        }}
+        t={t}
+      />
+
       <EditTransactionDialog
         expense={editExpense}
         onClose={() => setEditExpense(null)}
@@ -345,6 +462,14 @@ export function TransactionsPage() {
         expenseCategories={expenseCategories}
         ownerOptions={ownerOptions}
         cardSources={cardSources}
+      />
+
+      <EditTransferDialog
+        transfer={editTransfer}
+        onClose={() => setEditTransfer(null)}
+        onSubmit={(id, updates) => updateOwnerTransfer(id, updates)}
+        ownerOptions={ownerOptions}
+        t={t}
       />
 
       <DeleteOneTransactionDialog

@@ -31,7 +31,15 @@
     "sourceTd": "TD Bank",
     "transaction": "লেনদেন",
     "uncategorized": "অবিভক্ত",
-    "withValidAmount": "{{count}} বৈধ পরিমাণ সহ"
+    "withValidAmount": "{{count}} বৈধ পরিমাণ সহ",
+    "paidBy": "কে পরিশোধ করেছে",
+    "splitMode": "বণ্টন ধরন",
+    "splitSingle": "একজন মালিক",
+    "splitEqual": "সমান বণ্টন",
+    "splitCustom": "কাস্টম বণ্টন",
+    "splitOwner": "যার উপর চার্জ হবে",
+    "splitOwners": "মালিকদের মধ্যে ভাগ",
+    "customSplitHint": "প্রতি মালিকের কাস্টম শতাংশ"
   },
   "auth": {
     "createAccountHeading": "আপনার Ortho অ্যাকাউন্ট তৈরি করুন",
@@ -218,7 +226,22 @@
     "insightMortgagePaidOn": "{{date}} তারিখে মর্টগেজ পরিশোধ করা হয়েছে।",
     "insightNoDebtPaymentThisMonth": "এই মাসে {{name}}-এর জন্য কোনো পরিশোধ লগ করা হয়নি।",
     "insightNoIncomeThisMonth": "এই মাসে কোনো আয় এন্ট্রি রেকর্ড করা হয়নি।",
-    "debtPaidThisMonth": "↓ এই মাসে {{amount}} পরিশোধ হয়েছে"
+    "debtPaidThisMonth": "↓ এই মাসে {{amount}} পরিশোধ হয়েছে",
+    "sectionExpenseByOwner": "Expense by Owner",
+    "sectionNoOwnerExpenses": "No owner expenses this month.",
+    "ofTotalSpent": "{{percent}} of total spent",
+    "sectionNoOwnerExpenseItems": "No expense entries for this owner in this month.",
+    "ownerTransfersMtd": "Owner Transfers (MTD)",
+    "noOwnerTransfersMtd": "No owner transfers this month.",
+    "grossExpenseByOwner": "Gross Expense by Owner",
+    "netAfterTransfers": "Net After Transfers",
+    "transfersSent": "Transfers Sent",
+    "transfersReceived": "Transfers Received",
+    "grossShort": "Gross",
+    "netShort": "Net",
+    "sectionSpendByCardSource": "Total Spend by Card Source",
+    "sectionNoSpendByCardSource": "No spend by source for selected range.",
+    "moreItemsCount": "+{{count}} more items"
   },
   "dashboardDebt": {
     "addDebt": "ঋণ যোগ করুন",
@@ -554,7 +577,16 @@
     "syncing": "সিঙ্ক হচ্ছে...",
     "title": "লেনদেন",
     "transaction_one": "{{count}} লেনদেন",
-    "transaction_other": "{{count}} লেনদেন"
+    "transaction_other": "{{count}} লেনদেন",
+    "type": "Type",
+    "typeAll": "All types",
+    "typeExpense": "Expense",
+    "typeTransfer": "Owner Transfer",
+    "transfer": "Owner Transfer",
+    "transferFrom": "From owner",
+    "transferTo": "To owner",
+    "transferNote": "Note",
+    "transferValidationOwnersDifferent": "From owner and to owner must be different"
   },
   "investments": {
     "title": "Investments",

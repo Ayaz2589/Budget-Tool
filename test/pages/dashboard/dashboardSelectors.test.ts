@@ -117,6 +117,57 @@ test("buildOwnerSplit handles 50/50 and unassigned buckets", () => {
   expect(shared?.value).toBe(240);
 });
 
+test("buildOwnerSplit honors equal split mode across owners", () => {
+  const slices = buildOwnerSplit({
+    currentMonthKey: "2026-02",
+    scope: "all",
+    owners: ["Ayaz", "Tasnuva"],
+    expenses: [
+      {
+        id: "e1",
+        date: "2026-02-01",
+        amount: 655,
+        description: "Water bill",
+        category: "Utilities",
+        source: "manual",
+        paidByOwner: "Ayaz",
+        allocationMode: "equal",
+      },
+    ],
+  });
+
+  const ayaz = slices.find((slice) => slice.label === "Ayaz");
+  const tasnuva = slices.find((slice) => slice.label === "Tasnuva");
+  expect(ayaz?.value).toBe(327.5);
+  expect(tasnuva?.value).toBe(327.5);
+});
+
+test("buildOwnerSplit repairs equal split records with single explicit owner", () => {
+  const slices = buildOwnerSplit({
+    currentMonthKey: "2026-02",
+    scope: "all",
+    owners: ["Ayaz", "Tasnuva"],
+    expenses: [
+      {
+        id: "e1",
+        date: "2026-02-01",
+        amount: 655,
+        description: "Water bill",
+        category: "Utilities",
+        source: "manual",
+        paidByOwner: "Ayaz",
+        allocationMode: "equal",
+        allocation: [{ owner: "Ayaz", percent: 100 }],
+      },
+    ],
+  });
+
+  const ayaz = slices.find((slice) => slice.label === "Ayaz");
+  const tasnuva = slices.find((slice) => slice.label === "Tasnuva");
+  expect(ayaz?.value).toBe(327.5);
+  expect(tasnuva?.value).toBe(327.5);
+});
+
 test("buildFixedObligations includes mortgage, utilities, and debt payments", () => {
   const value = buildFixedObligations({
     currentMonthKey: "2026-02",

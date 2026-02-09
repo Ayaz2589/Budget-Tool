@@ -13,6 +13,7 @@ import type {
   Expense,
   ExpenseSource,
   Income,
+  OwnerTransfer,
 } from "@/types/core";
 import {
   ALL_EXPENSE_SOURCES,
@@ -24,6 +25,7 @@ import {
   setUiFormatSettings as applyUiFormatSettings,
   type UiFormatSettings,
 } from "@/lib/format";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 import { buildDummyBudget, type DummyBudgetData } from "@/lib/dummyData";
 import type { BudgetState } from "@/types/budget";
@@ -74,6 +76,7 @@ function loadStoredBudget(): {
   income: Income[];
   debts: Debt[];
   debtPayments: DebtPayment[];
+  ownerTransfers: OwnerTransfer[];
   iOweNova: Record<string, number>;
   cardSources: string[];
   expenseCategories: string[];
@@ -89,6 +92,7 @@ function loadStoredBudget(): {
         income?: Income[];
         debts?: Debt[];
         debtPayments?: DebtPayment[];
+        ownerTransfers?: OwnerTransfer[];
         iOweNova?: Record<string, number>;
         cardSources?: string[];
         expenseCategories?: string[];
@@ -134,11 +138,19 @@ function loadStoredBudget(): {
                 (e as Expense & { cardMember?: string }).owner ??
                 (e as Expense & { cardMember?: string }).cardMember ??
                 undefined,
+              paidByOwner:
+                e.paidByOwner ??
+                (e as Expense & { cardMember?: string }).owner ??
+                (e as Expense & { cardMember?: string }).cardMember ??
+                undefined,
             }))
           : [],
         income: Array.isArray(data.income) ? data.income : [],
         debts: Array.isArray(data.debts) ? data.debts : [],
         debtPayments: Array.isArray(data.debtPayments) ? data.debtPayments : [],
+        ownerTransfers: Array.isArray(data.ownerTransfers)
+          ? data.ownerTransfers
+          : [],
         iOweNova:
           data.iOweNova && typeof data.iOweNova === "object"
             ? data.iOweNova
@@ -159,6 +171,7 @@ function loadStoredBudget(): {
     income: [],
     debts: [],
     debtPayments: [],
+    ownerTransfers: [],
     iOweNova: {},
     cardSources: [...ALL_EXPENSE_SOURCES],
     expenseCategories: [],
@@ -176,6 +189,9 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const [debts, setDebts] = useState<Debt[]>(stored.debts);
   const [debtPayments, setDebtPayments] = useState<DebtPayment[]>(
     stored.debtPayments
+  );
+  const [ownerTransfers, setOwnerTransfers] = useState<OwnerTransfer[]>(
+    stored.ownerTransfers,
   );
   const [expenseCategories, setExpenseCategoriesState] = useState<string[]>(
     stored.expenseCategories
@@ -248,6 +264,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
           income,
           debts,
           debtPayments,
+          ownerTransfers,
           iOweNova,
           cardSources,
           expenseCategories,
@@ -265,6 +282,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     income,
     debts,
     debtPayments,
+    ownerTransfers,
     iOweNova,
     cardSources,
     expenseCategories,
@@ -279,7 +297,11 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         setDummyState((prev) => {
           const byId = new Map(prev.expenses.map((e) => [e.id, e]));
           for (const e of newExpenses) {
-            if (!byId.has(e.id)) byId.set(e.id, e);
+            if (!byId.has(e.id))
+              byId.set(e.id, {
+                ...e,
+                paidByOwner: e.paidByOwner ?? e.owner,
+              });
           }
           return {
             ...prev,
@@ -293,7 +315,11 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       setExpenses((prev) => {
         const byId = new Map(prev.map((e) => [e.id, e]));
         for (const e of newExpenses) {
-          if (!byId.has(e.id)) byId.set(e.id, e);
+          if (!byId.has(e.id))
+            byId.set(e.id, {
+              ...e,
+              paidByOwner: e.paidByOwner ?? e.owner,
+            });
         }
         return Array.from(byId.values()).sort((a, b) =>
           b.date.localeCompare(a.date)
@@ -305,7 +331,11 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
 
   const addExpense = useCallback(
     (entry: Omit<Expense, "id">) => {
-      const newExpense: Expense = { ...entry, id: generateId() };
+      const newExpense: Expense = {
+        ...entry,
+        id: generateId(),
+        paidByOwner: entry.paidByOwner ?? entry.owner,
+      };
       if (useDummyData) {
         setDummyState((prev) => ({
           ...prev,
@@ -324,17 +354,21 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
 
   const updateExpense = useCallback(
     (id: string, updates: Partial<Expense>) => {
+      const normalizedUpdates: Partial<Expense> =
+        "owner" in updates && !("paidByOwner" in updates)
+          ? { ...updates, paidByOwner: updates.owner }
+          : updates;
       if (useDummyData) {
         setDummyState((prev) => ({
           ...prev,
           expenses: prev.expenses.map((e) =>
-            e.id === id ? { ...e, ...updates } : e
+            e.id === id ? { ...e, ...normalizedUpdates } : e
           ),
         }));
         return;
       }
       setExpenses((prev) =>
-        prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+        prev.map((e) => (e.id === id ? { ...e, ...normalizedUpdates } : e))
       );
     },
     [useDummyData]
@@ -601,13 +635,69 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
     [useDummyData]
   );
 
+  const addOwnerTransfer = useCallback(
+    (entry: Omit<OwnerTransfer, "id"> | OwnerTransfer) => {
+      const newTransfer: OwnerTransfer = {
+        ...entry,
+        id: "id" in entry && entry.id ? entry.id : generateId(),
+      };
+      if (useDummyData) {
+        setDummyState((prev) => ({
+          ...prev,
+          ownerTransfers: [...prev.ownerTransfers, newTransfer].sort((a, b) =>
+            b.date.localeCompare(a.date),
+          ),
+        }));
+        return;
+      }
+      setOwnerTransfers((prev) =>
+        [...prev, newTransfer].sort((a, b) => b.date.localeCompare(a.date)),
+      );
+    },
+    [useDummyData],
+  );
+
+  const updateOwnerTransfer = useCallback(
+    (id: string, updates: Partial<OwnerTransfer>) => {
+      if (useDummyData) {
+        setDummyState((prev) => ({
+          ...prev,
+          ownerTransfers: prev.ownerTransfers.map((row) =>
+            row.id === id ? { ...row, ...updates } : row,
+          ),
+        }));
+        return;
+      }
+      setOwnerTransfers((prev) =>
+        prev.map((row) => (row.id === id ? { ...row, ...updates } : row)),
+      );
+    },
+    [useDummyData],
+  );
+
+  const removeOwnerTransfer = useCallback(
+    (id: string) => {
+      if (useDummyData) {
+        setDummyState((prev) => ({
+          ...prev,
+          ownerTransfers: prev.ownerTransfers.filter((row) => row.id !== id),
+        }));
+        return;
+      }
+      setOwnerTransfers((prev) => prev.filter((row) => row.id !== id));
+    },
+    [useDummyData],
+  );
+
   const setExpenseCategories = useCallback(
     (categories: string[]) => {
       if (useDummyData) {
         setDummyState((prev) => ({
           ...prev,
           expenses: prev.expenses.map((e) =>
-            e.category && !categories.includes(e.category)
+            e.category &&
+            !isMortgageCategory(e.category) &&
+            !categories.includes(e.category)
               ? { ...e, category: "" }
               : e
           ),
@@ -617,7 +707,9 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       }
       setExpenses((prev) =>
         prev.map((e) =>
-          e.category && !categories.includes(e.category)
+          e.category &&
+          !isMortgageCategory(e.category) &&
+          !categories.includes(e.category)
             ? { ...e, category: "" }
             : e
         )
@@ -660,8 +752,19 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         setDummyState((prev) => ({
           ...prev,
           expenses: prev.expenses.map((e) =>
-            e.owner && !normalized.includes(e.owner)
-              ? { ...e, owner: undefined }
+            (e.owner && !normalized.includes(e.owner)) ||
+            (e.paidByOwner && !normalized.includes(e.paidByOwner))
+              ? {
+                  ...e,
+                  owner: e.owner && !normalized.includes(e.owner) ? undefined : e.owner,
+                  paidByOwner:
+                    e.paidByOwner && !normalized.includes(e.paidByOwner)
+                      ? undefined
+                      : e.paidByOwner,
+                  allocation: e.allocation?.filter((a) =>
+                    normalized.includes(a.owner),
+                  ),
+                }
               : e
           ),
           income: prev.income.map((i) =>
@@ -674,13 +777,29 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
               ? { ...d, owner: undefined }
               : d
           ),
+          ownerTransfers: prev.ownerTransfers.filter(
+            (row) =>
+              normalized.includes(row.fromOwner) &&
+              normalized.includes(row.toOwner),
+          ),
           owners: normalized,
         }));
         return;
       }
       setExpenses((prev) =>
         prev.map((e) =>
-          e.owner && !normalized.includes(e.owner) ? { ...e, owner: undefined } : e
+          (e.owner && !normalized.includes(e.owner)) ||
+          (e.paidByOwner && !normalized.includes(e.paidByOwner))
+            ? {
+                ...e,
+                owner: e.owner && !normalized.includes(e.owner) ? undefined : e.owner,
+                paidByOwner:
+                  e.paidByOwner && !normalized.includes(e.paidByOwner)
+                    ? undefined
+                    : e.paidByOwner,
+                allocation: e.allocation?.filter((a) => normalized.includes(a.owner)),
+              }
+            : e
         )
       );
       setIncome((prev) =>
@@ -692,6 +811,13 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         prev.map((d) =>
           d.owner && !normalized.includes(d.owner) ? { ...d, owner: undefined } : d
         )
+      );
+      setOwnerTransfers((prev) =>
+        prev.filter(
+          (row) =>
+            normalized.includes(row.fromOwner) &&
+            normalized.includes(row.toOwner),
+        ),
       );
       setOwnersState(normalized);
     },
@@ -917,6 +1043,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       income: useDummyData ? dummyState.income : income,
       debts: useDummyData ? dummyState.debts : debts,
       debtPayments: useDummyData ? dummyState.debtPayments : debtPayments,
+      ownerTransfers: useDummyData ? dummyState.ownerTransfers : ownerTransfers,
       expenseCategories: useDummyData
         ? dummyState.expenseCategories
         : expenseCategories,
@@ -943,6 +1070,9 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       addDebtPayments,
       updateDebtPayment,
       removeDebtPayment,
+      addOwnerTransfer,
+      updateOwnerTransfer,
+      removeOwnerTransfer,
       setExpenseCategories,
       setIncomeCategories,
       setOwners,
@@ -966,6 +1096,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       addDebt,
       addDebtPayment,
       addDebtPayments,
+      addOwnerTransfer,
       addDebts,
       addExpense,
       addExpenses,
@@ -974,6 +1105,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       cardSources,
       investmentPortfolios,
       debtPayments,
+      ownerTransfers,
       debts,
       dummyState,
       expenseCategories,
@@ -987,6 +1119,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       removeExpense,
       removeExpenses,
       removeIncome,
+      removeOwnerTransfer,
       repairCorruptedDates,
       setCardSources,
       setExpenseCategories,
@@ -999,6 +1132,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       updateDebtPayment,
       updateExpense,
       updateIncome,
+      updateOwnerTransfer,
       useDummyData,
       setUseDummyData,
       addPortfolio,

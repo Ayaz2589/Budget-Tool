@@ -2,24 +2,33 @@ import { test, expect, mock } from "bun:test";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { ExpensesByMonthTable } from "@/pages/transactions/ExpensesByMonthTable";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
-import type { Expense } from "@/lib/types";
+import type { TransactionLedgerRow } from "@/types/transactions";
 
 const mockT = (key: string, opts?: { count?: number }) =>
   opts?.count != null ? `${key}:${opts.count}` : key;
 
 test("ExpensesByMonthTable shows Date and Category headers when has data", () => {
-  const onExpenseTap = mock(() => {});
-  const byMonth: [string, Expense[]][] = [
+  const onRowTap = mock(() => {});
+  const byMonth: [string, TransactionLedgerRow[]][] = [
     [
       "2025-01",
       [
         {
+          kind: "expense",
           id: "e1",
           date: "2025-01-15",
           amount: 50,
           description: "Test",
           category: "My Purchase",
           source: "manual",
+          expense: {
+            id: "e1",
+            date: "2025-01-15",
+            amount: 50,
+            description: "Test",
+            category: "My Purchase",
+            source: "manual",
+          },
         },
       ],
     ],
@@ -31,7 +40,7 @@ test("ExpensesByMonthTable shows Date and Category headers when has data", () =>
       sortBy="date"
       sortDir="desc"
       onSort={() => {}}
-      onExpenseTap={onExpenseTap}
+      onRowTap={onRowTap}
       sourceLabelKeys={SOURCE_LABEL_KEYS}
       t={mockT}
     />,
@@ -44,7 +53,5 @@ test("ExpensesByMonthTable shows Date and Category headers when has data", () =>
   ).toBeInTheDocument();
   expect(screen.getByText("Test")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: /Test/i }));
-  expect(onExpenseTap).toHaveBeenCalledWith(
-    expect.objectContaining({ id: "e1" }),
-  );
+  expect(onRowTap).toHaveBeenCalledWith(expect.objectContaining({ id: "e1" }));
 });

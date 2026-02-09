@@ -1,5 +1,6 @@
 import type { Debt, Expense, Income, PresetTransaction } from "@/types/core";
 import type { ParsedExportedPdf } from "@/types/pdf";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 
 export function normalizeImportedData(
   input: {
@@ -18,7 +19,10 @@ export function normalizeImportedData(
   return {
     expenses: input.expenses.map((e) => ({
       ...e,
-      category: expenseCatSet.has(e.category) ? e.category : "",
+      category:
+        expenseCatSet.has(e.category) || isMortgageCategory(e.category)
+          ? e.category
+          : "",
       owner: ownerSet.has(e.owner ?? "") ? e.owner : undefined,
     })),
     income: input.income.map((i) => ({

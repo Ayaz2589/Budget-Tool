@@ -31,7 +31,15 @@
     "sourceTd": "TD Bank",
     "transaction": "Transacción",
     "uncategorized": "Sin categoría",
-    "withValidAmount": "{{count}} con importe válido"
+    "withValidAmount": "{{count}} con importe válido",
+    "paidBy": "Pagado por",
+    "splitMode": "Modo de reparto",
+    "splitSingle": "Un solo propietario",
+    "splitEqual": "Reparto equitativo",
+    "splitCustom": "Reparto personalizado",
+    "splitOwner": "Asignado al propietario",
+    "splitOwners": "Repartir entre propietarios",
+    "customSplitHint": "Porcentaje personalizado por propietario"
   },
   "auth": {
     "createAccountHeading": "Crea tu cuenta de Ortho",
@@ -218,7 +226,22 @@
     "insightMortgagePaidOn": "Hipoteca pagada el {{date}}.",
     "insightNoDebtPaymentThisMonth": "No se registró pago para {{name}} este mes.",
     "insightNoIncomeThisMonth": "No se registraron ingresos este mes.",
-    "debtPaidThisMonth": "↓ {{amount}} pagados este mes"
+    "debtPaidThisMonth": "↓ {{amount}} pagados este mes",
+    "sectionExpenseByOwner": "Expense by Owner",
+    "sectionNoOwnerExpenses": "No owner expenses this month.",
+    "ofTotalSpent": "{{percent}} of total spent",
+    "sectionNoOwnerExpenseItems": "No expense entries for this owner in this month.",
+    "ownerTransfersMtd": "Owner Transfers (MTD)",
+    "noOwnerTransfersMtd": "No owner transfers this month.",
+    "grossExpenseByOwner": "Gross Expense by Owner",
+    "netAfterTransfers": "Net After Transfers",
+    "transfersSent": "Transfers Sent",
+    "transfersReceived": "Transfers Received",
+    "grossShort": "Gross",
+    "netShort": "Net",
+    "sectionSpendByCardSource": "Total Spend by Card Source",
+    "sectionNoSpendByCardSource": "No spend by source for selected range.",
+    "moreItemsCount": "+{{count}} more items"
   },
   "dashboardDebt": {
     "addDebt": "Añadir una deuda",
@@ -555,7 +578,16 @@
     "syncing": "Sincronizando...",
     "title": "Transacciones",
     "transaction_one": "{{count}} transacción",
-    "transaction_other": "{{count}} transacciones"
+    "transaction_other": "{{count}} transacciones",
+    "type": "Type",
+    "typeAll": "All types",
+    "typeExpense": "Expense",
+    "typeTransfer": "Owner Transfer",
+    "transfer": "Owner Transfer",
+    "transferFrom": "From owner",
+    "transferTo": "To owner",
+    "transferNote": "Note",
+    "transferValidationOwnersDifferent": "From owner and to owner must be different"
   },
   "investments": {
     "title": "Investments",

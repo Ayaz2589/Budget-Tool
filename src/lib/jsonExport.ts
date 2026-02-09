@@ -1,4 +1,11 @@
-import type { Debt, DebtPayment, Expense, Income, PresetTransaction } from "@/types/core";
+import type {
+  Debt,
+  DebtPayment,
+  Expense,
+  Income,
+  OwnerTransfer,
+  PresetTransaction,
+} from "@/types/core";
 import type { InvestmentPortfolio } from "@/types/investments";
 import type { CategoryWithColorPayload, ExpandedPayload } from "@/types/payload";
 
@@ -13,12 +20,14 @@ export function buildExpandedPayload(
   owners: string[] = [],
   cardSources: string[] = [],
   investmentPortfolios: InvestmentPortfolio[] = [],
+  ownerTransfers: OwnerTransfer[] = [],
 ): ExpandedPayload {
   return {
     expenses,
     income,
     debts,
     debtPayments,
+    ownerTransfers,
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,
@@ -53,6 +62,7 @@ export function parseBudgetJson(text: string): ExpandedPayload {
     income: Array.isArray(raw.income) ? raw.income : [],
     debts: Array.isArray(raw.debts) ? raw.debts : [],
     debtPayments: Array.isArray(raw.debtPayments) ? raw.debtPayments : [],
+    ownerTransfers: Array.isArray(raw.ownerTransfers) ? raw.ownerTransfers : [],
     presetTransactions: Array.isArray(raw.presetTransactions)
       ? raw.presetTransactions
       : [],

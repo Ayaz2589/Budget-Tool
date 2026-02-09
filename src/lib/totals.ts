@@ -1,5 +1,6 @@
 import type { Expense, Income } from "@/types/core";
 import type { MonthTotals, TotalsInput } from "@/types/totals";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 
 export type { MonthTotals, TotalsInput };
 
@@ -45,7 +46,7 @@ export function computeMonthTotals(
   const totalEarned = monthIncome.reduce((s, i) => s + i.amount, 0);
   const totalSpent = monthExpenses.reduce((s, e) => s + e.amount, 0);
   const totalSpentWithoutMortgage = monthExpenses
-    .filter((e) => e.category !== "Mortgage")
+    .filter((e) => !isMortgageCategory(e.category))
     .reduce((s, e) => s + e.amount, 0);
   const total5050Spent = monthExpenses
     .filter((e) => e.category === "50/50")
@@ -61,7 +62,7 @@ export function computeMonthTotals(
       (e) =>
         e.category !== "Tasnuva's Purchases" &&
         e.category !== "50/50" &&
-        e.category !== "Mortgage"
+        !isMortgageCategory(e.category)
     )
     .reduce((s, e) => s + e.amount, 0);
   const myTotalSpendingWithoutMortgage = myCategoriesSpent + split5050;

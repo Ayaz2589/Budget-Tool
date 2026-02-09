@@ -1,4 +1,10 @@
-import type { Debt, DebtPayment, Expense, Income } from "./core";
+import type {
+  Debt,
+  DebtPayment,
+  Expense,
+  Income,
+  OwnerTransfer,
+} from "./core";
 import type { InvestmentPortfolio } from "./investments";
 
 export interface BudgetState {
@@ -6,6 +12,7 @@ export interface BudgetState {
   income: Income[];
   debts: Debt[];
   debtPayments: DebtPayment[];
+  ownerTransfers: OwnerTransfer[];
   expenseCategories: string[];
   incomeCategories: string[];
   owners: string[];

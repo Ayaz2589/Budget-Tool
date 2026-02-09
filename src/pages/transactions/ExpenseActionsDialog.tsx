@@ -36,6 +36,12 @@ export function ExpenseActionsDialog({
     onDelete(expense);
     onClose();
   };
+  const splitModeLabel =
+    expense.allocationMode === "equal"
+      ? t("addTransaction.splitEqual")
+      : expense.allocationMode === "custom"
+        ? t("addTransaction.splitCustom")
+        : t("addTransaction.splitSingle");
 
   const actionButtonClass = "h-11 w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
@@ -64,6 +70,20 @@ export function ExpenseActionsDialog({
                   {formatCurrency(expense.amount)}
                 </span>
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">
+                {t("addTransaction.paidBy")}
+              </Label>
+              <p className="text-sm font-medium text-foreground">
+                {expense.paidByOwner || expense.owner || t("common.noOwner")}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">
+                {t("addTransaction.splitMode")}
+              </Label>
+              <p className="text-sm font-medium text-foreground">{splitModeLabel}</p>
             </div>
             <div className="space-y-2">
               <Label className="text-sm text-muted-foreground">

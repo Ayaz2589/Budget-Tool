@@ -3,6 +3,7 @@ import type {
   DebtPayment,
   Expense,
   Income,
+  OwnerTransfer,
   PresetTransaction,
 } from "@/types/core";
 import type { InvestmentPortfolio } from "@/types/investments";
@@ -23,12 +24,14 @@ export function buildExportString(
   owners: string[] = [],
   cardSources: string[] = [],
   investmentPortfolios: InvestmentPortfolio[] = [],
+  ownerTransfers: OwnerTransfer[] = [],
 ): string {
   const blob = serializeToBlob({
     expenses,
     income,
     debts,
     debtPayments,
+    ownerTransfers,
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,

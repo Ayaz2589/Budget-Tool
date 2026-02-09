@@ -32,6 +32,8 @@ export function FiltersAndActionsDialog({
   onCategoryFilterChange,
   ownerFilter,
   onOwnerFilterChange,
+  typeFilter,
+  onTypeFilterChange,
   searchFilter,
   onSearchFilterChange,
   expenseCategories,
@@ -160,6 +162,21 @@ export function FiltersAndActionsDialog({
                         {name}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">
+                  {t("transactions.type")}
+                </Label>
+                <Select value={typeFilter} onValueChange={onTypeFilterChange}>
+                  <SelectTrigger className={selectTriggerClass}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t("transactions.typeAll")}</SelectItem>
+                    <SelectItem value="expense">{t("transactions.typeExpense")}</SelectItem>
+                    <SelectItem value="transfer">{t("transactions.typeTransfer")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

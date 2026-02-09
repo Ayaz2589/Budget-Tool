@@ -31,7 +31,15 @@
     "sourceTd": "TD Bank",
     "transaction": "取引",
     "uncategorized": "未分類",
-    "withValidAmount": "有効な金額{{count}}件"
+    "withValidAmount": "有効な金額{{count}}件",
+    "paidBy": "支払者",
+    "splitMode": "分割方法",
+    "splitSingle": "単一オーナー",
+    "splitEqual": "均等割り",
+    "splitCustom": "カスタム分割",
+    "splitOwner": "請求先オーナー",
+    "splitOwners": "オーナー間で分割",
+    "customSplitHint": "オーナーごとのカスタム割合"
   },
   "auth": {
     "createAccountHeading": "Orthoアカウントを作成",
@@ -218,7 +226,22 @@
     "insightMortgagePaidOn": "住宅ローンは {{date}} に支払われました。",
     "insightNoDebtPaymentThisMonth": "今月は {{name}} の返済が記録されていません。",
     "insightNoIncomeThisMonth": "今月の収入が記録されていません。",
-    "debtPaidThisMonth": "↓ 今月の返済額 {{amount}}"
+    "debtPaidThisMonth": "↓ 今月の返済額 {{amount}}",
+    "sectionExpenseByOwner": "Expense by Owner",
+    "sectionNoOwnerExpenses": "No owner expenses this month.",
+    "ofTotalSpent": "{{percent}} of total spent",
+    "sectionNoOwnerExpenseItems": "No expense entries for this owner in this month.",
+    "ownerTransfersMtd": "Owner Transfers (MTD)",
+    "noOwnerTransfersMtd": "No owner transfers this month.",
+    "grossExpenseByOwner": "Gross Expense by Owner",
+    "netAfterTransfers": "Net After Transfers",
+    "transfersSent": "Transfers Sent",
+    "transfersReceived": "Transfers Received",
+    "grossShort": "Gross",
+    "netShort": "Net",
+    "sectionSpendByCardSource": "Total Spend by Card Source",
+    "sectionNoSpendByCardSource": "No spend by source for selected range.",
+    "moreItemsCount": "+{{count}} more items"
   },
   "dashboardDebt": {
     "addDebt": "債務を追加",
@@ -554,7 +577,16 @@
     "syncing": "同期中...",
     "title": "取引",
     "transaction_one": "{{count}}件の取引",
-    "transaction_other": "{{count}}件の取引"
+    "transaction_other": "{{count}}件の取引",
+    "type": "Type",
+    "typeAll": "All types",
+    "typeExpense": "Expense",
+    "typeTransfer": "Owner Transfer",
+    "transfer": "Owner Transfer",
+    "transferFrom": "From owner",
+    "transferTo": "To owner",
+    "transferNote": "Note",
+    "transferValidationOwnersDifferent": "From owner and to owner must be different"
   },
   "investments": {
     "title": "Investments",

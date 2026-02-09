@@ -26,10 +26,12 @@ import {
   readDebtsFromSheet,
   readPresetsFromSheet,
   readDebtPaymentsFromSheet,
+  readOwnerTransfersFromSheet,
   readInvestmentsFromSheet,
 } from "@/lib/googleSheets";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 import type { SyncHealth, SyncStatus } from "@/types/auth";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
@@ -407,6 +409,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         income: budget.income,
         debts: budget.debts,
         debtPayments: budget.debtPayments,
+        ownerTransfers: budget.ownerTransfers,
         presetTransactions,
         expenseCategories: budget.expenseCategories,
         incomeCategories: budget.incomeCategories,
@@ -420,6 +423,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       budget.income,
       budget.debts,
       budget.debtPayments,
+      budget.ownerTransfers,
       presetTransactions,
       budget.expenseCategories,
       budget.incomeCategories,
@@ -450,6 +454,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       income: budget.income,
       debts: budget.debts,
       debtPayments: budget.debtPayments,
+      ownerTransfers: budget.ownerTransfers,
       presetTransactions,
       expenseCategoriesWithColors,
       incomeCategoriesWithColors,
@@ -463,6 +468,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.income,
     budget.debts,
     budget.debtPayments,
+    budget.ownerTransfers,
     presetTransactions,
     budget.expenseCategories,
     budget.incomeCategories,
@@ -501,16 +507,17 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       const snapshot = getSyncSnapshot();
       await ensureSheetsExist(accessToken, spreadsheetId);
       const nonMortgageExpenses = snapshot.expenses.filter(
-        (e) => (e.category || "").toLowerCase() !== "mortgage"
+        (e) => !isMortgageCategory(e.category)
       );
       const mortgageExpenses = snapshot.expenses.filter(
-        (e) => (e.category || "").toLowerCase() === "mortgage"
+        (e) => isMortgageCategory(e.category)
       );
       const dataBlob = serializeToBlob({
         expenses: snapshot.expenses,
         income: snapshot.income,
         debts: snapshot.debts,
         debtPayments: snapshot.debtPayments,
+        ownerTransfers: snapshot.ownerTransfers,
         presetTransactions: snapshot.presetTransactions,
         expenseCategoriesWithColors: snapshot.expenseCategoriesWithColors,
         incomeCategoriesWithColors: snapshot.incomeCategoriesWithColors,
@@ -530,6 +537,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         income: snapshot.income,
         debts: snapshot.debts,
         debtPayments: snapshot.debtPayments,
+        ownerTransfers: snapshot.ownerTransfers,
         presetTransactions: snapshot.presetTransactions,
         investmentPortfolios: snapshot.investmentPortfolios,
         dataBlob,
@@ -684,12 +692,14 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       const appIncomeKeys = new Set(budget.income.map((i) => incomeKey(i)));
       const appDebtIds = new Set(budget.debts.map((d) => d.id));
       const appPaymentIds = new Set(budget.debtPayments.map((p) => p.id));
+      const appTransferIds = new Set(budget.ownerTransfers.map((t) => t.id));
 
       let sheetExpenses: typeof budget.expenses;
       let sheetMortgage: typeof budget.expenses;
       let sheetIncome: typeof budget.income;
       let sheetDebts: typeof budget.debts;
       let sheetPayments: typeof budget.debtPayments;
+      let sheetOwnerTransfers: typeof budget.ownerTransfers;
       let sheetPresets: typeof presetTransactions;
       let sheetInvestmentPortfolios: typeof budget.investmentPortfolios;
 
@@ -699,14 +709,15 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           const expanded = parseFromBlob(blob);
           const allExpenses = expanded.expenses ?? [];
           sheetExpenses = allExpenses.filter(
-            (e) => (e.category || "").toLowerCase() !== "mortgage"
+            (e) => !isMortgageCategory(e.category)
           );
           sheetMortgage = allExpenses.filter(
-            (e) => (e.category || "").toLowerCase() === "mortgage"
+            (e) => isMortgageCategory(e.category)
           );
           sheetIncome = expanded.income ?? [];
           sheetDebts = expanded.debts ?? [];
           sheetPayments = expanded.debtPayments ?? [];
+          sheetOwnerTransfers = expanded.ownerTransfers ?? [];
           sheetPresets = expanded.presetTransactions ?? [];
           sheetInvestmentPortfolios = expanded.investmentPortfolios ?? [];
           if (
@@ -729,13 +740,23 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
             budget.setOwners(expanded.owners);
           }
         } catch {
-          const [expenses, mortgage, income, debts, payments, presets, investments] =
+          const [
+            expenses,
+            mortgage,
+            income,
+            debts,
+            payments,
+            ownerTransfers,
+            presets,
+            investments,
+          ] =
             await Promise.all([
               readExpensesFromSheet(accessToken, spreadsheetId),
               readMortgageFromSheet(accessToken, spreadsheetId),
               readIncomeFromSheet(accessToken, spreadsheetId),
               readDebtsFromSheet(accessToken, spreadsheetId),
               readDebtPaymentsFromSheet(accessToken, spreadsheetId),
+              readOwnerTransfersFromSheet(accessToken, spreadsheetId),
               readPresetsFromSheet(accessToken, spreadsheetId),
               readInvestmentsFromSheet(accessToken, spreadsheetId),
             ]);
@@ -744,6 +765,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetIncome = income;
           sheetDebts = debts;
           sheetPayments = payments;
+          sheetOwnerTransfers = ownerTransfers;
           sheetPresets = presets;
           sheetInvestmentPortfolios = investments;
           const derivedOwners = [
@@ -752,6 +774,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
                 .map((e) => e.owner)
                 .concat(income.map((i) => i.owner))
                 .concat(debts.map((d) => d.owner))
+                .concat(ownerTransfers.map((row) => row.fromOwner))
+                .concat(ownerTransfers.map((row) => row.toOwner))
                 .filter((o): o is string => !!o)
             ),
           ];
@@ -766,6 +790,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           sheetIncome,
           sheetDebts,
           sheetPayments,
+          sheetOwnerTransfers,
           sheetPresets,
           sheetInvestmentPortfolios,
         ] = await Promise.all([
@@ -774,6 +799,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           readIncomeFromSheet(accessToken, spreadsheetId),
           readDebtsFromSheet(accessToken, spreadsheetId),
           readDebtPaymentsFromSheet(accessToken, spreadsheetId),
+          readOwnerTransfersFromSheet(accessToken, spreadsheetId),
           readPresetsFromSheet(accessToken, spreadsheetId),
           readInvestmentsFromSheet(accessToken, spreadsheetId),
         ]);
@@ -783,6 +809,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
               .map((e) => e.owner)
               .concat(sheetIncome.map((i) => i.owner))
               .concat(sheetDebts.map((d) => d.owner))
+              .concat(sheetOwnerTransfers.map((row) => row.fromOwner))
+              .concat(sheetOwnerTransfers.map((row) => row.toOwner))
               .filter((o): o is string => !!o)
           ),
         ];
@@ -794,6 +822,13 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       const newExpenses = sheetExpenses.filter(
         (e) => !appExpenseKeys.has(expenseKey(e))
       );
+      const mortgageSheetKeys = new Set(sheetMortgage.map((e) => expenseKey(e)));
+      const mortgageRepairs = budget.expenses.filter(
+        (e) => mortgageSheetKeys.has(expenseKey(e)) && !isMortgageCategory(e.category),
+      );
+      for (const repair of mortgageRepairs) {
+        budget.updateExpense(repair.id, { category: "Mortgage" });
+      }
       const newMortgage = sheetMortgage.filter(
         (e) => !appExpenseKeys.has(expenseKey(e))
       );
@@ -808,7 +843,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
             .filter(
               (category) =>
                 category.length > 0 &&
-                category.toLowerCase() !== "mortgage" &&
+                !isMortgageCategory(category) &&
                 !budget.expenseCategories.includes(category)
             )
         ),
@@ -871,11 +906,23 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
 
       const newDebts = sheetDebts.filter((d) => !appDebtIds.has(d.id));
       const newPayments = sheetPayments.filter((p) => !appPaymentIds.has(p.id));
+      const newTransfers = sheetOwnerTransfers.filter(
+        (row) => !appTransferIds.has(row.id),
+      );
       if (newDebts.length > 0) {
         budget.addDebts(newDebts);
       }
       if (newPayments.length > 0) {
         budget.addDebtPayments(newPayments);
+      }
+      for (const transfer of newTransfers) {
+        budget.addOwnerTransfer({
+          date: transfer.date,
+          fromOwner: transfer.fromOwner,
+          toOwner: transfer.toOwner,
+          amount: transfer.amount,
+          note: transfer.note,
+        });
       }
 
       if (sheetPresets.length > 0) {
@@ -906,12 +953,15 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.income,
     budget.debts,
     budget.debtPayments,
+    budget.ownerTransfers,
     budget.investmentPortfolios,
     setPresets,
     budget.addExpenses,
     budget.addIncome,
     budget.addDebts,
     budget.addDebtPayments,
+    budget.addOwnerTransfer,
+    budget.updateExpense,
     budget.setCardSources,
     budget.setInvestmentPortfolios,
     budget.expenseCategories,

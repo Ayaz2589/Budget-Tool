@@ -19,7 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import type { PresetTransaction } from "@/types/core";
+import type { OwnerTransfer, PresetTransaction } from "@/types/core";
 import { collectMissingImportMeta, normalizeImportedData } from "@/lib/importNormalize";
 import { parseFromBlob } from "@/lib/minifiedPayload";
 import { parseBudgetJson } from "@/lib/jsonExport";
@@ -46,6 +46,9 @@ export function ImportPage() {
   const [previewDebtPayments, setPreviewDebtPayments] = useState<DebtPayment[]>(
     []
   );
+  const [previewOwnerTransfers, setPreviewOwnerTransfers] = useState<
+    OwnerTransfer[]
+  >([]);
   const [sourceLabel, setSourceLabel] = useState<string>("");
   const [lastDetected, setLastDetected] = useState<string>("");
   const [skippedDuplicates, setSkippedDuplicates] = useState<number>(0);
@@ -62,6 +65,7 @@ export function ImportPage() {
     income: Income[];
     debts: Debt[];
     debtPayments: DebtPayment[];
+    ownerTransfers: OwnerTransfer[];
     presetTransactions: PresetTransaction[];
     investmentPortfolios: InvestmentPortfolio[];
     cardSources: string[];
@@ -76,6 +80,7 @@ export function ImportPage() {
     addIncomes,
     addDebts,
     addDebtPayments,
+    addOwnerTransfer,
     expenseCategories,
     incomeCategories,
     cardSources,
@@ -86,6 +91,7 @@ export function ImportPage() {
     setInvestmentPortfolios,
     owners,
     investmentPortfolios,
+    ownerTransfers,
   } = useBudget();
   const { setPresets, presetTransactions } = usePresetTransactions();
   const { t } = useTranslation();
@@ -112,6 +118,9 @@ export function ImportPage() {
     income: Array.isArray(expanded.income) ? expanded.income : [],
     debts: Array.isArray(expanded.debts) ? expanded.debts : [],
     debtPayments: Array.isArray(expanded.debtPayments) ? expanded.debtPayments : [],
+    ownerTransfers: Array.isArray(expanded.ownerTransfers)
+      ? expanded.ownerTransfers
+      : [],
     presetTransactions: Array.isArray(expanded.presetTransactions)
       ? expanded.presetTransactions
       : [],
@@ -121,6 +130,14 @@ export function ImportPage() {
     cardSources: expanded.cardSources,
     investmentPortfolios: expanded.investmentPortfolios,
   });
+
+  const hasParsedRows = (parsed: ParsedExportedPdf): boolean =>
+    parsed.expenses.length > 0 ||
+    parsed.income.length > 0 ||
+    parsed.debts.length > 0 ||
+    parsed.debtPayments.length > 0 ||
+    (parsed.ownerTransfers?.length ?? 0) > 0 ||
+    parsed.presetTransactions.length > 0;
 
   const handleParsedExport = (
     parsed: ParsedExportedPdf,
@@ -143,9 +160,13 @@ export function ImportPage() {
     });
     const existingDebtIds = new Set(debts.map((d) => d.id));
     const existingPaymentIds = new Set(debtPayments.map((p) => p.id));
+    const existingTransferIds = new Set(ownerTransfers.map((row) => row.id));
     const toAddDebts = parsed.debts.filter((d) => !existingDebtIds.has(d.id));
     const toAddDebtPayments = parsed.debtPayments.filter(
       (p) => !existingPaymentIds.has(p.id)
+    );
+    const toAddOwnerTransfers = (parsed.ownerTransfers ?? []).filter(
+      (row) => !existingTransferIds.has(row.id)
     );
     const missingMeta = collectMissingImportMeta(
       parsed,
@@ -166,6 +187,7 @@ export function ImportPage() {
         income: toAddIncome,
         debts: toAddDebts,
         debtPayments: toAddDebtPayments,
+        ownerTransfers: toAddOwnerTransfers,
         presetTransactions: parsed.presetTransactions,
         investmentPortfolios: parsed.investmentPortfolios ?? [],
         cardSources: parsed.cardSources ?? [],
@@ -207,6 +229,7 @@ export function ImportPage() {
     setPreviewIncome(toAddIncome);
     setPreviewDebts(toAddDebts);
     setPreviewDebtPayments(toAddDebtPayments);
+    setPreviewOwnerTransfers(toAddOwnerTransfers);
     setSourceLabel(label);
     setLastDetected("pdf-export");
     setSkippedDuplicates(0);
@@ -228,12 +251,16 @@ export function ImportPage() {
             parsed.income.length === 0 &&
             parsed.debts.length === 0 &&
             parsed.debtPayments.length === 0 &&
+            (parsed.ownerTransfers?.length ?? 0) === 0 &&
             parsed.presetTransactions.length === 0 &&
             text.trim().length > 0
           ) {
             setImportError(t("import.exportedPdfInvalid"));
             setPreviewExpenses([]);
             setPreviewIncome([]);
+            setPreviewDebts([]);
+            setPreviewDebtPayments([]);
+            setPreviewOwnerTransfers([]);
             setLastDetected("");
             setSourceLabel("");
             return;
@@ -247,6 +274,7 @@ export function ImportPage() {
           setPreviewIncome([]);
           setPreviewDebts([]);
           setPreviewDebtPayments([]);
+          setPreviewOwnerTransfers([]);
           setLastDetected("");
           setSourceLabel("");
           setSkippedDuplicates(0);
@@ -270,6 +298,9 @@ export function ImportPage() {
           setSkippedDuplicates(result.expenses.length - toAdd.length);
           setPreviewExpenses(toAdd);
           setPreviewIncome([]);
+          setPreviewDebts([]);
+          setPreviewDebtPayments([]);
+          setPreviewOwnerTransfers([]);
           const label =
             selectedSource === "amex"
               ? t("import.amexCard")
@@ -284,6 +315,9 @@ export function ImportPage() {
           setImportError(err instanceof Error ? err.message : t("import.importFailed"));
           setPreviewExpenses([]);
           setPreviewIncome([]);
+          setPreviewDebts([]);
+          setPreviewDebtPayments([]);
+          setPreviewOwnerTransfers([]);
           setLastDetected("");
           setSourceLabel("");
           setSkippedDuplicates(0);
@@ -310,14 +344,7 @@ export function ImportPage() {
         const expanded = parseFromBlob(raw);
         parsed = expandedToParsed(expanded);
       }
-      if (
-        !parsed ||
-        (parsed.expenses.length === 0 &&
-          parsed.income.length === 0 &&
-          parsed.debts.length === 0 &&
-          parsed.debtPayments.length === 0 &&
-          parsed.presetTransactions.length === 0)
-      ) {
+      if (!parsed || !hasParsedRows(parsed)) {
         setExportStringError(t("import.exportStringNotRecognized"));
         return;
       }
@@ -339,13 +366,7 @@ export function ImportPage() {
         const text = String(reader.result);
         const expanded = parseBudgetJson(text);
         const parsed = expandedToParsed(expanded);
-        if (
-          parsed.expenses.length === 0 &&
-          parsed.income.length === 0 &&
-          parsed.debts.length === 0 &&
-          parsed.debtPayments.length === 0 &&
-          parsed.presetTransactions.length === 0
-        ) {
+        if (!hasParsedRows(parsed)) {
           setJsonImportError(t("import.jsonNoData"));
           return;
         }
@@ -381,10 +402,23 @@ export function ImportPage() {
     if (normalizedIncome.length > 0) addIncomes(normalizedIncome);
     if (previewDebts.length > 0) addDebts(previewDebts);
     if (previewDebtPayments.length > 0) addDebtPayments(previewDebtPayments);
+    if (previewOwnerTransfers.length > 0) {
+      previewOwnerTransfers.forEach((row) =>
+        addOwnerTransfer({
+          id: row.id,
+          date: row.date,
+          fromOwner: row.fromOwner,
+          toOwner: row.toOwner,
+          amount: row.amount,
+          note: row.note,
+        })
+      );
+    }
     setPreviewExpenses([]);
     setPreviewIncome([]);
     setPreviewDebts([]);
     setPreviewDebtPayments([]);
+    setPreviewOwnerTransfers([]);
     setSourceLabel("");
     setLastDetected("");
     setSkippedDuplicates(0);
@@ -433,6 +467,7 @@ export function ImportPage() {
       owners,
       cardSources,
       investmentPortfolios,
+      ownerTransfers,
     );
     downloadBudgetJson(payload);
   };
@@ -456,6 +491,8 @@ export function ImportPage() {
       incomeCategoriesWithColors,
       owners,
       cardSources,
+      investmentPortfolios,
+      ownerTransfers,
     );
     downloadExportString(exportString);
   };
@@ -473,6 +510,7 @@ export function ImportPage() {
           expenses: pendingParsed.expenses,
           income: pendingParsed.income,
           debts: pendingParsed.debts,
+          ownerTransfers: pendingParsed.ownerTransfers,
           presetTransactions: pendingParsed.presetTransactions,
         };
 
@@ -500,6 +538,7 @@ export function ImportPage() {
     setPreviewIncome(normalized.income);
     setPreviewDebts(normalized.debts);
     setPreviewDebtPayments(pendingParsed.debtPayments);
+    setPreviewOwnerTransfers(pendingParsed.ownerTransfers);
     setSourceLabel(pendingParsed.sourceLabel);
     setLastDetected("pdf-export");
     setSkippedDuplicates(0);
@@ -511,7 +550,8 @@ export function ImportPage() {
     previewExpenses.length > 0 ||
     previewIncome.length > 0 ||
     previewDebts.length > 0 ||
-    previewDebtPayments.length > 0;
+    previewDebtPayments.length > 0 ||
+    previewOwnerTransfers.length > 0;
   const primaryAddLabel = t(
     lastDetected === "pdf-export" ? "import.addAll" : "import.addToTransactions",
   );
@@ -522,7 +562,8 @@ export function ImportPage() {
             ? previewExpenses.length +
               previewIncome.length +
               previewDebts.length +
-              previewDebtPayments.length
+              previewDebtPayments.length +
+              previewOwnerTransfers.length
             : previewExpenses.length,
       })}${
         lastDetected === "pdf-export"

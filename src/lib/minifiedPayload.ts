@@ -3,7 +3,9 @@ import type {
   Debt,
   DebtPayment,
   Expense,
+  ExpenseAllocation,
   Income,
+  OwnerTransfer,
   ExpenseSource,
   PresetTransaction,
 } from "@/types/core";
@@ -25,12 +27,45 @@ function omitEmpty<T extends Record<string, unknown>>(obj: T): Record<string, un
   return out;
 }
 
+function minifyAllocation(allocation: ExpenseAllocation[] | undefined): Record<string, unknown>[] | undefined {
+  if (!Array.isArray(allocation) || allocation.length === 0) return undefined;
+  const mapped = allocation
+    .map((row) =>
+      omitEmpty({
+        o: row.owner,
+        a: row.amount,
+        p: row.percent,
+      }),
+    )
+    .filter((row) => typeof row.o === "string" && String(row.o).trim().length > 0);
+  return mapped.length > 0 ? mapped : undefined;
+}
+
+function expandAllocation(raw: unknown): ExpenseAllocation[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const rows = raw
+    .map((entry) => {
+      const value = entry as Record<string, unknown>;
+      const owner = String(value.owner ?? value.o ?? "").trim();
+      if (!owner) return null;
+      const amount = Number(value.amount ?? value.a);
+      const percent = Number(value.percent ?? value.p);
+      const next: ExpenseAllocation = { owner };
+      if (Number.isFinite(amount)) next.amount = amount;
+      if (Number.isFinite(percent)) next.percent = percent;
+      return next;
+    })
+    .filter((row): row is ExpenseAllocation => row !== null);
+  return rows.length > 0 ? rows : undefined;
+}
+
 /** Build minified payload with short keys and omitted optional fields. */
 export function buildMinifiedPayload(
   expenses: Expense[],
   income: Income[],
   debts: Debt[],
   debtPayments: DebtPayment[],
+  ownerTransfers: OwnerTransfer[],
   presetTransactions: PresetTransaction[],
   expenseCategoriesWithColors: CategoryWithColorPayload[],
   incomeCategoriesWithColors: CategoryWithColorPayload[],
@@ -48,6 +83,9 @@ export function buildMinifiedPayload(
         c: x.category || undefined,
         s: x.source,
         o: x.owner,
+        po: x.paidByOwner,
+        am: x.allocationMode,
+        al: minifyAllocation(x.allocation),
       }),
     ),
     i: income.map((x) =>
@@ -74,6 +112,16 @@ export function buildMinifiedPayload(
         i: x.id,
         di: x.debtId,
         d: x.date,
+        a: x.amount,
+        n: x.note,
+      }),
+    ),
+    ot: ownerTransfers.map((x) =>
+      omitEmpty({
+        i: x.id,
+        d: x.date,
+        fo: x.fromOwner,
+        to: x.toOwner,
         a: x.amount,
         n: x.note,
       }),
@@ -115,6 +163,16 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
         (get("owner", "o", undefined) as string | undefined) ??
         (get("cardMember", "cm", undefined) as string | undefined) ??
         undefined,
+      paidByOwner:
+        (get("paidByOwner", "po", undefined) as string | undefined) ??
+        (get("owner", "o", undefined) as string | undefined) ??
+        undefined,
+      allocationMode: get("allocationMode", "am", undefined) as
+        | "single"
+        | "equal"
+        | "custom"
+        | undefined,
+      allocation: expandAllocation(get("allocation", "al", undefined)),
     } as Expense;
   });
 
@@ -153,6 +211,19 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
       amount: Number(get("amount", "a", 0)),
       note: get("note", "n", undefined) as string | undefined,
     } as DebtPayment;
+  });
+
+  const ownerTransfers = arr("ownerTransfers", "ot").map((x) => {
+    const o = x as Record<string, unknown>;
+    const get = (k: string, sk: string, def: unknown) => o[k] ?? o[sk] ?? def;
+    return {
+      id: String(get("id", "i", "")),
+      date: String(get("date", "d", "")),
+      fromOwner: String(get("fromOwner", "fo", "")),
+      toOwner: String(get("toOwner", "to", "")),
+      amount: Number(get("amount", "a", 0)),
+      note: get("note", "n", undefined) as string | undefined,
+    } as OwnerTransfer;
   });
 
   const presetTransactions = arr("presetTransactions", "pt").map((x) => {
@@ -200,6 +271,7 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
     income,
     debts,
     debtPayments,
+    ownerTransfers,
     presetTransactions,
     expenseCategoriesWithColors,
     incomeCategoriesWithColors,
@@ -216,6 +288,7 @@ export function serializeToBlob(input: MinifiedPayloadInput): string {
     input.income,
     input.debts,
     input.debtPayments,
+    input.ownerTransfers ?? [],
     input.presetTransactions,
     input.expenseCategoriesWithColors ?? [],
     input.incomeCategoriesWithColors ?? [],

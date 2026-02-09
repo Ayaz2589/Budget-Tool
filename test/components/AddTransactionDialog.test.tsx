@@ -98,7 +98,7 @@ test("AddTransactionDialog applies preset details to row", () => {
   renderDialog();
   const dialog = screen.getByRole("dialog");
 
-  const presetTrigger = within(dialog).getAllByRole("combobox")[0]!;
+  const presetTrigger = within(dialog).getAllByRole("combobox")[1]!;
   fireEvent.click(presetTrigger);
   fireEvent.click(screen.getByRole("option", { name: /preset coffee/i }));
 

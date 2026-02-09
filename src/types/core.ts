@@ -32,6 +32,16 @@ export interface Expense {
   category: string;
   source: ExpenseSource;
   owner?: string; // optional owner label (from settings)
+  /** Preferred payer field for new records. Falls back to legacy `owner`. */
+  paidByOwner?: string;
+  allocationMode?: "single" | "equal" | "custom";
+  allocation?: ExpenseAllocation[];
+}
+
+export interface ExpenseAllocation {
+  owner: string;
+  amount?: number;
+  percent?: number;
 }
 
 export interface Income {
@@ -58,6 +68,17 @@ export interface DebtPayment {
   id: string;
   debtId: string;
   date: string; // ISO date YYYY-MM-DD
+  amount: number;
+  note?: string;
+}
+
+export type LedgerEntryType = "expense" | "owner-transfer";
+
+export interface OwnerTransfer {
+  id: string;
+  date: string; // ISO date YYYY-MM-DD
+  fromOwner: string;
+  toOwner: string;
   amount: number;
   note?: string;
 }

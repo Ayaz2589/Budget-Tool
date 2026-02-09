@@ -16,8 +16,9 @@ import { MortgagePaymentsTable } from "./MortgagePaymentsTable";
 import { MortgagePaymentsList } from "./MortgagePaymentsList";
 import { MortgagePaymentActionsDialog } from "./MortgagePaymentActionsDialog";
 import { DeleteMortgagePaymentDialog } from "./DeleteMortgagePaymentDialog";
+import { isMortgageCategory, MORTGAGE_CATEGORY_LABEL } from "@/lib/mortgageCategory";
 
-const MORTGAGE_CATEGORY = "Mortgage";
+const MORTGAGE_CATEGORY = MORTGAGE_CATEGORY_LABEL;
 const DEFAULT_MORTGAGE_AMOUNT = 5400;
 
 export function MortgagePage() {
@@ -38,8 +39,7 @@ export function MortgagePage() {
   const mortgagePayments = useMemo(() => {
     return [...expenses]
       .filter(
-        (e) =>
-          (e.category || "").toLowerCase() === MORTGAGE_CATEGORY.toLowerCase(),
+        (e) => isMortgageCategory(e.category),
       )
       .sort((a, b) => b.date.localeCompare(a.date));
   }, [expenses]);
@@ -148,7 +148,12 @@ export function MortgagePage() {
           setDeleteConfirm(exp);
         }}
         onUpdateOwner={(id, owner) =>
-          updateExpense(id, { owner: owner || undefined })
+          updateExpense(id, {
+            owner: owner || undefined,
+            paidByOwner: owner || undefined,
+            allocationMode: owner ? "single" : undefined,
+            allocation: owner ? [{ owner, percent: 100 }] : undefined,
+          })
         }
         ownerOptions={owners}
         t={t}

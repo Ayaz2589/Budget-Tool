@@ -1,5 +1,9 @@
 import { getDebtBalance } from "@/lib/debtUtils";
 import { getMonthLabel, isValidDate } from "@/lib/totals";
+import {
+  isSharedExpenseByAllocation,
+  normalizeExpenseAllocation,
+} from "@/lib/ownerAccounting";
 import type { Debt, DebtPayment, Expense, Income } from "@/types/core";
 import type {
   DashboardCashFlowRow,
@@ -8,6 +12,7 @@ import type {
   DashboardExpenseScope,
   DashboardKpis,
   DashboardOwnerSlice,
+  DashboardOwnerExpenseItem,
   DashboardRange,
   DashboardRecentItem,
 } from "@/types/dashboard";
@@ -174,9 +179,34 @@ export function buildCategoryBreakdown({
     .sort((a, b) => b.value - a.value);
 }
 
+export function buildSpendBySource({
+  expenses,
+  monthKeys,
+  scope,
+}: {
+  expenses: Expense[];
+  monthKeys: string[];
+  scope: DashboardExpenseScope;
+}): { source: Expense["source"]; value: number }[] {
+  const allowedMonthKeys = new Set(monthKeys);
+  const bySource = new Map<Expense["source"], number>();
+
+  for (const expense of expenses) {
+    if (!isValidDate(expense.date)) continue;
+    if (!allowedMonthKeys.has(monthFromDate(expense.date))) continue;
+    if (!shouldIncludeExpense(expense, scope)) continue;
+    bySource.set(expense.source, (bySource.get(expense.source) ?? 0) + expense.amount);
+  }
+
+  return Array.from(bySource.entries())
+    .map(([source, value]) => ({ source, value }))
+    .sort((a, b) => b.value - a.value);
+}
+
 export function buildOwnerSplit({
   expenses,
   currentMonthKey,
+  monthKeys,
   scope,
   owners,
   sharedLabel = "Shared",
@@ -184,36 +214,38 @@ export function buildOwnerSplit({
 }: {
   expenses: Expense[];
   currentMonthKey: string;
+  monthKeys?: string[];
   scope: DashboardExpenseScope;
   owners: string[];
   sharedLabel?: string;
   unassignedLabel?: string;
 }): DashboardOwnerSlice[] {
+  const allowedMonthKeys =
+    monthKeys && monthKeys.length > 0 ? new Set(monthKeys) : null;
   const ownerValues = new Map<string, number>();
   let shared = 0;
   let unassigned = 0;
 
   for (const expense of expenses) {
-    if (!isValidDate(expense.date) || monthFromDate(expense.date) !== currentMonthKey) continue;
-    if (!shouldIncludeExpense(expense, scope)) continue;
-
-    const category = (expense.category || "").trim().toLowerCase();
-    if (category === "50/50" && owners.length >= 2) {
-      const split = expense.amount / 2;
-      const first = owners[0]!;
-      const second = owners[1]!;
-      ownerValues.set(first, (ownerValues.get(first) ?? 0) + split);
-      ownerValues.set(second, (ownerValues.get(second) ?? 0) + split);
-      shared += expense.amount;
+    if (!isValidDate(expense.date)) continue;
+    const monthKey = monthFromDate(expense.date);
+    if (allowedMonthKeys) {
+      if (!allowedMonthKeys.has(monthKey)) continue;
+    } else if (monthKey !== currentMonthKey) {
       continue;
     }
-
-    const owner = (expense.owner || "").trim();
-    if (owner.length > 0) {
-      ownerValues.set(owner, (ownerValues.get(owner) ?? 0) + expense.amount);
-    } else {
-      unassigned += expense.amount;
+    if (!shouldIncludeExpense(expense, scope)) continue;
+    const allocation = normalizeExpenseAllocation(expense, owners);
+    if (isSharedExpenseByAllocation(allocation)) {
       shared += expense.amount;
+    }
+    for (const item of allocation) {
+      if (item.isUnassigned) {
+        unassigned += item.amount;
+        shared += item.amount;
+        continue;
+      }
+      ownerValues.set(item.owner, (ownerValues.get(item.owner) ?? 0) + item.amount);
     }
   }
 
@@ -233,6 +265,56 @@ export function buildOwnerSplit({
   }
 
   return rows.sort((a, b) => b.value - a.value);
+}
+
+export function buildOwnerExpenseItems({
+  expenses,
+  currentMonthKey,
+  monthKeys,
+  scope,
+  owners,
+  owner,
+}: {
+  expenses: Expense[];
+  currentMonthKey: string;
+  monthKeys?: string[];
+  scope: DashboardExpenseScope;
+  owners: string[];
+  owner: string;
+}): DashboardOwnerExpenseItem[] {
+  const allowedMonthKeys =
+    monthKeys && monthKeys.length > 0 ? new Set(monthKeys) : null;
+  const items: DashboardOwnerExpenseItem[] = [];
+  for (const expense of expenses) {
+    if (!isValidDate(expense.date)) continue;
+    const monthKey = monthFromDate(expense.date);
+    if (allowedMonthKeys) {
+      if (!allowedMonthKeys.has(monthKey)) continue;
+    } else if (monthKey !== currentMonthKey) {
+      continue;
+    }
+    if (!shouldIncludeExpense(expense, scope)) continue;
+    const allocation = normalizeExpenseAllocation(expense, owners);
+    const allocatedAmount = allocation
+      .filter((entry) => !entry.isUnassigned && entry.owner === owner)
+      .reduce((sum, entry) => sum + entry.amount, 0);
+    if (allocatedAmount <= 0) continue;
+    items.push({
+      id: expense.id,
+      date: expense.date,
+      description: expense.description,
+      category: expense.category,
+      paidByOwner: expense.paidByOwner ?? expense.owner,
+      allocatedAmount,
+      totalAmount: expense.amount,
+    });
+  }
+
+  return items.sort((a, b) => {
+    const byDate = b.date.localeCompare(a.date);
+    if (byDate !== 0) return byDate;
+    return b.allocatedAmount - a.allocatedAmount;
+  });
 }
 
 export function buildDebtSnapshot({
@@ -285,6 +367,21 @@ export function buildRecentActivity(expenses: Expense[]): DashboardRecentItem[] 
     .filter((expense) => isValidDate(expense.date))
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 5);
+}
+
+export function buildOwnerTransfersMtd({
+  ownerTransfers,
+  currentMonthKey,
+  limit = 5,
+}: {
+  ownerTransfers: { id: string; date: string; fromOwner: string; toOwner: string; amount: number; note?: string }[];
+  currentMonthKey: string;
+  limit?: number;
+}) {
+  return [...ownerTransfers]
+    .filter((row) => isValidDate(row.date) && monthFromDate(row.date) === currentMonthKey)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, limit);
 }
 
 export function getOwnerDrilldownParam(slice: DashboardOwnerSlice): string {

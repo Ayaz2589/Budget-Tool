@@ -133,6 +133,8 @@ function SidebarContent({
   onNavClick?: () => void;
 }) {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const isActivePath = (to: string) =>
+    location.pathname === to || location.pathname.startsWith(`${to}/`);
 
   return (
     <>
@@ -149,7 +151,7 @@ function SidebarContent({
             label={t(labelKey)}
             icon={Icon}
             onClick={onNavClick}
-            active={location.pathname === to}
+            active={isActivePath(to)}
           />
         ))}
       </div>
@@ -247,6 +249,8 @@ export function Layout() {
   const currentLng = i18n.language;
   const showSyncStatusUi = location.pathname !== "/dashboard";
   const [moreOpen, setMoreOpen] = useState(false);
+  const isActivePath = (to: string) =>
+    location.pathname === to || location.pathname.startsWith(`${to}/`);
   const [showSyncComplete, setShowSyncComplete] = useState(false);
   const prevSignedInRef = useRef(isSignedIn);
   const syncingStartedAtRef = useRef<number | null>(null);
@@ -387,7 +391,7 @@ export function Layout() {
             to={to}
             className={cn(
               "flex flex-col items-center gap-1 px-4 py-1.5 rounded-md text-xs font-medium transition-colors min-w-0 flex-1 max-w-[33%] ds-label",
-              location.pathname === to
+              isActivePath(to)
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground",
             )}
@@ -401,7 +405,7 @@ export function Layout() {
           onClick={() => setMoreOpen(true)}
           className={cn(
             "flex flex-col items-center gap-1 px-4 py-1.5 rounded-md text-xs font-medium transition-colors min-w-0 flex-1 max-w-[33%] text-muted-foreground hover:text-foreground ds-label",
-            moreNavItems.some(({ to }) => location.pathname === to)
+            moreNavItems.some(({ to }) => isActivePath(to))
               ? "text-primary"
               : "",
           )}
@@ -427,10 +431,10 @@ export function Layout() {
                 <Link
                   to={to}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-medium transition-colors",
-                    location.pathname === to
-                      ? "bg-primary text-primary-foreground"
-                      : "text-foreground hover:bg-muted",
+                    "flex items-center gap-3 px-4 py-3 rounded-[var(--radius-control)] text-sm font-medium border border-transparent transition-colors",
+                    isActivePath(to)
+                      ? "bg-[var(--interactive-primary)] text-[var(--interactive-primary-foreground)] border-[var(--interactive-primary)]"
+                      : "text-[var(--text-primary)] hover:bg-[var(--control-hover)] hover:border-[var(--border-subtle)]",
                   )}
                 >
                   <Icon className="size-5 shrink-0" />

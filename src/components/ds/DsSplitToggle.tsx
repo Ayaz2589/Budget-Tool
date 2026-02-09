@@ -22,7 +22,7 @@ export function DsSplitToggle({
   return (
     <div
       className={cn(
-        "grid w-full rounded-2xl bg-[var(--surface-2)] p-1 ring-1 ring-[var(--border-subtle)]",
+        "grid w-full rounded-[var(--radius-control)] border border-[var(--control-border)] bg-[var(--control-surface)] p-1",
         className,
       )}
       style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
@@ -34,10 +34,10 @@ export function DsSplitToggle({
             key={option.value}
             type="button"
             className={cn(
-              "h-11 rounded-xl px-2 text-sm font-medium transition-colors ds-label",
+              "h-11 min-h-[44px] rounded-[calc(var(--radius-control)-4px)] px-2 text-sm font-medium transition-colors ds-label focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--focus-ring)]/45",
               isActive
                 ? "bg-[var(--interactive-primary)] text-[var(--interactive-primary-foreground)]"
-                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
+                : "text-[var(--text-secondary)] hover:bg-[var(--control-hover)] hover:text-[var(--text-primary)]",
             )}
             onClick={() => onChange(option.value)}
           >
@@ -48,4 +48,3 @@ export function DsSplitToggle({
     </div>
   );
 }
-

@@ -877,7 +877,8 @@ export function AddTransactionDialog({
           <DsSheetActions className="shrink-0 flex flex-col gap-2 pt-2 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
             <Button
               type="button"
-              className="h-11 w-full bg-white text-black hover:bg-white/90"
+              variant="secondary"
+              className="h-11 w-full"
               onClick={addRow}
             >
               <Plus className="size-4" />

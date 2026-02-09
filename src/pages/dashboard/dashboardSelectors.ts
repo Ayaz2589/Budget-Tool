@@ -179,6 +179,30 @@ export function buildCategoryBreakdown({
     .sort((a, b) => b.value - a.value);
 }
 
+export function buildSpendBySource({
+  expenses,
+  monthKeys,
+  scope,
+}: {
+  expenses: Expense[];
+  monthKeys: string[];
+  scope: DashboardExpenseScope;
+}): { source: Expense["source"]; value: number }[] {
+  const allowedMonthKeys = new Set(monthKeys);
+  const bySource = new Map<Expense["source"], number>();
+
+  for (const expense of expenses) {
+    if (!isValidDate(expense.date)) continue;
+    if (!allowedMonthKeys.has(monthFromDate(expense.date))) continue;
+    if (!shouldIncludeExpense(expense, scope)) continue;
+    bySource.set(expense.source, (bySource.get(expense.source) ?? 0) + expense.amount);
+  }
+
+  return Array.from(bySource.entries())
+    .map(([source, value]) => ({ source, value }))
+    .sort((a, b) => b.value - a.value);
+}
+
 export function buildOwnerSplit({
   expenses,
   currentMonthKey,

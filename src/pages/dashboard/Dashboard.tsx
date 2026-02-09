@@ -17,6 +17,7 @@ import {
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
@@ -36,6 +37,7 @@ import {
   buildFixedObligations,
   buildOwnerExpenseItems,
   buildOwnerSplit,
+  buildSpendBySource,
   buildOwnerTransfersMtd,
   buildRecentActivity,
   getCurrentMonthKey,
@@ -245,6 +247,15 @@ export function Dashboard() {
   );
 
   const recentActivity = useMemo(() => buildRecentActivity(expenses), [expenses]);
+  const spendBySourceRows = useMemo(
+    () =>
+      buildSpendBySource({
+        expenses,
+        monthKeys,
+        scope: expenseScope,
+      }),
+    [expenses, monthKeys, expenseScope],
+  );
 
   const insights = useMemo(
     () =>
@@ -883,6 +894,25 @@ export function Dashboard() {
           <h2 className="text-base font-semibold">{t("dashboard.sectionFixedObligationsMtd")}</h2>
           <p className="text-2xl font-semibold">{formatCurrency(fixedObligations)}</p>
           <p className="text-xs text-muted-foreground">{t("dashboard.sectionFixedObligationsHint")}</p>
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="text-base font-semibold">{t("dashboard.sectionSpendByCardSource")}</h2>
+          {spendBySourceRows.length === 0 ? (
+            <DsEmptyState title={t("dashboard.sectionNoSpendByCardSource")} className="py-4" />
+          ) : (
+            <div className="border-t border-[var(--border-subtle)]">
+              {spendBySourceRows.map((row, index) => (
+                <DsDataRow
+                  key={row.source}
+                  title={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[row.source]}`)}
+                  trailing={<p className="font-semibold">{formatCurrency(row.value)}</p>}
+                  className={index % 2 === 1 ? "bg-muted/30" : ""}
+                  dense
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="space-y-2">

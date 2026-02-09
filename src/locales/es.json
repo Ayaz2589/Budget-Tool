@@ -238,7 +238,9 @@
     "transfersSent": "Transfers Sent",
     "transfersReceived": "Transfers Received",
     "grossShort": "Gross",
-    "netShort": "Net"
+    "netShort": "Net",
+    "sectionSpendByCardSource": "Total Spend by Card Source",
+    "sectionNoSpendByCardSource": "No spend by source for selected range."
   },
   "dashboardDebt": {
     "addDebt": "Añadir una deuda",

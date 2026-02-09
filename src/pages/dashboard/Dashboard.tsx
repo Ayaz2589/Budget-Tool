@@ -19,6 +19,12 @@ import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
   DsChartCard,
@@ -385,6 +391,7 @@ export function Dashboard() {
                     : 0;
                 const isExpanded = expandedOwnerKey === row.owner;
                 const ownerItems = ownerExpenseItemsByOwner.get(row.owner) ?? [];
+                const ownerItemsPreview = ownerItems.slice(0, 4);
                 const netToneClass =
                   row.net >= 0 ? "text-foreground" : "text-destructive";
                 return (
@@ -437,7 +444,7 @@ export function Dashboard() {
                             </p>
                           ) : (
                             <div className="space-y-1">
-                              {ownerItems.map((item) => (
+                              {ownerItemsPreview.map((item) => (
                                 <div
                                   key={`${row.owner}-${item.id}`}
                                   className="flex items-start justify-between gap-2 rounded-md bg-muted/30 px-2 py-1.5 text-xs"
@@ -463,6 +470,13 @@ export function Dashboard() {
                                   </div>
                                 </div>
                               ))}
+                              {ownerItems.length > ownerItemsPreview.length ? (
+                                <p className="pt-1 text-[11px] text-muted-foreground">
+                                  {t("dashboard.moreItemsCount", {
+                                    count: ownerItems.length - ownerItemsPreview.length,
+                                  })}
+                                </p>
+                              ) : null}
                             </div>
                           )}
                         </div>
@@ -861,129 +875,159 @@ export function Dashboard() {
           </DsChartCard>
         </section>
 
-        <section className="space-y-2">
-          <h2 className="text-base font-semibold">{t("dashboard.sectionDebtSnapshot")}</h2>
-          {debtRows.length === 0 ? (
-            <DsEmptyState title={t("dashboard.sectionNoActiveDebts")} className="py-4" />
-          ) : (
-            <div className="border-t border-[var(--border-subtle)]">
-              {debtRows.map((row, index) => (
-                <DsDataRow
-                  key={row.id}
-                  title={row.name}
-                  subtitle={row.owner || t("common.noOwner")}
-                  trailing={<p className="font-semibold">{formatCurrency(row.remaining)}</p>}
-                  meta={
-                    <>
-                      <div className="mt-2 h-2 rounded bg-muted">
-                        <div className="h-2 rounded bg-primary" style={{ width: `${Math.min(100, Math.max(0, row.progress * 100))}%` }} />
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {formatCurrency(row.paid)} / {formatCurrency(row.initialAmount)}
-                      </p>
-                    </>
-                  }
-                  className={index % 2 === 1 ? "bg-muted/30" : ""}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+        <Accordion
+          type="multiple"
+          defaultValue={["fixed-obligations", "debt", "spend-source"]}
+          className="space-y-2 pb-4"
+        >
+          <AccordionItem value="fixed-obligations" className="rounded-xl border border-border/60 px-3">
+            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+              {t("dashboard.sectionFixedObligationsMtd")}
+            </AccordionTrigger>
+            <AccordionContent className="pb-3 pt-0">
+              <p className="text-2xl font-semibold">{formatCurrency(fixedObligations)}</p>
+              <p className="text-xs text-muted-foreground">{t("dashboard.sectionFixedObligationsHint")}</p>
+            </AccordionContent>
+          </AccordionItem>
 
-        <section className="space-y-1">
-          <h2 className="text-base font-semibold">{t("dashboard.sectionFixedObligationsMtd")}</h2>
-          <p className="text-2xl font-semibold">{formatCurrency(fixedObligations)}</p>
-          <p className="text-xs text-muted-foreground">{t("dashboard.sectionFixedObligationsHint")}</p>
-        </section>
-
-        <section className="space-y-2">
-          <h2 className="text-base font-semibold">{t("dashboard.sectionSpendByCardSource")}</h2>
-          {spendBySourceRows.length === 0 ? (
-            <DsEmptyState title={t("dashboard.sectionNoSpendByCardSource")} className="py-4" />
-          ) : (
-            <div className="border-t border-[var(--border-subtle)]">
-              {spendBySourceRows.map((row, index) => (
-                <DsDataRow
-                  key={row.source}
-                  title={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[row.source]}`)}
-                  trailing={<p className="font-semibold">{formatCurrency(row.value)}</p>}
-                  className={index % 2 === 1 ? "bg-muted/30" : ""}
-                  dense
-                />
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="space-y-2">
-          <h2 className="text-base font-semibold">{t("dashboard.ownerTransfersMtd")}</h2>
-          {ownerTransfersMtd.length === 0 ? (
-            <DsEmptyState title={t("dashboard.noOwnerTransfersMtd")} className="py-4" />
-          ) : (
-            <div className="border-t border-[var(--border-subtle)]">
-              <div className="px-0 py-2">
-                <p className="text-xl font-semibold">{formatCurrency(ownerTransfersMtdTotal)}</p>
-              </div>
-              {ownerTransfersMtd.map((row, index) => (
-                <DsDataRow
-                  key={row.id}
-                  title={`${row.fromOwner} → ${row.toOwner}`}
-                  subtitle={`${formatDate(row.date)}${row.note ? ` · ${row.note}` : ""}`}
-                  trailing={<p className="font-semibold">{formatCurrency(row.amount)}</p>}
-                  className={index % 2 === 1 ? "bg-muted/30" : ""}
-                  dense
-                />
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="space-y-2">
-          <h2 className="text-base font-semibold">{t("dashboard.sectionRecentActivity")}</h2>
-          {recentActivity.length === 0 ? (
-            <DsEmptyState title={t("dashboard.sectionNoRecentTransactions")} className="py-4" />
-          ) : (
-            <div className="border-t border-[var(--border-subtle)]">
-              {recentActivity.map((item, index) => (
-                <DsDataRow
-                  key={item.id}
-                  title={item.description || "—"}
-                  subtitle={(item.category || t("common.uncategorized")) + " · " + (item.owner || t("common.noOwner"))}
-                  trailing={<p className="font-semibold">{formatCurrency(item.amount)}</p>}
-                  className={index % 2 === 1 ? "bg-muted/30" : ""}
-                  dense
-                />
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="space-y-2 pb-4">
-          <h2 className="text-base font-semibold">{t("dashboard.sectionSmartInsightsAlerts")}</h2>
-          {insights.length === 0 ? (
-            <DsEmptyState title={t("dashboard.sectionNoAlerts")} className="py-4" />
-          ) : (
-            <div className="space-y-2">
-              {insights.map((insight) => (
-                <div
-                  key={insight.id}
-                  className="flex items-start justify-between gap-3 border border-border/60 rounded-md px-3 py-2"
-                >
-                  <p className="text-sm">{t(insight.messageKey, insight.messageValues)}</p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    density="compact"
-                    className="h-8 px-2 text-xs"
-                    onClick={() => dismissInsight(insight.id)}
-                  >
-                    {t("dashboard.dismiss")}
-                  </Button>
+          <AccordionItem value="debt" className="rounded-xl border border-border/60 px-3">
+            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+              {t("dashboard.sectionDebtSnapshot")}
+            </AccordionTrigger>
+            <AccordionContent className="pb-3 pt-0">
+              {debtRows.length === 0 ? (
+                <DsEmptyState title={t("dashboard.sectionNoActiveDebts")} className="py-4" />
+              ) : (
+                <div className="border-t border-[var(--border-subtle)]">
+                  {debtRows.map((row, index) => (
+                    <DsDataRow
+                      key={row.id}
+                      title={row.name}
+                      subtitle={row.owner || t("common.noOwner")}
+                      trailing={<p className="font-semibold">{formatCurrency(row.remaining)}</p>}
+                      meta={
+                        <>
+                          <div className="mt-2 h-2 rounded bg-muted">
+                            <div className="h-2 rounded bg-primary" style={{ width: `${Math.min(100, Math.max(0, row.progress * 100))}%` }} />
+                          </div>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {formatCurrency(row.paid)} / {formatCurrency(row.initialAmount)}
+                          </p>
+                        </>
+                      }
+                      className={index % 2 === 1 ? "bg-muted/30" : ""}
+                    />
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-        </section>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="spend-source" className="rounded-xl border border-border/60 px-3">
+            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+              {t("dashboard.sectionSpendByCardSource")}
+            </AccordionTrigger>
+            <AccordionContent className="pb-3 pt-0">
+              {spendBySourceRows.length === 0 ? (
+                <DsEmptyState title={t("dashboard.sectionNoSpendByCardSource")} className="py-4" />
+              ) : (
+                <div className="border-t border-[var(--border-subtle)]">
+                  {spendBySourceRows.map((row, index) => (
+                    <DsDataRow
+                      key={row.source}
+                      title={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[row.source]}`)}
+                      trailing={<p className="font-semibold">{formatCurrency(row.value)}</p>}
+                      className={index % 2 === 1 ? "bg-muted/30" : ""}
+                      dense
+                    />
+                  ))}
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="transfers" className="rounded-xl border border-border/60 px-3">
+            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+              {t("dashboard.ownerTransfersMtd")}
+            </AccordionTrigger>
+            <AccordionContent className="pb-3 pt-0">
+              {ownerTransfersMtd.length === 0 ? (
+                <DsEmptyState title={t("dashboard.noOwnerTransfersMtd")} className="py-4" />
+              ) : (
+                <div className="border-t border-[var(--border-subtle)]">
+                  <div className="px-0 py-2">
+                    <p className="text-xl font-semibold">{formatCurrency(ownerTransfersMtdTotal)}</p>
+                  </div>
+                  {ownerTransfersMtd.map((row, index) => (
+                    <DsDataRow
+                      key={row.id}
+                      title={`${row.fromOwner} → ${row.toOwner}`}
+                      subtitle={`${formatDate(row.date)}${row.note ? ` · ${row.note}` : ""}`}
+                      trailing={<p className="font-semibold">{formatCurrency(row.amount)}</p>}
+                      className={index % 2 === 1 ? "bg-muted/30" : ""}
+                      dense
+                    />
+                  ))}
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="recent" className="rounded-xl border border-border/60 px-3">
+            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+              {t("dashboard.sectionRecentActivity")}
+            </AccordionTrigger>
+            <AccordionContent className="pb-3 pt-0">
+              {recentActivity.length === 0 ? (
+                <DsEmptyState title={t("dashboard.sectionNoRecentTransactions")} className="py-4" />
+              ) : (
+                <div className="border-t border-[var(--border-subtle)]">
+                  {recentActivity.slice(0, 3).map((item, index) => (
+                    <DsDataRow
+                      key={item.id}
+                      title={item.description || "—"}
+                      subtitle={(item.category || t("common.uncategorized")) + " · " + (item.owner || t("common.noOwner"))}
+                      trailing={<p className="font-semibold">{formatCurrency(item.amount)}</p>}
+                      className={index % 2 === 1 ? "bg-muted/30" : ""}
+                      dense
+                    />
+                  ))}
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="insights" className="rounded-xl border border-border/60 px-3">
+            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+              {t("dashboard.sectionSmartInsightsAlerts")}
+            </AccordionTrigger>
+            <AccordionContent className="pb-3 pt-0">
+              {insights.length === 0 ? (
+                <DsEmptyState title={t("dashboard.sectionNoAlerts")} className="py-4" />
+              ) : (
+                <div className="space-y-2">
+                  {insights.map((insight) => (
+                    <div
+                      key={insight.id}
+                      className="flex items-start justify-between gap-3 border border-border/60 rounded-md px-3 py-2"
+                    >
+                      <p className="text-sm">{t(insight.messageKey, insight.messageValues)}</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        density="compact"
+                        className="h-8 px-2 text-xs"
+                        onClick={() => dismissInsight(insight.id)}
+                      >
+                        {t("dashboard.dismiss")}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </div>
   );

@@ -25,6 +25,7 @@ import { parseFromBlob } from "@/lib/minifiedPayload";
 import { parseBudgetJson } from "@/lib/jsonExport";
 import type { ExpandedPayload } from "@/types/payload";
 import type { ParsedExportedPdf } from "@/types/pdf";
+import { isDisplayCurrency } from "@/types/currency";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { buildExpandedPayload, downloadBudgetJson } from "@/lib/jsonExport";
@@ -221,11 +222,7 @@ export function ImportPage() {
     if (Array.isArray(parsed.owners) && parsed.owners.length > 0) {
       setOwners(parsed.owners);
     }
-    if (
-      parsed.displayCurrency === "USD" ||
-      parsed.displayCurrency === "EUR" ||
-      parsed.displayCurrency === "JPY"
-    ) {
+    if (isDisplayCurrency(parsed.displayCurrency)) {
       setUiFormatSettings({
         ...uiFormatSettings,
         currency: parsed.displayCurrency,
@@ -592,6 +589,7 @@ export function ImportPage() {
         <DsSectionHeader
           title={t("import.title")}
           subtitle={t("import.subtitle")}
+          showCurrencyChip
           actions={
             hasPreview ? (
               <Button className="hidden md:inline-flex" onClick={addToTransactions}>

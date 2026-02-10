@@ -7,6 +7,7 @@ import type {
   PresetTransaction,
 } from "@/types/core";
 import type { CategoryWithColorPayload } from "@/types/payload";
+import type { DisplayCurrency } from "@/types/currency";
 import { serializeToBlob } from "@/lib/minifiedPayload";
 
 const DATA_START_MARKER = "BUDGET_TOOL_DATA_START";
@@ -23,7 +24,7 @@ export function buildExportString(
   owners: string[] = [],
   cardSources: string[] = [],
   ownerTransfers: OwnerTransfer[] = [],
-  displayCurrency: "USD" | "EUR" | "JPY" = "USD",
+  displayCurrency: DisplayCurrency = "USD",
   baseCurrency: "USD" = "USD",
   fxAsOf?: string,
 ): string {

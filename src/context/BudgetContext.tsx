@@ -25,7 +25,8 @@ import {
   setUiFormatSettings as applyUiFormatSettings,
   type UiFormatSettings,
 } from "@/lib/format";
-import { getUsdFxRate } from "@/lib/fx";
+import { toDisplayCurrency } from "@/types/currency";
+import { getCachedUsdFxRate, getUsdFxRate } from "@/lib/fx";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 import { buildDummyBudget, type DummyBudgetData } from "@/lib/dummyData";
@@ -54,12 +55,7 @@ function loadStoredUiFormatSettings(): UiFormatSettings {
     const raw = localStorage.getItem(UI_FORMAT_STORAGE_KEY);
     if (!raw) return fallback;
     const data = JSON.parse(raw) as Partial<UiFormatSettings>;
-    const currency =
-      data.currency === "EUR"
-        ? "EUR"
-        : data.currency === "JPY"
-        ? "JPY"
-        : "USD";
+    const currency = toDisplayCurrency(data.currency);
     const dateFormat =
       data.dateFormat === "MM/DD/YYYY" || data.dateFormat === "YYYY/MM/DD"
         ? data.dateFormat
@@ -890,23 +886,43 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   );
 
   const setUiFormatSettings = useCallback((settings: UiFormatSettings) => {
-    setUiFormatSettingsState((prev) => ({
-      ...prev,
-      ...settings,
-      baseCurrency: "USD",
-      fxRate:
-        settings.currency === "USD"
-          ? 1
-          : Number.isFinite(settings.fxRate) && settings.fxRate > 0
+    setUiFormatSettingsState((prev) => {
+      const nextCurrency = toDisplayCurrency(settings.currency);
+      const currencyChanged = nextCurrency !== prev.currency;
+      const cachedFx =
+        nextCurrency === "USD" ? null : getCachedUsdFxRate(nextCurrency);
+      const explicitFxRate =
+        Number.isFinite(settings.fxRate) && settings.fxRate > 0
           ? settings.fxRate
-          : prev.fxRate || 1,
-      currency:
-        settings.currency === "EUR"
-          ? "EUR"
-          : settings.currency === "JPY"
-          ? "JPY"
-          : "USD",
-    }));
+          : null;
+      const nextFxRate =
+        nextCurrency === "USD"
+          ? 1
+          : explicitFxRate ??
+            cachedFx?.rate ??
+            (currencyChanged ? 1 : prev.fxRate || 1);
+      const nextFxAsOf =
+        nextCurrency === "USD"
+          ? undefined
+          : settings.fxAsOf ??
+            cachedFx?.asOf ??
+            (currencyChanged ? undefined : prev.fxAsOf);
+      const nextFxFallback =
+        nextCurrency === "USD"
+          ? false
+          : settings.fxFallback ??
+            (cachedFx ? cachedFx.stale : currencyChanged ? true : prev.fxFallback);
+
+      return {
+        ...prev,
+        ...settings,
+        baseCurrency: "USD",
+        currency: nextCurrency,
+        fxRate: nextFxRate,
+        fxAsOf: nextFxAsOf,
+        fxFallback: nextFxFallback,
+      };
+    });
   }, []);
 
   const repairCorruptedDates = useCallback(() => {

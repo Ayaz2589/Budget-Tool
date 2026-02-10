@@ -77,6 +77,7 @@ export function MortgagePage() {
         <DsSectionHeader
           title={t("mortgage.title")}
           subtitle={t("mortgage.subtitle")}
+          showCurrencyChip
           actions={
             <Button className="hidden md:inline-flex" onClick={() => setAddOpen(true)}>
               <Plus className="size-4" />

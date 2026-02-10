@@ -3,14 +3,19 @@ import {
   getUiFormatSettings,
   usdToDisplayAmount,
 } from "@/lib/format";
+import { CURRENCY_META, type DisplayCurrency } from "@/types/currency";
 
-function getCurrencySymbol(currency: "USD" | "EUR" | "JPY"): string {
-  return currency === "EUR" ? "€" : currency === "JPY" ? "¥" : "$";
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getCurrencySymbol(currency: DisplayCurrency): string {
+  return CURRENCY_META[currency].symbol;
 }
 
 export function formatCurrencyInput(
   value: string,
-  currency: "USD" | "EUR" | "JPY" = getUiFormatSettings().currency
+  currency: DisplayCurrency = getUiFormatSettings().currency
 ): string {
   const cleaned = value.replace(/[^\d.]/g, "");
   if (!cleaned) return "";
@@ -18,7 +23,7 @@ export function formatCurrencyInput(
   const hasDot = cleaned.includes(".");
   const [rawWhole = "", rawDecimal = ""] = cleaned.split(".");
   const whole = rawWhole.replace(/^0+(?=\d)/, "") || "0";
-  const decimalLimit = currency === "JPY" ? 0 : 2;
+  const decimalLimit = CURRENCY_META[currency].fractionDigits;
   const decimal = rawDecimal.slice(0, decimalLimit);
   const wholeWithCommas = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
@@ -31,15 +36,23 @@ export function formatCurrencyInput(
 
 export function parseCurrencyInput(
   value: string,
-  currency: "USD" | "EUR" | "JPY" = getUiFormatSettings().currency
+  currency: DisplayCurrency = getUiFormatSettings().currency
 ): number {
+  const meta = CURRENCY_META[currency];
+  const tokens = [meta.symbol, currency, ...(meta.aliases ?? [])]
+    .filter(Boolean)
+    .map((t) => new RegExp(escapeRegex(t), "gi"));
+  let normalized = value.replace(/,/g, "");
+  for (const token of tokens) {
+    normalized = normalized.replace(token, "");
+  }
   const parsed = parseFloat(
-    value
-      .replace(/[$,]/g, "")
-      .replace(/EUR\s?/gi, "")
-      .replace(/JPY\s?/gi, "")
-      .replace(/€/g, "")
-      .replace(/¥/g, "")
+    normalized
+      .replace(/[$€¥£₩₹৳]/g, "")
+      .replace(/NT\$/gi, "")
+      .replace(/MX\$/gi, "")
+      .replace(/C\$/gi, "")
+      .trim()
   );
   if (!Number.isFinite(parsed)) return Number.NaN;
   if (currency === "USD") return parsed;
@@ -48,11 +61,11 @@ export function parseCurrencyInput(
 
 export function formatCurrencyFromNumber(
   value: number,
-  currency: "USD" | "EUR" | "JPY" = getUiFormatSettings().currency
+  currency: DisplayCurrency = getUiFormatSettings().currency
 ): string {
   const displayValue = currency === "USD" ? value : usdToDisplayAmount(value);
   const prefix = getCurrencySymbol(currency);
-  const decimalDigits = currency === "JPY" ? 0 : 2;
+  const decimalDigits = CURRENCY_META[currency].fractionDigits;
   return `${prefix}${displayValue.toLocaleString("en-US", {
     minimumFractionDigits: decimalDigits,
     maximumFractionDigits: decimalDigits,

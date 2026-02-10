@@ -7,6 +7,11 @@ import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { extractSpreadsheetId } from "@/lib/googleSheets";
 import { formatDate } from "@/lib/format";
 import { useTheme } from "@/hooks/useTheme";
+import {
+  CURRENCY_META,
+  DISPLAY_CURRENCIES,
+  type DisplayCurrency,
+} from "@/types/currency";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -39,11 +44,10 @@ const DATE_FORMAT_OPTIONS = [
   { value: "YYYY/MM/DD", label: "YYYY/MM/DD" },
   { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
 ] as const;
-const CURRENCY_OPTIONS = [
-  { value: "USD", label: "$ USD" },
-  { value: "EUR", label: "€ EUR" },
-  { value: "JPY", label: "¥ JPY" },
-] as const;
+const CURRENCY_OPTIONS = DISPLAY_CURRENCIES.map((code) => ({
+  value: code,
+  label: CURRENCY_META[code].label,
+})) as ReadonlyArray<{ value: DisplayCurrency; label: string }>;
 
 export function SettingsPage() {
   const {
@@ -164,6 +168,7 @@ export function SettingsPage() {
         <DsSectionHeader
           title={t("settings.title")}
           subtitle={t("settings.subtitle")}
+          showCurrencyChip
         />
       </div>
       <div className="space-y-4 sm:space-y-6 pb-24 md:pb-0 px-4 md:px-0">
@@ -255,7 +260,7 @@ export function SettingsPage() {
             <Label>Display currency</Label>
             <Select
               value={uiFormatSettings.currency}
-              onValueChange={(currency: "USD" | "EUR" | "JPY") =>
+              onValueChange={(currency: DisplayCurrency) =>
                 setUiFormatSettings({ ...uiFormatSettings, currency })
               }
             >

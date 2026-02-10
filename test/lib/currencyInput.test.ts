@@ -1,4 +1,5 @@
 import { beforeEach, test, expect } from "bun:test";
+import type { DisplayCurrency } from "@/types/currency";
 import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
@@ -56,5 +57,35 @@ test("JPY input uses whole units and parses back to canonical USD", () => {
   expect(formatCurrencyInput("1234.56", "JPY")).toBe("¥1,234");
   expect(parseCurrencyInput("¥300", "JPY")).toBe(2);
   expect(formatCurrencyFromNumber(2, "JPY")).toBe("¥300");
+  setUiFormatSettings(getDefaultUiFormatSettings());
+});
+
+test("all added currencies parse back to canonical USD", () => {
+  const samples: Array<{
+    code: DisplayCurrency;
+    symbolInput: string;
+    fxRate: number;
+    expectedUsd: number;
+  }> = [
+    { code: "CAD", symbolInput: "C$135.00", fxRate: 1.35, expectedUsd: 100 },
+    { code: "MXN", symbolInput: "MX$171.00", fxRate: 1.71, expectedUsd: 100 },
+    { code: "GBP", symbolInput: "£79.00", fxRate: 0.79, expectedUsd: 100 },
+    { code: "BDT", symbolInput: "৳117.20", fxRate: 1.172, expectedUsd: 100 },
+    { code: "INR", symbolInput: "₹83.10", fxRate: 0.831, expectedUsd: 100 },
+    { code: "KRW", symbolInput: "₩300", fxRate: 150, expectedUsd: 2 },
+    { code: "CNY", symbolInput: "¥72.00", fxRate: 0.72, expectedUsd: 100 },
+    { code: "TWD", symbolInput: "NT$315.00", fxRate: 3.15, expectedUsd: 100 },
+  ];
+
+  for (const sample of samples) {
+    setUiFormatSettings({
+      ...getDefaultUiFormatSettings(),
+      currency: sample.code,
+      baseCurrency: "USD",
+      fxRate: sample.fxRate,
+    });
+    const parsed = parseCurrencyInput(sample.symbolInput, sample.code);
+    expect(Math.round(parsed)).toBe(sample.expectedUsd);
+  }
   setUiFormatSettings(getDefaultUiFormatSettings());
 });

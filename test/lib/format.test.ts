@@ -1,5 +1,9 @@
 import { beforeEach, test, expect } from "bun:test";
 import {
+  CURRENCY_META,
+  type DisplayCurrency,
+} from "@/types/currency";
+import {
   formatCurrency,
   formatPercent,
   getDefaultUiFormatSettings,
@@ -42,5 +46,31 @@ test("formatCurrency formats JPY from canonical USD using fx rate", () => {
     fxRate: 150,
   });
   expect(formatCurrency(2)).toBe("¥300");
+  setUiFormatSettings(getDefaultUiFormatSettings());
+});
+
+test("formatCurrency supports all added currencies", () => {
+  const samples: Array<{ code: DisplayCurrency; fxRate: number; usd: number }> =
+    [
+      { code: "CAD", fxRate: 1.35, usd: 100 },
+      { code: "MXN", fxRate: 17.1, usd: 100 },
+      { code: "GBP", fxRate: 0.79, usd: 100 },
+      { code: "BDT", fxRate: 117.2, usd: 100 },
+      { code: "INR", fxRate: 83.1, usd: 100 },
+      { code: "KRW", fxRate: 1330, usd: 2 },
+      { code: "CNY", fxRate: 7.2, usd: 100 },
+      { code: "TWD", fxRate: 31.5, usd: 100 },
+    ];
+
+  for (const sample of samples) {
+    setUiFormatSettings({
+      ...getDefaultUiFormatSettings(),
+      currency: sample.code,
+      baseCurrency: "USD",
+      fxRate: sample.fxRate,
+    });
+    const value = formatCurrency(sample.usd);
+    expect(value.startsWith(CURRENCY_META[sample.code].symbol)).toBe(true);
+  }
   setUiFormatSettings(getDefaultUiFormatSettings());
 });

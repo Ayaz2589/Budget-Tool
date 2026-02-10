@@ -32,6 +32,7 @@ import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
 import type { SyncHealth, SyncStatus } from "@/types/auth";
+import { isDisplayCurrency } from "@/types/currency";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
 const ACCESS_TOKEN_STORAGE_KEY = "budget-tool-google-access-token";
@@ -738,11 +739,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           if (Array.isArray(expanded.owners)) {
             budget.setOwners(expanded.owners);
           }
-          if (
-            expanded.displayCurrency === "USD" ||
-            expanded.displayCurrency === "EUR" ||
-            expanded.displayCurrency === "JPY"
-          ) {
+          if (isDisplayCurrency(expanded.displayCurrency)) {
             budget.setUiFormatSettings({
               ...budget.uiFormatSettings,
               currency: expanded.displayCurrency,

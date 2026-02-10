@@ -1,7 +1,9 @@
+import { type DisplayCurrency } from "@/types/currency";
+
 const FX_TTL_MS = 12 * 60 * 60 * 1000;
 const FALLBACK_RATE = 1;
 
-type SupportedCurrency = "USD" | "EUR" | "JPY";
+type SupportedCurrency = DisplayCurrency;
 
 type CachedFx = {
   rate: number;
@@ -40,6 +42,18 @@ function readCache(currency: SupportedCurrency): CachedFx | null {
   }
 }
 
+export function getCachedUsdFxRate(
+  currency: SupportedCurrency
+): { rate: number; asOf: string; stale: boolean } | null {
+  if (currency === "USD") {
+    return { rate: 1, asOf: new Date().toISOString(), stale: false };
+  }
+  const cached = readCache(currency);
+  if (!cached) return null;
+  const stale = Date.now() - cached.fetchedAt > FX_TTL_MS;
+  return { rate: cached.rate, asOf: cached.asOf, stale };
+}
+
 function writeCache(currency: SupportedCurrency, cache: CachedFx): void {
   try {
     localStorage.setItem(getCacheKey(currency), JSON.stringify(cache));
@@ -48,7 +62,7 @@ function writeCache(currency: SupportedCurrency, cache: CachedFx): void {
   }
 }
 
-async function fetchUsdRate(currency: "EUR" | "JPY"): Promise<CachedFx> {
+async function fetchUsdRate(currency: Exclude<SupportedCurrency, "USD">): Promise<CachedFx> {
   const primaryUrl = `https://api.frankfurter.app/latest?from=USD&to=${currency}`;
   const fallbackUrl = "https://open.er-api.com/v6/latest/USD";
 

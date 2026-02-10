@@ -6,6 +6,7 @@ import type {
   OwnerTransfer,
   PresetTransaction,
 } from "./core";
+import type { DisplayCurrency } from "./currency";
 
 /** Category name + color for payload (used in PDF and Sheets). */
 export interface CategoryWithColorPayload {
@@ -24,7 +25,7 @@ export interface MinifiedPayloadInput {
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
   owners?: string[];
   cardSources?: string[];
-  displayCurrency?: "USD" | "EUR" | "JPY";
+  displayCurrency?: DisplayCurrency;
   baseCurrency?: "USD";
   fxAsOf?: string;
 }
@@ -40,7 +41,7 @@ export interface ExpandedPayload {
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
   owners?: string[];
   cardSources?: string[];
-  displayCurrency?: "USD" | "EUR" | "JPY";
+  displayCurrency?: DisplayCurrency;
   baseCurrency?: "USD";
   fxAsOf?: string;
 }

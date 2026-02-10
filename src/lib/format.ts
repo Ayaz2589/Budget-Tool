@@ -1,7 +1,14 @@
+import {
+  CURRENCY_META,
+  toDisplayCurrency,
+  type BaseCurrency,
+  type DisplayCurrency,
+} from "@/types/currency";
+
 export interface UiFormatSettings {
   locale: string;
-  currency: "USD" | "EUR" | "JPY";
-  baseCurrency: "USD";
+  currency: DisplayCurrency;
+  baseCurrency: BaseCurrency;
   fxRate: number;
   fxAsOf?: string;
   fxFallback?: boolean;
@@ -19,13 +26,8 @@ const DEFAULT_UI_FORMAT: UiFormatSettings = {
 let uiFormatSettings: UiFormatSettings = { ...DEFAULT_UI_FORMAT };
 
 export function setUiFormatSettings(settings: UiFormatSettings): void {
-  const currency =
-    settings.currency === "EUR"
-      ? "EUR"
-      : settings.currency === "JPY"
-      ? "JPY"
-      : "USD";
-  const locale = currency === "EUR" ? "de-DE" : currency === "JPY" ? "ja-JP" : "en-US";
+  const currency = toDisplayCurrency(settings.currency);
+  const locale = CURRENCY_META[currency].locale;
   const fxRate =
     Number.isFinite(settings.fxRate) && settings.fxRate > 0
       ? settings.fxRate
@@ -56,8 +58,8 @@ export function usdToDisplayAmount(usdAmount: number): number {
   return usdAmount * uiFormatSettings.fxRate;
 }
 
-function getCurrencySymbol(currency: "USD" | "EUR" | "JPY"): string {
-  return currency === "EUR" ? "€" : currency === "JPY" ? "¥" : "$";
+function getCurrencySymbol(currency: DisplayCurrency): string {
+  return CURRENCY_META[currency].symbol;
 }
 
 export function displayToUsdAmount(displayAmount: number): number {
@@ -73,8 +75,9 @@ export function formatCurrency(n: number): string {
   const displayAmount = usdToDisplayAmount(n);
   try {
     const abs = Math.abs(displayAmount);
-    const decimalDigits = uiFormatSettings.currency === "JPY" ? 0 : 2;
+    const decimalDigits = CURRENCY_META[uiFormatSettings.currency].fractionDigits;
     const formatted = new Intl.NumberFormat(uiFormatSettings.locale, {
+      numberingSystem: "latn",
       minimumFractionDigits: decimalDigits,
       maximumFractionDigits: decimalDigits,
     }).format(abs);
@@ -82,8 +85,9 @@ export function formatCurrency(n: number): string {
     return `${sign}${getCurrencySymbol(uiFormatSettings.currency)}${formatted}`;
   } catch {
     const abs = Math.abs(n);
-    const decimalDigits = DEFAULT_UI_FORMAT.currency === "JPY" ? 0 : 2;
+    const decimalDigits = CURRENCY_META[DEFAULT_UI_FORMAT.currency].fractionDigits;
     const formatted = new Intl.NumberFormat(DEFAULT_UI_FORMAT.locale, {
+      numberingSystem: "latn",
       minimumFractionDigits: decimalDigits,
       maximumFractionDigits: decimalDigits,
     }).format(abs);
@@ -95,6 +99,7 @@ export function formatCurrency(n: number): string {
 export function formatPercent(n: number): string {
   try {
     return new Intl.NumberFormat(uiFormatSettings.locale, {
+      numberingSystem: "latn",
       style: "percent",
       minimumFractionDigits: 1,
       maximumFractionDigits: 1,

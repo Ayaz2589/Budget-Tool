@@ -7,6 +7,7 @@ import type {
   PresetTransaction,
 } from "./core";
 import type { CategoryWithColorPayload } from "./payload";
+import type { DisplayCurrency } from "./currency";
 
 export interface ParsedExportedPdf {
   expenses: Expense[];
@@ -19,7 +20,7 @@ export interface ParsedExportedPdf {
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
   owners?: string[];
   cardSources?: string[];
-  displayCurrency?: "USD" | "EUR" | "JPY";
+  displayCurrency?: DisplayCurrency;
   baseCurrency?: "USD";
   fxAsOf?: string;
 }

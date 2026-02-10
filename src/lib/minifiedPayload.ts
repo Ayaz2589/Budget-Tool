@@ -14,6 +14,10 @@ import type {
   MinifiedPayloadInput,
   ExpandedPayload,
 } from "@/types/payload";
+import {
+  toDisplayCurrency,
+  type DisplayCurrency,
+} from "@/types/currency";
 
 export type { CategoryWithColorPayload, MinifiedPayloadInput, ExpandedPayload };
 
@@ -70,7 +74,7 @@ export function buildMinifiedPayload(
   incomeCategoriesWithColors: CategoryWithColorPayload[],
   owners?: string[],
   cardSources?: string[],
-  displayCurrency?: "USD" | "EUR" | "JPY",
+  displayCurrency?: DisplayCurrency,
   baseCurrency?: "USD",
   fxAsOf?: string,
 ): Record<string, unknown> {
@@ -262,12 +266,7 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
   const owners = Array.isArray(raw.owners ?? raw.o)
     ? (raw.owners ?? raw.o) as string[]
     : undefined;
-  const displayCurrency =
-    (raw.displayCurrency ?? raw.dc) === "EUR"
-      ? "EUR"
-      : (raw.displayCurrency ?? raw.dc) === "JPY"
-      ? "JPY"
-      : "USD";
+  const displayCurrency = toDisplayCurrency(raw.displayCurrency ?? raw.dc);
   const baseCurrency = "USD";
   const fxAsOf = typeof (raw.fxAsOf ?? raw.fa) === "string"
     ? String(raw.fxAsOf ?? raw.fa)

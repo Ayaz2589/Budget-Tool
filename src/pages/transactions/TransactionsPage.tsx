@@ -300,6 +300,7 @@ export function TransactionsPage() {
         <DsSectionHeader
           title={t("transactions.title")}
           subtitle={t("transactions.subtitle")}
+          showCurrencyChip
           actions={
             <div className="hidden md:block">
               <TransactionsToolbar

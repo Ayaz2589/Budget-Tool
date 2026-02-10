@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { getUsdFxRate } from "@/lib/fx";
+import type { DisplayCurrency } from "@/types/currency";
 
 const originalFetch = globalThis.fetch;
 
@@ -59,5 +60,33 @@ describe("fx", () => {
     const fx = await getUsdFxRate("JPY");
     expect(fx.rate).toBe(150.12);
     expect(fx.fallback).toBe(false);
+  });
+
+  test("fetches rates for all newly added currencies", async () => {
+    const currencies: DisplayCurrency[] = [
+      "CAD",
+      "MXN",
+      "GBP",
+      "BDT",
+      "INR",
+      "KRW",
+      "CNY",
+      "TWD",
+    ];
+    let idx = 0;
+    globalThis.fetch = mock(async () => {
+      const code = currencies[idx]!;
+      idx += 1;
+      return new Response(
+        JSON.stringify({ rates: { [code]: 1 + idx }, date: "2026-02-10" }),
+        { status: 200 }
+      ) as unknown as Response;
+    }) as typeof fetch;
+
+    for (const code of currencies) {
+      const fx = await getUsdFxRate(code);
+      expect(fx.rate).toBeGreaterThan(1);
+      expect(fx.fallback).toBe(false);
+    }
   });
 });

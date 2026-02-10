@@ -1,6 +1,21 @@
 import type { Expense } from "./core";
 import type { UiFormatSettings } from "@/lib/format";
 
+export interface MortgageProfile {
+  id: string;
+  name: string;
+  currentBalance: number;
+  interestRateAnnual: number;
+  loanType: "fixed" | "variable";
+  maturityDate?: string;
+  remainingTermMonths?: number;
+  monthlyPaymentTarget?: number;
+  annualPropertyTax?: number;
+  annualInsurance?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface MortgagePaymentsTableProps {
   payments: Expense[];
   onPaymentTap: (expense: Expense) => void;

@@ -879,7 +879,7 @@ export function Dashboard() {
                 </div>
               ) : (
                 <div className="border-t border-[var(--border-subtle)]">
-                  {debtRows.map((row, index) => (
+                  {debtRows.map((row) => (
                     <DsDataRow
                       key={row.id}
                       title={row.name}

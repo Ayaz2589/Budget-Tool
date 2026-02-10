@@ -44,6 +44,8 @@ const SYNC_RATE_LIMIT_MAX_DELAY_MS = 30_000;
 
 /** Set when user signs out or visits /auth; used to skip landing and go to /auth on next visit. */
 export const RETURNING_USER_KEY = "budget-tool-returning-user";
+/** Set after a user completes onboarding tour once. */
+export const TOUR_COMPLETED_KEY = "budget-tool-tour-completed";
 
 function getStoredAccessToken(): string | null {
   try {

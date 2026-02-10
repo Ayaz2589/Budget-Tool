@@ -17,6 +17,7 @@ import { TransactionsPage } from "@/pages/transactions/TransactionsPage";
 import { IncomePage } from "@/pages/income/IncomePage";
 import { PresetsPage } from "@/pages/presets/PresetsPage";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
+import { TourPage } from "@/pages/tour/TourPage";
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
@@ -25,6 +26,7 @@ function AppContent() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingRoute />} />
+        <Route path="/tour" element={<TourPage />} />
         <Route path="/auth" element={<AuthLoginRoute />} />
         <Route element={<AuthGate />}>
           <Route path="dashboard" element={<Layout />}>

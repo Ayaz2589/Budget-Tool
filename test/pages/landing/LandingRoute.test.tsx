@@ -4,6 +4,7 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { LandingRoute } from "@/pages/landing";
 import { GoogleAuthContext, GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
 import { RETURNING_USER_KEY } from "@/context/GoogleAuthContext";
+import { TOUR_COMPLETED_KEY } from "@/context/GoogleAuthContext";
 import type { GoogleAuthContextValue } from "@/context/GoogleAuthContext";
 
 const mockAuthValueSignedOut: GoogleAuthContextValue = {
@@ -27,6 +28,7 @@ const mockAuthValueSignedIn: GoogleAuthContextValue = {
 function clearReturningFlag() {
   try {
     localStorage.removeItem(RETURNING_USER_KEY);
+    localStorage.removeItem(TOUR_COMPLETED_KEY);
   } catch {
     // ignore
   }
@@ -50,6 +52,7 @@ test("LandingRoute redirects to /dashboard when signed in", () => {
 test("LandingRoute redirects to /auth when not signed in and returning user", () => {
   try {
     localStorage.setItem(RETURNING_USER_KEY, "1");
+    localStorage.setItem(TOUR_COMPLETED_KEY, "1");
   } catch {
     // ignore
   }
@@ -71,19 +74,40 @@ test("LandingRoute redirects to /auth when not signed in and returning user", ()
   }
 });
 
-test("LandingRoute renders LandingPage when not signed in and new visitor", () => {
+test("LandingRoute redirects to /tour when not signed in and first-time user", () => {
   clearReturningFlag();
   const { container } = render(
     <GoogleAuthProviderFallback>
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
           <Route path="/" element={<LandingRoute />} />
+          <Route path="/tour" element={<div>Tour page</div>} />
           <Route path="/auth" element={<div>Login page</div>} />
         </Routes>
       </MemoryRouter>
     </GoogleAuthProviderFallback>,
   );
-  expect(within(container).getByText("Ortho")).toBeInTheDocument();
-  expect(within(container).getByRole("link", { name: /get started/i })).toBeInTheDocument();
+  expect(within(container).getByText("Tour page")).toBeInTheDocument();
   expect(within(container).queryByText("Login page")).not.toBeInTheDocument();
+});
+
+test("LandingRoute renders LandingPage when tour is completed and user is not returning", () => {
+  try {
+    localStorage.setItem(TOUR_COMPLETED_KEY, "1");
+  } catch {
+    // ignore
+  }
+  const { container } = render(
+    <GoogleAuthProviderFallback>
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<LandingRoute />} />
+          <Route path="/tour" element={<div>Tour page</div>} />
+        </Routes>
+      </MemoryRouter>
+    </GoogleAuthProviderFallback>,
+  );
+  expect(within(container).getByText("Ortho")).toBeInTheDocument();
+  expect(within(container).queryByText("Tour page")).not.toBeInTheDocument();
+  clearReturningFlag();
 });

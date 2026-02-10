@@ -1,11 +1,20 @@
 import { Navigate } from "react-router-dom";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { RETURNING_USER_KEY } from "@/context/GoogleAuthContext";
+import { TOUR_COMPLETED_KEY } from "@/context/GoogleAuthContext";
 import { LandingPage } from "./LandingPage";
 
 function isReturningUser(): boolean {
   try {
     return !!localStorage.getItem(RETURNING_USER_KEY);
+  } catch {
+    return false;
+  }
+}
+
+function isTourCompleted(): boolean {
+  try {
+    return !!localStorage.getItem(TOUR_COMPLETED_KEY);
   } catch {
     return false;
   }
@@ -21,6 +30,10 @@ export function LandingRoute() {
 
   if (isSignedIn) {
     return <Navigate to="/dashboard" replace />;
+  }
+
+  if (!isTourCompleted()) {
+    return <Navigate to="/tour" replace />;
   }
 
   if (isReturningUser()) {

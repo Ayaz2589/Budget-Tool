@@ -221,7 +221,11 @@ export function ImportPage() {
     if (Array.isArray(parsed.owners) && parsed.owners.length > 0) {
       setOwners(parsed.owners);
     }
-    if (parsed.displayCurrency === "USD" || parsed.displayCurrency === "EUR") {
+    if (
+      parsed.displayCurrency === "USD" ||
+      parsed.displayCurrency === "EUR" ||
+      parsed.displayCurrency === "JPY"
+    ) {
       setUiFormatSettings({
         ...uiFormatSettings,
         currency: parsed.displayCurrency,

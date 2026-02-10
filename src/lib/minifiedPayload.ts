@@ -70,7 +70,7 @@ export function buildMinifiedPayload(
   incomeCategoriesWithColors: CategoryWithColorPayload[],
   owners?: string[],
   cardSources?: string[],
-  displayCurrency?: "USD" | "EUR",
+  displayCurrency?: "USD" | "EUR" | "JPY",
   baseCurrency?: "USD",
   fxAsOf?: string,
 ): Record<string, unknown> {
@@ -263,7 +263,11 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
     ? (raw.owners ?? raw.o) as string[]
     : undefined;
   const displayCurrency =
-    (raw.displayCurrency ?? raw.dc) === "EUR" ? "EUR" : "USD";
+    (raw.displayCurrency ?? raw.dc) === "EUR"
+      ? "EUR"
+      : (raw.displayCurrency ?? raw.dc) === "JPY"
+      ? "JPY"
+      : "USD";
   const baseCurrency = "USD";
   const fxAsOf = typeof (raw.fxAsOf ?? raw.fa) === "string"
     ? String(raw.fxAsOf ?? raw.fa)

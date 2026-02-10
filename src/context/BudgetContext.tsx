@@ -25,7 +25,7 @@ import {
   setUiFormatSettings as applyUiFormatSettings,
   type UiFormatSettings,
 } from "@/lib/format";
-import { getUsdToEurRate } from "@/lib/fx";
+import { getUsdFxRate } from "@/lib/fx";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 import { buildDummyBudget, type DummyBudgetData } from "@/lib/dummyData";
@@ -54,7 +54,12 @@ function loadStoredUiFormatSettings(): UiFormatSettings {
     const raw = localStorage.getItem(UI_FORMAT_STORAGE_KEY);
     if (!raw) return fallback;
     const data = JSON.parse(raw) as Partial<UiFormatSettings>;
-    const currency = data.currency === "EUR" ? "EUR" : "USD";
+    const currency =
+      data.currency === "EUR"
+        ? "EUR"
+        : data.currency === "JPY"
+        ? "JPY"
+        : "USD";
     const dateFormat =
       data.dateFormat === "MM/DD/YYYY" || data.dateFormat === "YYYY/MM/DD"
         ? data.dateFormat
@@ -252,13 +257,13 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   }, [uiFormatSettings]);
 
   useEffect(() => {
-    if (uiFormatSettings.currency !== "EUR") return;
+    if (uiFormatSettings.currency === "USD") return;
     let cancelled = false;
-    getUsdToEurRate().then((fx) => {
+    getUsdFxRate(uiFormatSettings.currency).then((fx) => {
       if (cancelled) return;
       setUiFormatSettingsState((prev) => {
         if (
-          prev.currency !== "EUR" ||
+          prev.currency !== uiFormatSettings.currency ||
           (Math.abs(prev.fxRate - fx.rate) < 0.000001 &&
             prev.fxAsOf === fx.asOf &&
             prev.fxFallback === fx.fallback)
@@ -895,7 +900,12 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
           : Number.isFinite(settings.fxRate) && settings.fxRate > 0
           ? settings.fxRate
           : prev.fxRate || 1,
-      currency: settings.currency === "EUR" ? "EUR" : "USD",
+      currency:
+        settings.currency === "EUR"
+          ? "EUR"
+          : settings.currency === "JPY"
+          ? "JPY"
+          : "USD",
     }));
   }, []);
 

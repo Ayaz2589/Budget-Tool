@@ -4,13 +4,13 @@ import {
   usdToDisplayAmount,
 } from "@/lib/format";
 
-function getCurrencySymbol(currency: "USD" | "EUR"): string {
-  return currency === "EUR" ? "€" : "$";
+function getCurrencySymbol(currency: "USD" | "EUR" | "JPY"): string {
+  return currency === "EUR" ? "€" : currency === "JPY" ? "¥" : "$";
 }
 
 export function formatCurrencyInput(
   value: string,
-  currency: "USD" | "EUR" = getUiFormatSettings().currency
+  currency: "USD" | "EUR" | "JPY" = getUiFormatSettings().currency
 ): string {
   const cleaned = value.replace(/[^\d.]/g, "");
   if (!cleaned) return "";
@@ -18,10 +18,12 @@ export function formatCurrencyInput(
   const hasDot = cleaned.includes(".");
   const [rawWhole = "", rawDecimal = ""] = cleaned.split(".");
   const whole = rawWhole.replace(/^0+(?=\d)/, "") || "0";
-  const decimal = rawDecimal.slice(0, 2);
+  const decimalLimit = currency === "JPY" ? 0 : 2;
+  const decimal = rawDecimal.slice(0, decimalLimit);
   const wholeWithCommas = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
   const prefix = getCurrencySymbol(currency);
+  if (decimalLimit === 0) return `${prefix}${wholeWithCommas}`;
   if (!hasDot) return `${prefix}${wholeWithCommas}`;
   if (decimal.length === 0) return `${prefix}${wholeWithCommas}.`;
   return `${prefix}${wholeWithCommas}.${decimal}`;
@@ -29,13 +31,15 @@ export function formatCurrencyInput(
 
 export function parseCurrencyInput(
   value: string,
-  currency: "USD" | "EUR" = getUiFormatSettings().currency
+  currency: "USD" | "EUR" | "JPY" = getUiFormatSettings().currency
 ): number {
   const parsed = parseFloat(
     value
       .replace(/[$,]/g, "")
       .replace(/EUR\s?/gi, "")
+      .replace(/JPY\s?/gi, "")
       .replace(/€/g, "")
+      .replace(/¥/g, "")
   );
   if (!Number.isFinite(parsed)) return Number.NaN;
   if (currency === "USD") return parsed;
@@ -44,12 +48,13 @@ export function parseCurrencyInput(
 
 export function formatCurrencyFromNumber(
   value: number,
-  currency: "USD" | "EUR" = getUiFormatSettings().currency
+  currency: "USD" | "EUR" | "JPY" = getUiFormatSettings().currency
 ): string {
   const displayValue = currency === "USD" ? value : usdToDisplayAmount(value);
   const prefix = getCurrencySymbol(currency);
+  const decimalDigits = currency === "JPY" ? 0 : 2;
   return `${prefix}${displayValue.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: decimalDigits,
+    maximumFractionDigits: decimalDigits,
   })}`;
 }

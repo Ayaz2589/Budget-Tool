@@ -738,7 +738,11 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           if (Array.isArray(expanded.owners)) {
             budget.setOwners(expanded.owners);
           }
-          if (expanded.displayCurrency === "USD" || expanded.displayCurrency === "EUR") {
+          if (
+            expanded.displayCurrency === "USD" ||
+            expanded.displayCurrency === "EUR" ||
+            expanded.displayCurrency === "JPY"
+          ) {
             budget.setUiFormatSettings({
               ...budget.uiFormatSettings,
               currency: expanded.displayCurrency,

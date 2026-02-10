@@ -1,6 +1,6 @@
 export interface UiFormatSettings {
   locale: string;
-  currency: "USD" | "EUR";
+  currency: "USD" | "EUR" | "JPY";
   baseCurrency: "USD";
   fxRate: number;
   fxAsOf?: string;
@@ -19,8 +19,13 @@ const DEFAULT_UI_FORMAT: UiFormatSettings = {
 let uiFormatSettings: UiFormatSettings = { ...DEFAULT_UI_FORMAT };
 
 export function setUiFormatSettings(settings: UiFormatSettings): void {
-  const currency = settings.currency === "EUR" ? "EUR" : "USD";
-  const locale = currency === "EUR" ? "de-DE" : "en-US";
+  const currency =
+    settings.currency === "EUR"
+      ? "EUR"
+      : settings.currency === "JPY"
+      ? "JPY"
+      : "USD";
+  const locale = currency === "EUR" ? "de-DE" : currency === "JPY" ? "ja-JP" : "en-US";
   const fxRate =
     Number.isFinite(settings.fxRate) && settings.fxRate > 0
       ? settings.fxRate
@@ -51,8 +56,8 @@ export function usdToDisplayAmount(usdAmount: number): number {
   return usdAmount * uiFormatSettings.fxRate;
 }
 
-function getCurrencySymbol(currency: "USD" | "EUR"): string {
-  return currency === "EUR" ? "€" : "$";
+function getCurrencySymbol(currency: "USD" | "EUR" | "JPY"): string {
+  return currency === "EUR" ? "€" : currency === "JPY" ? "¥" : "$";
 }
 
 export function displayToUsdAmount(displayAmount: number): number {
@@ -68,17 +73,19 @@ export function formatCurrency(n: number): string {
   const displayAmount = usdToDisplayAmount(n);
   try {
     const abs = Math.abs(displayAmount);
+    const decimalDigits = uiFormatSettings.currency === "JPY" ? 0 : 2;
     const formatted = new Intl.NumberFormat(uiFormatSettings.locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: decimalDigits,
+      maximumFractionDigits: decimalDigits,
     }).format(abs);
     const sign = displayAmount < 0 ? "-" : "";
     return `${sign}${getCurrencySymbol(uiFormatSettings.currency)}${formatted}`;
   } catch {
     const abs = Math.abs(n);
+    const decimalDigits = DEFAULT_UI_FORMAT.currency === "JPY" ? 0 : 2;
     const formatted = new Intl.NumberFormat(DEFAULT_UI_FORMAT.locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: decimalDigits,
+      maximumFractionDigits: decimalDigits,
     }).format(abs);
     const sign = n < 0 ? "-" : "";
     return `${sign}${getCurrencySymbol(DEFAULT_UI_FORMAT.currency)}${formatted}`;

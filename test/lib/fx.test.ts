@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
-import { getUsdToEurRate } from "@/lib/fx";
+import { getUsdFxRate } from "@/lib/fx";
 
 const originalFetch = globalThis.fetch;
 
@@ -18,12 +18,12 @@ describe("fx", () => {
       ) as unknown as Response;
     }) as typeof fetch;
 
-    const first = await getUsdToEurRate();
+    const first = await getUsdFxRate("EUR");
     expect(first.rate).toBe(0.92);
     expect(first.asOf).toBe("2026-02-10");
     expect(first.fallback).toBe(false);
 
-    const second = await getUsdToEurRate();
+    const second = await getUsdFxRate("EUR");
     expect(second.rate).toBe(0.92);
     expect(second.fallback).toBe(false);
   });
@@ -37,9 +37,27 @@ describe("fx", () => {
       return new Response("fail", { status: 500 }) as unknown as Response;
     }) as typeof fetch;
 
-    const fx = await getUsdToEurRate();
+    const fx = await getUsdFxRate("EUR");
     expect(fx.rate).toBe(0.9);
     expect(fx.fallback).toBe(true);
   });
-});
 
+  test("returns USD rate without fetch", async () => {
+    const fx = await getUsdFxRate("USD");
+    expect(fx.rate).toBe(1);
+    expect(fx.fallback).toBe(false);
+  });
+
+  test("fetches and caches JPY rate", async () => {
+    globalThis.fetch = mock(async () => {
+      return new Response(
+        JSON.stringify({ rates: { JPY: 150.12 }, date: "2026-02-10" }),
+        { status: 200 }
+      ) as unknown as Response;
+    }) as typeof fetch;
+
+    const fx = await getUsdFxRate("JPY");
+    expect(fx.rate).toBe(150.12);
+    expect(fx.fallback).toBe(false);
+  });
+});

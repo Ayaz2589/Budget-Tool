@@ -42,6 +42,7 @@ const DATE_FORMAT_OPTIONS = [
 const CURRENCY_OPTIONS = [
   { value: "USD", label: "$ USD" },
   { value: "EUR", label: "€ EUR" },
+  { value: "JPY", label: "¥ JPY" },
 ] as const;
 
 export function SettingsPage() {
@@ -254,7 +255,7 @@ export function SettingsPage() {
             <Label>Display currency</Label>
             <Select
               value={uiFormatSettings.currency}
-              onValueChange={(currency: "USD" | "EUR") =>
+              onValueChange={(currency: "USD" | "EUR" | "JPY") =>
                 setUiFormatSettings({ ...uiFormatSettings, currency })
               }
             >
@@ -270,7 +271,7 @@ export function SettingsPage() {
               </SelectContent>
             </Select>
           </div>
-          {uiFormatSettings.currency === "EUR" && (
+          {uiFormatSettings.currency !== "USD" && (
             <p className="text-xs text-muted-foreground">
               FX as of {uiFormatSettings.fxAsOf || "—"}
               {uiFormatSettings.fxFallback ? " (fallback)" : ""}

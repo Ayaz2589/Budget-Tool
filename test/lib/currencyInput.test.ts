@@ -1,10 +1,14 @@
-import { test, expect } from "bun:test";
+import { beforeEach, test, expect } from "bun:test";
 import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
   parseCurrencyInput,
 } from "@/lib/currencyInput";
 import { getDefaultUiFormatSettings, setUiFormatSettings } from "@/lib/format";
+
+beforeEach(() => {
+  setUiFormatSettings(getDefaultUiFormatSettings());
+});
 
 test("formatCurrencyInput strips non-numeric chars and formats with $", () => {
   expect(formatCurrencyInput("abc1234")).toBe("$1,234");
@@ -39,5 +43,18 @@ test("EUR input parses back to canonical USD", () => {
   });
   expect(formatCurrencyInput("1234", "EUR")).toBe("€1,234");
   expect(parseCurrencyInput("€50.00", "EUR")).toBe(100);
+  setUiFormatSettings(getDefaultUiFormatSettings());
+});
+
+test("JPY input uses whole units and parses back to canonical USD", () => {
+  setUiFormatSettings({
+    ...getDefaultUiFormatSettings(),
+    currency: "JPY",
+    baseCurrency: "USD",
+    fxRate: 150,
+  });
+  expect(formatCurrencyInput("1234.56", "JPY")).toBe("¥1,234");
+  expect(parseCurrencyInput("¥300", "JPY")).toBe(2);
+  expect(formatCurrencyFromNumber(2, "JPY")).toBe("¥300");
   setUiFormatSettings(getDefaultUiFormatSettings());
 });

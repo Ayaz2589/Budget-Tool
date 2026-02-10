@@ -1,8 +1,7 @@
-const FX_CACHE_KEY = "budget-tool-fx-usd-eur";
 const FX_TTL_MS = 12 * 60 * 60 * 1000;
 const FALLBACK_RATE = 1;
 
-let inFlight: Promise<{ rate: number; asOf: string; fallback: boolean }> | null = null;
+type SupportedCurrency = "USD" | "EUR" | "JPY";
 
 type CachedFx = {
   rate: number;
@@ -10,9 +9,18 @@ type CachedFx = {
   fetchedAt: number;
 };
 
-function readCache(): CachedFx | null {
+const inFlight = new Map<
+  SupportedCurrency,
+  Promise<{ rate: number; asOf: string; fallback: boolean }>
+>();
+
+function getCacheKey(currency: SupportedCurrency): string {
+  return `budget-tool-fx-usd-${currency.toLowerCase()}`;
+}
+
+function readCache(currency: SupportedCurrency): CachedFx | null {
   try {
-    const raw = localStorage.getItem(FX_CACHE_KEY);
+    const raw = localStorage.getItem(getCacheKey(currency));
     if (!raw) return null;
     const data = JSON.parse(raw) as Partial<CachedFx>;
     if (
@@ -32,16 +40,16 @@ function readCache(): CachedFx | null {
   }
 }
 
-function writeCache(cache: CachedFx): void {
+function writeCache(currency: SupportedCurrency, cache: CachedFx): void {
   try {
-    localStorage.setItem(FX_CACHE_KEY, JSON.stringify(cache));
+    localStorage.setItem(getCacheKey(currency), JSON.stringify(cache));
   } catch {
     // ignore
   }
 }
 
-async function fetchUsdToEurRate(): Promise<CachedFx> {
-  const primaryUrl = "https://api.frankfurter.app/latest?from=USD&to=EUR";
+async function fetchUsdRate(currency: "EUR" | "JPY"): Promise<CachedFx> {
+  const primaryUrl = `https://api.frankfurter.app/latest?from=USD&to=${currency}`;
   const fallbackUrl = "https://open.er-api.com/v6/latest/USD";
 
   const tryParse = async (url: string): Promise<CachedFx> => {
@@ -51,13 +59,13 @@ async function fetchUsdToEurRate(): Promise<CachedFx> {
       throw new Error(`FX fetch failed: ${res.status} ${body}`);
     }
     const data = (await res.json()) as {
-      rates?: { EUR?: number };
+      rates?: Record<string, number | undefined>;
       date?: string;
       time_last_update_utc?: string;
     };
-    const rate = Number(data.rates?.EUR);
+    const rate = Number(data.rates?.[currency]);
     if (!Number.isFinite(rate) || rate <= 0) {
-      throw new Error("FX fetch failed: invalid EUR rate");
+      throw new Error(`FX fetch failed: invalid ${currency} rate`);
     }
     return {
       rate,
@@ -73,23 +81,28 @@ async function fetchUsdToEurRate(): Promise<CachedFx> {
   }
 }
 
-export async function getUsdToEurRate(): Promise<{
+export async function getUsdFxRate(currency: SupportedCurrency): Promise<{
   rate: number;
   asOf: string;
   fallback: boolean;
 }> {
-  const cached = readCache();
+  if (currency === "USD") {
+    return { rate: 1, asOf: new Date().toISOString(), fallback: false };
+  }
+
+  const cached = readCache(currency);
   const now = Date.now();
   if (cached && now - cached.fetchedAt <= FX_TTL_MS) {
     return { rate: cached.rate, asOf: cached.asOf, fallback: false };
   }
 
-  if (inFlight) return inFlight;
+  const active = inFlight.get(currency);
+  if (active) return active;
 
-  inFlight = (async () => {
+  const task = (async () => {
     try {
-      const fresh = await fetchUsdToEurRate();
-      writeCache(fresh);
+      const fresh = await fetchUsdRate(currency);
+      writeCache(currency, fresh);
       return { rate: fresh.rate, asOf: fresh.asOf, fallback: false };
     } catch {
       if (cached) {
@@ -101,9 +114,10 @@ export async function getUsdToEurRate(): Promise<{
         fallback: true,
       };
     } finally {
-      inFlight = null;
+      inFlight.delete(currency);
     }
   })();
 
-  return inFlight;
+  inFlight.set(currency, task);
+  return task;
 }

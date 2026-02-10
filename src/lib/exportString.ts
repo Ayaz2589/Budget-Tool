@@ -23,7 +23,7 @@ export function buildExportString(
   owners: string[] = [],
   cardSources: string[] = [],
   ownerTransfers: OwnerTransfer[] = [],
-  displayCurrency: "USD" | "EUR" = "USD",
+  displayCurrency: "USD" | "EUR" | "JPY" = "USD",
   baseCurrency: "USD" = "USD",
   fxAsOf?: string,
 ): string {

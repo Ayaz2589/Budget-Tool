@@ -19,7 +19,7 @@ export interface ParsedExportedPdf {
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
   owners?: string[];
   cardSources?: string[];
-  displayCurrency?: "USD" | "EUR";
+  displayCurrency?: "USD" | "EUR" | "JPY";
   baseCurrency?: "USD";
   fxAsOf?: string;
 }

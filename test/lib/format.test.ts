@@ -1,10 +1,14 @@
-import { test, expect } from "bun:test";
+import { beforeEach, test, expect } from "bun:test";
 import {
   formatCurrency,
   formatPercent,
   getDefaultUiFormatSettings,
   setUiFormatSettings,
 } from "@/lib/format";
+
+beforeEach(() => {
+  setUiFormatSettings(getDefaultUiFormatSettings());
+});
 
 test("formatCurrency formats USD", () => {
   expect(formatCurrency(0)).toBe("$0.00");
@@ -27,5 +31,16 @@ test("formatCurrency formats EUR from canonical USD using fx rate", () => {
     fxRate: 0.5,
   });
   expect(formatCurrency(100)).toContain("50");
+  setUiFormatSettings(getDefaultUiFormatSettings());
+});
+
+test("formatCurrency formats JPY from canonical USD using fx rate", () => {
+  setUiFormatSettings({
+    ...getDefaultUiFormatSettings(),
+    currency: "JPY",
+    baseCurrency: "USD",
+    fxRate: 150,
+  });
+  expect(formatCurrency(2)).toBe("¥300");
   setUiFormatSettings(getDefaultUiFormatSettings());
 });

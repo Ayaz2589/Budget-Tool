@@ -10,14 +10,18 @@ export function MortgagePaymentsList({
   onPaymentTap,
 }: MortgagePaymentsListProps) {
   return (
-    <div className="space-y-0">
+    <div className="space-y-3 px-3 pb-2">
       {payments.map((e, index) => (
-        <div key={e.id} className="border-t border-border">
+        <section
+          key={e.id}
+          className={cn(
+            "rounded-2xl border border-border shadow-sm overflow-hidden",
+            index % 2 === 1 ? "bg-muted/20" : "bg-card",
+          )}
+        >
           <DsDataRow
             dense
-            className={cn(
-              index % 2 === 1 ? "bg-muted/30" : "bg-background"
-            )}
+            className={cn("!border-t-0")}
             onClick={() => onPaymentTap(e)}
             ariaLabel={`${formatDate(e.date)}, ${formatCurrency(e.amount)}`}
             title={formatDate(e.date)}
@@ -28,7 +32,7 @@ export function MortgagePaymentsList({
               </span>
             }
           />
-        </div>
+        </section>
       ))}
     </div>
   );

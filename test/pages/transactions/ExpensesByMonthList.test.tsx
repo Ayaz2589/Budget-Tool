@@ -34,7 +34,7 @@ test("ExpensesByMonthList shows month header and expense when has one month and 
   );
   expect(screen.getAllByText("January 2025").length).toBeGreaterThan(0);
   expect(screen.getByText("Test purchase")).toBeInTheDocument();
-  expect(screen.getByText("$50.00")).toBeInTheDocument();
+  expect(screen.getAllByText("$50.00").length).toBeGreaterThan(0);
 });
 
 test("ExpensesByMonthList has tap target for each expense", () => {

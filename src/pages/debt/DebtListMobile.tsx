@@ -14,18 +14,19 @@ export function DebtListMobile({
 }: DebtListMobileProps) {
   const { t } = useTranslation();
   return (
-    <div className="space-y-0">
-      {debts.map((debt, index) => {
+    <div className="space-y-3 px-3 pb-2">
+      {debts.map((debt) => {
         const payments = paymentsByDebt.get(debt.id) ?? [];
         const balance = getDebtBalance(debt, payments);
         return (
-          <div key={debt.id} className="border-t border-border">
+          <section
+            key={debt.id}
+            className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden"
+          >
             <DsDataRow
               dense
               onClick={() => onDebtTap(debt)}
-              className={cn(
-                index % 2 === 1 ? "bg-muted/30" : "bg-background"
-              )}
+              className={cn("!border-t-0")}
               ariaLabel={`${debt.name}, ${formatCurrency(balance)}, ${
                 debt.owner || t("common.noOwner")
               }`}
@@ -46,7 +47,7 @@ export function DebtListMobile({
                 </div>
               }
             />
-          </div>
+          </section>
         );
       })}
     </div>

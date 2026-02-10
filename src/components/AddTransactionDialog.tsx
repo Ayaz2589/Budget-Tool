@@ -324,7 +324,7 @@ export function AddTransactionDialog({
       <SheetContent
         side={sheetSide}
        
-        className="flex flex-col h-full w-[90vw] max-w-md border-l p-0 gap-0 overflow-hidden rounded-l-2xl md:w-[720px] md:max-w-[720px]"
+        className="flex flex-col h-full w-[85vw] max-w-sm border-l p-0 gap-0 overflow-hidden rounded-l-2xl"
         onOpenAutoFocus={(event) => event.preventDefault()}
       >
         <DsSheetHeader

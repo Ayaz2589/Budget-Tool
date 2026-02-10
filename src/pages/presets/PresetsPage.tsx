@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import type { ExpenseSource, PresetTransaction } from "@/types/core";
@@ -425,40 +425,52 @@ export function PresetsPage() {
                 </Table>
               </div>
               <div className="md:hidden">
-                <div className="space-y-4">
+                <div className="space-y-3 px-3 pb-2">
                   {groupedPresets.map(([categoryName, presets]) => {
                     const isOpen = openCategory === categoryName;
+                    const categoryTotal = presets.reduce(
+                      (sum, preset) => sum + (typeof preset.amount === "number" ? preset.amount : 0),
+                      0,
+                    );
                     return (
-                      <div key={categoryName} className="border-t border-border">
+                      <section
+                        key={categoryName}
+                        className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden"
+                      >
                         <button
                           type="button"
                           onClick={() =>
                             setOpenCategory(isOpen ? "" : categoryName)
                           }
-                          className="sticky top-0 z-10 w-full px-4 py-3 flex items-center justify-between text-left text-sm font-medium bg-background/90 backdrop-blur border-b border-border/60"
+                          className="w-full px-4 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-muted/30 transition-colors cursor-pointer"
                           aria-expanded={isOpen}
                         >
-                          <span className="flex items-center gap-2">
-                            <span>{categoryName}</span>
-                            <span className="text-muted-foreground font-normal">
-                              ({presets.length === 1
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold leading-none">
+                              {categoryName}
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              {presets.length === 1
                                 ? t("transactions.transaction_one", { count: 1 })
                                 : t("transactions.transaction_other", {
                                     count: presets.length,
-                                  })})
+                                  })}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-sm font-semibold tabular-nums">
+                              {formatCurrencyFromNumber(categoryTotal)}
                             </span>
-                          </span>
-                          <span
-                            className={cn(
-                              "transition-transform text-muted-foreground",
-                              isOpen ? "rotate-180" : "rotate-0"
-                            )}
-                          >
-                            ▼
-                          </span>
+                            <ChevronDown
+                              className={cn(
+                                "size-4 text-muted-foreground transition-transform",
+                                isOpen ? "rotate-180" : "rotate-0"
+                              )}
+                            />
+                          </div>
                         </button>
                         {isOpen && (
-                          <div className="divide-y">
+                          <div className="divide-y divide-border/70 border-t border-border/70">
                             {presets.map((preset, index) => {
                               const amountLabel =
                                 typeof preset.amount === "number"
@@ -467,15 +479,16 @@ export function PresetsPage() {
                               return (
                                 <div
                                   key={preset.id}
-                                  className={cn(index % 2 === 1 ? "bg-muted/30" : "bg-background")}
+                                  className={cn(index % 2 === 1 ? "bg-muted/20" : "bg-card")}
                                 >
                                   <DsDataRow
+                                    dense
                                     onClick={() => setPresetForActions(preset)}
                                     title={preset.description || "—"}
                                     subtitle={`${preset.owner || t("common.noOwner")} · ${preset.category || t("common.uncategorized")}`}
                                     trailing={
                                       <div className="flex items-center gap-2 shrink-0">
-                                        <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                                        <span className="inline-flex items-center justify-center rounded-md bg-[var(--surface-2)] text-[10px] px-2 py-0.5 text-muted-foreground">
                                           {getSourceBadge(preset.source)}
                                         </span>
                                         {amountLabel ? (
@@ -489,7 +502,7 @@ export function PresetsPage() {
                             })}
                           </div>
                         )}
-                      </div>
+                      </section>
                     );
                   })}
                 </div>

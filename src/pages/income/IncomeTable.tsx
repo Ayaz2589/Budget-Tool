@@ -42,18 +42,25 @@ export function IncomeTable({
         byMonth.map(([monthKey, monthIncome]) => (
           <AccordionItem key={monthKey} value={monthKey} className="border-0">
             <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
-              <span className="flex items-center gap-2">
-                <span className="font-semibold">{getMonthLabel(monthKey)}</span>
-                <span className="text-muted-foreground font-normal">
-                  (
-                  {monthIncome.length === 1
-                    ? t("transactions.transaction_one", { count: 1 })
-                    : t("transactions.transaction_other", {
-                        count: monthIncome.length,
-                      })}
-                  )
+              <div className="flex w-full items-center justify-between gap-3">
+                <span className="flex items-center gap-2">
+                  <span className="font-semibold">{getMonthLabel(monthKey)}</span>
+                  <span className="text-muted-foreground font-normal">
+                    (
+                    {monthIncome.length === 1
+                      ? t("transactions.transaction_one", { count: 1 })
+                      : t("transactions.transaction_other", {
+                          count: monthIncome.length,
+                        })}
+                    )
+                  </span>
                 </span>
-              </span>
+                <span className="text-sm font-semibold tabular-nums">
+                  {formatCurrency(
+                    monthIncome.reduce((sum, row) => sum + row.amount, 0),
+                  )}
+                </span>
+              </div>
             </AccordionTrigger>
             <AccordionContent className="px-0 pb-0">
               <Table density="comfortable">

@@ -43,6 +43,7 @@ export function TransactionsPage() {
   const [searchFilter, setSearchFilter] = useState<string>("");
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<"all" | "expense" | "transfer">("all");
+  const [includeOwnerTransfersInTotals, setIncludeOwnerTransfersInTotals] = useState(true);
   const [sortBy, setSortBy] = useState<SortColumn>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
@@ -327,6 +328,8 @@ export function TransactionsPage() {
               onOwnerFilterChange={setOwnerFilter}
               typeFilter={typeFilter}
               onTypeFilterChange={setTypeFilter}
+              includeOwnerTransfersInTotals={includeOwnerTransfersInTotals}
+              onIncludeOwnerTransfersInTotalsChange={setIncludeOwnerTransfersInTotals}
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
               expenseCategories={expenseCategories}
@@ -350,6 +353,7 @@ export function TransactionsPage() {
                     <ExpensesByMonthTable
                       byMonth={byMonth}
                       defaultOpenMonth={defaultOpenMonth}
+                      includeOwnerTransfersInTotals={includeOwnerTransfersInTotals}
                       sortBy={sortBy}
                       sortDir={sortDir}
                       onSort={toggleSort}

@@ -41,6 +41,7 @@ export type SortColumn =
 export interface ExpensesByMonthTableProps {
   byMonth: [string, TransactionLedgerRow[]][];
   defaultOpenMonth: string;
+  includeOwnerTransfersInTotals?: boolean;
   sortBy: SortColumn;
   sortDir: "asc" | "desc";
   onSort: (col: SortColumn) => void;
@@ -69,6 +70,8 @@ export interface FiltersAndActionsDialogProps {
   onOwnerFilterChange: (value: string) => void;
   typeFilter: "all" | "expense" | "transfer";
   onTypeFilterChange: (value: "all" | "expense" | "transfer") => void;
+  includeOwnerTransfersInTotals: boolean;
+  onIncludeOwnerTransfersInTotalsChange: (value: boolean) => void;
   searchFilter: string;
   onSearchFilterChange: (value: string) => void;
   expenseCategories: string[];

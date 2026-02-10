@@ -5,6 +5,7 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -33,6 +34,8 @@ export function FiltersAndActionsDialog({
   onOwnerFilterChange,
   typeFilter,
   onTypeFilterChange,
+  includeOwnerTransfersInTotals,
+  onIncludeOwnerTransfersInTotalsChange,
   searchFilter,
   onSearchFilterChange,
   expenseCategories,
@@ -180,6 +183,20 @@ export function FiltersAndActionsDialog({
                     <SelectItem value="transfer">{t("transactions.typeTransfer")}</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">
+                  Totals
+                </Label>
+                <label className="flex items-center gap-2 rounded-[var(--radius-control)] border border-[var(--control-border)] bg-[var(--field-surface)] px-3 py-2 min-h-[44px] text-sm">
+                  <Checkbox
+                    checked={includeOwnerTransfersInTotals}
+                    onCheckedChange={(checked) =>
+                      onIncludeOwnerTransfersInTotalsChange(checked === true)
+                    }
+                  />
+                  <span>Include owner transfers in totals</span>
+                </label>
               </div>
               <div className="space-y-2">
                 <Label className="text-muted-foreground">

@@ -23,6 +23,9 @@ export function buildExportString(
   owners: string[] = [],
   cardSources: string[] = [],
   ownerTransfers: OwnerTransfer[] = [],
+  displayCurrency: "USD" | "EUR" = "USD",
+  baseCurrency: "USD" = "USD",
+  fxAsOf?: string,
 ): string {
   const blob = serializeToBlob({
     expenses,
@@ -35,6 +38,9 @@ export function buildExportString(
     incomeCategoriesWithColors,
     owners,
     cardSources,
+    displayCurrency,
+    baseCurrency,
+    fxAsOf,
   });
   return `${DATA_START_MARKER}\n${blob}\n${DATA_END_MARKER}`;
 }

@@ -4,6 +4,7 @@ import {
   formatCurrencyInput,
   parseCurrencyInput,
 } from "@/lib/currencyInput";
+import { getDefaultUiFormatSettings, setUiFormatSettings } from "@/lib/format";
 
 test("formatCurrencyInput strips non-numeric chars and formats with $", () => {
   expect(formatCurrencyInput("abc1234")).toBe("$1,234");
@@ -27,4 +28,16 @@ test("parseCurrencyInput returns NaN for invalid strings", () => {
 
 test("formatCurrencyFromNumber formats with two decimals", () => {
   expect(formatCurrencyFromNumber(1200)).toBe("$1,200.00");
+});
+
+test("EUR input parses back to canonical USD", () => {
+  setUiFormatSettings({
+    ...getDefaultUiFormatSettings(),
+    currency: "EUR",
+    baseCurrency: "USD",
+    fxRate: 0.5,
+  });
+  expect(formatCurrencyInput("1234", "EUR")).toBe("€1,234");
+  expect(parseCurrencyInput("€50.00", "EUR")).toBe(100);
+  setUiFormatSettings(getDefaultUiFormatSettings());
 });

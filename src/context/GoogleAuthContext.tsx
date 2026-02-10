@@ -458,6 +458,9 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       owners: budget.owners,
       cardSources: budget.cardSources,
       iOweNova: budget.iOweNova,
+      displayCurrency: budget.uiFormatSettings.currency,
+      baseCurrency: "USD" as const,
+      fxAsOf: budget.uiFormatSettings.fxAsOf,
     };
   }, [
     budget.expenses,
@@ -471,6 +474,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.owners,
     budget.cardSources,
     budget.iOweNova,
+    budget.uiFormatSettings.currency,
+    budget.uiFormatSettings.fxAsOf,
   ]);
 
   const runSync = useCallback(async () => {
@@ -518,6 +523,9 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         incomeCategoriesWithColors: snapshot.incomeCategoriesWithColors,
         owners: snapshot.owners,
         cardSources: snapshot.cardSources,
+        displayCurrency: snapshot.displayCurrency,
+        baseCurrency: snapshot.baseCurrency,
+        fxAsOf: snapshot.fxAsOf,
       });
       const months = computeAllTotals({
         expenses: snapshot.expenses,
@@ -729,6 +737,15 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           }
           if (Array.isArray(expanded.owners)) {
             budget.setOwners(expanded.owners);
+          }
+          if (expanded.displayCurrency === "USD" || expanded.displayCurrency === "EUR") {
+            budget.setUiFormatSettings({
+              ...budget.uiFormatSettings,
+              currency: expanded.displayCurrency,
+              baseCurrency: "USD",
+              fxRate: budget.uiFormatSettings.fxRate,
+              fxAsOf: expanded.fxAsOf ?? budget.uiFormatSettings.fxAsOf,
+            });
           }
         } catch {
           const [

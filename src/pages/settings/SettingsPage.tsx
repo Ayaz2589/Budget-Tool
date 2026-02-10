@@ -39,6 +39,10 @@ const DATE_FORMAT_OPTIONS = [
   { value: "YYYY/MM/DD", label: "YYYY/MM/DD" },
   { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
 ] as const;
+const CURRENCY_OPTIONS = [
+  { value: "USD", label: "$ USD" },
+  { value: "EUR", label: "€ EUR" },
+] as const;
 
 export function SettingsPage() {
   const {
@@ -239,6 +243,39 @@ export function SettingsPage() {
               </SelectContent>
             </Select>
           </div>
+
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold">Currency</h3>
+            <p className="text-xs text-muted-foreground">
+              All amounts are stored in USD (canonical). Display conversion uses the latest cached rate.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label>Display currency</Label>
+            <Select
+              value={uiFormatSettings.currency}
+              onValueChange={(currency: "USD" | "EUR") =>
+                setUiFormatSettings({ ...uiFormatSettings, currency })
+              }
+            >
+              <SelectTrigger className="h-11 w-full data-[size=default]:h-11 bg-background/60">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCY_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {uiFormatSettings.currency === "EUR" && (
+            <p className="text-xs text-muted-foreground">
+              FX as of {uiFormatSettings.fxAsOf || "—"}
+              {uiFormatSettings.fxFallback ? " (fallback)" : ""}
+            </p>
+          )}
 
           <div className="space-y-1">
             <h3 className="text-sm font-semibold">{t("settings.dateFormatTitle")}</h3>

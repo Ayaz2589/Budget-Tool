@@ -24,6 +24,9 @@ export interface MinifiedPayloadInput {
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
   owners?: string[];
   cardSources?: string[];
+  displayCurrency?: "USD" | "EUR";
+  baseCurrency?: "USD";
+  fxAsOf?: string;
 }
 
 export interface ExpandedPayload {
@@ -37,4 +40,7 @@ export interface ExpandedPayload {
   incomeCategoriesWithColors?: CategoryWithColorPayload[];
   owners?: string[];
   cardSources?: string[];
+  displayCurrency?: "USD" | "EUR";
+  baseCurrency?: "USD";
+  fxAsOf?: string;
 }

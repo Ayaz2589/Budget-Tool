@@ -19,6 +19,9 @@ export function buildExpandedPayload(
   owners: string[] = [],
   cardSources: string[] = [],
   ownerTransfers: OwnerTransfer[] = [],
+  displayCurrency: "USD" | "EUR" = "USD",
+  baseCurrency: "USD" = "USD",
+  fxAsOf?: string,
 ): ExpandedPayload {
   return {
     expenses,
@@ -31,6 +34,9 @@ export function buildExpandedPayload(
     incomeCategoriesWithColors,
     owners,
     cardSources,
+    displayCurrency,
+    baseCurrency,
+    fxAsOf,
   };
 }
 
@@ -71,5 +77,8 @@ export function parseBudgetJson(text: string): ExpandedPayload {
       : [],
     owners: Array.isArray(raw.owners) ? raw.owners : [],
     cardSources: Array.isArray(raw.cardSources) ? raw.cardSources : [],
+    displayCurrency: raw.displayCurrency === "EUR" ? "EUR" : "USD",
+    baseCurrency: "USD",
+    fxAsOf: typeof raw.fxAsOf === "string" ? raw.fxAsOf : undefined,
   };
 }

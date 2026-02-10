@@ -25,6 +25,7 @@ import {
   setUiFormatSettings as applyUiFormatSettings,
   type UiFormatSettings,
 } from "@/lib/format";
+import { getUsdToEurRate } from "@/lib/fx";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 import { buildDummyBudget, type DummyBudgetData } from "@/lib/dummyData";
@@ -53,11 +54,25 @@ function loadStoredUiFormatSettings(): UiFormatSettings {
     const raw = localStorage.getItem(UI_FORMAT_STORAGE_KEY);
     if (!raw) return fallback;
     const data = JSON.parse(raw) as Partial<UiFormatSettings>;
+    const currency = data.currency === "EUR" ? "EUR" : "USD";
     const dateFormat =
       data.dateFormat === "MM/DD/YYYY" || data.dateFormat === "YYYY/MM/DD"
         ? data.dateFormat
         : fallback.dateFormat;
-    return { ...fallback, dateFormat };
+    const fxRate =
+      Number.isFinite(data.fxRate) && Number(data.fxRate) > 0
+        ? Number(data.fxRate)
+        : fallback.fxRate;
+    return {
+      ...fallback,
+      currency,
+      baseCurrency: "USD",
+      fxRate: currency === "USD" ? 1 : fxRate,
+      fxAsOf: typeof data.fxAsOf === "string" ? data.fxAsOf : undefined,
+      fxFallback:
+        typeof data.fxFallback === "boolean" ? data.fxFallback : undefined,
+      dateFormat,
+    };
   } catch {
     return fallback;
   }
@@ -235,6 +250,33 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       // ignore
     }
   }, [uiFormatSettings]);
+
+  useEffect(() => {
+    if (uiFormatSettings.currency !== "EUR") return;
+    let cancelled = false;
+    getUsdToEurRate().then((fx) => {
+      if (cancelled) return;
+      setUiFormatSettingsState((prev) => {
+        if (
+          prev.currency !== "EUR" ||
+          (Math.abs(prev.fxRate - fx.rate) < 0.000001 &&
+            prev.fxAsOf === fx.asOf &&
+            prev.fxFallback === fx.fallback)
+        ) {
+          return prev;
+        }
+        return {
+          ...prev,
+          fxRate: fx.rate,
+          fxAsOf: fx.asOf,
+          fxFallback: fx.fallback,
+        };
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [uiFormatSettings.currency]);
 
   useEffect(() => {
     if (useDummyData) return;
@@ -843,7 +885,18 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   );
 
   const setUiFormatSettings = useCallback((settings: UiFormatSettings) => {
-    setUiFormatSettingsState(settings);
+    setUiFormatSettingsState((prev) => ({
+      ...prev,
+      ...settings,
+      baseCurrency: "USD",
+      fxRate:
+        settings.currency === "USD"
+          ? 1
+          : Number.isFinite(settings.fxRate) && settings.fxRate > 0
+          ? settings.fxRate
+          : prev.fxRate || 1,
+      currency: settings.currency === "EUR" ? "EUR" : "USD",
+    }));
   }, []);
 
   const repairCorruptedDates = useCallback(() => {

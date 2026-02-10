@@ -612,20 +612,22 @@ export function ImportPage() {
           />
         </div>
         <CardContent className="space-y-3 px-4 md:px-0">
-          <textarea
-            value={exportString}
-            onChange={(e) => setExportString(e.target.value)}
-            placeholder={t("import.exportStringPlaceholder")}
-            className="min-h-[120px] w-full rounded-md border border-input bg-[var(--field-surface)] px-3 py-2 text-sm shadow-[var(--field-shadow)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--focus-ring)]/45"
-          />
-          {exportStringError && (
-            <span className="text-sm text-destructive block">
-              {exportStringError}
-            </span>
-          )}
-          <Button onClick={handleExportStringImport} className="w-full md:w-auto">
-            {t("import.importExportString")}
-          </Button>
+          <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-3">
+            <textarea
+              value={exportString}
+              onChange={(e) => setExportString(e.target.value)}
+              placeholder={t("import.exportStringPlaceholder")}
+              className="min-h-[120px] w-full rounded-md border border-input bg-background/60 px-3 py-2 text-sm shadow-[var(--field-shadow)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--focus-ring)]/45"
+            />
+            {exportStringError && (
+              <span className="text-sm text-destructive block">
+                {exportStringError}
+              </span>
+            )}
+            <Button onClick={handleExportStringImport} className="h-11 w-full md:w-auto">
+              {t("import.importExportString")}
+            </Button>
+          </div>
         </CardContent>
       </Card>
       <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
@@ -638,24 +640,26 @@ export function ImportPage() {
           />
         </div>
         <CardContent className="space-y-3 px-4 md:px-0">
-          <input
-            ref={jsonInputRef}
-            type="file"
-            accept=".json"
-            className="hidden"
-            onChange={handleJsonFileChange}
-          />
-          <Button
-            onClick={() => jsonInputRef.current?.click()}
-            className="w-full md:w-auto"
-          >
-            {t("import.importJson")}
-          </Button>
-          {jsonImportError && (
-            <span className="text-sm text-destructive block">
-              {jsonImportError}
-            </span>
-          )}
+          <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-3">
+            <input
+              ref={jsonInputRef}
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={handleJsonFileChange}
+            />
+            <Button
+              onClick={() => jsonInputRef.current?.click()}
+              className="h-11 w-full md:w-auto"
+            >
+              {t("import.importJson")}
+            </Button>
+            {jsonImportError && (
+              <span className="text-sm text-destructive block">
+                {jsonImportError}
+              </span>
+            )}
+          </div>
         </CardContent>
       </Card>
       <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
@@ -667,28 +671,30 @@ export function ImportPage() {
             subtitleClassName="text-xs md:text-sm"
           />
         </div>
-        <CardContent className="flex flex-col md:flex-row gap-2 px-4 md:px-0">
-          <Button
-            variant="outline"
-            onClick={handleDownloadPdf}
-            className="w-full md:w-auto"
-          >
-            {t("import.downloadPdf")}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleDownloadJson}
-            className="w-full md:w-auto"
-          >
-            {t("import.downloadJson")}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleDownloadExportString}
-            className="w-full md:w-auto"
-          >
-            {t("import.downloadExportString")}
-          </Button>
+        <CardContent className="px-4 md:px-0">
+          <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 flex flex-col md:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={handleDownloadPdf}
+              className="h-11 w-full md:w-auto"
+            >
+              {t("import.downloadPdf")}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleDownloadJson}
+              className="h-11 w-full md:w-auto"
+            >
+              {t("import.downloadJson")}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleDownloadExportString}
+              className="h-11 w-full md:w-auto"
+            >
+              {t("import.downloadExportString")}
+            </Button>
+          </div>
         </CardContent>
       </Card>
       {hasPreview && (
@@ -708,10 +714,12 @@ export function ImportPage() {
       {!hasPreview && !importError && !jsonImportError && !exportStringError ? (
         <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
           <CardContent className="px-0">
-            <DsEmptyState
-              title={t("import.previewTitle")}
-              description={t("import.emptyStateDescription")}
-            />
+            <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5">
+              <DsEmptyState
+                title={t("import.previewTitle")}
+                description={t("import.emptyStateDescription")}
+              />
+            </div>
           </CardContent>
         </Card>
       ) : null}

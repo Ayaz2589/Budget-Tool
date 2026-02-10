@@ -3,19 +3,8 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
 import { DsSectionHeader } from "@/components/ds";
-
-function PdfExportIcon({
-  className = "",
-  size = 40,
-}: {
-  className?: string;
-  size?: number;
-}) {
-  return <FileText size={size} className={className} />;
-}
-import { AmexPlatinumCardIcon, MasterCardIcon, ChaseCardIcon } from "@/components/cards";
+import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
 import { cn } from "@/lib/utils";
 import type { SourceChoice, ImportSourceCardProps } from "@/types/import";
 
@@ -47,27 +36,27 @@ export function ImportSourceCard({
     {
       value: "amex",
       label: t("import.amexCard"),
-      icon: AmexPlatinumCardIcon,
+      badge: EXPENSE_SOURCE_BADGE_LABELS.amex,
     },
     {
       value: "apple",
       label: t("import.appleCard"),
-      icon: MasterCardIcon,
+      badge: EXPENSE_SOURCE_BADGE_LABELS.apple,
     },
     {
       value: "chase",
       label: t("import.chaseCard"),
-      icon: ChaseCardIcon,
+      badge: EXPENSE_SOURCE_BADGE_LABELS.chase,
     },
     {
       value: "pdf-export",
       label: t("import.exportedPdf"),
-      icon: PdfExportIcon,
+      badge: "PDF",
     },
   ] satisfies {
     value: SourceChoice;
     label: string;
-    icon: React.ComponentType<{ className?: string; size?: number }>;
+    badge: string;
   }[];
 
   const filteredSourceOptions = sourceOptions.filter((opt) => {
@@ -112,8 +101,6 @@ export function ImportSourceCard({
         <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {filteredSourceOptions.map((opt) => {
-              const Icon = opt.icon;
-              const isPdfOpt = opt.value === "pdf-export";
               return (
                 <button
                   key={opt.value}
@@ -134,13 +121,10 @@ export function ImportSourceCard({
                       : "border-border hover:border-muted-foreground/30"
                   )}
                 >
-                  <div className="flex items-center justify-center size-12 shrink-0 text-foreground">
-                    <Icon
-                      size={isPdfOpt ? 32 : 48}
-                      className={isPdfOpt ? "text-muted-foreground" : ""}
-                    />
-                  </div>
-                  <span className="text-xs font-medium text-center leading-tight">
+                  <span className="inline-flex items-center justify-center rounded-md bg-muted text-[11px] px-2.5 py-1 text-muted-foreground">
+                    {opt.badge}
+                  </span>
+                  <span className="text-xs font-medium text-center leading-tight min-h-[2rem] flex items-center">
                     {opt.label}
                   </span>
                 </button>

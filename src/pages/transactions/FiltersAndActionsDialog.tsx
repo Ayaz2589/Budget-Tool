@@ -12,11 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SourceIcon } from "@/components/cards";
 import { CategoryOption } from "@/lib/categoryColors";
 import type { ExpenseSource } from "@/types/core";
 import type { FiltersAndActionsDialogProps } from "@/types/transactions";
-import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
+import { EXPENSE_SOURCE_BADGE_LABELS, SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { FiltersAndActionsDialogProps };
@@ -106,7 +105,9 @@ export function FiltersAndActionsDialog({
                     {cardSources.map((s) => (
                       <SelectItem key={s} value={s}>
                         <span className="flex items-center gap-2">
-                          <SourceIcon source={s as ExpenseSource} size={18} />
+                          <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                            {EXPENSE_SOURCE_BADGE_LABELS[s as ExpenseSource]}
+                          </span>
                           {t(SOURCE_LABEL_KEYS[s as ExpenseSource])}
                         </span>
                       </SelectItem>

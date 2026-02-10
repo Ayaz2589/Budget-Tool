@@ -481,18 +481,20 @@ export function Dashboard() {
 
           <DsChartCard title={t("dashboard.chartNetCashFlowTrend")} className="min-w-0">
             {range === "current" ? (
-              <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-3">
-                <p className="text-xs text-muted-foreground">{t("dashboard.chartCurrentMonthNetCashFlow")}</p>
+              <div className="rounded-2xl border border-border bg-card px-4 py-4 md:px-5 md:py-5">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground/90">
+                  {t("dashboard.chartCurrentMonthNetCashFlow")}
+                </p>
                 <p
                   className={
                     (netCashFlowRows[0]?.netCashFlow ?? 0) >= 0
-                      ? "mt-1 text-2xl font-semibold text-green-400"
-                      : "mt-1 text-2xl font-semibold text-destructive"
+                      ? "mt-2 text-3xl font-semibold leading-tight text-emerald-500"
+                      : "mt-2 text-3xl font-semibold leading-tight text-destructive"
                   }
                 >
                   {formatCurrency(netCashFlowRows[0]?.netCashFlow ?? 0)}
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-2 text-sm text-muted-foreground">
                   {t("dashboard.chartTrendSwitchHint")}
                 </p>
               </div>

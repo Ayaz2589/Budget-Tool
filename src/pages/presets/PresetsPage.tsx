@@ -4,13 +4,15 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import type { ExpenseSource, PresetTransaction } from "@/types/core";
-import { SOURCE_OPTIONS } from "@/lib/sourceLabels";
+import {
+  EXPENSE_SOURCE_BADGE_LABELS,
+  SOURCE_OPTIONS,
+} from "@/lib/sourceLabels";
 import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
   parseCurrencyInput,
 } from "@/lib/currencyInput";
-import { SourceIcon } from "@/components/cards";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -256,7 +258,9 @@ export function PresetsPage() {
                         {sourceOptionsFiltered.map((opt) => (
                           <SelectItem key={opt.value} value={opt.value}>
                             <span className="flex items-center gap-2">
-                              <SourceIcon source={opt.value} size={16} />
+                              <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                                {EXPENSE_SOURCE_BADGE_LABELS[opt.value]}
+                              </span>
                               {opt.label}
                             </span>
                           </SelectItem>
@@ -399,7 +403,9 @@ export function PresetsPage() {
                           </TableCell>
                           <TableCell className="text-muted-foreground">
                             <span className="flex items-center gap-2">
-                              <SourceIcon source={preset.source} size={16} />
+                              <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                                {EXPENSE_SOURCE_BADGE_LABELS[preset.source]}
+                              </span>
                               {sourceLabel}
                             </span>
                           </TableCell>
@@ -523,7 +529,9 @@ export function PresetsPage() {
                     <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wide">
                       <span>{t("common.source")}</span>
                       <span className="inline-flex items-center gap-1.5">
-                        <SourceIcon source={presetForActions.source} size={14} />
+                        <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                          {EXPENSE_SOURCE_BADGE_LABELS[presetForActions.source]}
+                        </span>
                         {getSourceLabel(presetForActions.source)}
                       </span>
                     </div>

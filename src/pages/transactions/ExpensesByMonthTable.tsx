@@ -12,9 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SourceIcon } from "@/components/cards";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { getMonthLabel } from "@/lib/totals";
+import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
@@ -198,7 +198,9 @@ export function ExpensesByMonthTable({
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       <span className="flex items-center gap-2">
-                        <SourceIcon source={row.source} size={20} />
+                        <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                          {EXPENSE_SOURCE_BADGE_LABELS[row.source]}
+                        </span>
                         {sourceLabelKeys[row.source]
                           ? t(sourceLabelKeys[row.source])
                           : row.source}

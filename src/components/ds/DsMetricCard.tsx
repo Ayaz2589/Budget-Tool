@@ -19,30 +19,29 @@ export function DsMetricCard({
 }: DsMetricCardProps) {
   return (
     <Card
-      surface="raised"
+      surface="flat"
       density="compact"
-      className={cn("h-full", className)}
+      className={cn("h-full rounded-2xl border border-border bg-card", className)}
     >
-      <CardHeader className="px-2.5 pt-2.5 pb-1 md:px-5 md:pt-5 md:pb-1.5">
-        <CardTitle className="text-[11px] md:text-sm text-muted-foreground ds-label">
+      <CardHeader className="px-4 pt-4 pb-1.5 md:px-5 md:pt-5 md:pb-2">
+        <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground/90 ds-label">
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-2.5 pb-2.5 md:px-5 md:pb-5 space-y-1">
+      <CardContent className="px-4 pb-4 md:px-5 md:pb-5 space-y-2">
         <p
           className={cn(
-            "text-base md:text-2xl font-semibold tracking-tight ds-heading-3",
-            tone === "positive" && "text-green-400",
+            "text-3xl font-semibold leading-tight tracking-tight ds-heading-3",
+            tone === "positive" && "text-emerald-500",
             tone === "negative" && "text-destructive",
           )}
         >
           {value}
         </p>
         {subtitle ? (
-          <p className="text-xs text-muted-foreground ds-caption">{subtitle}</p>
+          <p className="text-sm text-muted-foreground ds-caption">{subtitle}</p>
         ) : null}
       </CardContent>
     </Card>
   );
 }
-

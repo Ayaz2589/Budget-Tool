@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { ExpenseSource } from "@/lib/types";
 import { ALL_EXPENSE_SOURCES } from "@/lib/types";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
+import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import {
@@ -9,7 +10,6 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SourceIcon } from "@/components/cards";
 import { DsSectionHeader } from "@/components/ds";
 
 export function CardSourcesCard() {
@@ -72,7 +72,9 @@ export function CardSourcesCard() {
                     htmlFor={`card-source-${sourceId}`}
                     className="flex items-center gap-2 flex-1 cursor-pointer min-w-0"
                   >
-                    <SourceIcon source={sourceId} size={20} />
+                    <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                      {EXPENSE_SOURCE_BADGE_LABELS[sourceId]}
+                    </span>
                     <span className="text-sm font-medium truncate">
                       {t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
                     </span>

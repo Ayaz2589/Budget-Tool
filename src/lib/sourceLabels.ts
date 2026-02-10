@@ -33,6 +33,20 @@ export const EXPENSE_SOURCE_DISPLAY_LABELS: Record<ExpenseSource, string> = {
   td: "TD Bank",
 };
 
+/** Short badge labels for compact UI chips. */
+export const EXPENSE_SOURCE_BADGE_LABELS: Record<ExpenseSource, string> = {
+  amex: "AMEX",
+  "amex-gold": "AMEX",
+  apple: "MC",
+  visa: "VISA",
+  sapphire: "SAPPHIRE",
+  "bank-of-america": "BOA",
+  "wells-fargo": "WF",
+  chase: "CHASE",
+  manual: "MANUAL",
+  td: "TD",
+};
+
 /** Full i18n keys for transaction filter dropdown (transactions.* + common.all). */
 export const SOURCE_LABEL_KEYS: Record<ExpenseSource | "all", string> = {
   all: "common.all",

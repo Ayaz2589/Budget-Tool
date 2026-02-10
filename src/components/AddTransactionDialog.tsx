@@ -18,8 +18,10 @@ import {
   getDateInputPlaceholder,
   isoToDateInput,
 } from "@/lib/dateInput";
-import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
-import { SourceIcon } from "@/components/cards";
+import {
+  EXPENSE_SOURCE_BADGE_LABELS,
+  EXPENSE_SOURCE_LOCALE_KEYS,
+} from "@/lib/sourceLabels";
 import { CategoryOption, getCategoryColor } from "@/lib/categoryColors";
 import { Button } from "@/components/ui/button";
 import {
@@ -625,10 +627,9 @@ export function AddTransactionDialog({
                         {cardSources.map((s) => (
                           <SelectItem key={s} value={s}>
                             <span className="flex items-center gap-2">
-                              <SourceIcon
-                                source={s as ExpenseSource}
-                                size={18}
-                              />
+                              <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                                {EXPENSE_SOURCE_BADGE_LABELS[s as ExpenseSource]}
+                              </span>
                               {t(
                                 `addTransaction.${
                                   EXPENSE_SOURCE_LOCALE_KEYS[

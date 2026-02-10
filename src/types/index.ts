@@ -16,4 +16,3 @@ export * from "./income";
 export * from "./transactions";
 export * from "./settings";
 export * from "./mortgage";
-export * from "./cards";

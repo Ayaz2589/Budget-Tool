@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ExpenseSource } from "@/types/core";
 import type { EditTransactionDialogProps } from "@/types/transactions";
-import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
+import {
+  EXPENSE_SOURCE_BADGE_LABELS,
+  EXPENSE_SOURCE_LOCALE_KEYS,
+} from "@/lib/sourceLabels";
 import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
@@ -14,7 +17,6 @@ import {
   isoToDateInput,
 } from "@/lib/dateInput";
 import { CategoryOption } from "@/lib/categoryColors";
-import { SourceIcon } from "@/components/cards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -217,7 +219,9 @@ export function EditTransactionDialog({
                 {cardSources.map((s) => (
                   <SelectItem key={s} value={s}>
                     <span className="flex items-center gap-2">
-                      <SourceIcon source={s as ExpenseSource} size={18} />
+                      <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                        {EXPENSE_SOURCE_BADGE_LABELS[s as ExpenseSource]}
+                      </span>
                       {t(
                         `addTransaction.${
                           EXPENSE_SOURCE_LOCALE_KEYS[s as ExpenseSource]

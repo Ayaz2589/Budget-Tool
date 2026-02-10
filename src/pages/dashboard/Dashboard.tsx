@@ -369,115 +369,6 @@ export function Dashboard() {
           />
         </div>
 
-        <section className="space-y-2">
-          <h2 className="text-base font-semibold">{t("dashboard.sectionExpenseByOwner")}</h2>
-          {ownerNetRows.length === 0 ? (
-            <DsEmptyState title={t("dashboard.sectionNoOwnerExpenses")} className="py-4" />
-          ) : (
-            <div className="border-t border-[var(--border-subtle)]">
-              <div className="grid grid-cols-2 gap-2 px-2 py-2 text-[11px] uppercase tracking-wide text-muted-foreground">
-                <p>{t("dashboard.grossExpenseByOwner")}</p>
-                <p className="text-right">{t("dashboard.netAfterTransfers")}</p>
-              </div>
-              {ownerNetRows.map((row, index) => {
-                const percentOfTotal =
-                  totalSpentForSelectedRange > 0
-                    ? row.gross / totalSpentForSelectedRange
-                    : 0;
-                const isExpanded = expandedOwnerKey === row.owner;
-                const ownerItems = ownerExpenseItemsByOwner.get(row.owner) ?? [];
-                const netToneClass =
-                  row.net >= 0 ? "text-foreground" : "text-destructive";
-                return (
-                  <DsDataRow
-                    key={row.owner}
-                    title={row.owner}
-                    subtitle={t("dashboard.ofTotalSpent", {
-                      percent: percentFormatter.format(percentOfTotal),
-                    })}
-                    trailing={
-                      <div className="flex items-center gap-3">
-                        <div className="text-right space-y-0.5">
-                          <p className="text-[11px] text-muted-foreground">
-                            {t("dashboard.grossShort")}
-                          </p>
-                          <p className="text-sm font-semibold">{formatCurrency(row.gross)}</p>
-                          <p className="text-[11px] text-muted-foreground">
-                            {t("dashboard.netShort")}
-                          </p>
-                          <p className={`text-xs font-medium ${netToneClass}`}>
-                            {formatCurrency(row.net)}
-                          </p>
-                        </div>
-                        {isExpanded ? (
-                          <ChevronUp className="size-4 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="size-4 text-muted-foreground" />
-                        )}
-                      </div>
-                    }
-                    onClick={() =>
-                      setExpandedOwnerKey((prev) => (prev === row.owner ? null : row.owner))
-                    }
-                    ariaLabel={row.owner}
-                    meta={
-                      isExpanded ? (
-                        <div className="space-y-2">
-                          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                            <p>{t("dashboard.grossExpenseByOwner")}: {formatCurrency(row.gross)}</p>
-                            <p className="text-right">
-                              {t("dashboard.netAfterTransfers")}:{" "}
-                              <span className={netToneClass}>{formatCurrency(row.net)}</span>
-                            </p>
-                            <p>{t("dashboard.transfersSent")}: {formatCurrency(row.sent)}</p>
-                            <p className="text-right">{t("dashboard.transfersReceived")}: {formatCurrency(row.received)}</p>
-                          </div>
-                          {ownerItems.length === 0 ? (
-                            <p className="text-xs text-muted-foreground">
-                              {t("dashboard.sectionNoOwnerExpenseItems")}
-                            </p>
-                          ) : (
-                            <div className="space-y-1">
-                              {ownerItems.map((item) => (
-                                <div
-                                  key={`${row.owner}-${item.id}`}
-                                  className="flex items-start justify-between gap-2 rounded-md bg-muted/30 px-2 py-1.5 text-xs"
-                                >
-                                  <div className="min-w-0">
-                                    <p className="truncate font-medium text-foreground">
-                                      {item.description || "—"}
-                                    </p>
-                                    <p className="truncate text-muted-foreground">
-                                      {formatDate(item.date)} ·{" "}
-                                      {item.category || t("common.uncategorized")} ·{" "}
-                                      {t("addTransaction.paidBy")}:{" "}
-                                      {item.paidByOwner || t("common.noOwner")}
-                                    </p>
-                                  </div>
-                                  <div className="shrink-0 text-right">
-                                    <p className="font-medium text-foreground">
-                                      {formatCurrency(item.allocatedAmount)}
-                                    </p>
-                                    <p className="text-[11px] text-muted-foreground">
-                                      {formatCurrency(item.totalAmount)}
-                                    </p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ) : undefined
-                    }
-                    className={index % 2 === 1 ? "bg-muted/30" : ""}
-                    dense
-                  />
-                );
-              })}
-            </div>
-          )}
-        </section>
-
         <div className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <DsChartCard title={t("dashboard.chartIncomeVsExpenses")} className="min-w-0">
           <div className="hidden md:block">
@@ -862,18 +753,128 @@ export function Dashboard() {
           </DsChartCard>
         </section>
 
+        <section className="space-y-2">
+          <h2 className="text-base font-semibold">{t("dashboard.sectionExpenseByOwner")}</h2>
+          {ownerNetRows.length === 0 ? (
+            <DsEmptyState title={t("dashboard.sectionNoOwnerExpenses")} className="py-4" />
+          ) : (
+            <div className="border-t border-[var(--border-subtle)]">
+              <div className="grid grid-cols-2 gap-2 px-2 py-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+                <p>{t("dashboard.grossExpenseByOwner")}</p>
+                <p className="text-right">{t("dashboard.netAfterTransfers")}</p>
+              </div>
+              <div>
+              {ownerNetRows.map((row) => {
+                const percentOfTotal =
+                  totalSpentForSelectedRange > 0
+                    ? row.gross / totalSpentForSelectedRange
+                    : 0;
+                const isExpanded = expandedOwnerKey === row.owner;
+                const ownerItems = ownerExpenseItemsByOwner.get(row.owner) ?? [];
+                const netToneClass =
+                  row.net >= 0 ? "text-foreground" : "text-destructive";
+                return (
+                  <DsDataRow
+                    key={row.owner}
+                    title={row.owner}
+                    subtitle={t("dashboard.ofTotalSpent", {
+                      percent: percentFormatter.format(percentOfTotal),
+                    })}
+                    trailing={
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-sm font-semibold">{formatCurrency(row.gross)}</p>
+                          <p className={`text-xs font-medium ${netToneClass}`}>
+                            {formatCurrency(row.net)}
+                          </p>
+                        </div>
+                        {isExpanded ? (
+                          <ChevronUp className="size-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronDown className="size-4 text-muted-foreground" />
+                        )}
+                      </div>
+                    }
+                    onClick={() =>
+                      setExpandedOwnerKey((prev) => (prev === row.owner ? null : row.owner))
+                    }
+                    ariaLabel={row.owner}
+                    meta={
+                      isExpanded ? (
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                            <p>{t("dashboard.grossExpenseByOwner")}: {formatCurrency(row.gross)}</p>
+                            <p className="text-right">
+                              {t("dashboard.netAfterTransfers")}:{" "}
+                              <span className={netToneClass}>{formatCurrency(row.net)}</span>
+                            </p>
+                            <p>{t("dashboard.transfersSent")}: {formatCurrency(row.sent)}</p>
+                            <p className="text-right">{t("dashboard.transfersReceived")}: {formatCurrency(row.received)}</p>
+                          </div>
+                          {ownerItems.length === 0 ? (
+                            <p className="text-xs text-muted-foreground">
+                              {t("dashboard.sectionNoOwnerExpenseItems")}
+                            </p>
+                          ) : (
+                            <div className="space-y-1">
+                              {ownerItems.map((item) => (
+                                <div
+                                  key={`${row.owner}-${item.id}`}
+                                  className="flex items-start justify-between gap-2 rounded-md bg-muted/30 px-2 py-1.5 text-xs"
+                                >
+                                  <div className="min-w-0">
+                                    <p className="truncate font-medium text-foreground">
+                                      {item.description || "—"}
+                                    </p>
+                                    <p className="truncate text-muted-foreground">
+                                      {formatDate(item.date)} ·{" "}
+                                      {item.category || t("common.uncategorized")} ·{" "}
+                                      {t("addTransaction.paidBy")}:{" "}
+                                      {item.paidByOwner || t("common.noOwner")}
+                                    </p>
+                                  </div>
+                                  <div className="shrink-0 text-right">
+                                    <p className="font-medium text-foreground">
+                                      {formatCurrency(item.allocatedAmount)}
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground">
+                                      {formatCurrency(item.totalAmount)}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : undefined
+                    }
+                    className={isExpanded ? "bg-muted/20" : undefined}
+                    dense
+                  />
+                );
+              })}
+              </div>
+            </div>
+          )}
+        </section>
+
         <Accordion
           type="multiple"
           defaultValue={["debt", "spend-source"]}
-          className="space-y-2 pb-4"
+          className="space-y-0 pb-4 border-t border-[var(--border-subtle)]"
         >
-          <AccordionItem value="debt" className="rounded-xl border border-border/60 px-3">
-            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+          <AccordionItem
+            value="debt"
+            className="border-b border-[var(--border-subtle)] px-0"
+          >
+            <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
               {t("dashboard.sectionDebtSnapshot")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
               {debtRows.length === 0 ? (
-                <DsEmptyState title={t("dashboard.sectionNoActiveDebts")} className="py-4" />
+                <div className="border-t border-[var(--border-subtle)] pt-3">
+                  <DsEmptyState title={t("dashboard.sectionNoActiveDebts")} className="py-4" />
+                </div>
               ) : (
                 <div className="border-t border-[var(--border-subtle)]">
                   {debtRows.map((row, index) => (
@@ -892,7 +893,6 @@ export function Dashboard() {
                           </p>
                         </>
                       }
-                      className={index % 2 === 1 ? "bg-muted/30" : ""}
                     />
                   ))}
                 </div>
@@ -900,21 +900,25 @@ export function Dashboard() {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="spend-source" className="rounded-xl border border-border/60 px-3">
-            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+          <AccordionItem
+            value="spend-source"
+            className="border-b border-[var(--border-subtle)] px-0"
+          >
+            <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
               {t("dashboard.sectionSpendByCardSource")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
               {spendBySourceRows.length === 0 ? (
-                <DsEmptyState title={t("dashboard.sectionNoSpendByCardSource")} className="py-4" />
+                <div className="border-t border-[var(--border-subtle)] pt-3">
+                  <DsEmptyState title={t("dashboard.sectionNoSpendByCardSource")} className="py-4" />
+                </div>
               ) : (
                 <div className="border-t border-[var(--border-subtle)]">
-                  {spendBySourceRows.map((row, index) => (
+                  {spendBySourceRows.map((row) => (
                     <DsDataRow
                       key={row.source}
                       title={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[row.source]}`)}
                       trailing={<p className="font-semibold">{formatCurrency(row.value)}</p>}
-                      className={index % 2 === 1 ? "bg-muted/30" : ""}
                       dense
                     />
                   ))}
@@ -923,25 +927,29 @@ export function Dashboard() {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="transfers" className="rounded-xl border border-border/60 px-3">
-            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+          <AccordionItem
+            value="transfers"
+            className="border-b border-[var(--border-subtle)] px-0"
+          >
+            <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
               {t("dashboard.ownerTransfersMtd")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
               {ownerTransfersMtd.length === 0 ? (
-                <DsEmptyState title={t("dashboard.noOwnerTransfersMtd")} className="py-4" />
+                <div className="border-t border-[var(--border-subtle)] pt-3">
+                  <DsEmptyState title={t("dashboard.noOwnerTransfersMtd")} className="py-4" />
+                </div>
               ) : (
                 <div className="border-t border-[var(--border-subtle)]">
                   <div className="px-0 py-2">
                     <p className="text-xl font-semibold">{formatCurrency(ownerTransfersMtdTotal)}</p>
                   </div>
-                  {ownerTransfersMtd.map((row, index) => (
+                  {ownerTransfersMtd.map((row) => (
                     <DsDataRow
                       key={row.id}
                       title={`${row.fromOwner} → ${row.toOwner}`}
                       subtitle={`${formatDate(row.date)}${row.note ? ` · ${row.note}` : ""}`}
                       trailing={<p className="font-semibold">{formatCurrency(row.amount)}</p>}
-                      className={index % 2 === 1 ? "bg-muted/30" : ""}
                       dense
                     />
                   ))}
@@ -950,22 +958,26 @@ export function Dashboard() {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="recent" className="rounded-xl border border-border/60 px-3">
-            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+          <AccordionItem
+            value="recent"
+            className="border-b border-[var(--border-subtle)] px-0"
+          >
+            <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
               {t("dashboard.sectionRecentActivity")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
               {recentActivity.length === 0 ? (
-                <DsEmptyState title={t("dashboard.sectionNoRecentTransactions")} className="py-4" />
+                <div className="border-t border-[var(--border-subtle)] pt-3">
+                  <DsEmptyState title={t("dashboard.sectionNoRecentTransactions")} className="py-4" />
+                </div>
               ) : (
                 <div className="border-t border-[var(--border-subtle)]">
-                  {recentActivity.slice(0, 3).map((item, index) => (
+                  {recentActivity.slice(0, 3).map((item) => (
                     <DsDataRow
                       key={item.id}
                       title={item.description || "—"}
                       subtitle={(item.category || t("common.uncategorized")) + " · " + (item.owner || t("common.noOwner"))}
                       trailing={<p className="font-semibold">{formatCurrency(item.amount)}</p>}
-                      className={index % 2 === 1 ? "bg-muted/30" : ""}
                       dense
                     />
                   ))}
@@ -974,15 +986,20 @@ export function Dashboard() {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="insights" className="rounded-xl border border-border/60 px-3">
-            <AccordionTrigger className="py-3 text-base font-semibold hover:no-underline">
+          <AccordionItem
+            value="insights"
+            className="border-b border-[var(--border-subtle)] px-0"
+          >
+            <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
               {t("dashboard.sectionSmartInsightsAlerts")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
               {insights.length === 0 ? (
-                <DsEmptyState title={t("dashboard.sectionNoAlerts")} className="py-4" />
+                <div className="border-t border-[var(--border-subtle)] pt-3">
+                  <DsEmptyState title={t("dashboard.sectionNoAlerts")} className="py-4" />
+                </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2 border-t border-[var(--border-subtle)] pt-3">
                   {insights.map((insight) => (
                     <div
                       key={insight.id}

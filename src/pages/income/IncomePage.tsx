@@ -61,6 +61,7 @@ export function IncomePage() {
         <DsSectionHeader
           title={t("income.title")}
           subtitle={t("income.subtitle")}
+          showCurrencyChip
           actions={
             <Button
               className="hidden md:inline-flex"

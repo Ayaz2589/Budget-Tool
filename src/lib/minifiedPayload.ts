@@ -14,6 +14,10 @@ import type {
   MinifiedPayloadInput,
   ExpandedPayload,
 } from "@/types/payload";
+import {
+  toDisplayCurrency,
+  type DisplayCurrency,
+} from "@/types/currency";
 
 export type { CategoryWithColorPayload, MinifiedPayloadInput, ExpandedPayload };
 
@@ -70,6 +74,9 @@ export function buildMinifiedPayload(
   incomeCategoriesWithColors: CategoryWithColorPayload[],
   owners?: string[],
   cardSources?: string[],
+  displayCurrency?: DisplayCurrency,
+  baseCurrency?: "USD",
+  fxAsOf?: string,
 ): Record<string, unknown> {
   return {
     e: expenses.map((x) =>
@@ -135,6 +142,9 @@ export function buildMinifiedPayload(
     ic: incomeCategoriesWithColors.map((x) => ({ n: x.name, c: x.color })),
     o: Array.isArray(owners) && owners.length > 0 ? owners : undefined,
     sc: Array.isArray(cardSources) && cardSources.length > 0 ? cardSources : undefined,
+    dc: displayCurrency,
+    bc: baseCurrency,
+    fa: fxAsOf,
   };
 }
 
@@ -256,6 +266,11 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
   const owners = Array.isArray(raw.owners ?? raw.o)
     ? (raw.owners ?? raw.o) as string[]
     : undefined;
+  const displayCurrency = toDisplayCurrency(raw.displayCurrency ?? raw.dc);
+  const baseCurrency = "USD";
+  const fxAsOf = typeof (raw.fxAsOf ?? raw.fa) === "string"
+    ? String(raw.fxAsOf ?? raw.fa)
+    : undefined;
 
   return {
     expenses,
@@ -268,6 +283,9 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
     incomeCategoriesWithColors,
     owners,
     cardSources,
+    displayCurrency,
+    baseCurrency,
+    fxAsOf,
   };
 }
 
@@ -284,6 +302,9 @@ export function serializeToBlob(input: MinifiedPayloadInput): string {
     input.incomeCategoriesWithColors ?? [],
     input.owners,
     input.cardSources,
+    input.displayCurrency,
+    input.baseCurrency,
+    input.fxAsOf,
   );
   const jsonString = JSON.stringify(payload);
   const compressed = pako.gzip(new TextEncoder().encode(jsonString));

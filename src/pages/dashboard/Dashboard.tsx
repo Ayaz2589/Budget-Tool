@@ -314,6 +314,7 @@ export function Dashboard() {
           <DsSectionHeader
             title={t("dashboard.title")}
             subtitle={t("dashboard.healthQuestion")}
+            showCurrencyChip
           />
           <div className="flex w-full flex-col items-start gap-2 md:w-auto md:items-end">
             <div className="w-full md:w-auto">

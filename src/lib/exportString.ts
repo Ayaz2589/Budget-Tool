@@ -7,6 +7,7 @@ import type {
   PresetTransaction,
 } from "@/types/core";
 import type { CategoryWithColorPayload } from "@/types/payload";
+import type { DisplayCurrency } from "@/types/currency";
 import { serializeToBlob } from "@/lib/minifiedPayload";
 
 const DATA_START_MARKER = "BUDGET_TOOL_DATA_START";
@@ -23,6 +24,9 @@ export function buildExportString(
   owners: string[] = [],
   cardSources: string[] = [],
   ownerTransfers: OwnerTransfer[] = [],
+  displayCurrency: DisplayCurrency = "USD",
+  baseCurrency: "USD" = "USD",
+  fxAsOf?: string,
 ): string {
   const blob = serializeToBlob({
     expenses,
@@ -35,6 +39,9 @@ export function buildExportString(
     incomeCategoriesWithColors,
     owners,
     cardSources,
+    displayCurrency,
+    baseCurrency,
+    fxAsOf,
   });
   return `${DATA_START_MARKER}\n${blob}\n${DATA_END_MARKER}`;
 }

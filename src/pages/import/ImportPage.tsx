@@ -25,6 +25,7 @@ import { parseFromBlob } from "@/lib/minifiedPayload";
 import { parseBudgetJson } from "@/lib/jsonExport";
 import type { ExpandedPayload } from "@/types/payload";
 import type { ParsedExportedPdf } from "@/types/pdf";
+import { isDisplayCurrency } from "@/types/currency";
 import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { buildExpandedPayload, downloadBudgetJson } from "@/lib/jsonExport";
@@ -88,6 +89,8 @@ export function ImportPage() {
     setOwners,
     owners,
     ownerTransfers,
+    uiFormatSettings,
+    setUiFormatSettings,
   } = useBudget();
   const { setPresets, presetTransactions } = usePresetTransactions();
   const { t } = useTranslation();
@@ -124,6 +127,9 @@ export function ImportPage() {
     incomeCategoriesWithColors: expanded.incomeCategoriesWithColors,
     owners: expanded.owners,
     cardSources: expanded.cardSources,
+    displayCurrency: expanded.displayCurrency,
+    baseCurrency: expanded.baseCurrency,
+    fxAsOf: expanded.fxAsOf,
   });
 
   const hasParsedRows = (parsed: ParsedExportedPdf): boolean =>
@@ -215,6 +221,15 @@ export function ImportPage() {
     }
     if (Array.isArray(parsed.owners) && parsed.owners.length > 0) {
       setOwners(parsed.owners);
+    }
+    if (isDisplayCurrency(parsed.displayCurrency)) {
+      setUiFormatSettings({
+        ...uiFormatSettings,
+        currency: parsed.displayCurrency,
+        baseCurrency: "USD",
+        fxRate: uiFormatSettings.fxRate,
+        fxAsOf: parsed.fxAsOf ?? uiFormatSettings.fxAsOf,
+      });
     }
     setPreviewExpenses(toAddExpenses);
     setPreviewIncome(toAddIncome);
@@ -458,6 +473,9 @@ export function ImportPage() {
       owners,
       cardSources,
       ownerTransfers,
+      uiFormatSettings.currency,
+      "USD",
+      uiFormatSettings.fxAsOf,
     );
     downloadBudgetJson(payload);
   };
@@ -482,6 +500,9 @@ export function ImportPage() {
       owners,
       cardSources,
       ownerTransfers,
+      uiFormatSettings.currency,
+      "USD",
+      uiFormatSettings.fxAsOf,
     );
     downloadExportString(exportString);
   };
@@ -568,6 +589,7 @@ export function ImportPage() {
         <DsSectionHeader
           title={t("import.title")}
           subtitle={t("import.subtitle")}
+          showCurrencyChip
           actions={
             hasPreview ? (
               <Button className="hidden md:inline-flex" onClick={addToTransactions}>

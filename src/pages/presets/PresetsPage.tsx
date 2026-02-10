@@ -211,6 +211,7 @@ export function PresetsPage() {
         <DsSectionHeader
           title={t("nav.presets")}
           subtitle={t("presetTransactions.description")}
+          showCurrencyChip
           actions={
             <Button
               className="hidden md:inline-flex"

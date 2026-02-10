@@ -25,6 +25,8 @@ import {
   setUiFormatSettings as applyUiFormatSettings,
   type UiFormatSettings,
 } from "@/lib/format";
+import { toDisplayCurrency } from "@/types/currency";
+import { getCachedUsdFxRate, getUsdFxRate } from "@/lib/fx";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
 import { buildDummyBudget, type DummyBudgetData } from "@/lib/dummyData";
@@ -53,11 +55,25 @@ function loadStoredUiFormatSettings(): UiFormatSettings {
     const raw = localStorage.getItem(UI_FORMAT_STORAGE_KEY);
     if (!raw) return fallback;
     const data = JSON.parse(raw) as Partial<UiFormatSettings>;
+    const currency = toDisplayCurrency(data.currency);
     const dateFormat =
       data.dateFormat === "MM/DD/YYYY" || data.dateFormat === "YYYY/MM/DD"
         ? data.dateFormat
         : fallback.dateFormat;
-    return { ...fallback, dateFormat };
+    const fxRate =
+      Number.isFinite(data.fxRate) && Number(data.fxRate) > 0
+        ? Number(data.fxRate)
+        : fallback.fxRate;
+    return {
+      ...fallback,
+      currency,
+      baseCurrency: "USD",
+      fxRate: currency === "USD" ? 1 : fxRate,
+      fxAsOf: typeof data.fxAsOf === "string" ? data.fxAsOf : undefined,
+      fxFallback:
+        typeof data.fxFallback === "boolean" ? data.fxFallback : undefined,
+      dateFormat,
+    };
   } catch {
     return fallback;
   }
@@ -235,6 +251,33 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       // ignore
     }
   }, [uiFormatSettings]);
+
+  useEffect(() => {
+    if (uiFormatSettings.currency === "USD") return;
+    let cancelled = false;
+    getUsdFxRate(uiFormatSettings.currency).then((fx) => {
+      if (cancelled) return;
+      setUiFormatSettingsState((prev) => {
+        if (
+          prev.currency !== uiFormatSettings.currency ||
+          (Math.abs(prev.fxRate - fx.rate) < 0.000001 &&
+            prev.fxAsOf === fx.asOf &&
+            prev.fxFallback === fx.fallback)
+        ) {
+          return prev;
+        }
+        return {
+          ...prev,
+          fxRate: fx.rate,
+          fxAsOf: fx.asOf,
+          fxFallback: fx.fallback,
+        };
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [uiFormatSettings.currency]);
 
   useEffect(() => {
     if (useDummyData) return;
@@ -843,7 +886,43 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   );
 
   const setUiFormatSettings = useCallback((settings: UiFormatSettings) => {
-    setUiFormatSettingsState(settings);
+    setUiFormatSettingsState((prev) => {
+      const nextCurrency = toDisplayCurrency(settings.currency);
+      const currencyChanged = nextCurrency !== prev.currency;
+      const cachedFx =
+        nextCurrency === "USD" ? null : getCachedUsdFxRate(nextCurrency);
+      const explicitFxRate =
+        Number.isFinite(settings.fxRate) && settings.fxRate > 0
+          ? settings.fxRate
+          : null;
+      const nextFxRate =
+        nextCurrency === "USD"
+          ? 1
+          : explicitFxRate ??
+            cachedFx?.rate ??
+            (currencyChanged ? 1 : prev.fxRate || 1);
+      const nextFxAsOf =
+        nextCurrency === "USD"
+          ? undefined
+          : settings.fxAsOf ??
+            cachedFx?.asOf ??
+            (currencyChanged ? undefined : prev.fxAsOf);
+      const nextFxFallback =
+        nextCurrency === "USD"
+          ? false
+          : settings.fxFallback ??
+            (cachedFx ? cachedFx.stale : currencyChanged ? true : prev.fxFallback);
+
+      return {
+        ...prev,
+        ...settings,
+        baseCurrency: "USD",
+        currency: nextCurrency,
+        fxRate: nextFxRate,
+        fxAsOf: nextFxAsOf,
+        fxFallback: nextFxFallback,
+      };
+    });
   }, []);
 
   const repairCorruptedDates = useCallback(() => {

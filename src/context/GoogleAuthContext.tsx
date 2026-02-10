@@ -32,6 +32,7 @@ import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
 import type { SyncHealth, SyncStatus } from "@/types/auth";
+import { isDisplayCurrency } from "@/types/currency";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
 const ACCESS_TOKEN_STORAGE_KEY = "budget-tool-google-access-token";
@@ -458,6 +459,9 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       owners: budget.owners,
       cardSources: budget.cardSources,
       iOweNova: budget.iOweNova,
+      displayCurrency: budget.uiFormatSettings.currency,
+      baseCurrency: "USD" as const,
+      fxAsOf: budget.uiFormatSettings.fxAsOf,
     };
   }, [
     budget.expenses,
@@ -471,6 +475,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.owners,
     budget.cardSources,
     budget.iOweNova,
+    budget.uiFormatSettings.currency,
+    budget.uiFormatSettings.fxAsOf,
   ]);
 
   const runSync = useCallback(async () => {
@@ -518,6 +524,9 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
         incomeCategoriesWithColors: snapshot.incomeCategoriesWithColors,
         owners: snapshot.owners,
         cardSources: snapshot.cardSources,
+        displayCurrency: snapshot.displayCurrency,
+        baseCurrency: snapshot.baseCurrency,
+        fxAsOf: snapshot.fxAsOf,
       });
       const months = computeAllTotals({
         expenses: snapshot.expenses,
@@ -729,6 +738,15 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
           }
           if (Array.isArray(expanded.owners)) {
             budget.setOwners(expanded.owners);
+          }
+          if (isDisplayCurrency(expanded.displayCurrency)) {
+            budget.setUiFormatSettings({
+              ...budget.uiFormatSettings,
+              currency: expanded.displayCurrency,
+              baseCurrency: "USD",
+              fxRate: budget.uiFormatSettings.fxRate,
+              fxAsOf: expanded.fxAsOf ?? budget.uiFormatSettings.fxAsOf,
+            });
           }
         } catch {
           const [

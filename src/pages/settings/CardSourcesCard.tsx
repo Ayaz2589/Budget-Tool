@@ -48,38 +48,40 @@ export function CardSourcesCard() {
           subtitleClassName="text-xs md:text-sm"
         />
       </div>
-      <CardContent className="space-y-3 px-4 md:px-0">
-        <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
-          {ALL_EXPENSE_SOURCES.map((sourceId) => {
-            const enabled = cardSources.includes(sourceId);
-            const isLast = cardSources.length === 1 && enabled;
-            return (
-              <li
-                key={sourceId}
-                className="flex items-center gap-3 rounded-md border bg-muted/30 px-3 py-2"
-              >
-                <Checkbox
-                  id={`card-source-${sourceId}`}
-                  checked={enabled}
-                  onCheckedChange={(checked) =>
-                    handleToggle(sourceId, checked === true)
-                  }
-                  disabled={isLast}
-                  aria-label={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
-                />
-                <label
-                  htmlFor={`card-source-${sourceId}`}
-                  className="flex items-center gap-2 flex-1 cursor-pointer min-w-0"
+      <CardContent className="px-4 md:px-0">
+        <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5">
+          <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+            {ALL_EXPENSE_SOURCES.map((sourceId) => {
+              const enabled = cardSources.includes(sourceId);
+              const isLast = cardSources.length === 1 && enabled;
+              return (
+                <li
+                  key={sourceId}
+                  className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/60 px-3 py-2.5"
                 >
-                  <SourceIcon source={sourceId} size={20} />
-                  <span className="text-sm font-medium truncate">
-                    {t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
-                  </span>
-                </label>
-              </li>
-            );
-          })}
-        </ul>
+                  <Checkbox
+                    id={`card-source-${sourceId}`}
+                    checked={enabled}
+                    onCheckedChange={(checked) =>
+                      handleToggle(sourceId, checked === true)
+                    }
+                    disabled={isLast}
+                    aria-label={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
+                  />
+                  <label
+                    htmlFor={`card-source-${sourceId}`}
+                    className="flex items-center gap-2 flex-1 cursor-pointer min-w-0"
+                  >
+                    <SourceIcon source={sourceId} size={20} />
+                    <span className="text-sm font-medium truncate">
+                      {t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
+                    </span>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
         {onlyOneEnabled && (
           <p className="text-xs text-muted-foreground">
             {t("settings.cardSourcesOneRequired")}

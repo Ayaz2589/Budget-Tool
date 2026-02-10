@@ -56,97 +56,106 @@ export function GoogleSheetsCard({
       </div>
       <CardContent className="space-y-5 px-4 md:px-0">
         {!isSignedIn ? (
-          <div className="flex flex-col gap-3">
-            <Button onClick={signIn} className="h-11 w-full sm:w-auto">
-              {t("settings.connectGoogle")}
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              {t("settings.connectGoogleDesc")}
-            </p>
+          <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5">
+            <div className="flex flex-col gap-3">
+              <Button onClick={signIn} className="h-11 w-full sm:w-auto">
+                {t("settings.connectGoogle")}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                {t("settings.connectGoogleDesc")}
+              </p>
+            </div>
           </div>
         ) : (
           <>
-            <div className="rounded-lg border border-border/60 p-3">
-              <div className="flex items-start gap-3">
-                <Checkbox
-                  id="auto-sync-toggle"
-                  checked={isAutoSyncEnabled}
-                  onCheckedChange={(checked) => onAutoSyncToggle(checked === true)}
-                />
-                <div className="space-y-1">
-                  <Label htmlFor="auto-sync-toggle" className="text-sm font-medium">
-                    {t("settings.autoSyncTitle")}
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    {t("settings.autoSyncDesc")}
-                  </p>
+            <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start gap-3 rounded-lg border border-border/60 bg-background/60 p-3">
+                  <Checkbox
+                    id="auto-sync-toggle"
+                    checked={isAutoSyncEnabled}
+                    onCheckedChange={(checked) => onAutoSyncToggle(checked === true)}
+                  />
+                  <div className="space-y-1">
+                    <Label htmlFor="auto-sync-toggle" className="text-sm font-medium">
+                      {t("settings.autoSyncTitle")}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      {t("settings.autoSyncDesc")}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-2 text-xs text-muted-foreground">
-                <span>
-                  {t("settings.syncHealthLabel")}{" "}
-                  {syncHealth === "healthy"
-                    ? t("settings.syncHealthHealthy")
-                    : syncHealth === "warning"
-                      ? t("settings.syncHealthWarning")
-                      : t("settings.syncHealthError")}
-                </span>
+
+                <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                      {t("settings.status")}
+                    </span>
+                    <span className="rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-xs font-medium">
+                      {t("settings.signedIn")}
+                    </span>
+                    <span className="rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-xs">
+                      {t("settings.syncHealthLabel")}{" "}
+                      {syncHealth === "healthy"
+                        ? t("settings.syncHealthHealthy")
+                        : syncHealth === "warning"
+                          ? t("settings.syncHealthWarning")
+                          : t("settings.syncHealthError")}
+                    </span>
+                  </div>
+                  <Button variant="outline" onClick={signOut} className="h-11 md:min-w-32">
+                    {t("settings.disconnect")}
+                  </Button>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t("settings.spreadsheetIdOrUrl")}</Label>
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                    <Input
+                      placeholder={t("settings.spreadsheetPlaceholder")}
+                      value={sheetIdInput}
+                      onChange={(e) => onSheetIdChange(e.target.value)}
+                      className="min-w-0"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={onSetSheetId}
+                      className="h-11 shrink-0 w-full md:w-auto md:min-w-24"
+                    >
+                      {t("settings.set")}
+                    </Button>
+                  </div>
+                  {spreadsheetId && (
+                    <p
+                      className="text-xs text-muted-foreground break-all font-mono"
+                      title={spreadsheetId}
+                    >
+                      {t("settings.using")}: {spreadsheetId}
+                    </p>
+                  )}
+                </div>
+
                 {lastSyncAt && (
-                  <span className="ml-3">
+                  <p className="text-xs text-muted-foreground">
                     {t("settings.lastSyncAt", { date: new Date(lastSyncAt).toLocaleString() })}
-                  </span>
-                )}
-                {hasUnsyncedChanges && (
-                  <span className="ml-3">{t("settings.unsyncedUpdatesDetected")}</span>
+                    {hasUnsyncedChanges ? ` • ${t("settings.unsyncedUpdatesDetected")}` : ""}
+                  </p>
                 )}
               </div>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {t("settings.status")}
-                </span>
-                <span className="rounded-full border border-border/60 bg-muted/30 px-2 py-1 text-xs">
-                  {t("settings.signedIn")}
-                </span>
-              </div>
-              <Button
-                variant="outline"
-                onClick={signOut}
-                className="h-11"
-              >
-                {t("settings.disconnect")}
-              </Button>
-            </div>
-            <div className="space-y-2">
-              <Label>{t("settings.spreadsheetIdOrUrl")}</Label>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <Input
-                  placeholder={t("settings.spreadsheetPlaceholder")}
-                  value={sheetIdInput}
-                  onChange={(e) => onSheetIdChange(e.target.value)}
-                  className="min-w-0"
-                />
-                <Button
-                  variant="outline"
-                  onClick={onSetSheetId}
-                  className="h-11 shrink-0 w-full sm:w-auto"
-                >
-                  {t("settings.set")}
-                </Button>
-              </div>
-              {spreadsheetId && (
-                <p
-                  className="text-xs text-muted-foreground break-all font-mono"
-                  title={spreadsheetId}
-                >
-                  {t("settings.using")}: {spreadsheetId}
-                </p>
-              )}
-            </div>
+
             {spreadsheetId && (
-              <>
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-3">
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                  <Button
+                    onClick={() => setSyncConfirmOpen(true)}
+                    disabled={syncStatus === "syncing"}
+                    className="h-11 w-full"
+                  >
+                    {syncStatus === "syncing"
+                      ? t("settings.syncing")
+                      : t("settings.syncToGoogleSheets")}
+                  </Button>
                   <Button
                     onClick={() => setRestoreConfirmOpen(true)}
                     disabled={syncStatus === "syncing"}
@@ -158,100 +167,92 @@ export function GoogleSheetsCard({
                       : t("settings.restoreFromSheet")}
                   </Button>
                   <Button
-                    onClick={() => setSyncConfirmOpen(true)}
-                    disabled={syncStatus === "syncing"}
-                    className="h-11 w-full"
-                  >
-                    {syncStatus === "syncing"
-                      ? t("settings.syncing")
-                      : t("settings.syncToGoogleSheets")}
-                  </Button>
-                  <Button
                     variant="outline"
                     onClick={onRepairDates}
                     title={t("settings.repairCorruptedDatesTitle")}
-                    className="h-11 w-full sm:col-span-2"
+                    className="h-11 w-full"
                   >
                     {t("settings.repairCorruptedDates")}
                   </Button>
                 </div>
                 {repairResult && (
-                  <span className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     {repairResult}
-                  </span>
+                  </p>
                 )}
-
-                <Dialog
-                  open={syncConfirmOpen}
-                  onOpenChange={setSyncConfirmOpen}
-                >
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>{t("settings.syncConfirmTitle")}</DialogTitle>
-                      <DialogDescription>
-                        {t("settings.syncConfirmDesc")}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setSyncConfirmOpen(false)}
-                      >
-                        {t("common.cancel")}
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setSyncConfirmOpen(false);
-                          syncToSheets();
-                        }}
-                      >
-                        {t("settings.syncToGoogleSheets")}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog
-                  open={restoreConfirmOpen}
-                  onOpenChange={setRestoreConfirmOpen}
-                >
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>{t("settings.restoreConfirmTitle")}</DialogTitle>
-                      <DialogDescription>
-                        {t("settings.restoreConfirmDesc")}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setRestoreConfirmOpen(false)}
-                      >
-                        {t("common.cancel")}
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setRestoreConfirmOpen(false);
-                          pullFromSheet();
-                        }}
-                      >
-                        {t("settings.restoreFromSheet")}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {t("settings.restoreSyncNote")}
                 </p>
-              </>
+              </div>
             )}
+
+            <Dialog
+              open={syncConfirmOpen}
+              onOpenChange={setSyncConfirmOpen}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{t("settings.syncConfirmTitle")}</DialogTitle>
+                  <DialogDescription>
+                    {t("settings.syncConfirmDesc")}
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setSyncConfirmOpen(false)}
+                  >
+                    {t("common.cancel")}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSyncConfirmOpen(false);
+                      syncToSheets();
+                    }}
+                  >
+                    {t("settings.syncToGoogleSheets")}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog
+              open={restoreConfirmOpen}
+              onOpenChange={setRestoreConfirmOpen}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{t("settings.restoreConfirmTitle")}</DialogTitle>
+                  <DialogDescription>
+                    {t("settings.restoreConfirmDesc")}
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setRestoreConfirmOpen(false)}
+                  >
+                    {t("common.cancel")}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setRestoreConfirmOpen(false);
+                      pullFromSheet();
+                    }}
+                  >
+                    {t("settings.restoreFromSheet")}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             {syncStatus === "success" && (
-              <p className="text-sm text-green-600 dark:text-green-400">
+              <p className="rounded-lg border border-green-300/60 bg-green-50 px-3 py-2 text-sm text-green-700 dark:border-green-700/40 dark:bg-green-950/30 dark:text-green-400">
                 {t("settings.syncComplete")}
               </p>
             )}
             {syncStatus === "error" && (
-              <p className="text-sm text-destructive">
+              <p className="rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {syncErrorMessage ?? t("settings.syncFailed")}
               </p>
             )}

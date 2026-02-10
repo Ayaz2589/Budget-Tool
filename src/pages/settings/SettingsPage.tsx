@@ -193,84 +193,84 @@ export function SettingsPage() {
 
       {import.meta.env.DEV && (
         <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-          <CardContent className="rounded-lg border border-border/60 p-4">
-          <div className="flex items-start gap-3">
-            <Checkbox
-              id="dummy-data"
-              checked={useDummyData}
-              onCheckedChange={(checked) => setUseDummyData(checked === true)}
-            />
-            <div className="space-y-1">
-              <Label htmlFor="dummy-data" className="text-sm font-medium">
-                {t("settings.useDummyData")}
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                {t("settings.useDummyDataDesc")}
-              </p>
+          <CardContent className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5">
+            <div className="flex items-start gap-3 rounded-lg border border-border/60 bg-background/60 p-3">
+              <Checkbox
+                id="dummy-data"
+                checked={useDummyData}
+                onCheckedChange={(checked) => setUseDummyData(checked === true)}
+              />
+              <div className="space-y-1">
+                <Label htmlFor="dummy-data" className="text-sm font-medium">
+                  {t("settings.useDummyData")}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {t("settings.useDummyDataDesc")}
+                </p>
+              </div>
             </div>
-          </div>
           </CardContent>
         </Card>
       )}
 
       <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-        <CardContent className="rounded-lg border border-border/60 p-4 space-y-3">
-        <div className="space-y-1">
-          <h3 className="text-sm font-semibold">{t("settings.themeTitle")}</h3>
-          <p className="text-xs text-muted-foreground">
-            {t("settings.themeDesc")}
-          </p>
-        </div>
-        <div className="space-y-2">
-          <Label>{t("settings.themeLabel")}</Label>
-          <Select
-            value={theme}
-            onValueChange={(value: "light" | "dark" | "system") =>
-              setTheme(value)
-            }
-          >
-            <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="dark">{t("settings.themeDark")}</SelectItem>
-              <SelectItem value="light">{t("settings.themeLight")}</SelectItem>
-              <SelectItem value="system">{t("settings.themeSystem")}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <CardContent className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-4">
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold">{t("settings.themeTitle")}</h3>
+            <p className="text-xs text-muted-foreground">
+              {t("settings.themeDesc")}
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label>{t("settings.themeLabel")}</Label>
+            <Select
+              value={theme}
+              onValueChange={(value: "light" | "dark" | "system") =>
+                setTheme(value)
+              }
+            >
+              <SelectTrigger className="h-11 w-full data-[size=default]:h-11 bg-background/60">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="dark">{t("settings.themeDark")}</SelectItem>
+                <SelectItem value="light">{t("settings.themeLight")}</SelectItem>
+                <SelectItem value="system">{t("settings.themeSystem")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="space-y-1">
-          <h3 className="text-sm font-semibold">{t("settings.dateFormatTitle")}</h3>
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold">{t("settings.dateFormatTitle")}</h3>
+            <p className="text-xs text-muted-foreground">
+              {t("settings.dateFormatDesc")}
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label>{t("settings.dateFormatLabel")}</Label>
+            <Select
+              value={uiFormatSettings.dateFormat}
+              onValueChange={(dateFormat: "YYYY/MM/DD" | "MM/DD/YYYY") =>
+                setUiFormatSettings({ ...uiFormatSettings, dateFormat })
+              }
+            >
+              <SelectTrigger className="h-11 w-full data-[size=default]:h-11 bg-background/60">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {DATE_FORMAT_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <p className="text-xs text-muted-foreground">
-            {t("settings.dateFormatDesc")}
+            {t("settings.dateFormatPreview", {
+              date: formatDate("2026-02-06"),
+            })}
           </p>
-        </div>
-        <div className="space-y-2">
-          <Label>{t("settings.dateFormatLabel")}</Label>
-          <Select
-            value={uiFormatSettings.dateFormat}
-            onValueChange={(dateFormat: "YYYY/MM/DD" | "MM/DD/YYYY") =>
-              setUiFormatSettings({ ...uiFormatSettings, dateFormat })
-            }
-          >
-            <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {DATE_FORMAT_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          {t("settings.dateFormatPreview", {
-            date: formatDate("2026-02-06"),
-          })}
-        </p>
         </CardContent>
       </Card>
 
@@ -299,7 +299,7 @@ export function SettingsPage() {
       <div className="pt-4 border-t sm:pt-6">
         <Button
           variant="outline"
-          className="w-full sm:w-auto text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
+          className="h-11 w-full sm:w-auto text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
           onClick={() => setDeleteAllConfirmOpen(true)}
         >
           <Trash2 className="size-4 shrink-0" />

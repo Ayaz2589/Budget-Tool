@@ -387,7 +387,7 @@ export function Dashboard() {
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      className="min-w-[16rem] px-4 py-3 text-sm"
+                      className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                       labelClassName="text-sm font-semibold"
                       valueFormatter={(value) => formatCurrency(asNumber(value))}
                     />
@@ -452,7 +452,7 @@ export function Dashboard() {
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      className="min-w-[16rem] px-4 py-3 text-sm"
+                      className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                       labelClassName="text-sm font-semibold"
                       valueFormatter={(value) => formatCurrency(asNumber(value))}
                     />
@@ -521,7 +521,7 @@ export function Dashboard() {
                       <ChartTooltip
                         content={
                           <ChartTooltipContent
-                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                             labelClassName="text-sm font-semibold"
                             valueFormatter={(value) => formatCurrency(asNumber(value))}
                           />
@@ -587,7 +587,7 @@ export function Dashboard() {
                       <ChartTooltip
                         content={
                           <ChartTooltipContent
-                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                             labelClassName="text-sm font-semibold"
                             valueFormatter={(value) => formatCurrency(asNumber(value))}
                           />
@@ -637,7 +637,7 @@ export function Dashboard() {
                       <ChartTooltip
                         content={
                           <ChartTooltipContent
-                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                             labelClassName="text-sm font-semibold"
                             valueFormatter={(value) => formatCurrency(asNumber(value))}
                           />
@@ -663,7 +663,7 @@ export function Dashboard() {
                       <ChartTooltip
                         content={
                           <ChartTooltipContent
-                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                             labelClassName="text-sm font-semibold"
                             valueFormatter={(value) => formatCurrency(asNumber(value))}
                           />
@@ -705,7 +705,7 @@ export function Dashboard() {
                       <ChartTooltip
                         content={
                           <ChartTooltipContent
-                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                             labelClassName="text-sm font-semibold"
                             valueFormatter={(value) => formatCurrency(asNumber(value))}
                           />
@@ -731,7 +731,7 @@ export function Dashboard() {
                       <ChartTooltip
                         content={
                           <ChartTooltipContent
-                            className="min-w-[16rem] px-4 py-3 text-sm"
+                            className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                             labelClassName="text-sm font-semibold"
                             valueFormatter={(value) => formatCurrency(asNumber(value))}
                           />
@@ -753,13 +753,13 @@ export function Dashboard() {
           </DsChartCard>
         </section>
 
-        <section className="space-y-2">
+        <section className="space-y-2 pt-2">
           <h2 className="text-base font-semibold">{t("dashboard.sectionExpenseByOwner")}</h2>
           {ownerNetRows.length === 0 ? (
             <DsEmptyState title={t("dashboard.sectionNoOwnerExpenses")} className="py-4" />
           ) : (
-            <div className="border-t border-[var(--border-subtle)]">
-              <div className="grid grid-cols-2 gap-2 px-2 py-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+            <div className="rounded-2xl border border-border/60 bg-card">
+              <div className="grid grid-cols-2 gap-2 border-b border-[var(--border-subtle)] px-3 py-2 text-[11px] uppercase tracking-wide text-muted-foreground">
                 <p>{t("dashboard.grossExpenseByOwner")}</p>
                 <p className="text-right">{t("dashboard.netAfterTransfers")}</p>
               </div>
@@ -848,7 +848,7 @@ export function Dashboard() {
                         </div>
                       ) : undefined
                     }
-                    className={isExpanded ? "bg-muted/20" : undefined}
+                    className={isExpanded ? "bg-muted/20 cursor-pointer" : "cursor-pointer"}
                     dense
                   />
                 );
@@ -861,13 +861,13 @@ export function Dashboard() {
         <Accordion
           type="multiple"
           defaultValue={["debt", "spend-source"]}
-          className="space-y-0 pb-4 border-t border-[var(--border-subtle)]"
+          className="space-y-3 pb-4 pt-2"
         >
           <AccordionItem
             value="debt"
-            className="border-b border-[var(--border-subtle)] px-0"
+            className="rounded-2xl border border-border/60 bg-card px-4"
           >
-            <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
+            <AccordionTrigger className="cursor-pointer py-4 text-base font-semibold hover:no-underline">
               {t("dashboard.sectionDebtSnapshot")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
@@ -902,9 +902,9 @@ export function Dashboard() {
 
           <AccordionItem
             value="spend-source"
-            className="border-b border-[var(--border-subtle)] px-0"
+            className="rounded-2xl border border-border/60 bg-card px-4"
           >
-            <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
+            <AccordionTrigger className="cursor-pointer py-4 text-base font-semibold hover:no-underline">
               {t("dashboard.sectionSpendByCardSource")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
@@ -929,9 +929,9 @@ export function Dashboard() {
 
           <AccordionItem
             value="transfers"
-            className="border-b border-[var(--border-subtle)] px-0"
+            className="rounded-2xl border border-border/60 bg-card px-4"
           >
-            <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
+            <AccordionTrigger className="cursor-pointer py-4 text-base font-semibold hover:no-underline">
               {t("dashboard.ownerTransfersMtd")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
@@ -960,9 +960,9 @@ export function Dashboard() {
 
           <AccordionItem
             value="recent"
-            className="border-b border-[var(--border-subtle)] px-0"
+            className="rounded-2xl border border-border/60 bg-card px-4"
           >
-            <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
+            <AccordionTrigger className="cursor-pointer py-4 text-base font-semibold hover:no-underline">
               {t("dashboard.sectionRecentActivity")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
@@ -988,9 +988,9 @@ export function Dashboard() {
 
           <AccordionItem
             value="insights"
-            className="border-b border-[var(--border-subtle)] px-0"
+            className="rounded-2xl border border-border/60 bg-card px-4"
           >
-            <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
+            <AccordionTrigger className="cursor-pointer py-4 text-base font-semibold hover:no-underline">
               {t("dashboard.sectionSmartInsightsAlerts")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">

@@ -23,4 +23,17 @@ export interface GoogleAuthContextValue {
   lastSyncAt: number | null;
   hasUnsyncedChanges: boolean;
   syncHealth: SyncHealth;
+  sheetSetupState:
+    | "idle"
+    | "loading"
+    | "needs-selection"
+    | "needs-create"
+    | "creating"
+    | "done"
+    | "error";
+  availableDriveSheets: Array<{ id: string; name: string; modifiedTime?: string }>;
+  runSheetAutoSetup: () => Promise<void>;
+  linkDriveSheet: (id: string) => void;
+  createOrthoDriveSheet: () => Promise<void>;
+  dismissSheetSetupPrompt: () => void;
 }

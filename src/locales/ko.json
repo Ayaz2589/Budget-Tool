@@ -46,6 +46,7 @@
     "createAccountSubheading": "Ortho를 사용하려면 Google로 로그인하세요.",
     "googleNotConfigured": "Google 로그인이 구성되지 않았습니다.",
     "notSignedInOrNoSpreadsheet": "로그인하지 않았거나 스프레드시트가 설정되지 않았습니다.",
+    "sheetInTrashOrMissing": "연결된 스프레드시트가 Google Drive 휴지통에 있거나 사용할 수 없습니다. 설정에서 활성 시트를 다시 연결하세요.",
     "signInDisclaimer": "로그인하면 Google 스프레드시트와 동기화할 수 있습니다.",
     "signInToContinue": "대시보드를 보려면 Google로 로그인하세요.",
     "signInWithGoogle": "Google로 로그인",
@@ -534,7 +535,19 @@
     "themeLight": "Light",
     "themeSystem": "System",
     "replayTour": "투어 다시 보기",
-    "replayTourDesc": "주요 기능과 데이터 제어를 다시 확인하려면 온보딩 투어를 다시 실행하세요."
+    "replayTourDesc": "주요 기능과 데이터 제어를 다시 확인하려면 온보딩 투어를 다시 실행하세요.",
+    "sheetSetupTitle": "Google 시트 연결",
+    "sheetSetupLoading": "Google Drive에서 Ortho 폴더를 확인하는 중...",
+    "sheetSetupSelectDesc": "Ortho와 연결할 시트를 Ortho 폴더에서 선택하세요.",
+    "sheetSetupCreateDesc": "Ortho 폴더 또는 시트를 찾지 못했습니다. 지금 Ortho 폴더와 새 \"Ortho Budget\" 시트를 만들까요?",
+    "sheetSetupCreating": "Ortho 폴더와 \"Ortho Budget\" 시트를 생성하는 중...",
+    "sheetSetupError": "Drive 폴더 설정에 접근할 수 없습니다. Drive 권한을 위해 Google을 다시 연결하거나 설정에서 시트를 수동으로 지정하세요.",
+    "sheetSetupNotNow": "나중에",
+    "sheetSetupRefresh": "새로고침",
+    "sheetSetupUseSelected": "선택한 시트 사용",
+    "sheetSetupCreate": "Ortho 폴더 + 시트 생성",
+    "sheetSetupRetry": "다시 시도",
+    "sheetSetupManualHint": "설정에서 언제든지 스프레드시트를 수동으로 설정할 수 있습니다."
   },
   "transactions": {
     "add": "추가",

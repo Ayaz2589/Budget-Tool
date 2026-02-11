@@ -46,6 +46,7 @@
     "createAccountSubheading": "使用 Ortho 请用 Google 登录。",
     "googleNotConfigured": "未配置 Google 登录。",
     "notSignedInOrNoSpreadsheet": "未登录或未设置表格。",
+    "sheetInTrashOrMissing": "已链接的表格位于 Google Drive 回收站中或不可用。请在“设置”中重新关联一个可用表格。",
     "signInDisclaimer": "登录后可与 Google 表格同步数据。",
     "signInToContinue": "使用 Google 登录以查看您的仪表板。",
     "signInWithGoogle": "使用 Google 登录",
@@ -535,7 +536,19 @@
     "themeLight": "Light",
     "themeSystem": "System",
     "replayTour": "重新查看导览",
-    "replayTourDesc": "重新运行新手导览，快速回顾关键功能和数据控制方式。"
+    "replayTourDesc": "重新运行新手导览，快速回顾关键功能和数据控制方式。",
+    "sheetSetupTitle": "关联 Google 表格",
+    "sheetSetupLoading": "正在检查你在 Google Drive 中的 Ortho 文件夹...",
+    "sheetSetupSelectDesc": "请选择 Ortho 文件夹中的一个表格与 Ortho 关联。",
+    "sheetSetupCreateDesc": "未找到 Ortho 文件夹或表格。是否立即创建 Ortho 文件夹和新的“Ortho Budget”表格？",
+    "sheetSetupCreating": "正在创建 Ortho 文件夹和“Ortho Budget”表格...",
+    "sheetSetupError": "无法访问你的 Drive 文件夹设置。请重新连接 Google 以授予 Drive 权限，或在“设置”中手动设置表格。",
+    "sheetSetupNotNow": "暂不",
+    "sheetSetupRefresh": "刷新",
+    "sheetSetupUseSelected": "使用所选表格",
+    "sheetSetupCreate": "创建 Ortho 文件夹 + 表格",
+    "sheetSetupRetry": "重试",
+    "sheetSetupManualHint": "你也可以随时在“设置”中手动设置表格。"
   },
   "transactions": {
     "add": "添加",

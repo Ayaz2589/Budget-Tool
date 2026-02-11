@@ -39,6 +39,12 @@ function baseAuth(overrides: Partial<GoogleAuthContextValue> = {}): GoogleAuthCo
     lastSyncAt: null,
     hasUnsyncedChanges: false,
     syncHealth: "healthy",
+    sheetSetupState: "idle",
+    availableDriveSheets: [],
+    runSheetAutoSetup: async () => {},
+    linkDriveSheet: () => {},
+    createOrthoDriveSheet: async () => {},
+    dismissSheetSetupPrompt: () => {},
     ...overrides,
   };
 }

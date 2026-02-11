@@ -46,6 +46,7 @@
     "createAccountSubheading": "Ortho इस्तेमाल शुरू करने के लिए Google से साइन इन करें।",
     "googleNotConfigured": "Google साइन इन कॉन्फ़िगर नहीं।",
     "notSignedInOrNoSpreadsheet": "साइन इन नहीं या स्प्रैडशीट सेट नहीं।",
+    "sheetInTrashOrMissing": "लिंक किया गया स्प्रेडशीट Google Drive ट्रैश में है या उपलब्ध नहीं है। Settings में एक सक्रिय शीट लिंक करें।",
     "signInDisclaimer": "साइन इन करने पर Google Sheets के साथ सिंक होगा।",
     "signInToContinue": "अपना डैशबोर्ड देखने के लिए Google से साइन इन करें।",
     "signInWithGoogle": "Google से साइन इन करें",
@@ -534,7 +535,19 @@
     "themeLight": "Light",
     "themeSystem": "System",
     "replayTour": "टूर फिर से देखें",
-    "replayTourDesc": "मुख्य फीचर और डेटा नियंत्रण समझने के लिए ऑनबोर्डिंग टूर दोबारा चलाएं।"
+    "replayTourDesc": "मुख्य फीचर और डेटा नियंत्रण समझने के लिए ऑनबोर्डिंग टूर दोबारा चलाएं।",
+    "sheetSetupTitle": "Google Sheet लिंक करें",
+    "sheetSetupLoading": "Google Drive में आपका Ortho फ़ोल्डर जाँचा जा रहा है...",
+    "sheetSetupSelectDesc": "Ortho से लिंक करने के लिए अपने Ortho फ़ोल्डर से एक शीट चुनें।",
+    "sheetSetupCreateDesc": "कोई Ortho फ़ोल्डर या शीट नहीं मिली। क्या अभी Ortho फ़ोल्डर और नई \"Ortho Budget\" शीट बनाई जाए?",
+    "sheetSetupCreating": "आपका Ortho फ़ोल्डर और \"Ortho Budget\" शीट बनाई जा रही है...",
+    "sheetSetupError": "Drive फ़ोल्डर सेटअप एक्सेस नहीं हो पाया। Drive अनुमति देने के लिए Google फिर से कनेक्ट करें, या Settings में शीट मैन्युअली सेट करें।",
+    "sheetSetupNotNow": "अभी नहीं",
+    "sheetSetupRefresh": "रीफ़्रेश",
+    "sheetSetupUseSelected": "चुनी हुई शीट इस्तेमाल करें",
+    "sheetSetupCreate": "Ortho फ़ोल्डर + शीट बनाएं",
+    "sheetSetupRetry": "फिर कोशिश करें",
+    "sheetSetupManualHint": "आप Settings से कभी भी अपना स्प्रेडशीट मैन्युअली सेट कर सकते हैं।"
   },
   "transactions": {
     "add": "जोड़ें",

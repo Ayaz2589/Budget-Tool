@@ -41,6 +41,7 @@ import {
 import { persistLocale } from "@/i18n";
 import i18n from "@/i18n";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
+import { SheetSetupDialog } from "@/components/SheetSetupDialog";
 import {
   DsSidebarBrand,
   DsSidebarNavItem,
@@ -246,6 +247,12 @@ export function Layout() {
     spreadsheetId,
     syncStatus,
     hasUnsyncedChanges,
+    sheetSetupState,
+    availableDriveSheets,
+    runSheetAutoSetup,
+    linkDriveSheet,
+    createOrthoDriveSheet,
+    dismissSheetSetupPrompt,
   } = useGoogleAuth();
   const currentLng = i18n.language;
   const showSyncStatusUi = location.pathname !== "/dashboard";
@@ -524,6 +531,16 @@ export function Layout() {
           showSyncComplete={showSyncComplete}
         />
       )}
+      <SheetSetupDialog
+        isSignedIn={isSignedIn}
+        spreadsheetId={spreadsheetId}
+        sheetSetupState={sheetSetupState}
+        availableDriveSheets={availableDriveSheets}
+        runSheetAutoSetup={runSheetAutoSetup}
+        linkDriveSheet={linkDriveSheet}
+        createOrthoDriveSheet={createOrthoDriveSheet}
+        dismissSheetSetupPrompt={dismissSheetSetupPrompt}
+      />
     </div>
   );
 }

@@ -16,6 +16,17 @@ const mockAuthValueSignedOut: GoogleAuthContextValue = {
   pullFromSheet: async () => {},
   syncStatus: "idle",
   syncErrorMessage: null,
+  isAutoSyncEnabled: false,
+  setAutoSyncEnabled: () => {},
+  lastSyncAt: null,
+  hasUnsyncedChanges: false,
+  syncHealth: "healthy",
+  sheetSetupState: "idle",
+  availableDriveSheets: [],
+  runSheetAutoSetup: async () => {},
+  linkDriveSheet: () => {},
+  createOrthoDriveSheet: async () => {},
+  dismissSheetSetupPrompt: () => {},
 };
 
 const mockAuthValueSignedIn: GoogleAuthContextValue = {

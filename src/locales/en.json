@@ -46,6 +46,7 @@
     "createAccountSubheading": "Sign In with Google to start using Ortho.",
     "googleNotConfigured": "Google sign-in is not configured.",
     "notSignedInOrNoSpreadsheet": "Not signed in or no spreadsheet set.",
+    "sheetInTrashOrMissing": "The linked spreadsheet is in Google Drive trash or unavailable. Link an active sheet in Settings.",
     "signInDisclaimer": "By signing in, you can sync your data with Google Sheets and access your dashboard from any device.",
     "signInToContinue": "Sign in with Google to view your dashboard.",
     "signInWithGoogle": "Google",
@@ -534,7 +535,19 @@
     "themeLight": "Light",
     "themeSystem": "System",
     "replayTour": "Replay tour",
-    "replayTourDesc": "Run the onboarding walkthrough again to review key features and data controls."
+    "replayTourDesc": "Run the onboarding walkthrough again to review key features and data controls.",
+    "sheetSetupTitle": "Link a Google Sheet",
+    "sheetSetupLoading": "Checking your Ortho folder in Google Drive...",
+    "sheetSetupSelectDesc": "Choose a sheet from your Ortho folder to link with Ortho.",
+    "sheetSetupCreateDesc": "No Ortho folder or sheets were found. Create an Ortho folder with a new Ortho Budget sheet now?",
+    "sheetSetupCreating": "Creating your Ortho folder and Ortho Budget sheet...",
+    "sheetSetupError": "We could not access your Drive folder setup. Reconnect Google to grant Drive access, or set a sheet manually in Settings.",
+    "sheetSetupNotNow": "Not now",
+    "sheetSetupRefresh": "Refresh",
+    "sheetSetupUseSelected": "Use selected sheet",
+    "sheetSetupCreate": "Create Ortho folder + sheet",
+    "sheetSetupRetry": "Retry",
+    "sheetSetupManualHint": "You can always set your spreadsheet manually from Settings."
   },
   "transactions": {
     "add": "Add",

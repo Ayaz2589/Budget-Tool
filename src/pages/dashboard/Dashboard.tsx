@@ -310,13 +310,13 @@ export function Dashboard() {
   return (
     <div className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
       <div className="min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-3">
           <DsSectionHeader
             title={t("dashboard.title")}
             subtitle={t("dashboard.healthQuestion")}
             showCurrencyChip
           />
-          <div className="flex w-full flex-col items-start gap-2 md:w-auto md:items-end">
+          <div className="flex w-full flex-col items-start gap-2 md:items-end">
             <div className="w-full md:w-auto">
               <DsSplitToggle
                 className="md:min-w-[430px]"

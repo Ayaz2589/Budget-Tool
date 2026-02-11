@@ -1,4 +1,5 @@
 import type * as React from "react";
+import { useRef } from "react";
 import { useBudget } from "@/context/BudgetContext";
 import {
   CURRENCY_META,
@@ -61,11 +62,19 @@ export function DsSectionHeader({
 }
 
 function DsHeaderCurrencyChip() {
-  const { uiFormatSettings, setUiFormatSettings } = useBudget();
+  const { uiFormatSettings, setUiFormatSettings, isCurrencyUpdating } = useBudget();
   const currencyMeta = CURRENCY_META[uiFormatSettings.currency];
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   return (
     <Select
       value={uiFormatSettings.currency}
+      onOpenChange={(open) => {
+        if (!open) {
+          requestAnimationFrame(() => {
+            triggerRef.current?.blur();
+          });
+        }
+      }}
       onValueChange={(currency) =>
         setUiFormatSettings({
           ...uiFormatSettings,
@@ -73,9 +82,15 @@ function DsHeaderCurrencyChip() {
         })
       }
     >
-      <SelectTrigger className="h-8 w-auto min-w-0 rounded-full border-border/70 bg-card/70 px-3 text-xs font-medium tracking-wide text-muted-foreground data-[size=default]:h-8">
+      <SelectTrigger
+        ref={triggerRef}
+        disabled={isCurrencyUpdating}
+        className="h-8 w-auto min-w-0 rounded-full border-border/70 bg-card/70 px-3 text-xs font-medium tracking-wide text-muted-foreground data-[size=default]:h-8"
+      >
         <SelectValue>
-          {currencyMeta.symbol} {uiFormatSettings.currency}
+          {isCurrencyUpdating
+            ? "Updating..."
+            : `${currencyMeta.flag} ${currencyMeta.symbol} ${uiFormatSettings.currency}`}
         </SelectValue>
       </SelectTrigger>
       <SelectContent align="end">

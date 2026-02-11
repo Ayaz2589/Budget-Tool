@@ -214,6 +214,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       return initialSettings;
     }
   );
+  const [isCurrencyUpdating, setIsCurrencyUpdating] = useState(false);
   const [useDummyData, setUseDummyDataState] = useState(() => {
     if (!isDev) return false;
     try {
@@ -253,7 +254,11 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   }, [uiFormatSettings]);
 
   useEffect(() => {
-    if (uiFormatSettings.currency === "USD") return;
+    if (uiFormatSettings.currency === "USD") {
+      setIsCurrencyUpdating(false);
+      return;
+    }
+    setIsCurrencyUpdating(true);
     let cancelled = false;
     getUsdFxRate(uiFormatSettings.currency).then((fx) => {
       if (cancelled) return;
@@ -266,13 +271,19 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         ) {
           return prev;
         }
-        return {
+        const nextSettings: UiFormatSettings = {
           ...prev,
           fxRate: fx.rate,
           fxAsOf: fx.asOf,
           fxFallback: fx.fallback,
         };
+        // Apply formatter state before next render so currency conversion
+        // reflects immediately in all formatCurrency consumers.
+        applyUiFormatSettings(nextSettings);
+        return nextSettings;
       });
+    }).finally(() => {
+      if (!cancelled) setIsCurrencyUpdating(false);
     });
     return () => {
       cancelled = true;
@@ -891,8 +902,12 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       const currencyChanged = nextCurrency !== prev.currency;
       const cachedFx =
         nextCurrency === "USD" ? null : getCachedUsdFxRate(nextCurrency);
+      // Ignore stale fxRate values when the caller is switching currencies
+      // from UI controls that spread previous settings.
       const explicitFxRate =
-        Number.isFinite(settings.fxRate) && settings.fxRate > 0
+        Number.isFinite(settings.fxRate) &&
+        settings.fxRate > 0 &&
+        (!currencyChanged || typeof settings.fxAsOf === "string")
           ? settings.fxRate
           : null;
       const nextFxRate =
@@ -913,7 +928,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
           : settings.fxFallback ??
             (cachedFx ? cachedFx.stale : currencyChanged ? true : prev.fxFallback);
 
-      return {
+      const nextSettings: UiFormatSettings = {
         ...prev,
         ...settings,
         baseCurrency: "USD",
@@ -922,6 +937,10 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         fxAsOf: nextFxAsOf,
         fxFallback: nextFxFallback,
       };
+      // Apply formatter state synchronously so currency chip changes update
+      // conversion values immediately without requiring a refresh.
+      applyUiFormatSettings(nextSettings);
+      return nextSettings;
     });
   }, []);
 
@@ -1015,6 +1034,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       repairCorruptedDates,
       uiFormatSettings,
       setUiFormatSettings,
+      isCurrencyUpdating,
       useDummyData,
       setUseDummyData,
     }),
@@ -1050,6 +1070,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       setExpenseCategories,
       setIOweNova,
       setUiFormatSettings,
+      isCurrencyUpdating,
       setIncomeCategories,
       setOwners,
       uiFormatSettings,

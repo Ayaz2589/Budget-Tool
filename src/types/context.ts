@@ -39,6 +39,7 @@ export interface BudgetContextValue extends BudgetState {
   repairCorruptedDates: () => { fixedExpenses: number; fixedIncome: number };
   uiFormatSettings: UiFormatSettings;
   setUiFormatSettings: (settings: UiFormatSettings) => void;
+  isCurrencyUpdating: boolean;
   useDummyData: boolean;
   setUseDummyData: (value: boolean) => void;
 }

@@ -203,7 +203,6 @@ export function GoogleAuthProviderFallback({
 }
 
 const USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
-const TOKENINFO_URL = "https://www.googleapis.com/oauth2/v1/tokeninfo";
 
 function isUnauthorizedError(err: unknown): boolean {
   if (err instanceof Error) {
@@ -325,30 +324,6 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         if (!cancelled) setUserProfile(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [accessToken]);
-
-  useEffect(() => {
-    if (!import.meta.env.DEV || !accessToken) return;
-    let cancelled = false;
-    fetch(`${TOKENINFO_URL}?access_token=${encodeURIComponent(accessToken)}`)
-      .then((res) =>
-        res.ok ? res.json() : Promise.reject(new Error("Failed to fetch token info"))
-      )
-      .then((data: { scope?: string }) => {
-        if (cancelled) return;
-        const scopes = String(data.scope ?? "")
-          .split(" ")
-          .filter(Boolean)
-          .sort();
-        console.info("[Auth Debug] Granted OAuth scopes:", scopes);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        console.warn("[Auth Debug] Unable to fetch token scopes:", err);
       });
     return () => {
       cancelled = true;

@@ -1,6 +1,7 @@
 import { test, expect, mock } from "bun:test";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MortgagePaymentsTable } from "@/pages/mortgage/MortgagePaymentsTable";
+import i18n from "@/i18n";
 
 test("MortgagePaymentsTable shows empty state when no payments", () => {
   render(
@@ -9,9 +10,7 @@ test("MortgagePaymentsTable shows empty state when no payments", () => {
       onPaymentTap={() => {}}
     />,
   );
-  expect(
-    screen.getByText("No mortgage payments yet. Add your first payment."),
-  ).toBeInTheDocument();
+  expect(screen.getByText(i18n.t("mortgage.noPaymentsYet"))).toBeInTheDocument();
 });
 
 test("MortgagePaymentsTable shows Date and Category headers when has payments", () => {
@@ -32,10 +31,10 @@ test("MortgagePaymentsTable shows Date and Category headers when has payments", 
     />,
   );
   expect(
-    screen.getByRole("columnheader", { name: "Date" }),
+    screen.getByRole("columnheader", { name: i18n.t("common.date") }),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("columnheader", { name: "Category" }),
+    screen.getByRole("columnheader", { name: i18n.t("common.category") }),
   ).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: /Mortgage/i }));
   expect(onPaymentTap).toHaveBeenCalledWith(

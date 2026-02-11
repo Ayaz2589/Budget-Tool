@@ -39,6 +39,12 @@ function baseAuth(overrides: Partial<GoogleAuthContextValue> = {}): GoogleAuthCo
     lastSyncAt: null,
     hasUnsyncedChanges: false,
     syncHealth: "healthy",
+    sheetSetupState: "idle",
+    availableDriveSheets: [],
+    runSheetAutoSetup: async () => {},
+    linkDriveSheet: () => {},
+    createOrthoDriveSheet: async () => {},
+    dismissSheetSetupPrompt: () => {},
     ...overrides,
   };
 }
@@ -69,6 +75,8 @@ test("TourPage allows signed-in replay mode", () => {
     </GoogleAuthContext.Provider>,
   );
 
+  expect(screen.getByText("Language")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Next" }));
   expect(screen.getByText("Welcome to Ortho")).toBeInTheDocument();
   while (!screen.queryByRole("button", { name: "Finish tour" })) {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
@@ -87,6 +95,8 @@ test("TourPage allows stepping through tour and sign-in on final step", () => {
   const signIn = mock(() => {});
   renderWithAuth(baseAuth({ signIn }));
 
+  expect(screen.getByText("Language")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Next" }));
   expect(screen.getByText("Welcome to Ortho")).toBeInTheDocument();
   while (!screen.queryByRole("button", { name: "Sign in with Google" })) {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
@@ -97,4 +107,12 @@ test("TourPage allows stepping through tour and sign-in on final step", () => {
   expect(signIn).toHaveBeenCalledTimes(1);
   expect(localStorage.getItem(RETURNING_USER_KEY)).toBe("1");
   expect(localStorage.getItem(TOUR_COMPLETED_KEY)).toBe("1");
+});
+
+test("TourPage language selector changes tour copy", () => {
+  renderWithAuth(baseAuth());
+  fireEvent.click(screen.getByRole("combobox"));
+  fireEvent.click(screen.getByText("Español"));
+  fireEvent.click(screen.getByRole("button", { name: "Siguiente" }));
+  expect(screen.getByText("Bienvenido a Ortho")).toBeInTheDocument();
 });

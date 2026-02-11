@@ -25,6 +25,12 @@ function buildAuthValue(
     lastSyncAt: null,
     hasUnsyncedChanges: false,
     syncHealth: "healthy",
+    sheetSetupState: "idle",
+    availableDriveSheets: [],
+    runSheetAutoSetup: async () => {},
+    linkDriveSheet: () => {},
+    createOrthoDriveSheet: async () => {},
+    dismissSheetSetupPrompt: () => {},
     ...overrides,
   };
 }
@@ -103,4 +109,18 @@ test("Layout calls signOut from More sheet and supports avatar fallback", () => 
   const signOutButtons = screen.getAllByRole("button", { name: "Sign out" });
   fireEvent.click(signOutButtons[signOutButtons.length - 1]!);
   expect(signOut).toHaveBeenCalledTimes(1);
+});
+
+test("Layout shows sheet setup dialog when signed in without linked spreadsheet", () => {
+  const dismissSheetSetupPrompt = mock(() => {});
+  renderLayout({
+    isSignedIn: true,
+    spreadsheetId: null,
+    sheetSetupState: "needs-create",
+    dismissSheetSetupPrompt,
+  });
+
+  expect(screen.getByText("Link a Google Sheet")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Not now" }));
+  expect(dismissSheetSetupPrompt).toHaveBeenCalledTimes(1);
 });

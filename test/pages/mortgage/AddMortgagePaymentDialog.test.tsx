@@ -1,6 +1,7 @@
 import { test, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { AddMortgagePaymentDialog } from "@/pages/mortgage/AddMortgagePaymentDialog";
+import i18n from "@/i18n";
 
 test("AddMortgagePaymentDialog shows title when open", () => {
   render(
@@ -15,5 +16,5 @@ test("AddMortgagePaymentDialog shows title when open", () => {
     />,
   );
   expect(screen.getByRole("dialog")).toBeInTheDocument();
-  expect(screen.getByText("Add mortgage payment")).toBeInTheDocument();
+  expect(screen.getByText(i18n.t("mortgage.addMortgagePayment"))).toBeInTheDocument();
 });

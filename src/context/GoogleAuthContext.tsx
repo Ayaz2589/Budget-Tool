@@ -33,6 +33,14 @@ import { getCategoryColor } from "@/lib/categoryColors";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
 import type { SyncHealth, SyncStatus } from "@/types/auth";
 import { isDisplayCurrency } from "@/types/currency";
+import {
+  createOrthoFolder,
+  createSheetInFolder,
+  findOrthoFolder,
+  isSpreadsheetActive,
+  listSheetsInFolder,
+  ORTHO_SHEET_NAME,
+} from "@/lib/googleDrive";
 
 const SPREADSHEET_ID_KEY = "budget-tool-spreadsheet-id";
 const ACCESS_TOKEN_STORAGE_KEY = "budget-tool-google-access-token";
@@ -133,6 +141,8 @@ export function GoogleAuthProviderFallback({
   const [lastSyncAt] = useState<number | null>(null);
   const [hasUnsyncedChanges] = useState(false);
   const [syncHealth] = useState<SyncHealth>("healthy");
+  const [sheetSetupState] = useState<GoogleAuthContextValue["sheetSetupState"]>("idle");
+  const [availableDriveSheets] = useState<GoogleAuthContextValue["availableDriveSheets"]>([]);
 
   useEffect(() => {
     if (spreadsheetId) {
@@ -182,6 +192,12 @@ export function GoogleAuthProviderFallback({
       lastSyncAt,
       hasUnsyncedChanges,
       syncHealth,
+      sheetSetupState,
+      availableDriveSheets,
+      runSheetAutoSetup: async () => {},
+      linkDriveSheet: () => {},
+      createOrthoDriveSheet: async () => {},
+      dismissSheetSetupPrompt: () => {},
     }),
     [
       spreadsheetId,
@@ -192,6 +208,8 @@ export function GoogleAuthProviderFallback({
       lastSyncAt,
       hasUnsyncedChanges,
       syncHealth,
+      sheetSetupState,
+      availableDriveSheets,
     ]
   );
 
@@ -247,6 +265,15 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   const [lastSyncAt, setLastSyncAt] = useState<number | null>(null);
   const [hasUnsyncedChanges, setHasUnsyncedChanges] = useState(false);
   const [syncHealth, setSyncHealth] = useState<SyncHealth>("healthy");
+  const [sheetSetupState, setSheetSetupState] =
+    useState<GoogleAuthContextValue["sheetSetupState"]>("idle");
+  const [availableDriveSheets, setAvailableDriveSheets] = useState<
+    GoogleAuthContextValue["availableDriveSheets"]
+  >([]);
+  const [sheetSetupDismissed, setSheetSetupDismissed] = useState(false);
+  const sheetSetupRanForSessionRef = useRef(false);
+  const orthoFolderIdRef = useRef<string | null>(null);
+  const initialSyncAfterCreateRef = useRef(false);
   const latestSyncSignatureRef = useRef<string>("");
   const lastSyncedSignatureRef = useRef<string | null>(null);
   const inFlightRef = useRef(false);
@@ -272,6 +299,12 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(retryTimerRef.current);
       retryTimerRef.current = null;
     }
+    setSheetSetupState("idle");
+    setAvailableDriveSheets([]);
+    setSheetSetupDismissed(false);
+    sheetSetupRanForSessionRef.current = false;
+    orthoFolderIdRef.current = null;
+    initialSyncAfterCreateRef.current = false;
     try {
       localStorage.setItem(RETURNING_USER_KEY, "1");
     } catch {
@@ -290,13 +323,14 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       clearSession();
     },
     scope:
-      "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
     flow: "implicit",
   });
 
   useEffect(() => {
     if (!accessToken) {
       setUserProfile(null);
+      sheetSetupRanForSessionRef.current = false;
       return;
     }
     let cancelled = false;
@@ -368,6 +402,10 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     if (id) {
       const extracted = id.includes("/") ? extractSpreadsheetId(id) : id;
       setSpreadsheetIdState(extracted || id);
+      setSheetSetupState("done");
+      setAvailableDriveSheets([]);
+      setSheetSetupDismissed(false);
+      sheetSetupRanForSessionRef.current = true;
       latestSyncSignatureRef.current = "";
       lastSyncedSignatureRef.current = null;
       syncQueuedRef.current = false;
@@ -380,6 +418,12 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       setHasUnsyncedChanges(false);
     } else {
       setSpreadsheetIdState(null);
+      setSheetSetupState("idle");
+      setAvailableDriveSheets([]);
+      setSheetSetupDismissed(false);
+      sheetSetupRanForSessionRef.current = false;
+      orthoFolderIdRef.current = null;
+      initialSyncAfterCreateRef.current = false;
       latestSyncSignatureRef.current = "";
       lastSyncedSignatureRef.current = null;
       syncQueuedRef.current = false;
@@ -401,6 +445,83 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       // ignore
     }
   }, []);
+
+  const dismissSheetSetupPrompt = useCallback(() => {
+    setSheetSetupDismissed(true);
+    setSheetSetupState("idle");
+    setAvailableDriveSheets([]);
+  }, []);
+
+  const linkDriveSheet = useCallback(
+    (id: string) => {
+      setSpreadsheetId(id);
+      setSheetSetupState("done");
+      setSheetSetupDismissed(false);
+    },
+    [setSpreadsheetId],
+  );
+
+  const runSheetAutoSetup = useCallback(async () => {
+    if (!accessToken || spreadsheetId) return;
+    setSheetSetupState("loading");
+    setAvailableDriveSheets([]);
+    try {
+      const folder = await findOrthoFolder(accessToken);
+      if (!folder) {
+        orthoFolderIdRef.current = null;
+        setSheetSetupState("needs-create");
+        return;
+      }
+      orthoFolderIdRef.current = folder.id;
+      const sheets = await listSheetsInFolder(accessToken, folder.id);
+      if (sheets.length > 0) {
+        setAvailableDriveSheets(sheets);
+        setSheetSetupState("needs-selection");
+      } else {
+        setSheetSetupState("needs-create");
+      }
+    } catch {
+      setSheetSetupState("error");
+    }
+  }, [accessToken, spreadsheetId]);
+
+  const createOrthoDriveSheet = useCallback(async () => {
+    if (!accessToken || spreadsheetId) return;
+    setSheetSetupState("creating");
+    try {
+      let folderId = orthoFolderIdRef.current;
+      if (!folderId) {
+        const folder = await createOrthoFolder(accessToken);
+        folderId = folder.id;
+        orthoFolderIdRef.current = folder.id;
+      }
+      const created = await createSheetInFolder(
+        accessToken,
+        folderId,
+        ORTHO_SHEET_NAME,
+      );
+      initialSyncAfterCreateRef.current = true;
+      setSpreadsheetId(created.id);
+      setSheetSetupState("done");
+      setSheetSetupDismissed(false);
+    } catch {
+      setSheetSetupState("error");
+    }
+  }, [accessToken, spreadsheetId, setSpreadsheetId]);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    if (spreadsheetId) return;
+    if (sheetSetupDismissed) return;
+    if (sheetSetupRanForSessionRef.current) return;
+    sheetSetupRanForSessionRef.current = true;
+    void runSheetAutoSetup();
+  }, [
+    accessToken,
+    spreadsheetId,
+    sheetSetupDismissed,
+    runSheetAutoSetup,
+  ]);
 
   const budget = useBudget();
   const { presetTransactions, setPresets } = usePresetTransactions();
@@ -481,6 +602,18 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.uiFormatSettings.fxAsOf,
   ]);
 
+  const ensureLinkedSheetActive = useCallback(async (): Promise<boolean> => {
+    if (!accessToken || !spreadsheetId) return false;
+    const active = await isSpreadsheetActive(accessToken, spreadsheetId);
+    if (active) return true;
+
+    setSyncStatus("error");
+    setSyncErrorMessage(i18n.t("auth.sheetInTrashOrMissing"));
+    setSyncHealth("error");
+    setSpreadsheetId(null);
+    return false;
+  }, [accessToken, spreadsheetId, setSpreadsheetId]);
+
   const runSync = useCallback(async () => {
     if (!accessToken || !spreadsheetId) {
       setSyncStatus("error");
@@ -492,6 +625,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       syncQueuedRef.current = true;
       return;
     }
+    const active = await ensureLinkedSheetActive();
+    if (!active) return;
     const now = Date.now();
     if (nextSyncAllowedAtRef.current > now) {
       syncQueuedRef.current = true;
@@ -608,6 +743,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     spreadsheetId,
     clearSession,
     getSyncSnapshot,
+    ensureLinkedSheetActive,
   ]);
 
   const syncToSheets = useCallback(async () => {
@@ -654,6 +790,13 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   ]);
 
   useEffect(() => {
+    if (!initialSyncAfterCreateRef.current) return;
+    if (!accessToken || !spreadsheetId) return;
+    initialSyncAfterCreateRef.current = false;
+    void runSync();
+  }, [accessToken, spreadsheetId, runSync]);
+
+  useEffect(() => {
     if (!isAutoSyncEnabled) return;
     if (!accessToken || !spreadsheetId) return;
     const interval = window.setInterval(() => {
@@ -676,6 +819,8 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       setSyncErrorMessage(i18n.t("auth.notSignedInOrNoSpreadsheet"));
       return;
     }
+    const active = await ensureLinkedSheetActive();
+    if (!active) return;
     setSyncStatus("syncing");
     setSyncErrorMessage(null);
     try {
@@ -971,6 +1116,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     budget.incomeCategories,
     budget.setExpenseCategories,
     budget.setIncomeCategories,
+    ensureLinkedSheetActive,
   ]);
 
   const value = useMemo<GoogleAuthContextValue>(
@@ -990,6 +1136,12 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       lastSyncAt,
       hasUnsyncedChanges,
       syncHealth,
+      sheetSetupState,
+      availableDriveSheets,
+      runSheetAutoSetup,
+      linkDriveSheet,
+      createOrthoDriveSheet,
+      dismissSheetSetupPrompt,
     }),
     [
       accessToken,
@@ -1007,6 +1159,12 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       lastSyncAt,
       hasUnsyncedChanges,
       syncHealth,
+      sheetSetupState,
+      availableDriveSheets,
+      runSheetAutoSetup,
+      linkDriveSheet,
+      createOrthoDriveSheet,
+      dismissSheetSetupPrompt,
     ]
   );
 

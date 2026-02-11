@@ -81,6 +81,7 @@
     "japanese": "日本語",
     "korean": "韓国語",
     "language": "言語",
+    "languageTourIntro": "最初に希望する言語を選択してください。以降のツアー内容は選択した言語にすぐ切り替わります。",
     "loading": "読み込み中",
     "member": "会員",
     "month": "月",

@@ -81,6 +81,7 @@
     "japanese": "日本語",
     "korean": "한국어",
     "language": "Language",
+    "languageTourIntro": "Choose your preferred language first. The rest of this tour will immediately update to match your selection.",
     "loading": "Loading",
     "member": "Member",
     "month": "Month",

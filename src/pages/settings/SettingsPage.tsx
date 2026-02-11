@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useBudget } from "@/context/BudgetContext";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
@@ -82,6 +83,7 @@ export function SettingsPage() {
   const { presetTransactions, setPresets } = usePresetTransactions();
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
 
   const [sheetIdInput, setSheetIdInput] = useState(spreadsheetId ?? "");
   const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
@@ -314,6 +316,19 @@ export function SettingsPage() {
               date: formatDate("2026-02-06"),
             })}
           </p>
+          <div className="pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 w-full sm:w-auto"
+              onClick={() => navigate("/tour?replay=1")}
+            >
+              {t("settings.replayTour")}
+            </Button>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {t("settings.replayTourDesc")}
+            </p>
+          </div>
         </CardContent>
       </Card>
 

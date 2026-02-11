@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -11,32 +11,80 @@ import {
 type TourStep = {
   title: string;
   body: string;
+  highlights: string[];
 };
 
 const TOUR_STEPS: TourStep[] = [
   {
     title: "Welcome to Ortho",
-    body: "Ortho helps you track spending, income, debt, mortgage, and presets in one place. Your data is stored locally, and you stay in control with export and sync tools.",
+    body: "Ortho is built to give you one place to run your household finances without handing control of your data to a third-party backend.",
+    highlights: [
+      "Track expenses, income, debt, mortgage, and presets in one flow.",
+      "Keep your records locally and decide when to sync or export.",
+      "Use one consistent system across desktop and mobile.",
+    ],
   },
   {
     title: "Google Sheets Sync",
-    body: "You can connect Google Sheets and sync your data, so your spreadsheet stays aligned with app updates.",
+    body: "Connect Google Sheets when you want spreadsheet visibility and backup-style copy of your data.",
+    highlights: [
+      "Sync writes your current app data to your chosen spreadsheet.",
+      "Restore can pull your spreadsheet data back into the app.",
+      "Auto-sync helps keep edits aligned with minimal manual work.",
+    ],
   },
   {
     title: "Export Your Data",
-    body: "You can export and re-import your data as export string, PDF, and JSON. This gives you portability and full control of your records.",
+    body: "You can move your data in and out of Ortho whenever needed.",
+    highlights: [
+      "Export and import with export string, PDF, and JSON.",
+      "Portable formats let you migrate, archive, or inspect your data.",
+      "No lock-in: you can always leave with your own records.",
+    ],
   },
   {
-    title: "Know the Main Pages",
-    body: "Dashboard gives a quick summary. Transactions tracks expenses and transfers. Income tracks inflows. Debt and Mortgage track obligations. Settings controls sync, categories, owners, language, and currency.",
+    title: "Dashboard Overview",
+    body: "The dashboard is your quick health check for the selected period.",
+    highlights: [
+      "See net cash flow, income, spending, and debt context at a glance.",
+      "Use charts and owner views to spot trends quickly.",
+      "Check insights and activity without digging through tables.",
+    ],
+  },
+  {
+    title: "Transactions and Income",
+    body: "Use these pages for day-to-day entries and corrections.",
+    highlights: [
+      "Transactions: expenses, owner transfers, filters, and totals.",
+      "Income: grouped history and fast add/edit workflows.",
+      "Presets reduce repetitive entry work for common rows.",
+    ],
+  },
+  {
+    title: "Debt, Mortgage, and Settings",
+    body: "Use these pages to manage obligations and app-level controls.",
+    highlights: [
+      "Debt and Mortgage track balances, payments, and history.",
+      "Settings controls categories, owners, sync, formatting, and tour replay.",
+      "Data page handles imports and exports.",
+    ],
   },
   {
     title: "Language and Currency",
-    body: "You can switch languages and display currency at any time. Amounts are shown in your selected currency, while core records stay consistent for reliable sync and export.",
+    body: "Ortho supports multi-language and multi-currency display so the app can match your preferences.",
+    highlights: [
+      "Switch app language from Settings at any time.",
+      "Switch display currency and see values converted in the UI.",
+      "Canonical storage remains consistent for reliable sync/export.",
+    ],
   },
   {
     title: "Ready to Start",
     body: "Sign in with Google to begin using Ortho.",
+    highlights: [
+      "Sign in to unlock Google Sheets sync.",
+      "You can replay this tour later from Settings.",
+    ],
   },
 ];
 
@@ -51,17 +99,31 @@ function setTourCompleted(): void {
 
 export function TourPage() {
   const { isSignedIn, signIn } = useGoogleAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [stepIndex, setStepIndex] = useState(0);
+  const isReplay = searchParams.get("replay") === "1";
 
   const lastIndex = TOUR_STEPS.length - 1;
   const isLast = stepIndex === lastIndex;
-  const step = TOUR_STEPS[stepIndex]!;
+  const baseStep = TOUR_STEPS[stepIndex]!;
+  const step =
+    isLast && isSignedIn
+      ? {
+          ...baseStep,
+          body: "Your account is already connected. You can finish this walkthrough and continue to your dashboard.",
+          highlights: [
+            "Google Sheets sync is available in Settings.",
+            "You can replay this tour later from Settings.",
+          ],
+        }
+      : baseStep;
   const progressLabel = useMemo(
     () => `${stepIndex + 1} / ${TOUR_STEPS.length}`,
     [stepIndex],
   );
 
-  if (isSignedIn) {
+  if (isSignedIn && !isReplay) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -71,6 +133,11 @@ export function TourPage() {
   const handleFinishSignIn = () => {
     setTourCompleted();
     signIn();
+  };
+
+  const handleFinishReplay = () => {
+    setTourCompleted();
+    navigate("/dashboard");
   };
 
   return (
@@ -84,6 +151,13 @@ export function TourPage() {
           <p className="text-base text-muted-foreground leading-relaxed">
             {step.body}
           </p>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            {step.highlights.map((item) => (
+              <li key={item} className="leading-relaxed">
+                - {item}
+              </li>
+            ))}
+          </ul>
           <div className="flex items-center justify-between gap-3">
             <Button
               type="button"
@@ -97,6 +171,10 @@ export function TourPage() {
               <Button type="button" onClick={goNext}>
                 Next
               </Button>
+            ) : isSignedIn ? (
+              <Button type="button" onClick={handleFinishReplay}>
+                Finish tour
+              </Button>
             ) : (
               <Button type="button" onClick={handleFinishSignIn}>
                 Sign in with Google
@@ -108,4 +186,3 @@ export function TourPage() {
     </div>
   );
 }
-

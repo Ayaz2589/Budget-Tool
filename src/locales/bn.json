@@ -532,7 +532,9 @@
     "themeLabel": "Color mode",
     "themeDark": "Dark",
     "themeLight": "Light",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "replayTour": "ট্যুর আবার দেখুন",
+    "replayTourDesc": "মূল ফিচার ও ডেটা নিয়ন্ত্রণ আবার দেখার জন্য অনবোর্ডিং ট্যুর পুনরায় চালান।"
   },
   "transactions": {
     "add": "যোগ করুন",

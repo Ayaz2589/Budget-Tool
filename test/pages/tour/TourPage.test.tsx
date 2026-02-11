@@ -1,5 +1,5 @@
-import { beforeEach, expect, mock, test } from "bun:test";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+import { cleanup, render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { TourPage } from "@/pages/tour/TourPage";
 import {
@@ -48,9 +48,39 @@ beforeEach(() => {
   localStorage.removeItem(TOUR_COMPLETED_KEY);
 });
 
+afterEach(() => {
+  cleanup();
+});
+
 test("TourPage redirects signed-in users to dashboard", () => {
   renderWithAuth(baseAuth({ isSignedIn: true }));
-  expect(screen.getByText("Dashboard")).toBeInTheDocument();
+  expect(screen.getAllByText("Dashboard").length).toBeGreaterThan(0);
+});
+
+test("TourPage allows signed-in replay mode", () => {
+  render(
+    <GoogleAuthContext.Provider value={baseAuth({ isSignedIn: true })}>
+      <MemoryRouter initialEntries={["/tour?replay=1"]}>
+        <Routes>
+          <Route path="/tour" element={<TourPage />} />
+          <Route path="/dashboard" element={<div>Dashboard</div>} />
+        </Routes>
+      </MemoryRouter>
+    </GoogleAuthContext.Provider>,
+  );
+
+  expect(screen.getByText("Welcome to Ortho")).toBeInTheDocument();
+  while (!screen.queryByRole("button", { name: "Finish tour" })) {
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+  }
+  expect(
+    screen.getByText(
+      "Your account is already connected. You can finish this walkthrough and continue to your dashboard.",
+    ),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: "Sign in with Google" }),
+  ).not.toBeInTheDocument();
 });
 
 test("TourPage allows stepping through tour and sign-in on final step", () => {
@@ -58,12 +88,9 @@ test("TourPage allows stepping through tour and sign-in on final step", () => {
   renderWithAuth(baseAuth({ signIn }));
 
   expect(screen.getByText("Welcome to Ortho")).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: "Next" }));
-  fireEvent.click(screen.getByRole("button", { name: "Next" }));
-  fireEvent.click(screen.getByRole("button", { name: "Next" }));
-  fireEvent.click(screen.getByRole("button", { name: "Next" }));
-  fireEvent.click(screen.getByRole("button", { name: "Next" }));
-
+  while (!screen.queryByRole("button", { name: "Sign in with Google" })) {
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+  }
   expect(screen.getByText("Ready to Start")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Sign in with Google" }));
 
@@ -71,4 +98,3 @@ test("TourPage allows stepping through tour and sign-in on final step", () => {
   expect(localStorage.getItem(RETURNING_USER_KEY)).toBe("1");
   expect(localStorage.getItem(TOUR_COMPLETED_KEY)).toBe("1");
 });
-

@@ -532,7 +532,9 @@
     "themeLabel": "Color mode",
     "themeDark": "Dark",
     "themeLight": "Light",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "replayTour": "Replay tour",
+    "replayTourDesc": "Run the onboarding walkthrough again to review key features and data controls."
   },
   "transactions": {
     "add": "Add",

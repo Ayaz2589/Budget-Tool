@@ -533,7 +533,9 @@
     "themeLabel": "Color mode",
     "themeDark": "Dark",
     "themeLight": "Light",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "replayTour": "Repetir tour",
+    "replayTourDesc": "Vuelve a ejecutar el recorrido de inicio para repasar funciones clave y control de datos."
   },
   "transactions": {
     "add": "Añadir",

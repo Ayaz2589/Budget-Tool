@@ -532,7 +532,9 @@
     "themeLabel": "Color mode",
     "themeDark": "Dark",
     "themeLight": "Light",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "replayTour": "ツアーを再表示",
+    "replayTourDesc": "主要機能とデータ管理を再確認するために、オンボーディングツアーを再実行します。"
   },
   "transactions": {
     "add": "追加",

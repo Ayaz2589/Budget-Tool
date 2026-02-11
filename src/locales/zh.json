@@ -533,7 +533,9 @@
     "themeLabel": "Color mode",
     "themeDark": "Dark",
     "themeLight": "Light",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "replayTour": "重新查看导览",
+    "replayTourDesc": "重新运行新手导览，快速回顾关键功能和数据控制方式。"
   },
   "transactions": {
     "add": "添加",

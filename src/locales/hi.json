@@ -532,7 +532,9 @@
     "themeLabel": "Color mode",
     "themeDark": "Dark",
     "themeLight": "Light",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "replayTour": "टूर फिर से देखें",
+    "replayTourDesc": "मुख्य फीचर और डेटा नियंत्रण समझने के लिए ऑनबोर्डिंग टूर दोबारा चलाएं।"
   },
   "transactions": {
     "add": "जोड़ें",

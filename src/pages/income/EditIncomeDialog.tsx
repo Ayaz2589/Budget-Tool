@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -22,8 +23,6 @@ import {
 } from "@/lib/currencyInput";
 import {
   dateInputToIso,
-  formatDateInput,
-  getDateInputPlaceholder,
   isoToDateInput,
 } from "@/lib/dateInput";
 import { useBudget } from "@/context/BudgetContext";
@@ -95,17 +94,14 @@ export function EditIncomeDialog({
           <div className="flex-1 min-h-0 overflow-auto space-y-4">
             <div className="space-y-2">
               <Label>{t("income.date")}</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                placeholder={getDateInputPlaceholder(uiFormatSettings.dateFormat)}
-                maxLength={10}
-                value={date}
-                onChange={(e) =>
-                  setDate(formatDateInput(e.target.value, uiFormatSettings.dateFormat))
+              <DatePicker
+                valueIso={dateInputToIso(date, uiFormatSettings.dateFormat)}
+                onChangeIso={(isoDate) =>
+                  setDate(isoToDateInput(isoDate, uiFormatSettings.dateFormat))
                 }
-                required
-                className={fieldClass}
+                triggerLabel={date}
+                placeholder={t("income.date")}
+                triggerClassName={fieldClass}
               />
             </div>
             <div className="space-y-2">

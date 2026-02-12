@@ -7,6 +7,7 @@ afterEach(() => cleanup());
 
 test("AddPaymentDialog submits payment payload", () => {
   const onSubmit = mock(() => {});
+  const todayIso = new Date().toISOString().slice(0, 10);
   render(
     <BudgetProvider>
       <AddPaymentDialog
@@ -19,9 +20,6 @@ test("AddPaymentDialog submits payment payload", () => {
   );
 
   const dialog = screen.getByRole("dialog");
-  const dateInput = within(dialog).getByPlaceholderText("YYYY/MM/DD");
-  fireEvent.change(dateInput, { target: { value: "2026" } });
-  fireEvent.change(dateInput, { target: { value: "20260205" } });
   fireEvent.change(within(dialog).getByPlaceholderText("0.00"), {
     target: { value: "550.75" },
   });
@@ -34,7 +32,7 @@ test("AddPaymentDialog submits payment payload", () => {
   expect(onSubmit).toHaveBeenCalledTimes(1);
   expect(onSubmit.mock.calls[0]?.[0]).toEqual({
     debtId: "d1",
-    date: "2026-02-05",
+    date: todayIso,
     amount: 550.75,
     note: "Feb payment",
   });

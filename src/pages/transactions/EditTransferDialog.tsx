@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { parseCurrencyInput, formatCurrencyInput, formatCurrencyFromNumber } from "@/lib/currencyInput";
-import { dateInputToIso, formatDateInput, getDateInputPlaceholder, isoToDateInput } from "@/lib/dateInput";
+import { dateInputToIso, isoToDateInput } from "@/lib/dateInput";
 import { useBudget } from "@/context/BudgetContext";
 import type { EditTransferDialogProps } from "@/types/transactions";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
@@ -63,16 +64,14 @@ export function EditTransferDialog({
         <div className="grid gap-4 px-4 pt-4 pb-6 overflow-y-auto">
           <div className="space-y-2">
             <Label>{t("common.date")}</Label>
-            <Input
-              type="text"
-              inputMode="numeric"
-              placeholder={getDateInputPlaceholder(uiFormatSettings.dateFormat)}
-              maxLength={10}
-              value={date}
-              onChange={(e) =>
-                setDate(formatDateInput(e.target.value, uiFormatSettings.dateFormat))
+            <DatePicker
+              valueIso={dateInputToIso(date, uiFormatSettings.dateFormat)}
+              onChangeIso={(isoDate) =>
+                setDate(isoToDateInput(isoDate, uiFormatSettings.dateFormat))
               }
-              className="h-11"
+              triggerLabel={date}
+              placeholder={t("common.date")}
+              triggerClassName="h-11 w-full"
             />
           </div>
           <div className="space-y-2">

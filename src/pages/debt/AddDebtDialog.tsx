@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -21,8 +22,7 @@ import {
 } from "@/lib/currencyInput";
 import {
   dateInputToIso,
-  formatDateInput,
-  getDateInputPlaceholder,
+  isoToDateInput,
 } from "@/lib/dateInput";
 import type { AddDebtPayload, AddDebtDialogProps } from "@/types/debt";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
@@ -98,16 +98,12 @@ export function AddDebtDialog({
             </div>
             <div className="space-y-2">
               <Label>{t("debt.startDateOptional")}</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                placeholder={getDateInputPlaceholder(dateFormat)}
-                maxLength={10}
-                value={startDate}
-                onChange={(e) =>
-                  setStartDate(formatDateInput(e.target.value, dateFormat))
-                }
-                className={fieldClass}
+              <DatePicker
+                valueIso={dateInputToIso(startDate, dateFormat)}
+                onChangeIso={(isoDate) => setStartDate(isoToDateInput(isoDate, dateFormat))}
+                triggerLabel={startDate}
+                placeholder={t("common.date")}
+                triggerClassName={fieldClass}
               />
             </div>
             <div className="space-y-2">

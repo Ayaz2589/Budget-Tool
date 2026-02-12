@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -21,8 +22,6 @@ import {
 } from "@/lib/currencyInput";
 import {
   dateInputToIso,
-  formatDateInput,
-  getDateInputPlaceholder,
   isoToDateInput,
 } from "@/lib/dateInput";
 import type { Owner } from "@/types/core";
@@ -113,17 +112,12 @@ function AddIncomeForm({
       <div className="flex-1 min-h-0 overflow-auto space-y-4">
         <div className="space-y-2">
           <Label>{t("income.date")}</Label>
-          <Input
-            type="text"
-            inputMode="numeric"
-            placeholder={getDateInputPlaceholder(dateFormat)}
-            maxLength={10}
-            value={date}
-            onChange={(e) =>
-              setDate(formatDateInput(e.target.value, dateFormat))
-            }
-            required
-            className={fieldClass}
+          <DatePicker
+            valueIso={dateInputToIso(date, dateFormat)}
+            onChangeIso={(isoDate) => setDate(isoToDateInput(isoDate, dateFormat))}
+            triggerLabel={date}
+            placeholder={t("income.date")}
+            triggerClassName={fieldClass}
           />
         </div>
         <div className="space-y-2">

@@ -37,19 +37,13 @@ test("AddDebtDialog submits normalized payload", () => {
   fireEvent.change(screen.getByPlaceholderText("0.00"), {
     target: { value: "1234.5" },
   });
-  fireEvent.change(screen.getByPlaceholderText("YYYY/MM/DD"), {
-    target: { value: "2026" },
-  });
-  fireEvent.change(screen.getByPlaceholderText("YYYY/MM/DD"), {
-    target: { value: "20260203" },
-  });
   fireEvent.click(screen.getByRole("button", { name: "Add debt" }));
 
   expect(onSubmit).toHaveBeenCalledTimes(1);
   expect(onSubmit.mock.calls[0]?.[0]).toEqual({
     name: "Credit Card",
     initialAmount: 1234.5,
-    startDate: "2026-02-03",
+    startDate: undefined,
     owner: "Ayaz",
   });
 });

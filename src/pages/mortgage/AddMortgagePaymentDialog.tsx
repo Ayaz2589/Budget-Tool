@@ -4,6 +4,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -13,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrencyInput } from "@/lib/currencyInput";
-import { formatDateInput, getDateInputPlaceholder } from "@/lib/dateInput";
+import { dateInputToIso, isoToDateInput } from "@/lib/dateInput";
 import type { AddMortgagePaymentDialogProps } from "@/types/mortgage";
 import { useTranslation } from "react-i18next";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
@@ -53,17 +54,12 @@ export function AddMortgagePaymentDialog({
           <div className="flex-1 min-h-0 overflow-auto space-y-4">
             <div className="space-y-2">
               <Label>{t("common.date")}</Label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                placeholder={getDateInputPlaceholder(dateFormat)}
-                maxLength={10}
-                value={date}
-                onChange={(e) =>
-                  onDateChange(formatDateInput(e.target.value, dateFormat))
-                }
-                required
-                className={fieldClass}
+              <DatePicker
+                valueIso={dateInputToIso(date, dateFormat)}
+                onChangeIso={(isoDate) => onDateChange(isoToDateInput(isoDate, dateFormat))}
+                triggerLabel={date}
+                placeholder={t("common.date")}
+                triggerClassName={fieldClass}
               />
             </div>
             <div className="space-y-2">

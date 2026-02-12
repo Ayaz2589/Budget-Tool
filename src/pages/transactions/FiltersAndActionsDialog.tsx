@@ -4,6 +4,7 @@ import {
   SheetContent,
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
+import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -81,15 +82,12 @@ export function FiltersAndActionsDialog({
                 <Label className="text-muted-foreground">
                   {t("transactions.month")}
                 </Label>
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="YYYY-MM"
-                  pattern="\d{4}-\d{2}"
-                  maxLength={7}
+                <MonthYearPicker
                   value={monthFilter}
-                  onChange={(e) => onMonthFilterChange(e.target.value)}
-                  className={fieldClass}
+                  onChange={onMonthFilterChange}
+                  triggerLabel={monthFilter || "YYYY-MM"}
+                  placeholder="YYYY-MM"
+                  triggerClassName={fieldClass}
                 />
               </div>
               <div className="space-y-2">

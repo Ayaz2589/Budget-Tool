@@ -170,7 +170,6 @@ export function SettingsPage() {
         <DsSectionHeader
           title={t("settings.title")}
           subtitle={t("settings.subtitle")}
-          showCurrencyChip
         />
       </div>
       <div className="space-y-4 sm:space-y-6 pb-24 md:pb-0 px-4 md:px-0">

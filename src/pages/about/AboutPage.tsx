@@ -12,7 +12,6 @@ export function AboutPage() {
         <DsSectionHeader
           title={t("about.title")}
           subtitle={t("about.subtitle")}
-          showCurrencyChip
         />
       </div>
 

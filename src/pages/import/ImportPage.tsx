@@ -589,7 +589,6 @@ export function ImportPage() {
         <DsSectionHeader
           title={t("import.title")}
           subtitle={t("import.subtitle")}
-          showCurrencyChip
           actions={
             hasPreview ? (
               <Button className="hidden md:inline-flex" onClick={addToTransactions}>

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -19,6 +19,14 @@ import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   Accordion,
   AccordionContent,
@@ -28,6 +36,7 @@ import {
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
   DsChartCard,
+  DsActionBar,
   DsDataRow,
   DsEmptyState,
   DsLegendList,
@@ -35,6 +44,7 @@ import {
   DsSectionHeader,
   DsSplitToggle,
 } from "@/components/ds";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   buildCashFlowRows,
   buildCategoryBreakdown,
@@ -107,10 +117,12 @@ function monthLabelFromTooltipPayload(payload: unknown): string {
 
 export function Dashboard() {
   const { t, i18n } = useTranslation();
+  const isMobile = useMediaQuery("(max-width: 767px)");
   const { expenses, income, debts, debtPayments, owners, ownerTransfers } = useBudget();
   const { presetTransactions } = usePresetTransactions();
   const [range, setRange] = useState<DashboardRange>("current");
   const [expenseScope, setExpenseScope] = useState<DashboardExpenseScope>("all");
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [dismissedInsightIds, setDismissedInsightIds] = useState<string[]>(() =>
     parseDismissedInsightIds(sessionStorage.getItem(getInsightStorageKey())),
   );
@@ -344,37 +356,19 @@ export function Dashboard() {
             title={t("dashboard.title")}
             subtitle={t("dashboard.healthQuestion")}
             showCurrencyChip
+            actions={
+              !isMobile ? (
+                <Button
+                  variant="outline"
+                  className="h-11 gap-2"
+                  onClick={() => setSettingsOpen(true)}
+                >
+                  <SlidersHorizontal className="size-4" />
+                  <span>{t("settings.title")}</span>
+                </Button>
+              ) : undefined
+            }
           />
-          <div className="flex w-full flex-col items-start gap-2 md:items-end">
-            <div className="w-full md:w-auto">
-              <DsSplitToggle
-                className="md:min-w-[430px]"
-                options={[
-                  { value: "current", label: t("dashboard.rangeCurrent") },
-                  { value: "6", label: t("dashboard.range6") },
-                  { value: "12", label: t("dashboard.range12") },
-                ]}
-                value={range}
-                onChange={(next) => setRange(next as DashboardRange)}
-              />
-            </div>
-            <div className="w-full md:w-auto">
-              <DsSplitToggle
-                className="md:min-w-[320px]"
-                options={[
-                  { value: "all", label: t("dashboard.scopeAllExpenses") },
-                  { value: "exclude-mortgage", label: t("dashboard.scopeExcludeMortgage") },
-                ]}
-                value={expenseScope}
-                onChange={(next) => setExpenseScope(next as DashboardExpenseScope)}
-              />
-            </div>
-            {expenseScope === "exclude-mortgage" ? (
-              <p className="text-xs text-muted-foreground">
-                {t("dashboard.scopeMortgageExcludedHint")}
-              </p>
-            ) : null}
-          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-1.5 md:grid-cols-2 md:gap-3 xl:grid-cols-4">
@@ -1067,6 +1061,76 @@ export function Dashboard() {
           </AccordionItem>
         </Accordion>
       </div>
+
+      {isMobile ? (
+        <DsActionBar>
+          <Button
+            variant="secondary"
+            density="compact"
+            onClick={() => setSettingsOpen(true)}
+            className="h-11 w-11 rounded-full p-0"
+            aria-label={t("settings.title")}
+          >
+            <SlidersHorizontal className="size-4" />
+          </Button>
+        </DsActionBar>
+      ) : null}
+
+      <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <SheetContent
+          side="right"
+          className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col"
+        >
+          <SheetHeader className="px-4 pt-5 pb-4 border-b border-[var(--border-subtle)]">
+            <SheetTitle className="font-semibold text-left pr-10 break-words text-xl leading-snug ds-heading-3">
+              {t("settings.title")}
+            </SheetTitle>
+            <SheetDescription className="text-muted-foreground text-sm text-left ds-body-sm">
+              {t("dashboard.healthQuestion")}
+            </SheetDescription>
+          </SheetHeader>
+          <div className="grid content-start gap-4 px-4 pt-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
+            <div className="space-y-2">
+              <Label className="text-muted-foreground">{t("dashboard.timeRange")}</Label>
+              <DsSplitToggle
+                className="w-full"
+                options={[
+                  { value: "current", label: t("dashboard.rangeCurrent") },
+                  { value: "6", label: t("dashboard.range6") },
+                  { value: "12", label: t("dashboard.range12") },
+                ]}
+                value={range}
+                onChange={(next) => setRange(next as DashboardRange)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-muted-foreground">{t("common.totalSpent")}</Label>
+              <DsSplitToggle
+                className="w-full"
+                options={[
+                  { value: "all", label: t("dashboard.scopeAllExpenses") },
+                  { value: "exclude-mortgage", label: t("dashboard.scopeExcludeMortgage") },
+                ]}
+                value={expenseScope}
+                onChange={(next) => setExpenseScope(next as DashboardExpenseScope)}
+              />
+              {expenseScope === "exclude-mortgage" ? (
+                <p className="text-xs text-muted-foreground">
+                  {t("dashboard.scopeMortgageExcludedHint")}
+                </p>
+              ) : null}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 w-full"
+              onClick={() => setSettingsOpen(false)}
+            >
+              {t("common.done")}
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

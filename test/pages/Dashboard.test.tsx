@@ -87,9 +87,8 @@ test("Dashboard renders PRD sections", () => {
 test("Dashboard shows helper text when mortgage is excluded", () => {
   localStorage.clear();
   render(<TestWrapper />);
-  const toggle = screen.getByRole("button", { name: "Exclude Mortgage" });
-  fireEvent.mouseDown(toggle);
-  fireEvent.click(toggle);
+  fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+  fireEvent.click(screen.getByRole("button", { name: "Exclude Mortgage" }));
   return waitFor(() => {
     expect(
       screen.getByText("Mortgage excluded from expense totals"),

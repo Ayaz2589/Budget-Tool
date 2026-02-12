@@ -17,6 +17,7 @@ import {
   Globe,
   ChevronDown,
   MoreHorizontal,
+  CircleHelp,
 } from "lucide-react";
 import { useGoogleAuth } from "@/context/GoogleAuthContext";
 import { Button } from "@/components/ui/button";
@@ -90,6 +91,7 @@ const nav = [
   { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
   { to: "/dashboard/presets", labelKey: "nav.presets", icon: ListOrdered },
   { to: "/dashboard/import", labelKey: "nav.import", icon: Database },
+  { to: "/dashboard/about", labelKey: "nav.about", icon: CircleHelp },
   { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
@@ -106,6 +108,7 @@ const moreNavItems = [
   { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
   { to: "/dashboard/presets", labelKey: "nav.presets", icon: ListOrdered },
   { to: "/dashboard/import", labelKey: "nav.import", icon: Database },
+  { to: "/dashboard/about", labelKey: "nav.about", icon: CircleHelp },
   { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
 

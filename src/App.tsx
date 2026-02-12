@@ -18,6 +18,7 @@ import { IncomePage } from "@/pages/income/IncomePage";
 import { PresetsPage } from "@/pages/presets/PresetsPage";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { TourPage } from "@/pages/tour/TourPage";
+import { AboutPage } from "@/pages/about/AboutPage";
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
@@ -37,6 +38,7 @@ function AppContent() {
             <Route path="debt" element={<DebtPage />} />
             <Route path="mortgage" element={<MortgagePage />} />
             <Route path="presets" element={<PresetsPage />} />
+            <Route path="about" element={<AboutPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Route>

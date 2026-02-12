@@ -442,7 +442,8 @@
     "mortgage": "住宅ローン",
     "presets": "プリセット",
     "settings": "設定",
-    "transactions": "取引"
+    "transactions": "取引",
+    "about": "概要"
   },
   "presetTransactions": {
     "addPreset": "プリセットを追加",
@@ -611,5 +612,23 @@
     "transferTo": "To owner",
     "transferNote": "Note",
     "transferValidationOwnersDifferent": "From owner and to owner must be different"
+  },
+  "about": {
+    "title": "Ortho について",
+    "subtitle": "ミッションと目的",
+    "missionTitle": "Ortho ミッションステートメント",
+    "missionStrong": "私たちの使命は、言語・通貨・背景に関係なく、誰にとっても個人の資産管理をシンプルで分かりやすく、利用しやすいものにすることです。",
+    "missionBody": "お金を理解するために、スプレッドシートや難しい金融用語、高額なアドバイザーは不要であるべきだと私たちは考えます。Orthoは、丁寧なデザインとAIを組み合わせることで、お金の流れを可視化し、より良い意思決定と長期的な安定につなげます。",
+    "committedTitle": "私たちの取り組み:",
+    "committedItem1": "ユーザーがデータを完全に所有できること",
+    "committedItem2": "多言語・多通貨の家庭をサポートすること",
+    "committedItem3": "カップルや家族が一緒にお金を管理できるようにすること",
+    "committedItem4": "お金の不安や混乱を明確さに変えること",
+    "noBackendBody": "Orthoは従来型のバックエンドを使いません。Googleでサインインし、データはあなた自身のGoogle Sheetsに保存されます。つまり、データの主導権は常にあなたにあります。私たちはあなたの金融記録を自社サーバーに保持しません。",
+    "exportBody": "データはいつでもPDF、JSONファイル、安全なエクスポート文字列として書き出しでき、必要なときに再インポートできます。あなたの情報は持ち運び可能で柔軟、そして常にあなたのものです。",
+    "futureBody": "今後も、世界中のより多くの人が自然な形で家計管理できるよう、対応言語と通貨を継続的に拡張していきます。",
+    "closingStrong": "あなたのデータはあなたのもの。お金はより明確に。未来はあなたの手の中に。",
+    "supportBody": "Orthoがお役に立っているなら、サポートが継続的な改善につながります。",
+    "supportButton": "Patreonでサポートする"
   }
 }

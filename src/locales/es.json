@@ -443,7 +443,8 @@
     "mortgage": "Hipoteca",
     "presets": "Preajustes",
     "settings": "Ajustes",
-    "transactions": "Transacciones"
+    "transactions": "Transacciones",
+    "about": "Acerca de"
   },
   "presetTransactions": {
     "addPreset": "Añadir preajuste",
@@ -612,5 +613,23 @@
     "transferTo": "To owner",
     "transferNote": "Note",
     "transferValidationOwnersDifferent": "From owner and to owner must be different"
+  },
+  "about": {
+    "title": "Acerca de Ortho",
+    "subtitle": "Misión y propósito",
+    "missionTitle": "Declaración de misión de Ortho",
+    "missionStrong": "Nuestra misión es hacer que las finanzas personales sean simples, claras y accesibles para todos, sin importar idioma, moneda o contexto.",
+    "missionBody": "Creemos que entender tu dinero no debería requerir hojas de cálculo, jerga financiera ni asesores costosos. Combinando diseño cuidadoso con IA, Ortho ayuda a ver a dónde va tu dinero, tomar mejores decisiones y construir estabilidad financiera duradera.",
+    "committedTitle": "Nos comprometemos a:",
+    "committedItem1": "Dar a los usuarios propiedad total de sus datos",
+    "committedItem2": "Apoyar hogares multilingües y con múltiples monedas",
+    "committedItem3": "Ayudar a parejas y familias a gestionar su dinero juntas",
+    "committedItem4": "Convertir la confusión financiera en claridad",
+    "noBackendBody": "Ortho no usa un backend tradicional. Inicias sesión con Google y tus datos se guardan en tus propias Hojas de Cálculo de Google; eso significa que tú controlas todo. No guardamos tus registros financieros en nuestros servidores.",
+    "exportBody": "Puedes exportar tus datos en cualquier momento como PDF, archivo JSON o cadena segura de exportación, y volver a importarlos cuando quieras. Tu información es portátil, flexible y siempre tuya.",
+    "futureBody": "Con el tiempo seguiremos ampliando Ortho para soportar tantos idiomas y monedas como sea posible, para que más personas puedan gestionar sus finanzas de la forma que les resulte natural.",
+    "closingStrong": "Tus datos son tuyos. Tu dinero se mantiene claro. Tu futuro se mantiene bajo tu control.",
+    "supportBody": "Si Ortho te ha sido útil, tu apoyo nos ayuda a seguir mejorándolo.",
+    "supportButton": "Apóyanos en Patreon"
   }
 }

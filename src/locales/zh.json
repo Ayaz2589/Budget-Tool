@@ -443,7 +443,8 @@
     "mortgage": "房贷",
     "presets": "预设",
     "settings": "设置",
-    "transactions": "交易"
+    "transactions": "交易",
+    "about": "关于"
   },
   "presetTransactions": {
     "addPreset": "添加预设",
@@ -612,5 +613,23 @@
     "transferTo": "To owner",
     "transferNote": "Note",
     "transferValidationOwnersDifferent": "From owner and to owner must be different"
+  },
+  "about": {
+    "title": "关于 Ortho",
+    "subtitle": "使命与目标",
+    "missionTitle": "Ortho 使命宣言",
+    "missionStrong": "我们的使命是让个人理财对每个人都更简单、更清晰、更易获得——无论语言、货币或背景如何。",
+    "missionBody": "我们相信，理解自己的钱不应依赖电子表格、金融术语或昂贵顾问。通过将周到设计与 AI 结合，Ortho 帮助用户看清资金流向、做出更明智决策，并建立长期财务稳定。",
+    "committedTitle": "我们的承诺：",
+    "committedItem1": "让用户完全拥有自己的数据",
+    "committedItem2": "支持多语言与多币种家庭",
+    "committedItem3": "帮助伴侣和家庭共同管理财务",
+    "committedItem4": "把财务困惑变成清晰认知",
+    "noBackendBody": "Ortho 不使用传统后端。你通过 Google 登录，数据存储在你自己的 Google Sheets 中——这意味着数据由你掌控。我们不会在服务器上保存你的财务记录。",
+    "exportBody": "你可以随时将数据导出为 PDF、JSON 文件或安全导出字符串，并在需要时重新导入。你的信息可移植、灵活，并且始终属于你。",
+    "futureBody": "未来我们会持续扩展 Ortho 对语言和货币的支持，让更多人能够以最自然的方式管理财务。",
+    "closingStrong": "你的数据属于你。你的财务保持清晰。你的未来由你掌控。",
+    "supportBody": "如果 Ortho 对你有帮助，你的支持将帮助我们持续改进。",
+    "supportButton": "在 Patreon 上支持我们"
   }
 }

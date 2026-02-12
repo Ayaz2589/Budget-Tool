@@ -442,7 +442,8 @@
     "mortgage": "Mortgage",
     "presets": "Presets",
     "settings": "Settings",
-    "transactions": "Transactions"
+    "transactions": "Transactions",
+    "about": "About"
   },
   "presetTransactions": {
     "addPreset": "Add preset",
@@ -611,5 +612,23 @@
     "transferTo": "To owner",
     "transferNote": "Note",
     "transferValidationOwnersDifferent": "From owner and to owner must be different"
+  },
+  "about": {
+    "title": "About Ortho",
+    "subtitle": "Mission and purpose",
+    "missionTitle": "Ortho Mission Statement",
+    "missionStrong": "Our mission is to make personal finance simple, clear, and accessible for everyone — regardless of language, currency, or background.",
+    "missionBody": "We believe understanding your money should not require spreadsheets, financial jargon, or expensive advisors. By combining thoughtful design with AI, Ortho helps people see where their money goes, make smarter decisions, and build lasting financial stability.",
+    "committedTitle": "We are committed to:",
+    "committedItem1": "Giving users full ownership of their data",
+    "committedItem2": "Supporting multilingual and multi-currency households",
+    "committedItem3": "Helping couples and families manage money together",
+    "committedItem4": "Turning financial confusion into clarity",
+    "noBackendBody": "Ortho does not use a traditional backend. You sign in with Google, and your data is stored in your own Google Sheets — meaning you own and control everything. We do not hold your financial records on our servers.",
+    "exportBody": "You can export your data anytime as a PDF, JSON file, or secure export string, and re-import it whenever you want. Your information is portable, flexible, and always yours.",
+    "futureBody": "Over time, we will continue expanding Ortho to support as many languages and currencies as possible, so more people around the world can manage their finances in the way that feels natural to them.",
+    "closingStrong": "Your data is yours. Your money stays clear. Your future stays in your control.",
+    "supportBody": "If Ortho has been useful to you, your support helps us keep improving it.",
+    "supportButton": "Support us on Patreon"
   }
 }

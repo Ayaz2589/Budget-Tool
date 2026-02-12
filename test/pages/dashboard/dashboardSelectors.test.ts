@@ -52,7 +52,7 @@ test("buildDashboardKpis excludes mortgage when scope is exclude-mortgage", () =
     debtPayments: [{ id: "p1", debtId: "d1", date: "2026-02-10", amount: 100 }],
   });
 
-  expect(kpis.totalSpent).toBe(200);
+  expect(kpis.totalSpent).toBe(300);
   expect(kpis.netCashFlow).toBe(2700);
   expect(kpis.debtOutstanding).toBe(900);
 });

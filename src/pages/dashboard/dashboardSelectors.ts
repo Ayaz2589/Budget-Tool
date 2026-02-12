@@ -98,9 +98,12 @@ export function buildDashboardKpis({
 }): DashboardKpis {
   const previousMonthKey = getPreviousMonthKey(currentMonthKey);
   const currentIncome = sumIncomeForMonth(income, currentMonthKey);
-  const currentSpent = sumExpensesForMonth(expenses, currentMonthKey, scope);
+  const currentExpenses = sumExpensesForMonth(expenses, currentMonthKey, scope);
   const currentDebtPayments = sumDebtPaymentsForMonth(debtPayments, currentMonthKey);
-  const previousSpent = sumExpensesForMonth(expenses, previousMonthKey, scope);
+  const currentSpent = currentExpenses + currentDebtPayments;
+  const previousExpenses = sumExpensesForMonth(expenses, previousMonthKey, scope);
+  const previousDebtPayments = sumDebtPaymentsForMonth(debtPayments, previousMonthKey);
+  const previousSpent = previousExpenses + previousDebtPayments;
   const spentVsLastMonthPct =
     previousSpent > 0 ? (currentSpent - previousSpent) / previousSpent : null;
 
@@ -110,7 +113,7 @@ export function buildDashboardKpis({
   );
 
   return {
-    netCashFlow: currentIncome - currentSpent - currentDebtPayments,
+    netCashFlow: currentIncome - currentExpenses - currentDebtPayments,
     totalSpent: currentSpent,
     totalIncome: currentIncome,
     debtOutstanding,

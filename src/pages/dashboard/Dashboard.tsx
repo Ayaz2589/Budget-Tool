@@ -443,8 +443,14 @@ export function Dashboard() {
                   dataKey="expensesTotal"
                   name={t("dashboard.chartExpenses")}
                   fill="var(--viz-expense)"
+                  stackId="outflow"
                 />
-                <Bar dataKey="debtPaymentsTotal" name={t("dashboard.chartDebtPayments")} fill="var(--viz-debt)" />
+                <Bar
+                  dataKey="debtPaymentsTotal"
+                  name={t("dashboard.chartDebtPayments")}
+                  fill="var(--viz-debt)"
+                  stackId="outflow"
+                />
               </BarChart>
             </ChartContainer>
           </div>
@@ -496,12 +502,14 @@ export function Dashboard() {
                   name={t("dashboard.chartExpenses")}
                   fill="var(--viz-expense)"
                   radius={[4, 4, 0, 0]}
+                  stackId="outflow"
                 />
                 <Bar
                   dataKey="debtPaymentsTotal"
                   name={t("dashboard.chartDebtPayments")}
                   fill="var(--viz-debt)"
                   radius={[4, 4, 0, 0]}
+                  stackId="outflow"
                 />
               </BarChart>
             </ChartContainer>

@@ -253,13 +253,13 @@ export function SettingsPage() {
           </div>
 
           <div className="space-y-1">
-            <h3 className="text-sm font-semibold">Currency</h3>
+            <h3 className="text-sm font-semibold">{t("settings.currencyTitle")}</h3>
             <p className="text-xs text-muted-foreground">
-              All amounts are stored in USD (canonical). Display conversion uses the latest cached rate.
+              {t("settings.currencyDesc")}
             </p>
           </div>
           <div className="space-y-2">
-            <Label>Display currency</Label>
+            <Label>{t("settings.currencyDisplayLabel")}</Label>
             <Select
               value={uiFormatSettings.currency}
               onValueChange={(currency: DisplayCurrency) =>
@@ -280,8 +280,8 @@ export function SettingsPage() {
           </div>
           {uiFormatSettings.currency !== "USD" && (
             <p className="text-xs text-muted-foreground">
-              FX as of {uiFormatSettings.fxAsOf || "—"}
-              {uiFormatSettings.fxFallback ? " (fallback)" : ""}
+              {t("settings.fxAsOf", { value: uiFormatSettings.fxAsOf || "—" })}
+              {uiFormatSettings.fxFallback ? ` ${t("settings.fxFallback")}` : ""}
             </p>
           )}
 

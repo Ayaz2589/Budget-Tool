@@ -549,7 +549,12 @@
     "sheetSetupUseSelected": "Use selected sheet",
     "sheetSetupCreate": "Create Ortho folder + sheet",
     "sheetSetupRetry": "Retry",
-    "sheetSetupManualHint": "You can always set your spreadsheet manually from Settings."
+    "sheetSetupManualHint": "You can always set your spreadsheet manually from Settings.",
+    "currencyTitle": "Currency",
+    "currencyDesc": "All amounts are stored in USD (canonical). Display conversion uses the latest cached rate.",
+    "currencyDisplayLabel": "Display currency",
+    "fxAsOf": "FX as of {{value}}",
+    "fxFallback": "(fallback)"
   },
   "transactions": {
     "add": "Add",

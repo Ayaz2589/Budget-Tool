@@ -458,7 +458,8 @@
     "member": "Propietario",
     "newPreset": "Nuevo preajuste",
     "source": "Origen",
-    "title": "Transacciones predefinidas"
+    "title": "Transacciones predefinidas",
+    "amountOptional": "Opcional"
   },
   "settings": {
     "addCategory": "Añadir",

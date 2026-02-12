@@ -457,7 +457,8 @@
     "member": "मालिक",
     "newPreset": "नया प्रीसेट",
     "source": "स्रोत",
-    "title": "प्रीसेट लेनदेन"
+    "title": "प्रीसेट लेनदेन",
+    "amountOptional": "वैकल्पिक"
   },
   "settings": {
     "addCategory": "जोड़ें",

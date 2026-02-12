@@ -458,7 +458,8 @@
     "member": "所有者",
     "newPreset": "新建预设",
     "source": "来源",
-    "title": "预设交易"
+    "title": "预设交易",
+    "amountOptional": "可选"
   },
   "settings": {
     "addCategory": "添加",

@@ -457,7 +457,8 @@
     "member": "Member",
     "newPreset": "New preset",
     "source": "Source",
-    "title": "Preset Transactions"
+    "title": "Preset Transactions",
+    "amountOptional": "Optional"
   },
   "settings": {
     "addCategory": "Add",

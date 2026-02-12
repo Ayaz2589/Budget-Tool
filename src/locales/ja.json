@@ -457,7 +457,8 @@
     "member": "所有者",
     "newPreset": "新しいプリセット",
     "source": "ソース",
-    "title": "プリセット取引"
+    "title": "プリセット取引",
+    "amountOptional": "任意"
   },
   "settings": {
     "addCategory": "追加",

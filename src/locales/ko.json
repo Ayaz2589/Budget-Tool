@@ -457,7 +457,8 @@
     "member": "소유자",
     "newPreset": "새 프리셋",
     "source": "소스",
-    "title": "프리셋 거래"
+    "title": "프리셋 거래",
+    "amountOptional": "선택 사항"
   },
   "settings": {
     "addCategory": "추가",

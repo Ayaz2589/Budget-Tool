@@ -6,7 +6,7 @@ import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import type { ExpenseSource, PresetTransaction } from "@/types/core";
 import {
   EXPENSE_SOURCE_BADGE_LABELS,
-  SOURCE_OPTIONS,
+  EXPENSE_SOURCE_LOCALE_KEYS,
 } from "@/lib/sourceLabels";
 import {
   formatCurrencyFromNumber,
@@ -61,8 +61,14 @@ export function PresetsPage() {
     usePresetTransactions();
 
   const sourceOptionsFiltered = useMemo(
-    () => SOURCE_OPTIONS.filter((o) => cardSources.includes(o.value)),
-    [cardSources]
+    () =>
+      cardSources
+        .filter((value): value is ExpenseSource => value in EXPENSE_SOURCE_LOCALE_KEYS)
+        .map((value) => ({
+          value,
+          label: t(`transactions.${EXPENSE_SOURCE_LOCALE_KEYS[value]}`),
+        })),
+    [cardSources, t]
   );
   const ownerOptions = useMemo(() => owners, [owners]);
 
@@ -163,7 +169,7 @@ export function PresetsPage() {
   };
 
   const getSourceLabel = (source: ExpenseSource) =>
-    SOURCE_OPTIONS.find((o) => o.value === source)?.label ?? source;
+    t(`transactions.${EXPENSE_SOURCE_LOCALE_KEYS[source]}`);
 
   const getSourceBadge = (source: ExpenseSource) => {
     switch (source) {
@@ -285,7 +291,7 @@ export function PresetsPage() {
                       onChange={(e) =>
                         setPresetAmount(formatCurrencyInput(e.target.value))
                       }
-                      placeholder="Optional"
+                      placeholder={t("presetTransactions.amountOptional")}
                       inputMode="decimal"
                       className={fieldClass}
                     />

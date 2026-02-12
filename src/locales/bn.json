@@ -457,7 +457,8 @@
     "member": "মালিক",
     "newPreset": "নতুন প্রিসেট",
     "source": "সূত্র",
-    "title": "প্রিসেট ট্রান্স্যাকশন"
+    "title": "প্রিসেট ট্রান্স্যাকশন",
+    "amountOptional": "ঐচ্ছিক"
   },
   "settings": {
     "addCategory": "যোগ করুন",

@@ -109,6 +109,16 @@ const moreNavItems = [
   { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
+const LANGUAGE_OPTIONS = [
+  { value: "en", label: "English" },
+  { value: "es", label: "Español" },
+  { value: "bn", label: "বাংলা" },
+  { value: "zh", label: "中文" },
+  { value: "ko", label: "한국어" },
+  { value: "hi", label: "हिन्दी" },
+  { value: "ja", label: "日本語" },
+] as const;
+
 function SidebarContent({
   location,
   t,
@@ -165,13 +175,11 @@ function SidebarContent({
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="max-h-[280px]!">
-              <SelectItem value="en">{t("common.english")}</SelectItem>
-              <SelectItem value="es">{t("common.spanish")}</SelectItem>
-              <SelectItem value="bn">{t("common.bangla")}</SelectItem>
-              <SelectItem value="zh">{t("common.chinese")}</SelectItem>
-              <SelectItem value="ko">{t("common.korean")}</SelectItem>
-              <SelectItem value="hi">{t("common.hindi")}</SelectItem>
-              <SelectItem value="ja">{t("common.japanese")}</SelectItem>
+              {LANGUAGE_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -463,13 +471,11 @@ export function Layout() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="max-h-[280px]!">
-                  <SelectItem value="en">{t("common.english")}</SelectItem>
-                  <SelectItem value="es">{t("common.spanish")}</SelectItem>
-                  <SelectItem value="bn">{t("common.bangla")}</SelectItem>
-                  <SelectItem value="zh">{t("common.chinese")}</SelectItem>
-                  <SelectItem value="ko">{t("common.korean")}</SelectItem>
-                  <SelectItem value="hi">{t("common.hindi")}</SelectItem>
-                  <SelectItem value="ja">{t("common.japanese")}</SelectItem>
+                  {LANGUAGE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

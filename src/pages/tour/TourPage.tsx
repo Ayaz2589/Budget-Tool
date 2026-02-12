@@ -627,6 +627,16 @@ const TOUR_COPY: Record<string, TourCopy> = {
   },
 };
 
+const LANGUAGE_OPTIONS = [
+  { value: "en", label: "English" },
+  { value: "es", label: "Español" },
+  { value: "bn", label: "বাংলা" },
+  { value: "zh", label: "中文" },
+  { value: "ko", label: "한국어" },
+  { value: "hi", label: "हिन्दी" },
+  { value: "ja", label: "日本語" },
+] as const;
+
 function setTourCompleted(): void {
   try {
     localStorage.setItem(TOUR_COMPLETED_KEY, "1");
@@ -708,13 +718,11 @@ export function TourPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">{i18n.t("common.english")}</SelectItem>
-                  <SelectItem value="es">{i18n.t("common.spanish")}</SelectItem>
-                  <SelectItem value="bn">{i18n.t("common.bangla")}</SelectItem>
-                  <SelectItem value="zh">{i18n.t("common.chinese")}</SelectItem>
-                  <SelectItem value="ko">{i18n.t("common.korean")}</SelectItem>
-                  <SelectItem value="hi">{i18n.t("common.hindi")}</SelectItem>
-                  <SelectItem value="ja">{i18n.t("common.japanese")}</SelectItem>
+                  {LANGUAGE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <div className="flex justify-end">

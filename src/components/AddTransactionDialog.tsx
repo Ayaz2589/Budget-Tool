@@ -412,8 +412,8 @@ export function AddTransactionDialog({
                 </div>
 
                 {activeRowIndex === index && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 pt-2 border-t border-border/60">
-                  <div className="space-y-0.5 md:col-span-2">
+                <div className="grid grid-cols-1 gap-2 mt-2 pt-2 border-t border-border/60">
+                  <div className="space-y-0.5">
                     <div className="text-xs text-muted-foreground">
                       {t("transactions.type")}
                     </div>
@@ -527,7 +527,7 @@ export function AddTransactionDialog({
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-0.5 md:col-span-2">
+                      <div className="space-y-0.5">
                         <div className="text-xs text-muted-foreground">
                           {t("transactions.transferNote")}
                         </div>
@@ -543,7 +543,7 @@ export function AddTransactionDialog({
                       {row.transferFromOwner &&
                       row.transferToOwner &&
                       row.transferFromOwner === row.transferToOwner ? (
-                        <p className="md:col-span-2 text-xs text-destructive">
+                        <p className="text-xs text-destructive">
                           {t("transactions.transferValidationOwnersDifferent")}
                         </p>
                       ) : null}
@@ -552,7 +552,7 @@ export function AddTransactionDialog({
                     <>
                   {presetTransactions.length > 0 &&
                     expenseCategories.length > 0 && (
-                      <div className="space-y-0.5 md:col-span-2">
+                      <div className="space-y-0.5">
                         <div className="text-xs text-muted-foreground">
                           {t("addTransaction.preset")}
                         </div>
@@ -711,7 +711,7 @@ export function AddTransactionDialog({
                     </Select>
                   </div>
 
-                  <div className="space-y-0.5 md:col-span-2">
+                  <div className="space-y-0.5">
                     <div className="text-xs text-muted-foreground">
                       {t("addTransaction.description")}
                     </div>
@@ -797,7 +797,7 @@ export function AddTransactionDialog({
                   </div>
 
                   {row.allocationMode === "single" ? (
-                    <div className="space-y-0.5 md:col-span-2">
+                    <div className="space-y-0.5">
                       <div className="text-xs text-muted-foreground">
                         {t("addTransaction.splitOwner")}
                       </div>
@@ -823,7 +823,7 @@ export function AddTransactionDialog({
                       </Select>
                     </div>
                   ) : (
-                    <div className="space-y-1 md:col-span-2">
+                    <div className="space-y-1">
                       <div className="text-xs text-muted-foreground">
                         {t("addTransaction.splitOwners")}
                       </div>
@@ -854,11 +854,11 @@ export function AddTransactionDialog({
                   )}
 
                   {row.allocationMode === "custom" ? (
-                    <div className="space-y-2 md:col-span-2">
+                    <div className="space-y-2">
                       <div className="text-xs text-muted-foreground">
                         {t("addTransaction.customSplitHint")}
                       </div>
-                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-2">
                         {row.allocationOwners.map((name) => (
                           <div key={name} className="space-y-0.5">
                             <div className="text-xs text-muted-foreground">{name}</div>

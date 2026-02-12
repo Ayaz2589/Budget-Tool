@@ -87,6 +87,24 @@ function asNumber(value: unknown): number {
   return 0;
 }
 
+function formatMonthKeyNumeric(monthKey: string): string {
+  const [year, month] = monthKey.split("-");
+  if (!year || !month) return monthKey;
+  return `${month}/${year}`;
+}
+
+function formatMonthKeyForAxis(monthKey: string, range: DashboardRange): string {
+  const [, month] = monthKey.split("-");
+  if (!month) return monthKey;
+  return range === "12" ? month : formatMonthKeyNumeric(monthKey);
+}
+
+function monthLabelFromTooltipPayload(payload: unknown): string {
+  if (!Array.isArray(payload) || payload.length === 0) return "";
+  const first = payload[0] as { payload?: { monthLabel?: string } };
+  return first?.payload?.monthLabel ?? "";
+}
+
 export function Dashboard() {
   const { t, i18n } = useTranslation();
   const { expenses, income, debts, debtPayments, owners, ownerTransfers } = useBudget();
@@ -291,14 +309,25 @@ export function Dashboard() {
     return Array.from(keys).sort((a, b) => a.localeCompare(b));
   }, [cashFlowRows]);
 
-  const netCashFlowRows = useMemo(
+  const cashFlowDisplayRows = useMemo(
     () =>
       cashFlowRows.map((row) => ({
+        ...row,
+        monthLabel: formatMonthKeyNumeric(row.monthKey),
+        monthAxisLabel: formatMonthKeyForAxis(row.monthKey, range),
+      })),
+    [cashFlowRows, range],
+  );
+
+  const netCashFlowRows = useMemo(
+    () =>
+      cashFlowDisplayRows.map((row) => ({
         monthKey: row.monthKey,
         monthLabel: row.monthLabel,
+        monthAxisLabel: row.monthAxisLabel,
         netCashFlow: row.incomeTotal - row.expensesTotal - row.debtPaymentsTotal,
       })),
-    [cashFlowRows],
+    [cashFlowDisplayRows],
   );
 
   const dismissInsight = (id: string) => {
@@ -381,15 +410,21 @@ export function Dashboard() {
               heightMobile={220}
               heightDesktop={280}
             >
-              <BarChart data={cashFlowRows}>
+              <BarChart data={cashFlowDisplayRows}>
                 <CartesianGrid vertical={false} />
-                <XAxis dataKey="monthLabel" />
+                <XAxis
+                  dataKey="monthAxisLabel"
+                  interval={0}
+                  tickMargin={8}
+                  minTickGap={0}
+                />
                 <YAxis />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
                       className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                       labelClassName="text-sm font-semibold"
+                      labelFormatter={(_, payload) => monthLabelFromTooltipPayload(payload)}
                       valueFormatter={(value) => formatCurrency(asNumber(value))}
                     />
                   }
@@ -424,22 +459,17 @@ export function Dashboard() {
               heightDesktop={280}
             >
               <BarChart
-                data={cashFlowRows}
+                data={cashFlowDisplayRows}
                 margin={{ top: 4, right: 24, left: -4, bottom: 2 }}
               >
                 <CartesianGrid vertical={false} />
                 <XAxis
-                  dataKey="monthLabel"
+                  dataKey="monthAxisLabel"
                   tick={{ fontSize: 11 }}
                   tickMargin={8}
                   minTickGap={18}
                   interval="preserveStartEnd"
                   padding={{ left: 0, right: 8 }}
-                  tickFormatter={(value) => {
-                    const label = String(value ?? "");
-                    const month = label.split(" ")[0] ?? label;
-                    return month.slice(0, 3);
-                  }}
                 />
                 <YAxis
                   tick={{ fontSize: 11 }}
@@ -455,6 +485,7 @@ export function Dashboard() {
                     <ChartTooltipContent
                       className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                       labelClassName="text-sm font-semibold"
+                      labelFormatter={(_, payload) => monthLabelFromTooltipPayload(payload)}
                       valueFormatter={(value) => formatCurrency(asNumber(value))}
                     />
                   }
@@ -475,7 +506,7 @@ export function Dashboard() {
               </BarChart>
             </ChartContainer>
           </div>
-            {cashFlowRows.length === 0 ? (
+            {cashFlowDisplayRows.length === 0 ? (
               <DsEmptyState title={t("dashboard.chartNoDataRange")} className="py-4" />
             ) : null}
           </DsChartCard>
@@ -518,7 +549,12 @@ export function Dashboard() {
                         </linearGradient>
                       </defs>
                       <CartesianGrid vertical={false} />
-                      <XAxis dataKey="monthLabel" />
+                      <XAxis
+                        dataKey="monthAxisLabel"
+                        interval={0}
+                        tickMargin={8}
+                        minTickGap={0}
+                      />
                       <YAxis />
                       <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
                       <ChartTooltip
@@ -526,6 +562,7 @@ export function Dashboard() {
                           <ChartTooltipContent
                             className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                             labelClassName="text-sm font-semibold"
+                            labelFormatter={(_, payload) => monthLabelFromTooltipPayload(payload)}
                             valueFormatter={(value) => formatCurrency(asNumber(value))}
                           />
                         }
@@ -565,17 +602,12 @@ export function Dashboard() {
                       </defs>
                       <CartesianGrid vertical={false} />
                     <XAxis
-                      dataKey="monthLabel"
+                      dataKey="monthAxisLabel"
                       tick={{ fontSize: 11 }}
                       tickMargin={8}
                       minTickGap={18}
                       interval="preserveStartEnd"
                       padding={{ left: 0, right: 10 }}
-                      tickFormatter={(value) => {
-                        const label = String(value ?? "");
-                        const month = label.split(" ")[0] ?? label;
-                        return month.slice(0, 3);
-                      }}
                     />
                     <YAxis
                       tick={{ fontSize: 11 }}
@@ -592,6 +624,7 @@ export function Dashboard() {
                           <ChartTooltipContent
                             className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
                             labelClassName="text-sm font-semibold"
+                            labelFormatter={(_, payload) => monthLabelFromTooltipPayload(payload)}
                             valueFormatter={(value) => formatCurrency(asNumber(value))}
                           />
                         }

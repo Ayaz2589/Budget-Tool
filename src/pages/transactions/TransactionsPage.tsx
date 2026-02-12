@@ -9,6 +9,7 @@ import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Plus, SlidersHorizontal, Receipt } from "lucide-react";
 import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
 import { TransactionsToolbar } from "./TransactionsToolbar";
@@ -316,6 +317,15 @@ export function TransactionsPage() {
       <div className="flex-1 pb-24 md:pb-0">
         <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0 md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
         <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
+            <div className="px-4 pb-3 md:px-0">
+              <Input
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                placeholder={t("transactions.filterByDescription")}
+                className="h-11 w-full"
+                aria-label={t("transactions.searchDescription")}
+              />
+            </div>
             <FiltersAndActionsDialog
               open={filtersPopupOpen}
               onOpenChange={setFiltersPopupOpen}

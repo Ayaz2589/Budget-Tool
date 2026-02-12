@@ -178,6 +178,22 @@ test("TransactionsPage opens filters and actions sheet", () => {
   expect(screen.getAllByText(/filters/i).length).toBeGreaterThan(0);
 });
 
+test("TransactionsPage filters expenses with inline search", () => {
+  render(<TestWrapper />);
+
+  const searchInput = screen
+    .getAllByLabelText("Search description")
+    .find((el) => !el.closest('[role="dialog"]'));
+  expect(searchInput).toBeTruthy();
+
+  fireEvent.change(searchInput as HTMLInputElement, {
+    target: { value: "Gamma" },
+  });
+
+  expect(screen.getAllByText("Gamma utilities").length).toBeGreaterThan(0);
+  expect(screen.queryByText("Alpha grocery")).toBeNull();
+});
+
 test("TransactionsPage supports sorting branches and row tap actions", () => {
   render(<TestWrapper />);
 

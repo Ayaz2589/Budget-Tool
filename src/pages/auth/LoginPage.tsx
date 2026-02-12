@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Landmark, BarChart3, Wallet, CreditCard } from "lucide-react";
-import { useGoogleAuth } from "@/context/GoogleAuthContext";
-import { RETURNING_USER_KEY } from "@/context/GoogleAuthContext";
+import { useGoogleAuth } from "@/context";
+import { RETURNING_USER_KEY } from "@/context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

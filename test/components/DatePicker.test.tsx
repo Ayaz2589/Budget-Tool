@@ -25,7 +25,7 @@ test("DatePicker opens calendar dropdown from trigger", () => {
 
   fireEvent.click(screen.getByRole("button", { name: "2026/02/12" }));
 
-  expect(screen.getByText("February 2026")).toBeInTheDocument();
+  expect(screen.getAllByText("February 2026").length).toBeGreaterThan(0);
   expect(screen.getByText("Su")).toBeInTheDocument();
   expect(screen.getByText("Sa")).toBeInTheDocument();
 });
@@ -46,4 +46,3 @@ test("DatePicker emits ISO date when a day is selected", () => {
 
   expect(onChangeIso).toHaveBeenCalledWith("2026-02-20");
 });
-

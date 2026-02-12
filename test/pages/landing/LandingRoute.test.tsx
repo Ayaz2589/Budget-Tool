@@ -2,10 +2,10 @@ import { test, expect } from "bun:test";
 import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { LandingRoute } from "@/pages/landing";
-import { GoogleAuthContext, GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
-import { RETURNING_USER_KEY } from "@/context/GoogleAuthContext";
-import { TOUR_COMPLETED_KEY } from "@/context/GoogleAuthContext";
-import type { GoogleAuthContextValue } from "@/context/GoogleAuthContext";
+import { GoogleAuthContext, GoogleAuthProviderFallback } from "@/context";
+import { RETURNING_USER_KEY } from "@/context";
+import { TOUR_COMPLETED_KEY } from "@/context";
+import type { GoogleAuthContextValue } from "@/context";
 
 const mockAuthValueSignedOut: GoogleAuthContextValue = {
   isSignedIn: false,

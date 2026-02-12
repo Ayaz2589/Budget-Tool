@@ -1,67 +1,77 @@
-# Modules (file tree)
+# Modules
 
-One-line description per file or logical module. Use this to find where logic lives (e.g. "Where is sync?" → GoogleAuthContext + googleSheets).
+This document is the current module map after the refactor pass (barrel exports + selector extraction).
 
-## src/
+## Entry and Routing
 
-- **App.tsx** — Root routes: /auth (AuthLoginRoute), AuthGate wrapping Layout and nested routes (/, import, transactions, income, debt, mortgage, rules, settings).
-- **main.tsx** — Entry: React root, I18nextProvider, App.
-- **i18n.ts** — i18next config; locales loaded from src/locales/.
-- **index.css** — Tailwind and theme variables.
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/main.tsx`** — App bootstrap and i18n wiring.
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/App.tsx`** — Provider composition + router tree.
+- Routes:
+  - `/` landing gate
+  - `/tour`
+  - `/auth`
+  - `/dashboard` with nested pages: dashboard, data (`import`), transactions, income, debt, mortgage, presets, about, settings.
 
-## src/context/
+## Barrel Exports
 
-- **BudgetContext.tsx** — Global state: expenses, income, debts, debtPayments, expenseCategories, incomeCategories, cardSources, iOweNova; persistence to localStorage (budget-tool-data); add/update/remove and setExpenseCategories, setIncomeCategories, setCardSources.
-- **PresetTransactionsContext.tsx** — Preset transactions state; persistence to localStorage (budget-tool-preset-transactions).
-- **RulesContext.tsx** — Rules state; persistence to localStorage (budget-tool-rules).
-- **GoogleAuthContext.tsx** — Google OAuth (useGoogleLogin); token and expiry persistence; userProfile fetch; signIn, signOut; syncToSheets, pullFromSheet; clearSession on 401 or expiry; GoogleAuthProviderFallback when client ID not set.
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/components/index.ts`**
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/components/ui/index.ts`**
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/context/index.ts`**
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/hooks/index.ts`**
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/pages/index.ts`** plus per-page barrels (`src/pages/*/index.ts`)
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/lib/index.ts`**
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/types/index.ts`**
 
-## src/lib/
+Use barrels for feature-level imports; only import deep files when a module is intentionally private.
 
-- **types.ts** — Expense, Income, Debt, DebtPayment, PresetTransaction, ExpenseSource, ALL_EXPENSE_SOURCES, DEFAULT_*_CATEGORIES.
-- **sourceLabels.ts** — Centralized EXPENSE_SOURCE_LOCALE_KEYS and EXPENSE_SOURCE_DISPLAY_LABELS for i18n and PDF/Rules labels.
-- **totals.ts** — computeMonthTotals, computeAllTotals, computeGrandTotals, getMonthLabel.
-- **rules.ts** — Rule type; conditions (source, cardMember, amount, categoryTotal); actions (setCategory, showWarning); applyRulesToExpenses, getDashboardWarnings.
-- **minifiedPayload.ts** — buildMinifiedPayload, expandPayload, serializeToBlob, parseFromBlob; short keys (e, i, d, dp, r, pt, ec, ic, sc).
-- **googleSheets.ts** — Sheets API: ensureSheetsExist, clearAndWrite* (Expenses, Mortgage, Income, Debts, DebtPayments, Rules, Presets), writeDataBlob, readDataBlob, read*FromSheet, writeTotalsSheet, getSheetIds, applySheetsFormatting, extractSpreadsheetId; VALID_EXPENSE_SOURCES for parsing.
-- **pdfExport.ts** — downloadTransactionsAndIncomePdf (builds PDF with V2 blob), parseExportedPdfData (extracts V2 blob from PDF text); SOURCE_LABELS for table display.
-- **pdfText.ts** — extractTextFromPdf (pdfjs-dist).
-- **format.ts** — formatCurrency, formatPercent.
-- **dateRepair.ts** — isValidDate, tryRepairDate.
-- **debtUtils.ts** — getDebtBalance, applyRecurringPayments.
-- **categoryColors.tsx** — getCategoryColor, CategoryOption component.
-- **importDedup.ts** — filterOutExistingExpenses.
-- **utils.ts** — cn (classnames).
-- **parsers/amex.ts** — Parse Amex CSV; returns ParseResult (expenses, source).
-- **parsers/apple.ts** — Parse Apple Card CSV.
-- **parsers/chase.ts** — Parse Chase PDF text.
-- **parsers/index.ts** — parseCsv, detectCsvSource, CsvSource type; re-exports parsers.
+## Context Layer
 
-## src/components/
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/context/BudgetContext.tsx`**
+  - Canonical budget state and mutations.
+  - UI format settings (locale/currency/date format), FX hydration, and dummy mode.
+  - localStorage persistence for core budget + UI format.
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/context/PresetTransactionsContext.tsx`**
+  - Preset CRUD + persistence.
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/context/GoogleAuthContext.tsx`**
+  - Google OAuth session.
+  - Sheets sync/pull and queue-safe autosync behavior.
+  - Drive-assisted sheet setup flow.
 
-- **Layout.tsx** — Sidebar (desktop), header + bottom nav (mobile), language switcher, sign-in/sign-out; Outlet for main content; redirect to /auth when isSignedIn goes false.
-- **AddTransactionDialog.tsx** — Multi-row add transaction dialog; source from cardSources, categories from expenseCategories; presets from PresetTransactionsContext.
-- **ui/** — shadcn components (button, card, dialog, input, select, table, tabs, accordion, chart, checkbox, label).
-- **cards/SourceIcon.tsx** — Renders icon for ExpenseSource (Amex, Amex Gold, Chase, Apple, manual/td null).
-- **cards/*.tsx** — AmexPlatinumCardIcon, AmexGoldCardIcon, AppleCardIcon, ChaseCardIcon; index re-exports.
+## Transactions Refactor (Pure Selectors/Helpers)
 
-## src/pages/
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/pages/transactions/transactionsLedger.ts`**
+  - Pure functions for owner options, row projection, filtering, sorting, month grouping, and active filter detection.
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/pages/transactions/TransactionsPage.tsx`**
+  - Orchestrates state + dialogs and delegates data logic to `transactionsLedger.ts`.
+- **`/Users/ayazuddin/Development/personal/Web/budget-tool/src/components/add-transaction-utils.ts`**
+  - Pure helpers extracted from AddTransactionDialog.
 
-- **auth/AuthGate.tsx** — When !isSignedIn redirects to /auth; when signed in renders Outlet. AuthLoginRoute: when signed in redirects to /; else renders LoginPage.
-- **auth/LoginPage.tsx** — Full-page login: two-column layout (form left, value prop right), Google sign-in button.
-- **dashboard/Dashboard.tsx** — Month selector, summary cards, debt section, by-month section, overview, spending by type.
-- **dashboard/*.tsx** — ByMonthList, ByMonthSection, DebtSection, MonthSelector, OverviewSection, SpendingByTypeSection, SummaryCards.
-- **transactions/TransactionsPage.tsx** — Toolbar, filters, expenses by month (table/list), add transaction, delete dialogs, sync confirm.
-- **transactions/*.tsx** — DeleteTransactionDialogs, ExpenseActionsDialog, ExpensesByMonthList, ExpensesByMonthTable, FiltersAndActionsDialog, SyncConfirmDialog, TransactionsToolbar.
-- **import/ImportPage.tsx** — File input, source selection (filtered by cardSources), preview, add to transactions.
-- **import/ImportSourceCard.tsx** — Source buttons (card sources + pdf-export), file button, preview stats.
-- **import/ImportPreviewCard.tsx** — Preview tables for expenses, income, debts, debt payments.
-- **income/IncomePage.tsx** — Income table/list, add/edit dialogs, PDF download.
-- **income/*.tsx** — AddIncomeDialog, EditIncomeDialog, IncomeActionsDialog, IncomeList, IncomeTable.
-- **debt/DebtPage.tsx** — Debt list (desktop/mobile), add debt/payment, edit recurring.
-- **debt/*.tsx** — AddDebtDialog, AddPaymentDialog, DebtActionsDialog, DebtList, DebtListMobile, EditRecurringDialog.
-- **mortgage/MortgagePage.tsx** — Mortgage payments table/list, add/delete payment dialogs.
-- **mortgage/*.tsx** — AddMortgagePaymentDialog, DeleteMortgagePaymentDialog, MortgagePaymentActionsDialog, MortgagePaymentsList, MortgagePaymentsTable.
-- **rules/RulesPage.tsx** — Rules list (reorder, toggle, delete), rule editor dialog, preset transactions card; source options from cardSources.
-- **settings/SettingsPage.tsx** — Google Sheets card, CardSourcesCard, ExpenseCategoriesCard, IncomeCategoriesCard, delete all data.
-- **settings/*.tsx** — CardSourcesCard, ExpenseCategoriesCard, GoogleSheetsCard, IncomeCategoriesCard.
+## Library Modules
+
+- **Formatting/Input**
+  - `src/lib/format.ts`, `src/lib/currencyInput.ts`, `src/lib/dateInput.ts`, `src/lib/fx.ts`
+- **Import/Export**
+  - `src/lib/jsonExport.ts`, `src/lib/exportString.ts`, `src/lib/minifiedPayload.ts`, `src/lib/pdfExport.ts`
+- **Google**
+  - `src/lib/googleSheets.ts`, `src/lib/googleDrive.ts`
+- **Domain math/selectors**
+  - `src/lib/totals.ts`, `src/lib/debtUtils.ts`, `src/lib/ownerAccounting.ts`, `src/lib/importNormalize.ts`
+
+All utility modules should stay pure by default; side effects should be constrained to context/components.
+
+## Component Layer
+
+- **Layout shell:** `src/components/Layout.tsx`
+- **Feature dialogs/sheets:** Add/Edit dialogs per page modules.
+- **Design system wrappers:** `src/components/ds/*`
+- **UI primitives:** `src/components/ui/*`
+
+## Page Modules
+
+- **Dashboard:** `src/pages/dashboard/*` (selectors + insights + UI)
+- **Transactions:** `src/pages/transactions/*`
+- **Income:** `src/pages/income/*`
+- **Debt:** `src/pages/debt/*`
+- **Mortgage:** `src/pages/mortgage/*`
+- **Data import/export:** `src/pages/import/*`
+- **Settings/About/Tour/Auth/Landing:** corresponding page folders

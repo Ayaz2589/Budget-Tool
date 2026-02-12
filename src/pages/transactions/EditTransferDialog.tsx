@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { parseCurrencyInput, formatCurrencyInput, formatCurrencyFromNumber } from "@/lib/currencyInput";
 import { dateInputToIso, isoToDateInput } from "@/lib/dateInput";
-import { useBudget } from "@/context/BudgetContext";
+import { useBudget } from "@/context";
 import type { EditTransferDialogProps } from "@/types/transactions";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 

@@ -1,9 +1,9 @@
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
-import { BudgetProvider } from "@/context/BudgetContext";
-import { GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
-import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
+import { BudgetProvider } from "@/context";
+import { GoogleAuthProviderFallback } from "@/context";
+import { PresetTransactionsProvider } from "@/context";
 import { Layout } from "@/components/Layout";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
 

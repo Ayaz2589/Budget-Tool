@@ -1,50 +1,93 @@
 # Architecture
 
-## App entry
+## Runtime Composition
 
-- **main.tsx** — Renders `<App />` into `#root`; wraps app in `StrictMode` and `I18nextProvider`.
-- **App.tsx** — Wraps content in `BudgetProvider`, `PresetTransactionsProvider`, `RulesProvider`. If `VITE_GOOGLE_CLIENT_ID` is set, wraps in `GoogleOAuthProvider` and `GoogleAuthProvider`; otherwise uses `GoogleAuthProviderFallback`. Renders `AppContent` (router).
+`App.tsx` composes providers in this order:
 
-## Routing
+1. `BudgetProvider`
+2. `PresetTransactionsProvider`
+3. `GoogleOAuthProvider` (when client id exists) or fallback provider
+4. `GoogleAuthProvider`
 
-- **BrowserRouter** — Wraps all routes.
-- **Routes:**
-  - **`/`** — Renders `LandingRoute`. When signed in, redirects to `/dashboard`. When not signed in and returning user (localStorage flag `budget-tool-returning-user` set), redirects to `/auth`. Else (new visitor) renders `LandingPage` (marketing hero, features, CTA to `/auth`).
-  - **`/auth`** — Renders `AuthLoginRoute`. When signed in, redirects to `/dashboard`. When not signed in, renders `LoginPage` (full-page two-column login). Visiting `/auth` sets the returning-user flag.
-  - **AuthGate (no path)** — Layout route for `/dashboard`. When not signed in, redirects to `/auth`. When signed in, renders `<Outlet />` (child routes).
-  - **`/dashboard`** — Renders `Layout`; nested routes:
-    - **index** — Dashboard
-    - **import** — ImportPage
-    - **transactions** — TransactionsPage
-    - **income** — IncomePage
-    - **debt** — DebtPage
-    - **mortgage** — MortgagePage
-    - **rules** — RulesPage
-    - **settings** — SettingsPage
+Then routing is mounted via `BrowserRouter`.
 
-All app pages (dashboard, transactions, income, etc.) are behind AuthGate at `/dashboard`; unauthenticated users are redirected to `/auth`. New visitors see the landing at `/`; returning visitors (flag set on sign-out or visit to `/auth`) go straight to `/auth` when they hit `/`.
+## Routing Model
 
-## Context hierarchy
+Public routes:
 
-1. **BudgetProvider** — `src/context/BudgetContext.tsx`. Holds expenses, income, debts, debtPayments, expenseCategories, incomeCategories, cardSources, iOweNova. Persists to localStorage (`budget-tool-data`). Exposes add/update/remove and setExpenseCategories, setIncomeCategories, setCardSources.
-2. **PresetTransactionsProvider** — `src/context/PresetTransactionsContext.tsx`. Holds preset transactions. Persists to localStorage (`budget-tool-preset-transactions`).
-3. **RulesProvider** — `src/context/RulesContext.tsx`. Holds rules. Persists to localStorage (`budget-tool-rules`).
-4. **GoogleOAuthProvider** (optional) — From `@react-oauth/google`. Provides Google GSI client.
-5. **GoogleAuthProvider** or **GoogleAuthProviderFallback** — `src/context/GoogleAuthContext.tsx`. Holds accessToken, expiresAt, userProfile, spreadsheetId; signIn, signOut; syncToSheets, pullFromSheet. Token persisted in localStorage (`budget-tool-google-access-token`); spreadsheet ID in `budget-tool-spreadsheet-id`.
+- `/` (landing gate)
+- `/tour`
+- `/auth`
 
-## Auth flow
+Authenticated routes are nested under `/dashboard` and rendered through `Layout` + `AuthGate`:
 
-- **Sign-in:** User clicks "Sign in with Google" (LoginPage or sidebar). `useGoogleLogin` (implicit flow) opens Google consent; on success, token and `expires_in` are stored; `setAccessToken` and `setExpiresAt` are called.
-- **Token persistence:** Token and `expires_at` are written to localStorage. On load, `getStoredAccessToken()` and `getStoredExpiresAt()` restore state; if token is expired, null is returned.
-- **Token expiry (in-session):** A 60s interval in GoogleAuthContext checks `expiresAt`; if `Date.now() >= expiresAt`, `clearSession()` is called (clear token, setAccessToken(null), setExpiresAt(null), setUserProfile(null)).
-- **401 from Sheets API:** In `syncToSheets` and `pullFromSheet` catch blocks, if the error message contains `401`, `clearSession()` is called.
-- **Redirect when sign-in lost:** In Layout, an effect watches `isSignedIn`; when it transitions from true to false, `navigate("/auth")` is called.
-- **Returning-user flag:** On sign-out, `clearSession()` in GoogleAuthContext sets `localStorage.setItem('budget-tool-returning-user', '1')`. On visit to LoginPage (`/auth`), the same key is set. LandingRoute at `/` shows the landing only when not signed in and the flag is not set; otherwise redirects to `/auth` (returning) or `/dashboard` (signed in).
+- `/dashboard` (dashboard)
+- `/dashboard/import` (data import/export page)
+- `/dashboard/transactions`
+- `/dashboard/income`
+- `/dashboard/debt`
+- `/dashboard/mortgage`
+- `/dashboard/presets`
+- `/dashboard/about`
+- `/dashboard/settings`
 
-## Page tours
+## State Boundaries
 
-- **PageTourTrigger** — Renders a help icon and optional dot badge. On click, sets `budget-tool-tour-seen-<pageId>` in localStorage and runs the page tour via `runPageTour(steps, t)` (driver.js). Each page mounts the trigger and passes its `pageId` and steps from `pageTourSteps.ts`. Step targets use `data-tour="id"` on DOM nodes.
+### BudgetContext
 
-## Layout
+Owns canonical app data:
 
-- **Layout.tsx** — Renders sidebar (desktop) or header + bottom nav (mobile). Sidebar contains nav links, language switcher, and sign-in/sign-out + user profile. Main content area renders `<Outlet />` (the current nested route). Mobile "More" opens a dialog with additional nav links.
+- expenses, income, debts, debt payments, owner transfers
+- categories, owners, card sources
+- UI format settings (locale, display currency, date format)
+
+Responsibilities:
+
+- mutation APIs for all financial entities
+- localStorage persistence
+- FX-backed currency display settings hydration
+
+### PresetTransactionsContext
+
+Owns presets only. Keeps preset operations isolated from core budget reducer concerns.
+
+### GoogleAuthContext
+
+Owns auth and external sync concerns:
+
+- OAuth token/session
+- Google Sheets sync/pull
+- queue-safe autosync state
+- Drive-backed sheet discovery/creation flow
+
+This keeps external I/O out of budget mutation logic.
+
+## Refactor Pattern: Orchestrator + Pure Selectors
+
+Feature pages should follow:
+
+- **Page component:** orchestrates UI state and invokes pure selectors/helpers.
+- **Selector/helper modules:** pure projections, filtering, sorting, grouping.
+
+Current reference implementation:
+
+- `src/pages/transactions/TransactionsPage.tsx`
+- `src/pages/transactions/transactionsLedger.ts`
+
+`transactionsLedger.ts` now centralizes transaction row projection and filter/sort/group logic as pure functions, improving testability and reducing render-time coupling.
+
+## Shared Module Strategy
+
+- Use barrel exports for feature-level imports (`src/components`, `src/context`, `src/pages`, `src/types`).
+- Keep low-level modules private unless they represent a stable public contract.
+- Prefer pure utilities in `src/lib/*` and avoid hidden side effects.
+
+## Testing Strategy
+
+Three layers:
+
+1. **Unit tests:** pure utilities/selectors (`test/lib`, `test/pages/*/*selectors*`, `test/components/addTransactionUtils.test.ts`)
+2. **Component/page tests:** interaction and rendering (`test/components`, `test/pages`)
+3. **Integration tests:** multi-page workflow sanity checks (`test/integration/AppFlows.test.tsx`)
+
+This gives fast feedback at unit level while protecting cross-page regressions.

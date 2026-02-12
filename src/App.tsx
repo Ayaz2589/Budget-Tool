@@ -1,24 +1,24 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { BudgetProvider } from "@/context/BudgetContext";
-import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
 import {
+  BudgetProvider,
+  PresetTransactionsProvider,
   GoogleAuthProvider,
   GoogleAuthProviderFallback,
-} from "@/context/GoogleAuthContext";
-import { Layout } from "@/components/Layout";
-import { AuthGate, AuthLoginRoute } from "@/pages/auth/AuthGate";
+} from "@/context";
+import { Layout } from "@/components";
+import { AboutPage } from "@/pages/about";
+import { AuthGate, AuthLoginRoute } from "@/pages/auth";
+import { Dashboard } from "@/pages/dashboard";
+import { DebtPage } from "@/pages/debt";
+import { ImportPage } from "@/pages/import";
+import { IncomePage } from "@/pages/income";
 import { LandingRoute } from "@/pages/landing";
-import { Dashboard } from "@/pages/dashboard/Dashboard";
-import { DebtPage } from "@/pages/debt/DebtPage";
-import { MortgagePage } from "@/pages/mortgage/MortgagePage";
-import { ImportPage } from "@/pages/import/ImportPage";
-import { TransactionsPage } from "@/pages/transactions/TransactionsPage";
-import { IncomePage } from "@/pages/income/IncomePage";
-import { PresetsPage } from "@/pages/presets/PresetsPage";
-import { SettingsPage } from "@/pages/settings/SettingsPage";
-import { TourPage } from "@/pages/tour/TourPage";
-import { AboutPage } from "@/pages/about/AboutPage";
+import { MortgagePage } from "@/pages/mortgage";
+import { PresetsPage } from "@/pages/presets";
+import { SettingsPage } from "@/pages/settings";
+import { TourPage } from "@/pages/tour";
+import { TransactionsPage } from "@/pages/transactions";
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 

@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { useBudget } from "@/context/BudgetContext";
+import { useBudget } from "@/context";
 import type { Debt, DebtPayment } from "@/lib/types";
 import {
   Dialog,

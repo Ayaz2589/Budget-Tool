@@ -1,8 +1,8 @@
 import { test, expect } from "bun:test";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { LoginPage } from "@/pages/auth/LoginPage";
-import { GoogleAuthContext, GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
-import type { GoogleAuthContextValue } from "@/context/GoogleAuthContext";
+import { GoogleAuthContext, GoogleAuthProviderFallback } from "@/context";
+import type { GoogleAuthContextValue } from "@/context";
 
 const mockAuthValue: GoogleAuthContextValue = {
   isSignedIn: false,

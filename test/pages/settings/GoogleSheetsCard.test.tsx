@@ -1,7 +1,7 @@
 import { test, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { GoogleSheetsCard } from "@/pages/settings/GoogleSheetsCard";
-import { GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
+import { GoogleAuthProviderFallback } from "@/context";
 
 const mockT = (key: string) => key;
 

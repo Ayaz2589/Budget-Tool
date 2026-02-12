@@ -1,8 +1,8 @@
 import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { BudgetProvider } from "@/context/BudgetContext";
-import { GoogleAuthContext } from "@/context/GoogleAuthContext";
+import { BudgetProvider } from "@/context";
+import { GoogleAuthContext } from "@/context";
 import type { GoogleAuthContextValue } from "@/types/auth";
 import { Layout } from "@/components/Layout";
 

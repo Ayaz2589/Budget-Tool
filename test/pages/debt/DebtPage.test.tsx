@@ -2,8 +2,8 @@ import { afterEach, test, expect } from "bun:test";
 import { cleanup, render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { DebtPage } from "@/pages/debt/DebtPage";
-import { BudgetProvider } from "@/context/BudgetContext";
-import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
+import { BudgetProvider } from "@/context";
+import { PresetTransactionsProvider } from "@/context";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
 

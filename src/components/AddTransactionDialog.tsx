@@ -1,12 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useBudget } from "@/context/BudgetContext";
-import { usePresetTransactions } from "@/context/PresetTransactionsContext";
-import type { ExpenseAllocation, ExpenseSource } from "@/types/core";
-import type {
-  TransactionRow,
-  AddTransactionDialogProps,
-} from "@/types/transactions";
+import { useBudget, usePresetTransactions } from "@/context";
+import type { ExpenseSource, TransactionRow, AddTransactionDialogProps } from "@/types";
 import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
@@ -38,74 +33,12 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
-
-function defaultRow(
-  defaultSource: ExpenseSource = "manual",
-  dateValue: string = new Date().toISOString().slice(0, 10)
-): TransactionRow {
-  return {
-    id: crypto.randomUUID(),
-    entryType: "expense",
-    date: dateValue,
-    amount: "",
-    description: "",
-    category: "", // default: Uncategorized (empty string; UI shows "_" in Select)
-    source: defaultSource,
-    owner: "",
-    paidByOwner: "",
-    allocationMode: "single",
-    allocationOwners: [],
-    allocationPercents: {},
-    transferFromOwner: "",
-    transferToOwner: "",
-    transferNote: "",
-  };
-}
-
-function parsePercentValue(raw: string): number | null {
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || parsed <= 0) return null;
-  return parsed;
-}
-
-function uniqueOwners(values: string[]): string[] {
-  return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
-}
-
-function buildAllocationForRow(
-  row: TransactionRow,
-  paidByOwner: string,
-  ownerOptions: string[],
-): ExpenseAllocation[] | undefined {
-  if (row.allocationMode === "single") {
-    const owner = (row.allocationOwners[0] || paidByOwner || "").trim();
-    return owner ? [{ owner, percent: 100 }] : undefined;
-  }
-
-  if (row.allocationMode === "equal") {
-    const selectedOwners = uniqueOwners(row.allocationOwners);
-    const fallbackOwners = uniqueOwners(ownerOptions);
-    const effectiveOwners =
-      selectedOwners.length >= 2
-        ? selectedOwners
-        : fallbackOwners.length >= 2
-          ? fallbackOwners
-          : selectedOwners;
-    if (effectiveOwners.length === 0) return undefined;
-    const percent = 100 / effectiveOwners.length;
-    return effectiveOwners.map((owner) => ({ owner, percent }));
-  }
-
-  const owners = uniqueOwners(row.allocationOwners);
-  const customAllocation: ExpenseAllocation[] = [];
-  for (const owner of owners) {
-    const percent = parsePercentValue(row.allocationPercents[owner] ?? "");
-    if (percent == null) continue;
-    customAllocation.push({ owner, percent });
-  }
-
-  return customAllocation.length > 0 ? customAllocation : undefined;
-}
+import {
+  buildAllocationForRow,
+  createDefaultTransactionRow,
+  sortPresetTransactionsByCategory,
+  uniqueOwners,
+} from "./add-transaction-utils";
 
 export function AddTransactionDialog({
   open,
@@ -124,10 +57,13 @@ export function AddTransactionDialog({
   const { presetTransactions } = usePresetTransactions();
   const defaultSource = (cardSources[0] as ExpenseSource) ?? "manual";
   const [rows, setRows] = useState<TransactionRow[]>(() => [
-    defaultRow(
+    createDefaultTransactionRow({
       defaultSource,
-      isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
-    ),
+      dateValue: isoToDateInput(
+        new Date().toISOString().slice(0, 10),
+        uiFormatSettings.dateFormat,
+      ),
+    }),
   ]);
   const [activeRowIndex, setActiveRowIndex] = useState(0);
 
@@ -135,10 +71,13 @@ export function AddTransactionDialog({
     if (open) {
       const fallback = (cardSources[0] as ExpenseSource) ?? "manual";
       setRows([
-        defaultRow(
-          fallback,
-          isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
-        ),
+        createDefaultTransactionRow({
+          defaultSource: fallback,
+          dateValue: isoToDateInput(
+            new Date().toISOString().slice(0, 10),
+            uiFormatSettings.dateFormat,
+          ),
+        }),
       ]);
       setActiveRowIndex(0);
     }
@@ -156,21 +95,10 @@ export function AddTransactionDialog({
     return fromExpenses;
   }, [owners, expenses]);
 
-  const sortedPresetTransactions = useMemo(() => {
-    return [...presetTransactions].sort((a, b) => {
-      const categoryA = (a.category || "").trim().toLowerCase();
-      const categoryB = (b.category || "").trim().toLowerCase();
-      const categoryCompare = categoryA.localeCompare(categoryB);
-      if (categoryCompare !== 0) return categoryCompare;
-
-      const descriptionA = (a.description || "").trim().toLowerCase();
-      const descriptionB = (b.description || "").trim().toLowerCase();
-      const descriptionCompare = descriptionA.localeCompare(descriptionB);
-      if (descriptionCompare !== 0) return descriptionCompare;
-
-      return a.id.localeCompare(b.id);
-    });
-  }, [presetTransactions]);
+  const sortedPresetTransactions = useMemo(
+    () => sortPresetTransactionsByCategory(presetTransactions),
+    [presetTransactions],
+  );
 
   const updateRow = (index: number, updates: Partial<TransactionRow>) => {
     setRows((prev) =>
@@ -182,10 +110,13 @@ export function AddTransactionDialog({
     setRows((prev) => {
       const next = [
         ...prev,
-        defaultRow(
+        createDefaultTransactionRow({
           defaultSource,
-          isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
-        ),
+          dateValue: isoToDateInput(
+            new Date().toISOString().slice(0, 10),
+            uiFormatSettings.dateFormat,
+          ),
+        }),
       ];
       setActiveRowIndex(next.length - 1);
       return next;
@@ -225,7 +156,11 @@ export function AddTransactionDialog({
       const isoDate = dateInputToIso(row.date, uiFormatSettings.dateFormat);
       if (!isoDate) return [];
       const paidByOwner = (row.paidByOwner || row.owner || "").trim();
-      const allocation = buildAllocationForRow(row, paidByOwner, ownerOptions);
+      const allocation = buildAllocationForRow({
+        row,
+        paidByOwner,
+        ownerOptions,
+      });
       return [
         {
           date: isoDate,
@@ -268,10 +203,13 @@ export function AddTransactionDialog({
     const added = expensesToAdd.length + transfersToAdd.length;
     if (added > 0) {
       setRows([
-        defaultRow(
+        createDefaultTransactionRow({
           defaultSource,
-          isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
-        ),
+          dateValue: isoToDateInput(
+            new Date().toISOString().slice(0, 10),
+            uiFormatSettings.dateFormat,
+          ),
+        }),
       ]);
       onOpenChange(false);
     }

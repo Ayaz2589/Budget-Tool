@@ -6,8 +6,8 @@ import {
   GoogleAuthContext,
   RETURNING_USER_KEY,
   TOUR_COMPLETED_KEY,
-} from "@/context/GoogleAuthContext";
-import type { GoogleAuthContextValue } from "@/context/GoogleAuthContext";
+} from "@/context";
+import type { GoogleAuthContextValue } from "@/context";
 
 function renderWithAuth(value: GoogleAuthContextValue) {
   return render(

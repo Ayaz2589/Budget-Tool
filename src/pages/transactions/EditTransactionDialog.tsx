@@ -31,7 +31,7 @@ import {
   SheetContent,
 } from "@/components/ui/sheet";
 import { useTranslation } from "react-i18next";
-import { useBudget } from "@/context/BudgetContext";
+import { useBudget } from "@/context";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 function parsePercentValue(raw: string): number | null {

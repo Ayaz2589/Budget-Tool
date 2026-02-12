@@ -1,9 +1,9 @@
 import { test, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { CardSourcesCard } from "@/pages/settings/CardSourcesCard";
-import { BudgetProvider } from "@/context/BudgetContext";
-import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
-import { GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
+import { BudgetProvider } from "@/context";
+import { PresetTransactionsProvider } from "@/context";
+import { GoogleAuthProviderFallback } from "@/context";
 
 function TestWrapper() {
   return (

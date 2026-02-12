@@ -1,33 +1,53 @@
 # Testing
 
-## How to run
+## Commands
 
-- **Watch mode:** `bun test`
-- **Single run:** `bun run test:run` (or `npm run test:run`)
+- Run full suite: `bun test`
+- Build check: `npm run build`
 
-Tests use Bun's built-in test runner. No Jest; assertions and mocks are from `bun:test`.
+Use both before merge. `bun test` validates logic and UI flows; `npm run build` catches type-level regressions.
 
-## Setup
+## Test Environment
 
-- **test/setup.ts** — Runs before tests. Registers happy-dom (GlobalRegistrator from `@happy-dom/global-registrator`), extends `expect` with `@testing-library/jest-dom` matchers, imports `src/i18n` so locale is initialized.
-- **Vite/config** — Test environment uses happy-dom; path alias `@/` points to `src/`.
+- Runner: `bun:test`
+- DOM: `happy-dom`
+- Setup: `test/setup.ts` initializes i18n + testing-library matchers
 
-## Structure
+## Test Layers
 
-- **test/** mirrors **src/**:
-  - **test/lib/** — Unit tests for lib modules (e.g. format.test.ts, totals.test.ts, minifiedPayload.test.ts, rules.test.ts, googleSheets.test.ts, pdfExport.test.ts, parsers/index.test.ts).
-  - **test/components/** — Component tests (AddTransactionDialog, Layout).
-  - **test/pages/** — Page tests (Dashboard, TransactionsPage, ImportPage, IncomePage, DebtPage, MortgagePage, RulesPage, SettingsPage, auth).
+### Unit
 
-## Conventions
+`test/lib/*` and selector utility tests focus on pure logic:
 
-- **Mocking contexts:** Wrap components that use `useBudget`, `useGoogleAuth`, etc. in the corresponding providers, or mock the context with a custom wrapper.
-- **Router:** For components that use `useNavigate`, `useLocation`, or `Link`, wrap in `MemoryRouter` (from react-router-dom) in the test.
-- **i18n:** setup.ts imports i18n; use `t()` in components. For snapshot or text assertions, ensure locale is set or use default keys.
-- **Async:** Use `await` for user events or state updates when testing async behavior.
+- currency/date formatting
+- import/export parsers
+- sheets/drive helper behavior
+- dashboard and transaction selectors
 
-## Auth tests
+### Component/Page
 
-- **AuthGate:** When `isSignedIn` is false, expect redirect to `/auth` (Navigate component or location check). When true, expect Outlet (child content).
-- **LoginPage:** Renders app name, heading, and sign-in button; mock `useGoogleAuth` with `signIn` jest.fn() and assert it is called on button click.
-- **AuthLoginRoute:** When signed in, expect Navigate to `/`. When not signed in, expect LoginPage content.
+`test/components/*` and `test/pages/*` validate:
+
+- dialog/sheet interactions
+- table/list rendering
+- filter and form behavior
+- routing guards and auth-aware page behavior
+
+### Integration
+
+`test/integration/AppFlows.test.tsx` covers cross-page user flow behavior using provider + router composition (not just isolated components).
+
+## Refactor Guardrails
+
+When refactoring:
+
+1. Move deterministic logic into pure modules first.
+2. Add or update unit tests for extracted functions.
+3. Keep page behavior parity with component/page tests.
+4. Add at least one integration assertion when flow spans pages/providers.
+
+## Common Pitfalls
+
+- Multiple matching elements in dialogs/sheets: use scoped queries (`within`) or pick visible instance intentionally.
+- Recharts warnings in tests are expected when container dimensions are zero in DOM simulation; they are not failures.
+- Missing dialog description warnings should be treated as accessibility debt and fixed when touching that dialog.

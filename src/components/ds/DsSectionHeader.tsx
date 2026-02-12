@@ -1,6 +1,6 @@
 import type * as React from "react";
 import { useRef } from "react";
-import { useBudget } from "@/context/BudgetContext";
+import { useBudget } from "@/context";
 import {
   CURRENCY_META,
   DISPLAY_CURRENCIES,

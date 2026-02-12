@@ -13,7 +13,7 @@ import {
   RETURNING_USER_KEY,
   TOUR_COMPLETED_KEY,
   useGoogleAuth,
-} from "@/context/GoogleAuthContext";
+} from "@/context";
 import i18n, { persistLocale } from "@/i18n";
 
 type TourStep = {

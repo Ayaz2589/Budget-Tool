@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
-import { useGoogleAuth } from "@/context/GoogleAuthContext";
-import { RETURNING_USER_KEY } from "@/context/GoogleAuthContext";
-import { TOUR_COMPLETED_KEY } from "@/context/GoogleAuthContext";
+import { useGoogleAuth } from "@/context";
+import { RETURNING_USER_KEY } from "@/context";
+import { TOUR_COMPLETED_KEY } from "@/context";
 import { LandingPage } from "./LandingPage";
 
 function isReturningUser(): boolean {

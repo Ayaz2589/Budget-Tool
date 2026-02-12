@@ -17,6 +17,7 @@ import {
 import { useBudget } from "@/context/BudgetContext";
 import { usePresetTransactions } from "@/context/PresetTransactionsContext";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { isValidDate } from "@/lib/totals";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -27,6 +28,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Accordion,
   AccordionContent,
@@ -121,14 +129,32 @@ export function Dashboard() {
   const { expenses, income, debts, debtPayments, owners, ownerTransfers } = useBudget();
   const { presetTransactions } = usePresetTransactions();
   const [range, setRange] = useState<DashboardRange>("current");
+  const [selectedMonthKey, setSelectedMonthKey] = useState(getCurrentMonthKey());
   const [expenseScope, setExpenseScope] = useState<DashboardExpenseScope>("all");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dismissedInsightIds, setDismissedInsightIds] = useState<string[]>(() =>
     parseDismissedInsightIds(sessionStorage.getItem(getInsightStorageKey())),
   );
 
-  const currentMonthKey = getCurrentMonthKey();
+  const currentMonthKey = selectedMonthKey;
   const previousMonthKey = getPreviousMonthKey(currentMonthKey);
+  const availableMonthKeys = useMemo(() => {
+    const keys = new Set<string>();
+    keys.add(getCurrentMonthKey());
+    expenses.forEach((row) => {
+      if (isValidDate(row.date)) keys.add(row.date.slice(0, 7));
+    });
+    income.forEach((row) => {
+      if (isValidDate(row.date)) keys.add(row.date.slice(0, 7));
+    });
+    debtPayments.forEach((row) => {
+      if (isValidDate(row.date)) keys.add(row.date.slice(0, 7));
+    });
+    ownerTransfers.forEach((row) => {
+      if (isValidDate(row.date)) keys.add(row.date.slice(0, 7));
+    });
+    return Array.from(keys).sort((a, b) => b.localeCompare(a));
+  }, [expenses, income, debtPayments, ownerTransfers]);
   const monthKeys = useMemo(
     () => getRangeMonthKeys(range, currentMonthKey),
     [range, currentMonthKey],
@@ -1090,6 +1116,24 @@ export function Dashboard() {
             </SheetDescription>
           </SheetHeader>
           <div className="grid content-start gap-4 px-4 pt-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
+            <div className="space-y-2">
+              <Label className="text-muted-foreground">{t("common.month")}</Label>
+              <Select
+                value={selectedMonthKey}
+                onValueChange={setSelectedMonthKey}
+              >
+                <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableMonthKeys.map((monthKey) => (
+                    <SelectItem key={monthKey} value={monthKey}>
+                      {formatMonthKeyNumeric(monthKey)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label className="text-muted-foreground">{t("dashboard.timeRange")}</Label>
               <DsSplitToggle

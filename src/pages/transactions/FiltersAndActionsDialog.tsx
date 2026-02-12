@@ -186,7 +186,7 @@ export function FiltersAndActionsDialog({
               </div>
               <div className="space-y-2">
                 <Label className="text-muted-foreground">
-                  Totals
+                  {t("transactions.totalsLabel")}
                 </Label>
                 <label className="flex items-center gap-2 rounded-[var(--radius-control)] border border-[var(--control-border)] bg-[var(--field-surface)] px-3 py-2 min-h-[44px] text-sm">
                   <Checkbox
@@ -195,7 +195,7 @@ export function FiltersAndActionsDialog({
                       onIncludeOwnerTransfersInTotalsChange(checked === true)
                     }
                   />
-                  <span>Include owner transfers in totals</span>
+                  <span>{t("transactions.includeOwnerTransfersInTotals")}</span>
                 </label>
               </div>
               <div className="space-y-2">

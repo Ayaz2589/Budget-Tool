@@ -17,6 +17,6 @@ test("TransactionsToolbar shows Filters and Add buttons", () => {
     screen.getByRole("button", { name: /common\.filtersAndActions/i }),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("button", { name: /add expense/i }),
+    screen.getByRole("button", { name: /transactions\.addExpense/i }),
   ).toBeInTheDocument();
 });

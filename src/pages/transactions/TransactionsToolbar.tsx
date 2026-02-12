@@ -35,11 +35,10 @@ export function TransactionsToolbar({
         <Button
           onClick={onAddTransaction}
           className="gap-1.5 h-11"
-         
-          aria-label="Add Expense"
+          aria-label={t("transactions.addExpense")}
         >
           <Plus className="size-4" />
-          <span>Add Expense</span>
+          <span>{t("transactions.addExpense")}</span>
         </Button>
       </div>
     </div>

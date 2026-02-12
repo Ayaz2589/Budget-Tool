@@ -70,7 +70,7 @@ export function DebtActionsDialog({
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <p className="text-muted-foreground text-xs uppercase tracking-wide">
-                Initial
+                {t("debt.initial")}
               </p>
               <p className="font-medium mt-0.5">
                 {formatCurrency(debt.initialAmount)}
@@ -78,7 +78,7 @@ export function DebtActionsDialog({
             </div>
             <div>
               <p className="text-muted-foreground text-xs uppercase tracking-wide">
-                Balance
+                {t("debt.balance")}
               </p>
               <p className="text-lg font-semibold mt-0.5">
                 {formatCurrency(balance)}
@@ -111,7 +111,7 @@ export function DebtActionsDialog({
           {payments.length > 0 && (
             <div className="border-t pt-4 space-y-2">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Payment history
+                {t("debt.paymentHistory")}
               </h4>
               <ul className="space-y-1">
                 {payments.map((p) => (
@@ -149,7 +149,7 @@ export function DebtActionsDialog({
               onClick={handleAddPayment}
               disabled={balance <= 0}
             >
-              Make payment
+              {t("debt.makePayment")}
             </Button>
             <Button
               variant="destructive"
@@ -157,8 +157,8 @@ export function DebtActionsDialog({
               className="h-11 flex-1 justify-center text-center"
               onClick={handleDelete}
             >
-              <Trash2 className="size-4 text-destructive" />
-              Delete debt
+              <Trash2 className="size-4 text-white" />
+              {t("debt.deleteDebt")}
             </Button>
           </div>
         </DsSheetActions>

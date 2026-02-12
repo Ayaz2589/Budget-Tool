@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,7 @@ export function AddPaymentDialog({
   onClose,
   onSubmit,
 }: AddPaymentDialogProps) {
+  const { t } = useTranslation();
   const { uiFormatSettings } = useBudget();
   const [date, setDate] = useState(() =>
     isoToDateInput(new Date().toISOString().slice(0, 10), uiFormatSettings.dateFormat)
@@ -67,15 +69,12 @@ export function AddPaymentDialog({
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Make payment</DialogTitle>
-          <DialogDescription>
-            Record a payment toward this debt. Balance will update
-            automatically.
-          </DialogDescription>
+          <DialogTitle>{t("debt.makePaymentTitle")}</DialogTitle>
+          <DialogDescription>{t("debt.makePaymentDesc")}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>Date</Label>
+            <Label>{t("common.date")}</Label>
             <Input
               type="text"
               inputMode="numeric"
@@ -89,7 +88,7 @@ export function AddPaymentDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label>Amount</Label>
+            <Label>{t("common.amount")}</Label>
             <Input
               type="text"
               placeholder="0.00"
@@ -99,18 +98,18 @@ export function AddPaymentDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label>Note (optional)</Label>
+            <Label>{t("debt.noteOptional")}</Label>
             <Input
-              placeholder="e.g. Monthly payment"
+              placeholder={t("debt.placeholderNote")}
               value={note}
               onChange={(e) => setNote(e.target.value)}
             />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              {t("common.cancel")}
             </Button>
-            <Button type="submit">Add payment</Button>
+            <Button type="submit">{t("debt.addPayment")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

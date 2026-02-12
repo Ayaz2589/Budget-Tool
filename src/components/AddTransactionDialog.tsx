@@ -14,8 +14,6 @@ import {
 } from "@/lib/currencyInput";
 import {
   dateInputToIso,
-  formatDateInput,
-  getDateInputPlaceholder,
   isoToDateInput,
 } from "@/lib/dateInput";
 import {
@@ -36,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
@@ -444,21 +443,16 @@ export function AddTransactionDialog({
                         <div className="text-xs text-muted-foreground">
                           {t("addTransaction.date")}
                         </div>
-                        <Input
-                          type="text"
-                          inputMode="numeric"
-                          placeholder={getDateInputPlaceholder(uiFormatSettings.dateFormat)}
-                          maxLength={10}
-                          className={fieldClass}
-                          value={row.date}
-                          onChange={(e) =>
+                        <DatePicker
+                          valueIso={dateInputToIso(row.date, uiFormatSettings.dateFormat)}
+                          onChangeIso={(isoDate) =>
                             updateRow(index, {
-                              date: formatDateInput(
-                                e.target.value,
-                                uiFormatSettings.dateFormat
-                              ),
+                              date: isoToDateInput(isoDate, uiFormatSettings.dateFormat),
                             })
                           }
+                          triggerLabel={row.date}
+                          placeholder={t("addTransaction.date")}
+                          triggerClassName={fieldClass}
                         />
                       </div>
                       <div className="space-y-0.5">
@@ -647,21 +641,16 @@ export function AddTransactionDialog({
                     <div className="text-xs text-muted-foreground">
                       {t("addTransaction.date")}
                     </div>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder={getDateInputPlaceholder(uiFormatSettings.dateFormat)}
-                      maxLength={10}
-                      className={fieldClass}
-                      value={row.date}
-                      onChange={(e) =>
+                    <DatePicker
+                      valueIso={dateInputToIso(row.date, uiFormatSettings.dateFormat)}
+                      onChangeIso={(isoDate) =>
                         updateRow(index, {
-                          date: formatDateInput(
-                            e.target.value,
-                            uiFormatSettings.dateFormat
-                          ),
+                          date: isoToDateInput(isoDate, uiFormatSettings.dateFormat),
                         })
                       }
+                      triggerLabel={row.date}
+                      placeholder={t("addTransaction.date")}
+                      triggerClassName={fieldClass}
                     />
                   </div>
 

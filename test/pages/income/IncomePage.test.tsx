@@ -1,6 +1,7 @@
 import { afterEach, test, expect } from "bun:test";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { cleanup } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { IncomePage } from "@/pages/income/IncomePage";
 import { BudgetProvider } from "@/context";
 import { PresetTransactionsProvider } from "@/context";
@@ -31,11 +32,13 @@ test("IncomePage shows delete income confirmation dialog when delete is clicked"
   );
 
   render(
-    <BudgetProvider>
-      <PresetTransactionsProvider>
-        <IncomePage />
-      </PresetTransactionsProvider>
-    </BudgetProvider>,
+    <MemoryRouter initialEntries={["/dashboard/income"]}>
+      <BudgetProvider>
+        <PresetTransactionsProvider>
+          <IncomePage />
+        </PresetTransactionsProvider>
+      </BudgetProvider>
+    </MemoryRouter>,
   );
 
   fireEvent.click(screen.getAllByRole("button", { name: /Pay/i })[0]!);
@@ -53,11 +56,13 @@ test("IncomePage opens add income sheet from page action", () => {
   localStorage.clear();
 
   render(
-    <BudgetProvider>
-      <PresetTransactionsProvider>
-        <IncomePage />
-      </PresetTransactionsProvider>
-    </BudgetProvider>,
+    <MemoryRouter initialEntries={["/dashboard/income"]}>
+      <BudgetProvider>
+        <PresetTransactionsProvider>
+          <IncomePage />
+        </PresetTransactionsProvider>
+      </BudgetProvider>
+    </MemoryRouter>,
   );
 
   const addButtons = screen.getAllByRole("button", { name: /add income/i });
@@ -95,11 +100,13 @@ test("IncomePage groups entries by month", () => {
   );
 
   render(
-    <BudgetProvider>
-      <PresetTransactionsProvider>
-        <IncomePage />
-      </PresetTransactionsProvider>
-    </BudgetProvider>,
+    <MemoryRouter initialEntries={["/dashboard/income"]}>
+      <BudgetProvider>
+        <PresetTransactionsProvider>
+          <IncomePage />
+        </PresetTransactionsProvider>
+      </BudgetProvider>
+    </MemoryRouter>,
   );
 
   expect(screen.getAllByText("February 2026").length).toBeGreaterThan(0);

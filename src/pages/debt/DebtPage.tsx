@@ -52,6 +52,11 @@ export function DebtPage() {
     }
   }, [debts, location.search]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setAddDebtOpen(params.get("tourSheet") === "debt-add");
+  }, [location.search]);
+
   const paymentsByDebt = useMemo(() => {
     const map = new Map<string, DebtPayment[]>();
     for (const p of debtPayments) {
@@ -105,7 +110,7 @@ export function DebtPage() {
       />
 
       <div
-       
+        data-tour="debt-table"
         className="flex-1 min-h-0 flex flex-col overflow-hidden"
       >
         <div className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">

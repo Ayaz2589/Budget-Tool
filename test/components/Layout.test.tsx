@@ -55,7 +55,17 @@ function renderLayout(
   );
 }
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  localStorage.setItem("budget-tool-app-tour-completed", "1");
+});
+
+test("Layout shows desktop app tour on first dashboard visit", () => {
+  localStorage.removeItem("budget-tool-app-tour-completed");
+  renderLayout({ isSignedIn: true, spreadsheetId: "sheet-id" });
+  expect(screen.getByText("App Tour 1/24")).toBeInTheDocument();
+  expect(screen.getByText("Dashboard overview")).toBeInTheDocument();
+});
 
 test("Layout renders branding, nav, and routed content", () => {
   renderLayout();

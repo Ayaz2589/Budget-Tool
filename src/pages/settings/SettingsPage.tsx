@@ -172,7 +172,7 @@ export function SettingsPage() {
           subtitle={t("settings.subtitle")}
         />
       </div>
-      <div className="space-y-4 sm:space-y-6 pb-24 md:pb-0 px-4 md:px-0">
+      <div data-tour="settings-page" className="space-y-4 sm:space-y-6 pb-24 md:pb-0 px-4 md:px-0">
 
       <div>
         <GoogleSheetsCard

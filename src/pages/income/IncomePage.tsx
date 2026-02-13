@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { useBudget } from "@/context";
 import type { Income } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { IncomeList } from "./IncomeList";
 import { IncomeActionsDialog } from "./IncomeActionsDialog";
 
 export function IncomePage() {
+  const location = useLocation();
   const {
     income,
     addIncome,
@@ -55,6 +57,11 @@ export function IncomePage() {
     setEditIncome(null);
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setAddOpen(params.get("tourSheet") === "income-add");
+  }, [location.search]);
+
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
@@ -92,7 +99,7 @@ export function IncomePage() {
       />
 
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
+        <CardContent data-tour="income-table" className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           {sortedIncome.length === 0 ? (
             <DsEmptyState
               icon={<Wallet className="size-8" />}

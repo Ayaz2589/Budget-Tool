@@ -599,7 +599,7 @@ export function ImportPage() {
           }
         />
       </div>
-      <div className="space-y-6 pb-24 md:pb-0 px-4 md:px-0">
+      <div data-tour="data-page" className="space-y-6 pb-24 md:pb-0 px-4 md:px-0">
       <div>
         <ImportSourceCard
           selectedSource={selectedSource}

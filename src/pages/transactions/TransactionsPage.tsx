@@ -89,6 +89,9 @@ export function TransactionsPage() {
     );
     pendingHighlightIdRef.current = params.get("highlight");
     pendingOpenEditIdRef.current = params.get("openEdit");
+    const tourSheet = params.get("tourSheet");
+    setAddTransactionOpen(tourSheet === "transactions-add");
+    setFiltersPopupOpen(tourSheet === "transactions-filters");
   }, [location.search]);
 
   const ledgerRows = useMemo(
@@ -228,7 +231,7 @@ export function TransactionsPage() {
       </div>
       <div className="flex-1 pb-24 md:pb-0">
         <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0 md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
+        <CardContent data-tour="transactions-table" className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
             <div className="px-4 pb-3 md:px-0">
               <Input
                 value={searchFilter}

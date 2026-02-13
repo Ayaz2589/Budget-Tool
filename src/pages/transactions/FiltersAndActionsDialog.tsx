@@ -55,6 +55,7 @@ export function FiltersAndActionsDialog({
       <SheetContent
         side={sheetSide}
         showCloseButton={true}
+        data-tour="transactions-filters-sheet"
        
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col"
       >

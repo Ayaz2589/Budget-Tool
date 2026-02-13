@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import { useBudget } from "@/context";
 import { usePresetTransactions } from "@/context";
@@ -56,6 +57,7 @@ import {
 
 export function PresetsPage() {
   const { t } = useTranslation();
+  const location = useLocation();
   const { expenseCategories, cardSources, owners } = useBudget();
   const { presetTransactions, addPreset, removePreset, setPresets } =
     usePresetTransactions();
@@ -208,6 +210,11 @@ export function PresetsPage() {
     setOpenCategory(groupedPresets[0]?.[0] ?? "");
   }, [groupedPresets, openCategory]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setPresetOpen(params.get("tourSheet") === "presets-add");
+  }, [location.search]);
+
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
@@ -232,10 +239,11 @@ export function PresetsPage() {
       </div>
 
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
+        <CardContent data-tour="presets-table" className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           <Sheet open={presetOpen} onOpenChange={setPresetOpen}>
             <SheetContent
               side="right"
+              data-tour="presets-add-sheet"
               className="flex flex-col h-full w-[85vw] max-w-sm border-l p-4 gap-3 overflow-hidden rounded-l-2xl"
             >
               <DsSheetHeader

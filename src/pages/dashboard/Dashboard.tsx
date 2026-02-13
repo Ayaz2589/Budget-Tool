@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
 import {
   AreaChart,
@@ -134,6 +135,7 @@ function monthLabelFromTooltipPayload(payload: unknown): string {
 
 export function Dashboard() {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
   const isMobile = useMediaQuery("(max-width: 767px)");
   const { expenses, income, debts, debtPayments, owners, ownerTransfers } = useBudget();
   const { presetTransactions } = usePresetTransactions();
@@ -218,6 +220,11 @@ export function Dashboard() {
     if (availableMonthKeys.includes(selectedMonthKey)) return;
     setSelectedMonthKey(availableMonthKeys[0] ?? getCurrentMonthKey());
   }, [availableMonthKeys, selectedMonthKey]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setSettingsOpen(params.get("tourSheet") === "dashboard-settings");
+  }, [location.search]);
 
   const currentMonthKey = selectedMonthKey;
   const previousMonthKey = getPreviousMonthKey(currentMonthKey);
@@ -441,7 +448,7 @@ export function Dashboard() {
   return (
     <div className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
       <div className="min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-4">
-        <div className="space-y-3">
+        <div className="space-y-3" data-tour="dashboard-header">
           <DsSectionHeader
             title={
               <span className="inline-flex items-center gap-1.5">
@@ -469,7 +476,7 @@ export function Dashboard() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-1.5 md:grid-cols-2 md:gap-3 xl:grid-cols-4">
+        <div data-tour="dashboard-kpis" className="grid grid-cols-2 gap-1.5 md:grid-cols-2 md:gap-3 xl:grid-cols-4">
           <DsMetricCard
             title={
               <span className="inline-flex items-center gap-1.5">
@@ -538,7 +545,7 @@ export function Dashboard() {
           />
         </div>
 
-        <div className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div data-tour="dashboard-trends" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <DsChartCard
             title={
               <span className="inline-flex items-center gap-1.5">
@@ -838,7 +845,7 @@ export function Dashboard() {
           </DsChartCard>
         </div>
 
-        <section className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <section data-tour="dashboard-pies" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <DsChartCard title={t("dashboard.chartSpendingBreakdown")} className="min-w-0">
             {categorySlices.length === 0 ? (
               <DsEmptyState title={t("dashboard.chartNoSpendingCategories")} className="py-4" />
@@ -976,7 +983,7 @@ export function Dashboard() {
           </DsChartCard>
         </section>
 
-        <section className="space-y-2 pt-2">
+        <section data-tour="dashboard-expense-by-owner" className="space-y-2 pt-2">
           <h2 className="inline-flex items-center gap-1.5 text-base font-semibold">
             {t("dashboard.sectionExpenseByOwner")}
             <DsHelpTooltip
@@ -1122,6 +1129,7 @@ export function Dashboard() {
         >
           <AccordionItem
             value="debt"
+            data-tour="dashboard-debt-snapshot"
             className="rounded-2xl border border-border/60 bg-card px-4"
           >
             <AccordionTrigger className="cursor-pointer py-4 text-base font-semibold hover:no-underline">
@@ -1162,6 +1170,7 @@ export function Dashboard() {
 
           <AccordionItem
             value="spend-source"
+            data-tour="dashboard-spend-by-source"
             className="rounded-2xl border border-border/60 bg-card px-4"
           >
             <AccordionTrigger className="cursor-pointer py-4 text-base font-semibold hover:no-underline">
@@ -1189,6 +1198,7 @@ export function Dashboard() {
 
           <AccordionItem
             value="transfers"
+            data-tour="dashboard-owner-transfers"
             className="rounded-2xl border border-border/60 bg-card px-4"
           >
             <AccordionTrigger className="cursor-pointer py-4 text-base font-semibold hover:no-underline">
@@ -1220,6 +1230,7 @@ export function Dashboard() {
 
           <AccordionItem
             value="recent"
+            data-tour="dashboard-recent-activity"
             className="rounded-2xl border border-border/60 bg-card px-4"
           >
             <AccordionTrigger className="cursor-pointer py-4 text-base font-semibold hover:no-underline">
@@ -1248,6 +1259,7 @@ export function Dashboard() {
 
           <AccordionItem
             value="insights"
+            data-tour="dashboard-insights"
             className="rounded-2xl border border-border/60 bg-card px-4"
           >
             <AccordionTrigger className="cursor-pointer py-4 text-base font-semibold hover:no-underline">
@@ -1301,6 +1313,7 @@ export function Dashboard() {
       <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
         <SheetContent
           side="right"
+          data-tour="dashboard-settings-sheet"
           className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col"
         >
           <SheetHeader className="px-4 pt-5 pb-4 border-b border-[var(--border-subtle)]">

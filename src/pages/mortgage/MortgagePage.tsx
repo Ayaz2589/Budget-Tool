@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { useBudget } from "@/context";
 import type { Expense } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +23,7 @@ const MORTGAGE_CATEGORY = MORTGAGE_CATEGORY_LABEL;
 const DEFAULT_MORTGAGE_AMOUNT = 5400;
 
 export function MortgagePage() {
+  const location = useLocation();
   const { expenses, addExpense, updateExpense, removeExpense, owners, uiFormatSettings } = useBudget();
   const [addOpen, setAddOpen] = useState(false);
   const [addDate, setAddDate] = useState(() =>
@@ -70,6 +72,11 @@ export function MortgagePage() {
     setDeleteConfirm(null);
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setAddOpen(params.get("tourSheet") === "mortgage-add");
+  }, [location.search]);
+
   const { t } = useTranslation();
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
@@ -96,7 +103,7 @@ export function MortgagePage() {
       </div>
 
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
+        <CardContent data-tour="mortgage-table" className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           <AddMortgagePaymentDialog
             open={addOpen}
             onOpenChange={setAddOpen}

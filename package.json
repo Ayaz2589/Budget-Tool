@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "bun test",
     "test:run": "bun test",
+    "test:financial": "bun test test/lib/mathCore.test.ts test/lib/totals.test.ts test/lib/debtUtils.test.ts test/lib/ownerAccounting.test.ts test/lib/financialModel.test.ts test/lib/mortgageMath.test.ts test/lib/currencyInput.test.ts test/lib/format.test.ts test/lib/fx.test.ts test/pages/dashboard/dashboardSelectors.test.ts test/pages/transactions/transactionsLedger.test.ts",
     "docs:update": "node scripts/update-prd-and-docs.cjs",
     "prepare": "husky",
     "test:coverage": "bun test --coverage",

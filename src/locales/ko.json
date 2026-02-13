@@ -239,11 +239,16 @@
     "netAfterTransfers": "이체 후 순지출",
     "transfersSent": "보낸 이체",
     "transfersReceived": "받은 이체",
-    "grossShort": "Gross",
-    "netShort": "Net",
+    "grossShort": "총액",
+    "netShort": "순액",
+    "transferImpact": "이체 영향",
     "sectionSpendByCardSource": "카드 출처별 총지출",
     "sectionNoSpendByCardSource": "선택한 범위에 출처별 지출이 없습니다.",
-    "moreItemsCount": "+{{count}}개 항목 더 보기"
+    "moreItemsCount": "+{{count}}개 항목 더 보기",
+    "viewMode": "View",
+    "viewHousehold": "Household",
+    "viewOwner": "Individual owner",
+    "selectOwner": "Select owner"
   },
   "dashboardDebt": {
     "addDebt": "부채 추가",

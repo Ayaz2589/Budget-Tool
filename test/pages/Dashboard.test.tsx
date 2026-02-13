@@ -123,3 +123,53 @@ test("Dashboard debt row is read-only", () => {
   expect(screen.getByText("Car loan")).toBeInTheDocument();
   expect(screen.queryByText("/dashboard/debt?debtId=d1")).toBeNull();
 });
+
+test("Dashboard can switch between household and owner views", async () => {
+  localStorage.clear();
+  localStorage.setItem(
+    BUDGET_STORAGE_KEY,
+    JSON.stringify({
+      expenses: [
+        {
+          id: "e1",
+          date: "2026-02-01",
+          amount: 111,
+          description: "OnlyAyazExpense",
+          category: "Food",
+          source: "manual",
+          owner: "OwnerA1",
+        },
+        {
+          id: "e2",
+          date: "2026-02-02",
+          amount: 222,
+          description: "OnlyTasnuvaExpense",
+          category: "Food",
+          source: "manual",
+          owner: "OwnerB1",
+        },
+      ],
+      income: [],
+      debts: [],
+      debtPayments: [],
+      owners: ["OwnerA1", "OwnerB1"],
+      iOweNova: {},
+      cardSources: ["manual"],
+      expenseCategories: ["Food"],
+      incomeCategories: ["Paycheck"],
+    }),
+  );
+
+  render(<TestWrapper />);
+  fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+  fireEvent.click(screen.getByRole("button", { name: "Individual owner" }));
+  const comboboxes = screen.getAllByRole("combobox");
+  fireEvent.click(comboboxes[comboboxes.length - 1]!);
+  fireEvent.click(await screen.findByRole("option", { name: "OwnerB1" }));
+  fireEvent.click(screen.getByRole("button", { name: "Done" }));
+
+  await waitFor(() => {
+    expect(screen.getAllByText("OwnerB1").length).toBeGreaterThan(0);
+  });
+  expect(screen.queryAllByText("OwnerA1").length).toBe(0);
+});

@@ -239,11 +239,16 @@
     "netAfterTransfers": "ट्रांसफर के बाद शुद्ध",
     "transfersSent": "भेजे गए ट्रांसफर",
     "transfersReceived": "प्राप्त ट्रांसफर",
-    "grossShort": "Gross",
-    "netShort": "Net",
+    "grossShort": "सकल",
+    "netShort": "शुद्ध",
+    "transferImpact": "ट्रांसफर प्रभाव",
     "sectionSpendByCardSource": "कार्ड स्रोत के अनुसार कुल खर्च",
     "sectionNoSpendByCardSource": "चयनित अवधि में स्रोत के अनुसार कोई खर्च नहीं है।",
-    "moreItemsCount": "+{{count}} और आइटम"
+    "moreItemsCount": "+{{count}} और आइटम",
+    "viewMode": "View",
+    "viewHousehold": "Household",
+    "viewOwner": "Individual owner",
+    "selectOwner": "Select owner"
   },
   "dashboardDebt": {
     "addDebt": "कर्ज जोड़ें",

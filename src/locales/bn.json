@@ -239,11 +239,16 @@
     "netAfterTransfers": "ট্রান্সফারের পর নেট",
     "transfersSent": "পাঠানো ট্রান্সফার",
     "transfersReceived": "প্রাপ্ত ট্রান্সফার",
-    "grossShort": "Gross",
-    "netShort": "Net",
+    "grossShort": "মোট",
+    "netShort": "নেট",
+    "transferImpact": "ট্রান্সফার প্রভাব",
     "sectionSpendByCardSource": "কার্ড উৎস অনুযায়ী মোট ব্যয়",
     "sectionNoSpendByCardSource": "নির্বাচিত সময়সীমায় উৎস অনুযায়ী কোনো ব্যয় নেই।",
-    "moreItemsCount": "+আরও {{count}} টি আইটেম"
+    "moreItemsCount": "+আরও {{count}} টি আইটেম",
+    "viewMode": "View",
+    "viewHousehold": "Household",
+    "viewOwner": "Individual owner",
+    "selectOwner": "Select owner"
   },
   "dashboardDebt": {
     "addDebt": "ঋণ যোগ করুন",

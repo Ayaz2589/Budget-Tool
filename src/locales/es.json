@@ -239,11 +239,16 @@
     "netAfterTransfers": "Neto después de transferencias",
     "transfersSent": "Transferencias enviadas",
     "transfersReceived": "Transferencias recibidas",
-    "grossShort": "Gross",
-    "netShort": "Net",
+    "grossShort": "Bruto",
+    "netShort": "Neto",
+    "transferImpact": "Impacto de transferencia",
     "sectionSpendByCardSource": "Gasto total por fuente de tarjeta",
     "sectionNoSpendByCardSource": "No hay gasto por fuente en el rango seleccionado.",
-    "moreItemsCount": "+{{count}} elementos más"
+    "moreItemsCount": "+{{count}} elementos más",
+    "viewMode": "View",
+    "viewHousehold": "Household",
+    "viewOwner": "Individual owner",
+    "selectOwner": "Select owner"
   },
   "dashboardDebt": {
     "addDebt": "Añadir una deuda",

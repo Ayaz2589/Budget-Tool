@@ -193,6 +193,10 @@
     "scopeAllExpenses": "All Expenses",
     "scopeExcludeMortgage": "Exclude Mortgage",
     "scopeMortgageExcludedHint": "Mortgage excluded from expense totals",
+    "viewMode": "View",
+    "viewHousehold": "Household",
+    "viewOwner": "Individual owner",
+    "selectOwner": "Select owner",
     "kpiNetCashFlowMtd": "Net Cash Flow (MTD)",
     "kpiTotalSpentMtd": "Total Spent (MTD)",
     "kpiTotalIncomeMtd": "Total Income (MTD)",
@@ -241,6 +245,7 @@
     "transfersReceived": "Transfers Received",
     "grossShort": "Gross",
     "netShort": "Net",
+    "transferImpact": "Transfer Impact",
     "sectionSpendByCardSource": "Total Spend by Card Source",
     "sectionNoSpendByCardSource": "No spend by source for selected range.",
     "moreItemsCount": "+{{count}} more items"

@@ -239,11 +239,16 @@
     "netAfterTransfers": "转账后净额",
     "transfersSent": "已转出",
     "transfersReceived": "已转入",
-    "grossShort": "Gross",
-    "netShort": "Net",
+    "grossShort": "总额",
+    "netShort": "净额",
+    "transferImpact": "转账影响",
     "sectionSpendByCardSource": "按卡片来源总支出",
     "sectionNoSpendByCardSource": "所选范围内暂无按来源支出。",
-    "moreItemsCount": "+还有 {{count}} 项"
+    "moreItemsCount": "+还有 {{count}} 项",
+    "viewMode": "View",
+    "viewHousehold": "Household",
+    "viewOwner": "Individual owner",
+    "selectOwner": "Select owner"
   },
   "dashboardDebt": {
     "addDebt": "添加债务",

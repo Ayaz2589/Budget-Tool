@@ -239,11 +239,16 @@
     "netAfterTransfers": "送金後の純額",
     "transfersSent": "送金額（支払）",
     "transfersReceived": "送金額（受取）",
-    "grossShort": "Gross",
-    "netShort": "Net",
+    "grossShort": "総額",
+    "netShort": "純額",
+    "transferImpact": "振替影響",
     "sectionSpendByCardSource": "カードソース別合計支出",
     "sectionNoSpendByCardSource": "選択した期間にソース別支出はありません。",
-    "moreItemsCount": "+{{count}} 件の項目"
+    "moreItemsCount": "+{{count}} 件の項目",
+    "viewMode": "View",
+    "viewHousehold": "Household",
+    "viewOwner": "Individual owner",
+    "selectOwner": "Select owner"
   },
   "dashboardDebt": {
     "addDebt": "債務を追加",

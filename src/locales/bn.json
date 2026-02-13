@@ -104,7 +104,8 @@
     "totalEarned": "মোট আয়",
     "totalSaved": "মোট সঞ্চয়",
     "totalSpent": "মোট ব্যয়",
-    "uncategorized": "অবিভক্ত"
+    "uncategorized": "অবিভক্ত",
+    "help": "সহায়তা"
   },
   "dashboard": {
     "alertEssentialsHigh": "অপরিহার্য খরচ আয়ের {{percent}}।",
@@ -255,7 +256,18 @@
     "kpiTotalSpentDefExcludeMortgageAndDebt": "মর্টগেজ ও ঋণ পরিশোধ বাদ।",
     "includeDebtPayments": "ঋণ অন্তর্ভুক্ত",
     "excludeDebtPayments": "ঋণ বাদ",
-    "debtPaymentsExcludedHint": "ড্যাশবোর্ডের মোট ও ক্যাশ ফ্লো চার্ট থেকে ঋণ পরিশোধ বাদ দেওয়া হয়েছে।"
+    "debtPaymentsExcludedHint": "ড্যাশবোর্ডের মোট ও ক্যাশ ফ্লো চার্ট থেকে ঋণ পরিশোধ বাদ দেওয়া হয়েছে।",
+    "help": {
+      "page": "নির্বাচিত সময়ের আর্থিক অবস্থা এক নজরে দেখুন।",
+      "kpiNetCashFlow": "নির্বাচিত সময়ে আয় থেকে খরচ ও ঋণ পরিশোধ বাদ দিলে যা থাকে।",
+      "kpiTotalSpent": "মর্টগেজ/ঋণ স্কোপ সেটিং অনুযায়ী মোট খরচ।",
+      "kpiTotalIncome": "নির্বাচিত সময়ে মোট আয়।",
+      "kpiDebtOutstanding": "সব সক্রিয় ঋণের বর্তমান বাকি ব্যালান্স।",
+      "chartIncomeVsExpenses": "মাসভিত্তিক আয় বনাম খরচ ও ঋণ আউটফ্লো তুলনা করে।",
+      "chartNetCashFlow": "প্রতিটি মাসে নেট পজিটিভ না নেগেটিভ ছিল দেখায়।",
+      "expenseByOwner": "প্রতি ওনারের গ্রস খরচ, ট্রান্সফার প্রভাব ও নেট দেখায়।",
+      "settingsSheet": "ড্যাশবোর্ডের সব কার্ড ও চার্টের জন্য স্কোপ ঠিক করুন। Household বা নির্দিষ্ট একজন owner নির্বাচন করুন, ডেটা থাকা একটি মাস বেছে নিন, তারপর মোট খরচে mortgage ও debt payment ধরবেন কি না সেট করুন।"
+    }
   },
   "dashboardDebt": {
     "addDebt": "ঋণ যোগ করুন",
@@ -311,7 +323,12 @@
     "startDateOptional": "শুরুর তারিখ (ঐচ্ছিক)",
     "started": "শুরু {{date}}",
     "subtitle": "ঋণ এবং ঋণ পরিশোধ ট্র্যাক করুন।",
-    "title": "ঋণ"
+    "title": "ঋণ",
+    "help": {
+      "page": "ঋণ, ব্যালান্স ও পেমেন্ট হিস্ট্রি ম্যানেজ করুন।",
+      "balanceColumn": "বাকি ব্যালান্স = প্রাথমিক ঋণ - রেকর্ডকৃত পেমেন্ট।",
+      "addSheet": "শুরুর বকেয়া এবং ঐচ্ছিক start date দিয়ে debt তৈরি করুন। payment রেকর্ড করলে balance কমে, এবং আপনার সেটিংস অনুযায়ী debt payment ড্যাশবোর্ড খরচে অন্তর্ভুক্ত হতে পারে।"
+    }
   },
   "import": {
     "addAll": "সব যোগ করুন",
@@ -404,7 +421,13 @@
     "recurringAmount": "পুনরাবৃত্ত পরিমাণ",
     "recurringIncome": "পুনরাবৃত্ত আয়",
     "subtitle": "বেতন, ভাড়া এবং অন্যান্য আয় ট্র্যাক করুন।",
-    "title": "আয়"
+    "title": "আয়",
+    "help": {
+      "page": "মাসভিত্তিক সব আয়ের রেকর্ড ট্র্যাক ও এডিট করুন।",
+      "monthTotal": "এই মাসের গ্রুপের মোট আয়।",
+      "amountColumn": "প্রতি সারির আয়ের পরিমাণ।",
+      "addSheet": "তারিখ, পরিমাণ, বিবরণ, ক্যাটাগরি ও owner সহ paycheck, rent, bonus বা অন্যান্য income যোগ করুন। recurring income নিয়ম সময়সূচি অনুযায়ী পূর্বানুমানযোগ্য এন্ট্রি তৈরি করে এবং ড্যাশবোর্ডের income total-এ যুক্ত করে।"
+    }
   },
   "landing": {
     "featureImport": "ডেটা ইমপোর্ট/এক্সপোর্ট",
@@ -444,7 +467,12 @@
     "removePaymentTitle": "বন্ধকী পেমেন্ট সরাবেন?",
     "subtitle": "মর্টগেজ পরিশোধ ট্র্যাক করুন।",
     "title": "বন্ধকী",
-    "totalThisYear": "এই বছরের মোট: {{amount}}"
+    "totalThisYear": "এই বছরের মোট: {{amount}}",
+    "help": {
+      "page": "মর্টগেজ পেমেন্ট ও ওনারশিপ তথ্য ট্র্যাক করুন।",
+      "amountColumn": "প্রতি মর্টগেজ এন্ট্রির রেকর্ডকৃত পেমেন্ট পরিমাণ।",
+      "addSheet": "mortgage payment-এর তারিখ, পরিমাণ এবং owner রেকর্ড করুন। mortgage এন্ট্রি transaction তালিকা থেকে আলাদা রাখা হয় এবং নির্বাচিত scope সেটিংস অনুযায়ী ড্যাশবোর্ড spend-এ যোগ বা বাদ হয়।"
+    }
   },
   "nav": {
     "dashboard": "ড্যাশবোর্ড",
@@ -628,7 +656,14 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "help": {
+      "page": "খরচ ও ওনার ট্রান্সফার দেখা, ফিল্টার ও এডিট করুন।",
+      "visibleTotal": "এই মাসের গ্রুপে বর্তমানে দৃশ্যমান সারিগুলোর মোট।",
+      "amountColumn": "ট্রানজ্যাকশনের পরিমাণ অনুযায়ী সর্ট।",
+      "filtersSheet": "দেখানো সারিগুলো সংকুচিত করতে মাস, উৎস, ক্যাটাগরি, owner এবং type দিয়ে ফিল্টার করুন। এই শিটের মোট হিসাব বর্তমানে দৃশ্যমান সারির উপর ভিত্তি করে এবং চাইলে owner transfer অন্তর্ভুক্ত করতে পারে।",
+      "addSheet": "একসাথে এক বা একাধিক সারি যোগ করুন। সাবমিট করলে প্রতিটি valid সারি সেভ হবে; expense সারি transaction তৈরি করে এবং transfer সারি household spend না বদলে owner-দের মধ্যে মান স্থানান্তর করে।"
+    }
   },
   "about": {
     "title": "Ortho সম্পর্কে",
@@ -647,5 +682,110 @@
     "closingStrong": "আপনার ডেটা আপনারই। আপনার অর্থ থাকবে স্পষ্ট। আপনার ভবিষ্যৎ থাকবে আপনার নিয়ন্ত্রণে।",
     "supportBody": "Ortho আপনার উপকারে এলে, আপনার সমর্থন আমাদের আরও উন্নত করতে সাহায্য করে।",
     "supportButton": "Patreon-এ আমাদের সমর্থন করুন"
+  },
+  "appTour": {
+    "title": "অ্যাপ ট্যুর",
+    "back": "পেছনে",
+    "next": "পরবর্তী",
+    "skip": "ট্যুর এড়িয়ে যান",
+    "finish": "ট্যুর শেষ করুন",
+    "steps": {
+      "dashboard": {
+        "title": "ড্যাশবোর্ড ওভারভিউ",
+        "description": "এই পেজে মাসভিত্তিক আর্থিক সারাংশ দেখা যায়। KPI কার্ড, ট্রেন্ড চার্ট, debt snapshot, owner অনুযায়ী খরচ, source breakdown, transfer, recent activity এবং insights দেখুন।"
+      },
+      "dashboardSettings": {
+        "title": "ড্যাশবোর্ড সেটিংস শিট",
+        "description": "ড্যাশবোর্ডের হিসাব কীভাবে হবে তা এখানে ঠিক করুন: household নাকি individual owner, কোন মাস, কোন খরচ scope, এবং debt payment খরচে ধরবেন কি না।"
+      },
+      "transactions": {
+        "title": "ট্রানজ্যাকশন টেবিল",
+        "description": "এই পেজে মাসভিত্তিক expense ও owner transfer দেখা যায়। sort ও search ব্যবহার করে রেকর্ড দেখুন এবং বর্তমান filter অনুযায়ী visible total মিলিয়ে নিন।"
+      },
+      "transactionsAdd": {
+        "title": "নতুন expense শিট",
+        "description": "একসাথে এক বা একাধিক expense/transfer row যোগ করতে এই শিট ব্যবহার করুন। প্রতিটি row-তে source, date, amount, category, owner এবং split/allocation সেট করা যায়।"
+      },
+      "transactionsFilters": {
+        "title": "ফিল্টার ও অ্যাকশন শিট",
+        "description": "মাস, source, category, owner ও type দিয়ে filter করুন। বর্তমান view-এর total-এ owner transfer যোগ হবে কি না সেটিও এখানে নিয়ন্ত্রণ করা যায়।"
+      },
+      "income": {
+        "title": "ইনকাম টেবিল",
+        "description": "এই পেজে সব income মাসভিত্তিক total সহ group করা থাকে। ড্যাশবোর্ড income হিসাবের জন্য এটি source এবং row-level edit/delete সাপোর্ট করে।"
+      },
+      "incomeAdd": {
+        "title": "ইনকাম শিট",
+        "description": "তারিখ, পরিমাণ, বিবরণ, category ও owner সহ income যোগ করুন। এখানকার সঠিক ডেটা net cash flow ও monthly comparison সরাসরি প্রভাবিত করে।"
+      },
+      "debt": {
+        "title": "ডেট টেবিল",
+        "description": "এই পেজে প্রতিটি debt-এর balance ও payment history ট্র্যাক করা হয়। initial amount থেকে payments বাদ দিয়ে balance হিসাব করা হয়।"
+      },
+      "debtAdd": {
+        "title": "ডেট শিটসমূহ",
+        "description": "Debt তৈরি ও payment রেকর্ড করতে এই শিটগুলো ব্যবহার করুন। payment row outstanding balance কমায় এবং সেটিংস অনুযায়ী ড্যাশবোর্ড spend-এ ধরা হতে পারে।"
+      },
+      "mortgage": {
+        "title": "মর্টগেজ টেবিল",
+        "description": "এই পেজে mortgage payment ট্রানজ্যাকশন তালিকা থেকে আলাদা করে রাখা হয়। scope সেটিংস অনুযায়ী এগুলো ড্যাশবোর্ড spend মেট্রিকে ব্যবহার হয়।"
+      },
+      "mortgageAdd": {
+        "title": "মর্টগেজ শিট",
+        "description": "date, amount, owner দিয়ে mortgage payment যোগ করুন। ধারাবাহিক এন্ট্রি mortgage total এবং owner-level হিসাবকে নির্ভুল রাখে।"
+      },
+      "presets": {
+        "title": "প্রিসেট টেবিল",
+        "description": "Preset হলো দ্রুত transaction entry-এর reusable template। এতে source, description, optional amount, category ও default owner রাখা যায়।"
+      },
+      "presetsAdd": {
+        "title": "প্রিসেট শিট",
+        "description": "Preset template তৈরি বা edit করতে এই শিট ব্যবহার করুন। এতে entry দ্রুত হয় এবং category/owner naming consistent থাকে।"
+      },
+      "data": {
+        "title": "ডেটা পেজ",
+        "description": "এই পেজে import/export করা হয়। সমর্থিত ফাইল import করতে পারবেন এবং PDF, JSON বা export string এ ডেটা export করতে পারবেন।"
+      },
+      "settings": {
+        "title": "সেটিংস পেজ",
+        "description": "Settings থেকে category, owner, theme, language, currency, sync behavior এবং Google Sheets linking নিয়ন্ত্রণ করা হয়।"
+      },
+      "dashboardKpis": {
+        "title": "ড্যাশবোর্ড KPI",
+        "description": "এই KPI কার্ডগুলো নির্বাচিত মাসের net cash flow, total spend, total income ও outstanding debt দেখায়। দ্রুত আর্থিক অবস্থা বোঝার জন্য এগুলো সবচেয়ে গুরুত্বপূর্ণ।"
+      },
+      "dashboardTrends": {
+        "title": "ট্রেন্ড চার্ট",
+        "description": "এই চার্টগুলো সময়ের সাথে পরিবর্তন দেখায়। Income vs expenses মাসভিত্তিক inflow/outflow তুলনা করে, আর net cash flow trend প্রতিটি মাস positive না negative ছিল তা দেখায়।"
+      },
+      "dashboardPies": {
+        "title": "ব্রেকডাউন চার্ট",
+        "description": "এই donut chartগুলো category এবং owner split অনুযায়ী খরচ ভাঙে। এতে spending composition ও shared বনাম individual pattern দ্রুত বোঝা যায়।"
+      },
+      "dashboardExpenseByOwner": {
+        "title": "Owner অনুযায়ী খরচ সেকশন",
+        "description": "এখানে owner-level gross spend, transfer impact এবং transfer-এর পর net দেখায়। row expand করলে transaction-level contribution দেখা যায়।"
+      },
+      "dashboardDebtSnapshot": {
+        "title": "Debt snapshot সেকশন",
+        "description": "এখানে active debt, remaining balance এবং payoff progress bar দেখায়। debt module-এর initial amount minus payment হিসাব ব্যবহার করে।"
+      },
+      "dashboardSpendBySource": {
+        "title": "Source অনুযায়ী খরচ সেকশন",
+        "description": "এই সেকশনে source (manual ও card) অনুযায়ী total spend দেখায়। কোন payment channel-এ বেশি খরচ হচ্ছে তা বোঝা যায়।"
+      },
+      "dashboardOwnerTransfers": {
+        "title": "Owner transfer সেকশন",
+        "description": "নির্বাচিত মাসের transfer entry এবং মাসিক total এখানে দেখায়। এগুলো owner net পরিবর্তন করে, household spend নয়।"
+      },
+      "dashboardRecentActivity": {
+        "title": "Recent activity সেকশন",
+        "description": "সর্বশেষ expense record দ্রুত রিভিউর জন্য দেখায়। recent entry চিহ্নিত করা এবং category/owner assignment যাচাই করা সহজ হয়।"
+      },
+      "dashboardInsights": {
+        "title": "Smart insights সেকশন",
+        "description": "বর্তমান ডেটা ও scope অনুযায়ী spending shift, missing income, বা unpaid obligation-এর মতো গুরুত্বপূর্ণ alert এখানে দেখায়।"
+      }
+    }
   }
 }

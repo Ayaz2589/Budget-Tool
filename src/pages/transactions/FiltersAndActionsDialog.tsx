@@ -55,12 +55,15 @@ export function FiltersAndActionsDialog({
       <SheetContent
         side={sheetSide}
         showCloseButton={true}
+        data-tour="transactions-filters-sheet"
        
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col"
       >
         <DsSheetHeader
           title={t("transactions.filtersActionsTitle")}
           description={t("transactions.filtersActionsDesc")}
+          helpContent={t("transactions.help.filtersSheet")}
+          helpLabel={t("common.help")}
         />
         <div className="grid gap-6 px-4 pt-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
           {/* Filters */}

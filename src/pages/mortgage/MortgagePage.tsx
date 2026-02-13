@@ -1,11 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { useBudget } from "@/context";
 import type { Expense } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Home, Plus } from "lucide-react";
-import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
+import { DsActionBar, DsEmptyState, DsHelpTooltip, DsSectionHeader } from "@/components/ds";
 import {
   formatCurrencyFromNumber,
   parseCurrencyInput,
@@ -22,6 +23,7 @@ const MORTGAGE_CATEGORY = MORTGAGE_CATEGORY_LABEL;
 const DEFAULT_MORTGAGE_AMOUNT = 5400;
 
 export function MortgagePage() {
+  const location = useLocation();
   const { expenses, addExpense, updateExpense, removeExpense, owners, uiFormatSettings } = useBudget();
   const [addOpen, setAddOpen] = useState(false);
   const [addDate, setAddDate] = useState(() =>
@@ -70,12 +72,25 @@ export function MortgagePage() {
     setDeleteConfirm(null);
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setAddOpen(params.get("tourSheet") === "mortgage-add");
+  }, [location.search]);
+
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
+    <div data-tour-page="mortgage" className="flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
         <DsSectionHeader
-          title={t("mortgage.title")}
+          title={
+            <span className="inline-flex items-center gap-1.5">
+              {t("mortgage.title")}
+              <DsHelpTooltip
+                content={t("mortgage.help.page")}
+                ariaLabel={t("common.help")}
+              />
+            </span>
+          }
           subtitle={t("mortgage.subtitle")}
           showCurrencyChip
           actions={
@@ -88,7 +103,7 @@ export function MortgagePage() {
       </div>
 
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
+        <CardContent data-tour="mortgage-table" className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           <AddMortgagePaymentDialog
             open={addOpen}
             onOpenChange={setAddOpen}

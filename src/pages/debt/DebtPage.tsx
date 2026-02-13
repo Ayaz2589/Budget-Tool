@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Plus, Trash2 } from "lucide-react";
-import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
+import { DsActionBar, DsEmptyState, DsHelpTooltip, DsSectionHeader } from "@/components/ds";
 import { AddDebtDialog } from "./AddDebtDialog";
 import { AddPaymentDialog } from "./AddPaymentDialog";
 import { DebtList } from "./DebtList";
@@ -52,6 +52,11 @@ export function DebtPage() {
     }
   }, [debts, location.search]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setAddDebtOpen(params.get("tourSheet") === "debt-add");
+  }, [location.search]);
+
   const paymentsByDebt = useMemo(() => {
     const map = new Map<string, DebtPayment[]>();
     for (const p of debtPayments) {
@@ -67,10 +72,18 @@ export function DebtPage() {
 
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
+    <div data-tour-page="debt" className="flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
         <DsSectionHeader
-          title={t("debt.title")}
+          title={
+            <span className="inline-flex items-center gap-1.5">
+              {t("debt.title")}
+              <DsHelpTooltip
+                content={t("debt.help.page")}
+                ariaLabel={t("common.help")}
+              />
+            </span>
+          }
           subtitle={t("debt.subtitle")}
           showCurrencyChip
           actions={
@@ -97,7 +110,7 @@ export function DebtPage() {
       />
 
       <div
-       
+        data-tour="debt-table"
         className="flex-1 min-h-0 flex flex-col overflow-hidden"
       >
         <div className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">

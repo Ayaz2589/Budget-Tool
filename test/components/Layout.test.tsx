@@ -55,7 +55,65 @@ function renderLayout(
   );
 }
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  localStorage.setItem("budget-tool-app-tour-completed", "1");
+});
+
+test("Layout shows desktop app tour on first dashboard visit", () => {
+  localStorage.removeItem("budget-tool-app-tour-completed");
+  renderLayout({ isSignedIn: true, spreadsheetId: "sheet-id" });
+  expect(screen.getByText("App Tour 1/24")).toBeInTheDocument();
+  expect(screen.getByText("Dashboard overview")).toBeInTheDocument();
+});
+
+test("Layout waits for sheet setup decision before starting first-run app tour", () => {
+  localStorage.removeItem("budget-tool-app-tour-completed");
+  const { rerender } = render(
+    <BudgetProvider>
+      <GoogleAuthContext.Provider
+        value={buildAuthValue({
+          isSignedIn: true,
+          spreadsheetId: null,
+          sheetSetupState: "needs-create",
+        })}
+      >
+        <MemoryRouter initialEntries={["/dashboard"]}>
+          <Routes>
+            <Route path="/dashboard" element={<Layout />}>
+              <Route index element={<div>Dashboard content</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </GoogleAuthContext.Provider>
+    </BudgetProvider>,
+  );
+
+  expect(screen.queryByText("App Tour 1/24")).not.toBeInTheDocument();
+  expect(screen.getByText("Link a Google Sheet")).toBeInTheDocument();
+
+  rerender(
+    <BudgetProvider>
+      <GoogleAuthContext.Provider
+        value={buildAuthValue({
+          isSignedIn: true,
+          spreadsheetId: null,
+          sheetSetupState: "idle",
+        })}
+      >
+        <MemoryRouter initialEntries={["/dashboard"]}>
+          <Routes>
+            <Route path="/dashboard" element={<Layout />}>
+              <Route index element={<div>Dashboard content</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </GoogleAuthContext.Provider>
+    </BudgetProvider>,
+  );
+
+  expect(screen.getByText("App Tour 1/24")).toBeInTheDocument();
+});
 
 test("Layout renders branding, nav, and routed content", () => {
   renderLayout();

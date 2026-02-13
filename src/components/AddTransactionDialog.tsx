@@ -260,6 +260,7 @@ export function AddTransactionDialog({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side={sheetSide}
+        data-tour="transactions-add-sheet"
         className="h-full !w-[85vw] !max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col overflow-hidden"
         onOpenAutoFocus={(event) => event.preventDefault()}
       >
@@ -271,6 +272,8 @@ export function AddTransactionDialog({
               : t("addTransaction.newTransaction")
           }
           description={t("addTransaction.dialogDesc")}
+          helpContent={t("transactions.help.addSheet")}
+          helpLabel={t("common.help")}
         />
         <form
           onSubmit={handleSubmit}

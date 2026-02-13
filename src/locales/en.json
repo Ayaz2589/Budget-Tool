@@ -104,7 +104,8 @@
     "totalEarned": "Total Earned",
     "totalSaved": "Total Saved",
     "totalSpent": "Total Spent",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "help": "Help"
   },
   "dashboard": {
     "alertEssentialsHigh": "Essentials are {{percent}} of income.",
@@ -255,7 +256,18 @@
     "netShort": "Net",
     "sectionSpendByCardSource": "Total Spend by Card Source",
     "sectionNoSpendByCardSource": "No spend by source for selected range.",
-    "moreItemsCount": "+{{count}} more items"
+    "moreItemsCount": "+{{count}} more items",
+    "help": {
+      "page": "Overview of your financial health for the selected period.",
+      "kpiNetCashFlow": "Income minus spending and debt payments for the selected period.",
+      "kpiTotalSpent": "Total spending for the selected period based on your mortgage/debt scope settings.",
+      "kpiTotalIncome": "Total income recorded in the selected period.",
+      "kpiDebtOutstanding": "Current remaining balance across all active debts.",
+      "chartIncomeVsExpenses": "Compares monthly income against expense and debt outflows.",
+      "chartNetCashFlow": "Shows whether each month ended positive or negative.",
+      "expenseByOwner": "Shows each owner's gross spend, transfer impact, and net result.",
+      "settingsSheet": "Set the dashboard scope used by all cards and charts. Choose household or an individual owner, pick a month with data, then set whether mortgage and debt payments are included in spending totals."
+    }
   },
   "dashboardDebt": {
     "addDebt": "Add a debt",
@@ -311,7 +323,12 @@
     "startDateOptional": "Start date (optional)",
     "started": "Started {{date}}",
     "subtitle": "Track loans and debt payments.",
-    "title": "Debt"
+    "title": "Debt",
+    "help": {
+      "page": "Manage debts, balances, and payment history.",
+      "balanceColumn": "Remaining balance = initial debt minus recorded payments.",
+      "addSheet": "Create a debt with initial balance and optional start date. Debt balances decrease as payments are recorded, and debt payments can be included in dashboard spending based on your settings."
+    }
   },
   "import": {
     "addAll": "Add all",
@@ -404,7 +421,13 @@
     "recurringAmount": "Recurring amount",
     "recurringIncome": "Recurring income",
     "subtitle": "Track paychecks, rent, and other income.",
-    "title": "Income"
+    "title": "Income",
+    "help": {
+      "page": "Track and edit all income records by month.",
+      "monthTotal": "Total income for this month group.",
+      "amountColumn": "Income amount for each row.",
+      "addSheet": "Record paycheck, rent, bonus, or other income with date, amount, description, category, and owner. Recurring income rules create predictable entries on schedule and feed all dashboard income totals."
+    }
   },
   "landing": {
     "featureImport": "Data import/export",
@@ -444,7 +467,12 @@
     "removePaymentTitle": "Remove mortgage payment?",
     "subtitle": "Record mortgage payments (excluded from Transactions list).",
     "title": "Mortgage",
-    "totalThisYear": "Total this year: {{amount}}"
+    "totalThisYear": "Total this year: {{amount}}",
+    "help": {
+      "page": "Track mortgage payments and ownership details.",
+      "amountColumn": "Payment amount recorded for each mortgage entry.",
+      "addSheet": "Record mortgage payment date, amount, and owner. Mortgage entries are tracked separately from the transactions list and are included or excluded from dashboard spend depending on selected scope settings."
+    }
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -628,7 +656,14 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "help": {
+      "page": "Review, filter, and edit expenses and owner transfers.",
+      "visibleTotal": "Total of rows currently visible in this month group.",
+      "amountColumn": "Sort by transaction amount.",
+      "filtersSheet": "Filter by month, source, category, owner, and type to narrow visible rows. Totals in this sheet are based on the currently visible rows and can optionally include owner transfers.",
+      "addSheet": "Add one or many rows at once. Each valid row is saved when you submit; expense rows create transactions and transfer rows move value between owners without changing household spend."
+    }
   },
   "about": {
     "title": "About Ortho",
@@ -647,5 +682,110 @@
     "closingStrong": "Your data is yours. Your money stays clear. Your future stays in your control.",
     "supportBody": "If Ortho has been useful to you, your support helps us keep improving it.",
     "supportButton": "Support us on Patreon"
+  },
+  "appTour": {
+    "title": "App Tour",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip tour",
+    "finish": "Finish tour",
+    "steps": {
+      "dashboard": {
+        "title": "Dashboard overview",
+        "description": "This page gives a month-level summary of financial health. Review KPI cards, trend charts, debt snapshot, expense by owner, source breakdown, owner transfers, recent activity, and insights."
+      },
+      "dashboardSettings": {
+        "title": "Dashboard settings sheet",
+        "description": "Open settings to control how dashboard math is calculated: household vs individual owner, selected month, included expense scope, and whether debt payments are counted in spend."
+      },
+      "transactions": {
+        "title": "Transactions table",
+        "description": "This page lists expense and owner transfer rows by month. Use sorting and search to inspect records, and review visible totals for the current filtered view."
+      },
+      "transactionsAdd": {
+        "title": "New expense sheet",
+        "description": "Use this sheet to add one or many expense or transfer rows in one submit. Each row supports source, date, amount, category, ownership, and split/allocation controls."
+      },
+      "transactionsFilters": {
+        "title": "Filters and actions sheet",
+        "description": "Use this sheet to filter by month, source, category, owner, and type. It also controls whether owner transfers are included in totals for the current transaction view."
+      },
+      "income": {
+        "title": "Income table",
+        "description": "This page groups all income entries by month with totals. It is the source for dashboard income calculations and supports row-level edits and deletes."
+      },
+      "incomeAdd": {
+        "title": "Income sheet",
+        "description": "Add income records with date, amount, description, category, and owner. Accurate entries here directly affect net cash flow and monthly comparisons."
+      },
+      "debt": {
+        "title": "Debt table",
+        "description": "This page tracks each debt balance and payment history. Balances are derived from initial amount minus payments and feed debt snapshot metrics on dashboard."
+      },
+      "debtAdd": {
+        "title": "Debt sheets",
+        "description": "Use the debt sheets to create debts and record payments. Payment rows reduce outstanding balance and can be included in dashboard spend depending on settings."
+      },
+      "mortgage": {
+        "title": "Mortgage table",
+        "description": "This page tracks mortgage payment entries separately from the transaction list. Those entries are available for dashboard spend metrics based on scope settings."
+      },
+      "mortgageAdd": {
+        "title": "Mortgage sheet",
+        "description": "Add mortgage payments with date, amount, and owner. Consistent entries here keep mortgage totals and owner-level calculations accurate."
+      },
+      "presets": {
+        "title": "Presets table",
+        "description": "Presets are reusable templates for fast transaction entry. They store source, description, optional amount, category, and owner defaults."
+      },
+      "presetsAdd": {
+        "title": "Preset sheet",
+        "description": "Use this sheet to create or edit a preset template. Presets speed up transaction entry and keep category/owner naming consistent."
+      },
+      "data": {
+        "title": "Data page",
+        "description": "This page handles import and export. You can import supported files and export your records as PDF, JSON, or export string for portability and backup."
+      },
+      "settings": {
+        "title": "Settings page",
+        "description": "Settings controls categories, owners, theme, language, currency, sync behavior, and Google Sheets linking. Use it to define app-wide behavior and data governance."
+      },
+      "dashboardKpis": {
+        "title": "Dashboard KPIs",
+        "description": "These KPI cards summarize the selected month: net cash flow, total spend, total income, and outstanding debt. They are the quickest high-level read of current financial status."
+      },
+      "dashboardTrends": {
+        "title": "Trend charts",
+        "description": "These charts explain momentum over time. Income vs expenses compares inflows and outflows by month, while net cash flow trend shows whether each month finished positive or negative."
+      },
+      "dashboardPies": {
+        "title": "Breakdown charts",
+        "description": "These donut charts break spending into categories and owner split. Use them to quickly understand spending composition and shared-vs-individual contribution patterns."
+      },
+      "dashboardExpenseByOwner": {
+        "title": "Expense by owner section",
+        "description": "This section shows owner-level gross spend, transfer impact, and net after transfers. Expand rows to inspect per-transaction contributions used in owner-mode accounting."
+      },
+      "dashboardDebtSnapshot": {
+        "title": "Debt snapshot section",
+        "description": "Debt Snapshot lists active debts, remaining balances, and progress bars toward payoff. It uses initial amount minus recorded payments from the debt module."
+      },
+      "dashboardSpendBySource": {
+        "title": "Spend by card source section",
+        "description": "This section totals spending by source (manual and cards). It helps identify where spending is concentrated across payment channels."
+      },
+      "dashboardOwnerTransfers": {
+        "title": "Owner transfers section",
+        "description": "Owner Transfers lists transfer entries for the selected month and shows the month total. These transfers affect owner net values but do not change household spend."
+      },
+      "dashboardRecentActivity": {
+        "title": "Recent activity section",
+        "description": "Recent Activity surfaces the latest expense records for quick review. It is useful for spotting recently logged items and validating category/owner assignments."
+      },
+      "dashboardInsights": {
+        "title": "Smart insights section",
+        "description": "Smart Insights and Alerts highlight notable conditions such as spending shifts, missing income, or unpaid obligations, based on current dataset and dashboard scope."
+      }
+    }
   }
 }

@@ -18,6 +18,7 @@ import { getMonthLabel } from "@/lib/totals";
 import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DsHelpTooltip } from "@/components/ds";
 import type {
   SortColumn,
   ExpensesByMonthTableProps,
@@ -81,6 +82,12 @@ export function ExpensesByMonthTable({
                   {includeOwnerTransfersInTotals
                     ? t("transactions.visibleRowsTotal")
                     : t("transactions.visibleExpenseTotal")}
+                  <DsHelpTooltip
+                    content={t("transactions.help.visibleTotal")}
+                    ariaLabel={t("common.help")}
+                    asChildSpan
+                    className="ml-1 align-middle"
+                  />
                 </span>
                 <span className="text-sm font-semibold tabular-nums">
                   {formatCurrency(
@@ -134,6 +141,11 @@ export function ExpensesByMonthTable({
                       className="flex items-center gap-1 hover:text-foreground"
                     >
                       {t("common.amount")}
+                      <DsHelpTooltip
+                        content={t("transactions.help.amountColumn")}
+                        ariaLabel={t("common.help")}
+                        asChildSpan
+                      />
                       <SortIcon
                         column="amount"
                         sortBy={sortBy}

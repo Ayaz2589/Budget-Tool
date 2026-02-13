@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { getDebtBalance } from "@/lib/debtUtils";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { DsHelpTooltip } from "@/components/ds";
 import type { DebtListProps } from "@/types/debt";
 
 export type { DebtListProps };
@@ -35,7 +36,16 @@ export function DebtList({
           <TableHead>{t("common.description")}</TableHead>
           <TableHead>{t("common.owner")}</TableHead>
           <TableHead>{t("common.amount")}</TableHead>
-          <TableHead>{t("debt.balance")}</TableHead>
+          <TableHead>
+            <span className="inline-flex items-center gap-1">
+              {t("debt.balance")}
+              <DsHelpTooltip
+                content={t("debt.help.balanceColumn")}
+                ariaLabel={t("common.help")}
+                asChildSpan
+              />
+            </span>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

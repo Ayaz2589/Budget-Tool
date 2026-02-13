@@ -104,7 +104,8 @@
     "totalEarned": "कुल आय",
     "totalSaved": "कुल बचत",
     "totalSpent": "कुल खर्च",
-    "uncategorized": "अश्रेणीबद्ध"
+    "uncategorized": "अश्रेणीबद्ध",
+    "help": "सहायता"
   },
   "dashboard": {
     "alertEssentialsHigh": "आवश्यक खर्च आय का {{percent}} है।",
@@ -255,7 +256,18 @@
     "kpiTotalSpentDefExcludeMortgageAndDebt": "मॉर्गेज और ऋण भुगतान दोनों शामिल नहीं हैं।",
     "includeDebtPayments": "ऋण शामिल करें",
     "excludeDebtPayments": "ऋण हटाएँ",
-    "debtPaymentsExcludedHint": "डैशबोर्ड कुल और कैश फ्लो चार्ट से ऋण भुगतान हटाए गए हैं।"
+    "debtPaymentsExcludedHint": "डैशबोर्ड कुल और कैश फ्लो चार्ट से ऋण भुगतान हटाए गए हैं।",
+    "help": {
+      "page": "चुने गए समय के लिए आपकी वित्तीय स्थिति का सारांश।",
+      "kpiNetCashFlow": "चुने गए समय में आय से खर्च और कर्ज भुगतान घटाने के बाद राशि।",
+      "kpiTotalSpent": "मॉर्गेज/कर्ज स्कोप सेटिंग के अनुसार कुल खर्च।",
+      "kpiTotalIncome": "चुने गए समय में दर्ज कुल आय।",
+      "kpiDebtOutstanding": "सभी सक्रिय कर्ज का वर्तमान बकाया बैलेंस।",
+      "chartIncomeVsExpenses": "महीने के हिसाब से आय बनाम खर्च और कर्ज आउटफ्लो दिखाता है।",
+      "chartNetCashFlow": "हर महीने का नेट सकारात्मक या नकारात्मक दिखाता है।",
+      "expenseByOwner": "हर मालिक का ग्रॉस खर्च, ट्रांसफर प्रभाव और नेट दिखाता है।",
+      "settingsSheet": "डैशबोर्ड के सभी कार्ड और चार्ट के लिए स्कोप सेट करें। Household या किसी एक owner को चुनें, डेटा वाला महीना चुनें, फिर तय करें कि कुल खर्च में mortgage और debt payment शामिल हों या नहीं।"
+    }
   },
   "dashboardDebt": {
     "addDebt": "कर्ज जोड़ें",
@@ -311,7 +323,12 @@
     "startDateOptional": "शुरू तारीख (वैकल्पिक)",
     "started": "{{date}} को शुरू",
     "subtitle": "ऋण और भुगतान ट्रैक करें।",
-    "title": "कर्ज"
+    "title": "कर्ज",
+    "help": {
+      "page": "कर्ज, बैलेंस और भुगतान इतिहास प्रबंधित करें।",
+      "balanceColumn": "बचा हुआ बैलेंस = शुरुआती कर्ज - दर्ज भुगतान।",
+      "addSheet": "प्रारंभिक बैलेंस और वैकल्पिक start date के साथ debt बनाएं। payment रिकॉर्ड होने पर बैलेंस घटता है, और आपकी settings के आधार पर debt payments को डैशबोर्ड खर्च में शामिल किया जा सकता है।"
+    }
   },
   "import": {
     "addAll": "सभी जोड़ें",
@@ -404,7 +421,13 @@
     "recurringAmount": "आवर्ती राशि",
     "recurringIncome": "आवर्ती आय",
     "subtitle": "वेतन, किराया और अन्य आय ट्रैक करें।",
-    "title": "आय"
+    "title": "आय",
+    "help": {
+      "page": "महीने के अनुसार आय रिकॉर्ड ट्रैक और एडिट करें।",
+      "monthTotal": "इस महीने समूह की कुल आय।",
+      "amountColumn": "हर पंक्ति की आय राशि।",
+      "addSheet": "तारीख, राशि, विवरण, श्रेणी और owner के साथ paycheck, rent, bonus या अन्य income दर्ज करें। recurring income नियम शेड्यूल के अनुसार अनुमानित एंट्री बनाते हैं और डैशबोर्ड income totals में जुड़ते हैं।"
+    }
   },
   "landing": {
     "featureImport": "डेटा आयात/निर्यात",
@@ -444,7 +467,12 @@
     "removePaymentTitle": "बंधक भुगतान हटाएं?",
     "subtitle": "बंधक भुगतान ट्रैक करें।",
     "title": "बंधक",
-    "totalThisYear": "इस साल कुल: {{amount}}"
+    "totalThisYear": "इस साल कुल: {{amount}}",
+    "help": {
+      "page": "मॉर्गेज भुगतान और मालिक जानकारी ट्रैक करें।",
+      "amountColumn": "हर मॉर्गेज एंट्री की भुगतान राशि।",
+      "addSheet": "mortgage payment की तारीख, राशि और owner रिकॉर्ड करें। mortgage एंट्रियाँ transaction सूची से अलग ट्रैक होती हैं और चुनी गई scope settings के अनुसार डैशबोर्ड spend में शामिल या बाहर रहती हैं।"
+    }
   },
   "nav": {
     "dashboard": "डैशबोर्ड",
@@ -628,7 +656,14 @@
     "visibleRowsTotal": "दिखाई दे रही पंक्तियों का कुल",
     "visibleExpenseTotal": "दिखाई दे रहे खर्च का कुल",
     "includeOwnerTransfersInTableTotals": "तालिका के कुल में मालिक ट्रांसफर शामिल करें",
-    "tableTotalsDefinitionHint": "तालिका के कुल केवल दिखाई दे रही लेनदेन पंक्तियों पर आधारित होते हैं और इनमें ऋण भुगतान शामिल नहीं होते।"
+    "tableTotalsDefinitionHint": "तालिका के कुल केवल दिखाई दे रही लेनदेन पंक्तियों पर आधारित होते हैं और इनमें ऋण भुगतान शामिल नहीं होते।",
+    "help": {
+      "page": "खर्च और ओनर ट्रांसफर देखें, फ़िल्टर करें और एडिट करें।",
+      "visibleTotal": "इस महीने के समूह में दिख रही पंक्तियों का कुल।",
+      "amountColumn": "ट्रांजैक्शन राशि के आधार पर सॉर्ट करें।",
+      "filtersSheet": "दिख रही पंक्तियों को सीमित करने के लिए माह, स्रोत, श्रेणी, owner और प्रकार से फ़िल्टर करें। इस शीट के कुल वर्तमान दृश्य पंक्तियों पर आधारित हैं और चाहें तो owner transfer शामिल किए जा सकते हैं।",
+      "addSheet": "एक साथ एक या कई पंक्तियाँ जोड़ें। सबमिट करने पर हर वैध पंक्ति सेव होगी; expense पंक्तियाँ transaction बनाती हैं और transfer पंक्तियाँ household spend बदले बिना owners के बीच राशि स्थानांतरित करती हैं।"
+    }
   },
   "about": {
     "title": "Ortho के बारे में",
@@ -647,5 +682,110 @@
     "closingStrong": "आपका डेटा आपका है। आपका पैसा स्पष्ट रहता है। आपका भविष्य आपके नियंत्रण में रहता है।",
     "supportBody": "यदि Ortho आपके काम आया है, तो आपका समर्थन हमें इसे और बेहतर बनाने में मदद करता है।",
     "supportButton": "Patreon पर हमारा समर्थन करें"
+  },
+  "appTour": {
+    "title": "ऐप टूर",
+    "back": "वापस",
+    "next": "आगे",
+    "skip": "टूर छोड़ें",
+    "finish": "टूर पूरा करें",
+    "steps": {
+      "dashboard": {
+        "title": "डैशबोर्ड ओवरव्यू",
+        "description": "यह पेज महीने के स्तर पर वित्तीय स्थिति का सार देता है। KPI कार्ड, ट्रेंड चार्ट, debt snapshot, owner के हिसाब से खर्च, source breakdown, transfers, recent activity और insights देखें।"
+      },
+      "dashboardSettings": {
+        "title": "डैशबोर्ड सेटिंग्स शीट",
+        "description": "यहाँ तय करें कि डैशबोर्ड गणना कैसे होगी: household बनाम individual owner, चुना हुआ महीना, खर्च का scope, और debt payment को spend में शामिल करना है या नहीं।"
+      },
+      "transactions": {
+        "title": "ट्रांजैक्शन्स टेबल",
+        "description": "इस पेज पर महीने के हिसाब से expense और owner transfer rows दिखती हैं। रिकॉर्ड जाँचने के लिए sorting और search का उपयोग करें और visible totals देखें।"
+      },
+      "transactionsAdd": {
+        "title": "नया expense शीट",
+        "description": "एक submit में एक या कई expense/transfer rows जोड़ें। हर row में source, date, amount, category, owner और split/allocation controls होते हैं।"
+      },
+      "transactionsFilters": {
+        "title": "Filters और actions शीट",
+        "description": "महीना, source, category, owner और type से filter करें। इसी शीट से तय करें कि totals में owner transfer शामिल हों या नहीं।"
+      },
+      "income": {
+        "title": "Income टेबल",
+        "description": "यह पेज सभी income entries को month-wise totals के साथ group करता है। यही dashboard income calculations का source है और row-level edit/delete सपोर्ट करता है।"
+      },
+      "incomeAdd": {
+        "title": "Income शीट",
+        "description": "Date, amount, description, category और owner के साथ income रिकॉर्ड जोड़ें। यहाँ की सटीकता net cash flow और monthly comparisons पर सीधा असर डालती है।"
+      },
+      "debt": {
+        "title": "Debt टेबल",
+        "description": "यह पेज हर debt का balance और payment history ट्रैक करता है। balance = initial amount minus payments से निकलता है और dashboard metrics में जाता है।"
+      },
+      "debtAdd": {
+        "title": "Debt शीट्स",
+        "description": "Debt बनाने और payments रिकॉर्ड करने के लिए इन शीट्स का उपयोग करें। payment rows outstanding balance घटाती हैं और settings के अनुसार dashboard spend में शामिल हो सकती हैं।"
+      },
+      "mortgage": {
+        "title": "Mortgage टेबल",
+        "description": "यह पेज mortgage payments को transactions list से अलग ट्रैक करता है। scope settings के आधार पर ये entries dashboard spend metrics में उपयोग होती हैं।"
+      },
+      "mortgageAdd": {
+        "title": "Mortgage शीट",
+        "description": "Date, amount और owner के साथ mortgage payments जोड़ें। लगातार सही entries mortgage totals और owner-level calculations को accurate रखती हैं।"
+      },
+      "presets": {
+        "title": "Presets टेबल",
+        "description": "Presets तेज transaction entry के लिए reusable templates हैं। इनमें source, description, optional amount, category और default owner सेव होता है।"
+      },
+      "presetsAdd": {
+        "title": "Preset शीट",
+        "description": "Preset template बनाने/संपादित करने के लिए इस शीट का उपयोग करें। इससे entry तेज होती है और category/owner naming consistent रहती है।"
+      },
+      "data": {
+        "title": "Data पेज",
+        "description": "यह पेज import और export संभालता है। आप supported files import कर सकते हैं और PDF, JSON या export string में data export कर सकते हैं।"
+      },
+      "settings": {
+        "title": "Settings पेज",
+        "description": "Settings में categories, owners, theme, language, currency, sync behavior और Google Sheets linking नियंत्रित होते हैं।"
+      },
+      "dashboardKpis": {
+        "title": "डैशबोर्ड KPI",
+        "description": "ये KPI cards चुने हुए महीने का net cash flow, total spend, total income और outstanding debt दिखाते हैं। यह current financial status का सबसे तेज snapshot है।"
+      },
+      "dashboardTrends": {
+        "title": "Trend charts",
+        "description": "ये charts समय के साथ बदलाव दिखाते हैं। Income vs expenses inflow/outflow तुलना करता है, और net cash flow trend बताता है कि महीना positive था या negative।"
+      },
+      "dashboardPies": {
+        "title": "Breakdown charts",
+        "description": "ये donut charts खर्च को categories और owner split में तोड़ते हैं। इससे spending composition और shared vs individual pattern जल्दी समझ आता है।"
+      },
+      "dashboardExpenseByOwner": {
+        "title": "Expense by owner सेक्शन",
+        "description": "यह सेक्शन owner-level gross spend, transfer impact और transfer के बाद net दिखाता है। rows expand करके transaction-level contribution देखें।"
+      },
+      "dashboardDebtSnapshot": {
+        "title": "Debt snapshot सेक्शन",
+        "description": "Debt Snapshot active debts, remaining balances और payoff progress bars दिखाता है। यह debt module के initial amount minus payments पर आधारित है।"
+      },
+      "dashboardSpendBySource": {
+        "title": "Spend by source सेक्शन",
+        "description": "यह सेक्शन source (manual और cards) के अनुसार total spend दिखाता है। इससे पता चलता है खर्च किस payment channel में ज्यादा है।"
+      },
+      "dashboardOwnerTransfers": {
+        "title": "Owner transfers सेक्शन",
+        "description": "यह चयनित महीने की transfers और उसका monthly total दिखाता है। transfers owner net बदलती हैं, household spend नहीं।"
+      },
+      "dashboardRecentActivity": {
+        "title": "Recent activity सेक्शन",
+        "description": "Recent Activity हाल की expense entries दिखाता है ताकि आप जल्दी review कर सकें और category/owner assignment verify कर सकें।"
+      },
+      "dashboardInsights": {
+        "title": "Smart insights सेक्शन",
+        "description": "Smart Insights and Alerts मौजूदा data और scope के आधार पर spending shift, missing income या unpaid obligations जैसी महत्वपूर्ण चीज़ें दिखाता है।"
+      }
+    }
   }
 }

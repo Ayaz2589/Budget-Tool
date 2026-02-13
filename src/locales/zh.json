@@ -104,7 +104,8 @@
     "totalEarned": "总收入",
     "totalSaved": "总储蓄",
     "totalSpent": "总支出",
-    "uncategorized": "未分类"
+    "uncategorized": "未分类",
+    "help": "帮助"
   },
   "dashboard": {
     "alertEssentialsHigh": "必需支出占收入的 {{percent}}。",
@@ -255,7 +256,18 @@
     "kpiTotalSpentDefExcludeMortgageAndDebt": "房贷和债务还款均不包含。",
     "includeDebtPayments": "包含债务",
     "excludeDebtPayments": "排除债务",
-    "debtPaymentsExcludedHint": "债务还款已从仪表盘总计和现金流图表中排除。"
+    "debtPaymentsExcludedHint": "债务还款已从仪表盘总计和现金流图表中排除。",
+    "help": {
+      "page": "查看所选周期的财务健康概览。",
+      "kpiNetCashFlow": "所选周期内：收入减去支出和债务付款。",
+      "kpiTotalSpent": "按房贷/债务范围设置计算的总支出。",
+      "kpiTotalIncome": "所选周期记录的总收入。",
+      "kpiDebtOutstanding": "所有有效债务的当前剩余余额。",
+      "chartIncomeVsExpenses": "对比每月收入与支出/债务流出。",
+      "chartNetCashFlow": "显示每个月是净正还是净负。",
+      "expenseByOwner": "显示每位成员的总支出、转账影响和净额。",
+      "settingsSheet": "设置仪表板中所有卡片和图表使用的统计范围。可选择“家庭”或“单个成员”，再选择有数据的月份，并设置是否将房贷和债务还款计入总支出。"
+    }
   },
   "dashboardDebt": {
     "addDebt": "添加债务",
@@ -311,7 +323,12 @@
     "startDateOptional": "开始日期（可选）",
     "started": "开始于 {{date}}",
     "subtitle": "跟踪贷款和还款。",
-    "title": "债务"
+    "title": "债务",
+    "help": {
+      "page": "管理债务、余额和还款历史。",
+      "balanceColumn": "剩余余额 = 初始债务 - 已记录还款。",
+      "addSheet": "创建债务时可填写初始余额和可选开始日期。记录还款后余额会下降，并且可根据设置决定是否将债务还款计入仪表板支出。"
+    }
   },
   "import": {
     "addAll": "全部添加",
@@ -405,7 +422,13 @@
     "recurringAmount": "定期金额",
     "recurringIncome": "定期收入",
     "subtitle": "跟踪工资、租金及其他收入。",
-    "title": "收入"
+    "title": "收入",
+    "help": {
+      "page": "按月跟踪和编辑所有收入记录。",
+      "monthTotal": "该月份分组的收入总额。",
+      "amountColumn": "每行的收入金额。",
+      "addSheet": "记录工资、租金、奖金或其他收入，包含日期、金额、描述、分类和成员。周期性收入规则会按计划生成可预测的记录，并计入仪表板收入总额。"
+    }
   },
   "landing": {
     "featureImport": "数据导入/导出",
@@ -445,7 +468,12 @@
     "removePaymentTitle": "移除房贷还款？",
     "subtitle": "跟踪抵押贷款还款。",
     "title": "房贷",
-    "totalThisYear": "今年总计：{{amount}}"
+    "totalThisYear": "今年总计：{{amount}}",
+    "help": {
+      "page": "跟踪房贷付款和归属信息。",
+      "amountColumn": "每条房贷记录的付款金额。",
+      "addSheet": "记录房贷还款日期、金额和成员。房贷记录与交易列表分开管理，并会根据所选范围设置计入或排除在仪表板支出之外。"
+    }
   },
   "nav": {
     "dashboard": "仪表盘",
@@ -629,7 +657,14 @@
     "visibleRowsTotal": "可见行总计",
     "visibleExpenseTotal": "可见支出总计",
     "includeOwnerTransfersInTableTotals": "在表格总计中包含所有者转账",
-    "tableTotalsDefinitionHint": "表格总计仅基于当前可见交易行，不包含债务还款。"
+    "tableTotalsDefinitionHint": "表格总计仅基于当前可见交易行，不包含债务还款。",
+    "help": {
+      "page": "查看、筛选并编辑支出和成员转账。",
+      "visibleTotal": "当前月份分组中可见行的总额。",
+      "amountColumn": "按交易金额排序。",
+      "filtersSheet": "按月份、来源、分类、成员和类型筛选可见记录。本面板中的合计基于当前可见行，并且可选择是否包含成员转账。",
+      "addSheet": "可一次添加一行或多行。提交后每条有效行都会保存；支出行会创建交易，转账行会在成员之间转移金额，但不会改变家庭总支出。"
+    }
   },
   "about": {
     "title": "关于 Ortho",
@@ -648,5 +683,110 @@
     "closingStrong": "你的数据属于你。你的财务保持清晰。你的未来由你掌控。",
     "supportBody": "如果 Ortho 对你有帮助，你的支持将帮助我们持续改进。",
     "supportButton": "在 Patreon 上支持我们"
+  },
+  "appTour": {
+    "title": "应用导览",
+    "back": "上一步",
+    "next": "下一步",
+    "skip": "跳过导览",
+    "finish": "完成导览",
+    "steps": {
+      "dashboard": {
+        "title": "仪表板总览",
+        "description": "该页面提供按月的财务健康概览。可查看 KPI 卡片、趋势图、债务快照、按成员支出、来源拆分、成员转账、最近活动和洞察。"
+      },
+      "dashboardSettings": {
+        "title": "仪表板设置面板",
+        "description": "在设置中控制仪表板计算方式：家庭视图或个人视图、所选月份、支出范围，以及是否将债务还款计入支出。"
+      },
+      "transactions": {
+        "title": "交易表格",
+        "description": "此页面按月列出支出和成员转账记录。可用排序和搜索检查记录，并核对当前筛选下的可见合计。"
+      },
+      "transactionsAdd": {
+        "title": "新增支出面板",
+        "description": "可一次提交一条或多条支出/转账。每行支持来源、日期、金额、分类、成员归属和分摊设置。"
+      },
+      "transactionsFilters": {
+        "title": "筛选与操作面板",
+        "description": "按月份、来源、分类、成员和类型筛选。也可控制当前交易视图的合计是否包含成员转账。"
+      },
+      "income": {
+        "title": "收入表格",
+        "description": "此页面按月分组显示所有收入及总额。它是仪表板收入计算的数据来源，并支持行级编辑和删除。"
+      },
+      "incomeAdd": {
+        "title": "收入面板",
+        "description": "录入日期、金额、描述、分类和成员。这里的数据准确性会直接影响净现金流和月度对比。"
+      },
+      "debt": {
+        "title": "债务表格",
+        "description": "此页面跟踪每笔债务余额和还款历史。余额由初始金额减去已记录还款计算，并用于仪表板债务指标。"
+      },
+      "debtAdd": {
+        "title": "债务面板",
+        "description": "在此创建债务并记录还款。还款会降低未偿余额，并可按设置决定是否计入仪表板支出。"
+      },
+      "mortgage": {
+        "title": "房贷表格",
+        "description": "此页面单独记录房贷还款，不与交易列表混合。这些记录会根据范围设置参与仪表板支出指标。"
+      },
+      "mortgageAdd": {
+        "title": "房贷面板",
+        "description": "按日期、金额和成员添加房贷还款。持续、规范的记录可保证房贷总额与成员级计算准确。"
+      },
+      "presets": {
+        "title": "预设表格",
+        "description": "预设是可复用模板，用于快速录入交易。可保存来源、描述、可选金额、分类和默认成员。"
+      },
+      "presetsAdd": {
+        "title": "预设面板",
+        "description": "在此创建或编辑预设模板。预设可提升录入速度，并保持分类与成员命名一致。"
+      },
+      "data": {
+        "title": "数据页面",
+        "description": "此页面用于导入和导出。你可以导入支持的文件，并将数据导出为 PDF、JSON 或导出字符串。"
+      },
+      "settings": {
+        "title": "设置页面",
+        "description": "设置页管理分类、成员、主题、语言、货币、同步行为和 Google Sheets 连接，用于定义全局行为与数据管理。"
+      },
+      "dashboardKpis": {
+        "title": "仪表板 KPI",
+        "description": "这些 KPI 卡片汇总所选月份：净现金流、总支出、总收入和未偿债务。它们是最快的财务状态总览。"
+      },
+      "dashboardTrends": {
+        "title": "趋势图表",
+        "description": "这些图表解释随时间变化的趋势。收入对比支出展示每月流入流出，净现金流趋势显示每个月是盈余还是赤字。"
+      },
+      "dashboardPies": {
+        "title": "拆分图表",
+        "description": "这些环形图按分类和成员分摊展示支出结构，帮助快速理解支出构成与共享/个人模式。"
+      },
+      "dashboardExpenseByOwner": {
+        "title": "按成员支出板块",
+        "description": "该板块显示成员级毛支出、转账影响及转账后净值。展开行可查看交易级贡献明细。"
+      },
+      "dashboardDebtSnapshot": {
+        "title": "债务快照板块",
+        "description": "债务快照列出活跃债务、剩余余额和还清进度，基于初始金额减去已记录还款计算。"
+      },
+      "dashboardSpendBySource": {
+        "title": "按来源支出板块",
+        "description": "该板块按来源（手动与银行卡）汇总支出，帮助识别支出集中在哪些支付渠道。"
+      },
+      "dashboardOwnerTransfers": {
+        "title": "成员转账板块",
+        "description": "该板块列出所选月份的转账记录并显示月度总额。转账会影响成员净值，但不改变家庭总支出。"
+      },
+      "dashboardRecentActivity": {
+        "title": "最近活动板块",
+        "description": "最近活动展示最新支出记录，便于快速复核近期条目并检查分类/成员归属是否正确。"
+      },
+      "dashboardInsights": {
+        "title": "智能洞察板块",
+        "description": "智能洞察与提醒会基于当前数据与范围提示关键情况，如支出变化、缺失收入或未付款义务。"
+      }
+    }
   }
 }

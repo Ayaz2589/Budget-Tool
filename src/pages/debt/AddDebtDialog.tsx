@@ -64,11 +64,14 @@ export function AddDebtDialog({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
+        data-tour="debt-add-sheet"
         className="flex flex-col h-full w-[85vw] max-w-sm border-l p-0 gap-0 overflow-hidden rounded-l-2xl"
       >
         <DsSheetHeader
           title={t("debt.newDebt")}
           description={t("debt.newDebtDesc")}
+          helpContent={t("debt.help.addSheet")}
+          helpLabel={t("common.help")}
         />
         <form
           onSubmit={handleSubmit}

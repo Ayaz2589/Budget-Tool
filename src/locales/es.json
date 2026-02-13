@@ -104,7 +104,8 @@
     "totalEarned": "Total ingresado",
     "totalSaved": "Total ahorrado",
     "totalSpent": "Total gastado",
-    "uncategorized": "Sin categoría"
+    "uncategorized": "Sin categoría",
+    "help": "Ayuda"
   },
   "dashboard": {
     "alertEssentialsHigh": "Los esenciales son {{percent}} de los ingresos.",
@@ -255,7 +256,18 @@
     "kpiTotalSpentDefExcludeMortgageAndDebt": "Hipoteca y pagos de deuda excluidos.",
     "includeDebtPayments": "Incluir deuda",
     "excludeDebtPayments": "Excluir deuda",
-    "debtPaymentsExcludedHint": "Los pagos de deuda se excluyen de los totales del panel y de los gráficos de flujo de caja."
+    "debtPaymentsExcludedHint": "Los pagos de deuda se excluyen de los totales del panel y de los gráficos de flujo de caja.",
+    "help": {
+      "page": "Resumen de tu salud financiera para el período seleccionado.",
+      "kpiNetCashFlow": "Ingresos menos gastos y pagos de deuda del período seleccionado.",
+      "kpiTotalSpent": "Gasto total del período según tu configuración de hipoteca/deuda.",
+      "kpiTotalIncome": "Ingreso total registrado en el período seleccionado.",
+      "kpiDebtOutstanding": "Saldo pendiente actual de todas las deudas activas.",
+      "chartIncomeVsExpenses": "Compara ingresos mensuales contra salidas por gastos y deuda.",
+      "chartNetCashFlow": "Muestra si cada mes terminó en positivo o negativo.",
+      "expenseByOwner": "Muestra gasto bruto, impacto de transferencias y neto por propietario.",
+      "settingsSheet": "Configura el alcance del panel para todas las tarjetas y gráficos. Elige hogar o un propietario individual, selecciona un mes con datos y define si los pagos de hipoteca y deuda se incluyen en el gasto total."
+    }
   },
   "dashboardDebt": {
     "addDebt": "Añadir una deuda",
@@ -311,7 +323,12 @@
     "startDateOptional": "Fecha de inicio (opcional)",
     "started": "Iniciado {{date}}",
     "subtitle": "Registra préstamos y pagos de deuda.",
-    "title": "Deudas"
+    "title": "Deudas",
+    "help": {
+      "page": "Gestiona deudas, saldos e historial de pagos.",
+      "balanceColumn": "Saldo restante = deuda inicial menos pagos registrados.",
+      "addSheet": "Crea una deuda con saldo inicial y fecha de inicio opcional. El saldo baja a medida que registras pagos, y esos pagos pueden incluirse en el gasto del panel según tu configuración."
+    }
   },
   "import": {
     "addAll": "Añadir todo",
@@ -405,7 +422,13 @@
     "recurringAmount": "Importe recurrente",
     "recurringIncome": "Ingreso recurrente",
     "subtitle": "Registra nóminas, alquiler y otros ingresos.",
-    "title": "Ingresos"
+    "title": "Ingresos",
+    "help": {
+      "page": "Registra y edita todos los ingresos por mes.",
+      "monthTotal": "Ingreso total de este grupo mensual.",
+      "amountColumn": "Importe de ingreso de cada fila.",
+      "addSheet": "Registra nómina, renta, bonificación u otros ingresos con fecha, monto, descripción, categoría y propietario. Las reglas de ingresos recurrentes crean entradas predecibles según el calendario y alimentan los totales del panel."
+    }
   },
   "landing": {
     "featureImport": "Importación/exportación de datos",
@@ -445,7 +468,12 @@
     "removePaymentTitle": "¿Quitar pago de hipoteca?",
     "subtitle": "Registra los pagos de la hipoteca.",
     "title": "Hipoteca",
-    "totalThisYear": "Total este año: {{amount}}"
+    "totalThisYear": "Total este año: {{amount}}",
+    "help": {
+      "page": "Gestiona pagos de hipoteca y propiedad.",
+      "amountColumn": "Importe de pago registrado en cada fila de hipoteca.",
+      "addSheet": "Registra fecha, monto y propietario del pago de hipoteca. Las entradas de hipoteca se siguen por separado de la lista de transacciones y se incluyen o excluyen del gasto del panel según la configuración elegida."
+    }
   },
   "nav": {
     "dashboard": "Panel",
@@ -629,7 +657,14 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "help": {
+      "page": "Revisa, filtra y edita gastos y transferencias entre propietarios.",
+      "visibleTotal": "Total de filas visibles en este grupo mensual.",
+      "amountColumn": "Ordenar por importe de transacción.",
+      "filtersSheet": "Filtra por mes, fuente, categoría, propietario y tipo para acotar las filas visibles. Los totales de esta hoja se basan en las filas visibles actualmente y pueden incluir transferencias entre propietarios de forma opcional.",
+      "addSheet": "Agrega una o varias filas a la vez. Cada fila válida se guarda al enviar; las filas de gasto crean transacciones y las filas de transferencia mueven valor entre propietarios sin cambiar el gasto del hogar."
+    }
   },
   "about": {
     "title": "Acerca de Ortho",
@@ -648,5 +683,110 @@
     "closingStrong": "Tus datos son tuyos. Tu dinero se mantiene claro. Tu futuro se mantiene bajo tu control.",
     "supportBody": "Si Ortho te ha sido útil, tu apoyo nos ayuda a seguir mejorándolo.",
     "supportButton": "Apóyanos en Patreon"
+  },
+  "appTour": {
+    "title": "Tour de la app",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "skip": "Saltar tour",
+    "finish": "Finalizar tour",
+    "steps": {
+      "dashboard": {
+        "title": "Resumen del dashboard",
+        "description": "Esta página muestra un resumen mensual de la salud financiera. Revisa tarjetas KPI, gráficos de tendencia, deuda, gastos por propietario, desglose por fuente, transferencias, actividad reciente e insights."
+      },
+      "dashboardSettings": {
+        "title": "Hoja de configuración del dashboard",
+        "description": "Abre Configuración para controlar cómo se calcula el dashboard: hogar vs propietario individual, mes seleccionado, alcance de gastos incluido y si los pagos de deuda se cuentan en el gasto."
+      },
+      "transactions": {
+        "title": "Tabla de transacciones",
+        "description": "Esta página lista gastos y transferencias entre propietarios por mes. Usa ordenación y búsqueda para revisar registros y valida los totales visibles del filtro actual."
+      },
+      "transactionsAdd": {
+        "title": "Hoja de nuevo gasto",
+        "description": "Usa esta hoja para agregar una o varias filas de gasto o transferencia en un solo envío. Cada fila admite fuente, fecha, monto, categoría, propietario y controles de reparto/asignación."
+      },
+      "transactionsFilters": {
+        "title": "Hoja de filtros y acciones",
+        "description": "Usa esta hoja para filtrar por mes, fuente, categoría, propietario y tipo. También controla si las transferencias entre propietarios se incluyen en los totales de la vista actual."
+      },
+      "income": {
+        "title": "Tabla de ingresos",
+        "description": "Esta página agrupa todos los ingresos por mes con totales. Es la base de los cálculos de ingresos del dashboard y permite editar o eliminar filas."
+      },
+      "incomeAdd": {
+        "title": "Hoja de ingresos",
+        "description": "Agrega ingresos con fecha, monto, descripción, categoría y propietario. La precisión aquí impacta directamente el flujo neto y las comparaciones mensuales."
+      },
+      "debt": {
+        "title": "Tabla de deudas",
+        "description": "Esta página rastrea el saldo de cada deuda y su historial de pagos. Los saldos se calculan como monto inicial menos pagos y alimentan métricas del dashboard."
+      },
+      "debtAdd": {
+        "title": "Hojas de deuda",
+        "description": "Usa las hojas de deuda para crear deudas y registrar pagos. Los pagos reducen el saldo pendiente y pueden incluirse en gasto del dashboard según configuración."
+      },
+      "mortgage": {
+        "title": "Tabla de hipoteca",
+        "description": "Esta página registra pagos de hipoteca por separado de la lista de transacciones. Esos pagos se usan en métricas de gasto del dashboard según el alcance seleccionado."
+      },
+      "mortgageAdd": {
+        "title": "Hoja de hipoteca",
+        "description": "Agrega pagos de hipoteca con fecha, monto y propietario. Entradas consistentes mantienen precisos los totales de hipoteca y los cálculos por propietario."
+      },
+      "presets": {
+        "title": "Tabla de presets",
+        "description": "Los presets son plantillas reutilizables para cargar transacciones rápido. Guardan fuente, descripción, monto opcional, categoría y propietario por defecto."
+      },
+      "presetsAdd": {
+        "title": "Hoja de preset",
+        "description": "Usa esta hoja para crear o editar una plantilla preset. Los presets aceleran la carga y mantienen consistentes categoría y propietario."
+      },
+      "data": {
+        "title": "Página de datos",
+        "description": "Esta página gestiona importación y exportación. Puedes importar archivos compatibles y exportar tus datos como PDF, JSON o cadena de exportación para respaldo y portabilidad."
+      },
+      "settings": {
+        "title": "Página de configuración",
+        "description": "Configuración controla categorías, propietarios, tema, idioma, moneda, comportamiento de sync y vinculación con Google Sheets."
+      },
+      "dashboardKpis": {
+        "title": "KPIs del dashboard",
+        "description": "Estas tarjetas KPI resumen el mes seleccionado: flujo neto, gasto total, ingreso total y deuda pendiente. Es la lectura rápida de tu estado financiero."
+      },
+      "dashboardTrends": {
+        "title": "Gráficos de tendencia",
+        "description": "Estos gráficos muestran la evolución en el tiempo. Ingresos vs gastos compara entradas y salidas por mes, y tendencia de flujo neto muestra si cada mes cerró en positivo o negativo."
+      },
+      "dashboardPies": {
+        "title": "Gráficos de desglose",
+        "description": "Estos gráficos donut dividen el gasto por categorías y por propietario. Sirven para entender composición del gasto y patrón compartido vs individual."
+      },
+      "dashboardExpenseByOwner": {
+        "title": "Sección gasto por propietario",
+        "description": "Esta sección muestra gasto bruto por propietario, impacto de transferencias y neto después de transferencias. Expande filas para ver contribuciones por transacción."
+      },
+      "dashboardDebtSnapshot": {
+        "title": "Sección resumen de deuda",
+        "description": "Resumen de deuda lista deudas activas, saldos pendientes y progreso de pago. Usa monto inicial menos pagos registrados."
+      },
+      "dashboardSpendBySource": {
+        "title": "Sección gasto por fuente",
+        "description": "Esta sección totaliza gasto por fuente (manual y tarjetas). Ayuda a identificar dónde se concentra el gasto por canal de pago."
+      },
+      "dashboardOwnerTransfers": {
+        "title": "Sección transferencias de propietarios",
+        "description": "Transferencias lista las transferencias del mes seleccionado y muestra el total mensual. Afectan el neto por propietario pero no cambian el gasto del hogar."
+      },
+      "dashboardRecentActivity": {
+        "title": "Sección actividad reciente",
+        "description": "Actividad reciente muestra los últimos gastos para revisión rápida. Útil para detectar registros recientes y validar categoría/propietario."
+      },
+      "dashboardInsights": {
+        "title": "Sección insights inteligentes",
+        "description": "Insights y alertas destacan condiciones relevantes como cambios de gasto, ingresos faltantes u obligaciones sin pago según los datos y el alcance actual."
+      }
+    }
   }
 }

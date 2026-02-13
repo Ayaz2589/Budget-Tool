@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -43,12 +43,16 @@ import { persistLocale } from "@/i18n";
 import i18n from "@/i18n";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { SheetSetupDialog } from "@/components/SheetSetupDialog";
+import { AppGuidedTour, type AppTourStep } from "@/components/AppGuidedTour";
 import {
   DsSidebarBrand,
   DsSidebarNavItem,
   DS_SIDEBAR_LANGUAGE_TRIGGER_CLASS,
   DS_SIDEBAR_ACCOUNT_TRIGGER_CLASS,
 } from "@/components/ds";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+
+const APP_TOUR_COMPLETED_KEY = "budget-tool-app-tour-completed";
 
 function Avatar({
   userProfile,
@@ -250,6 +254,7 @@ export function Layout() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
   const {
     isSignedIn,
     userProfile,
@@ -275,9 +280,49 @@ export function Layout() {
     return location.pathname === to || location.pathname.startsWith(`${to}/`);
   };
   const [showSyncComplete, setShowSyncComplete] = useState(false);
+  const [appTourOpen, setAppTourOpen] = useState(false);
+  const [appTourStepIndex, setAppTourStepIndex] = useState(0);
+  const [hasObservedSheetSetupFlow, setHasObservedSheetSetupFlow] =
+    useState(false);
+  const hasInitializedTourRef = useRef(false);
   const prevSignedInRef = useRef(isSignedIn);
   const syncingStartedAtRef = useRef<number | null>(null);
   const delayedCompleteTimerRef = useRef<number | null>(null);
+  const isSheetSetupDialogOpen =
+    isSignedIn &&
+    !spreadsheetId &&
+    sheetSetupState !== "idle" &&
+    sheetSetupState !== "done";
+
+  const appTourSteps = useMemo<AppTourStep[]>(
+    () => [
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-header\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboard.title"), description: t("appTour.steps.dashboard.description") },
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-kpis\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardKpis.title"), description: t("appTour.steps.dashboardKpis.description") },
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-trends\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardTrends.title"), description: t("appTour.steps.dashboardTrends.description") },
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-pies\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardPies.title"), description: t("appTour.steps.dashboardPies.description") },
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-expense-by-owner\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardExpenseByOwner.title"), description: t("appTour.steps.dashboardExpenseByOwner.description") },
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-debt-snapshot\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardDebtSnapshot.title"), description: t("appTour.steps.dashboardDebtSnapshot.description") },
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-spend-by-source\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardSpendBySource.title"), description: t("appTour.steps.dashboardSpendBySource.description") },
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-owner-transfers\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardOwnerTransfers.title"), description: t("appTour.steps.dashboardOwnerTransfers.description") },
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-recent-activity\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardRecentActivity.title"), description: t("appTour.steps.dashboardRecentActivity.description") },
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-insights\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardInsights.title"), description: t("appTour.steps.dashboardInsights.description") },
+      { route: "/dashboard?tourSheet=dashboard-settings", selector: '[data-tour=\"dashboard-settings-sheet\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardSettings.title"), description: t("appTour.steps.dashboardSettings.description") },
+      { route: "/dashboard/transactions", selector: '[data-tour=\"transactions-table\"]', fallbackSelector: '[data-tour-page=\"transactions\"]', title: t("appTour.steps.transactions.title"), description: t("appTour.steps.transactions.description") },
+      { route: "/dashboard/transactions?tourSheet=transactions-add", selector: '[data-tour=\"transactions-add-sheet\"]', fallbackSelector: '[data-tour-page=\"transactions\"]', title: t("appTour.steps.transactionsAdd.title"), description: t("appTour.steps.transactionsAdd.description") },
+      { route: "/dashboard/transactions?tourSheet=transactions-filters", selector: '[data-tour=\"transactions-filters-sheet\"]', fallbackSelector: '[data-tour-page=\"transactions\"]', title: t("appTour.steps.transactionsFilters.title"), description: t("appTour.steps.transactionsFilters.description") },
+      { route: "/dashboard/income", selector: '[data-tour=\"income-table\"]', fallbackSelector: '[data-tour-page=\"income\"]', title: t("appTour.steps.income.title"), description: t("appTour.steps.income.description") },
+      { route: "/dashboard/income?tourSheet=income-add", selector: '[data-tour=\"income-add-sheet\"]', fallbackSelector: '[data-tour-page=\"income\"]', title: t("appTour.steps.incomeAdd.title"), description: t("appTour.steps.incomeAdd.description") },
+      { route: "/dashboard/debt", selector: '[data-tour=\"debt-table\"]', fallbackSelector: '[data-tour-page=\"debt\"]', title: t("appTour.steps.debt.title"), description: t("appTour.steps.debt.description") },
+      { route: "/dashboard/debt?tourSheet=debt-add", selector: '[data-tour=\"debt-add-sheet\"]', fallbackSelector: '[data-tour-page=\"debt\"]', title: t("appTour.steps.debtAdd.title"), description: t("appTour.steps.debtAdd.description") },
+      { route: "/dashboard/mortgage", selector: '[data-tour=\"mortgage-table\"]', fallbackSelector: '[data-tour-page=\"mortgage\"]', title: t("appTour.steps.mortgage.title"), description: t("appTour.steps.mortgage.description") },
+      { route: "/dashboard/mortgage?tourSheet=mortgage-add", selector: '[data-tour=\"mortgage-add-sheet\"]', fallbackSelector: '[data-tour-page=\"mortgage\"]', title: t("appTour.steps.mortgageAdd.title"), description: t("appTour.steps.mortgageAdd.description") },
+      { route: "/dashboard/presets", selector: '[data-tour=\"presets-table\"]', fallbackSelector: '[data-tour-page=\"presets\"]', title: t("appTour.steps.presets.title"), description: t("appTour.steps.presets.description") },
+      { route: "/dashboard/presets?tourSheet=presets-add", selector: '[data-tour=\"presets-add-sheet\"]', fallbackSelector: '[data-tour-page=\"presets\"]', title: t("appTour.steps.presetsAdd.title"), description: t("appTour.steps.presetsAdd.description") },
+      { route: "/dashboard/import", selector: '[data-tour=\"data-page\"]', fallbackSelector: '[data-tour-page=\"data\"]', title: t("appTour.steps.data.title"), description: t("appTour.steps.data.description") },
+      { route: "/dashboard/settings", selector: '[data-tour=\"settings-page\"]', fallbackSelector: '[data-tour-page=\"settings\"]', title: t("appTour.steps.settings.title"), description: t("appTour.steps.settings.description") },
+    ],
+    [t],
+  );
 
   useEffect(() => {
     if (prevSignedInRef.current && !isSignedIn) {
@@ -350,9 +395,72 @@ export function Layout() {
     []
   );
 
+  useEffect(() => {
+    if (!isSignedIn) {
+      setHasObservedSheetSetupFlow(false);
+      return;
+    }
+    if (spreadsheetId) {
+      setHasObservedSheetSetupFlow(true);
+      return;
+    }
+    if (isSheetSetupDialogOpen) {
+      setHasObservedSheetSetupFlow(true);
+    }
+  }, [isSignedIn, spreadsheetId, isSheetSetupDialogOpen]);
+
+  useEffect(() => {
+    if (hasInitializedTourRef.current) return;
+    if (!isDesktop || !isSignedIn) return;
+    if (location.pathname !== "/dashboard") return;
+    if (!spreadsheetId) {
+      // For first-time users without a linked sheet, start the app tour only
+      // after they finish the sheet setup decision (link or not now).
+      if (!hasObservedSheetSetupFlow) return;
+      if (isSheetSetupDialogOpen) return;
+    }
+    hasInitializedTourRef.current = true;
+    try {
+      const completed = localStorage.getItem(APP_TOUR_COMPLETED_KEY) === "1";
+      if (!completed) {
+        setAppTourStepIndex(0);
+        setAppTourOpen(true);
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [
+    isDesktop,
+    isSignedIn,
+    location.pathname,
+    spreadsheetId,
+    hasObservedSheetSetupFlow,
+    isSheetSetupDialogOpen,
+  ]);
+
+  useEffect(() => {
+    if (!appTourOpen) return;
+    const step = appTourSteps[appTourStepIndex];
+    if (!step) return;
+    const current = `${location.pathname}${location.search}`;
+    if (current !== step.route) {
+      navigate(step.route, { replace: true });
+    }
+  }, [appTourOpen, appTourStepIndex, appTourSteps, location.pathname, location.search, navigate]);
+
   const handleLanguageChange = (locale: string) => {
     i18n.changeLanguage(locale);
     persistLocale(locale);
+  };
+
+  const completeAppTour = () => {
+    try {
+      localStorage.setItem(APP_TOUR_COMPLETED_KEY, "1");
+    } catch {
+      // ignore storage errors
+    }
+    setAppTourOpen(false);
+    navigate("/dashboard", { replace: true });
   };
 
   return (
@@ -549,6 +657,24 @@ export function Layout() {
         linkDriveSheet={linkDriveSheet}
         createOrthoDriveSheet={createOrthoDriveSheet}
         dismissSheetSetupPrompt={dismissSheetSetupPrompt}
+      />
+      <AppGuidedTour
+        open={appTourOpen && isDesktop}
+        stepIndex={appTourStepIndex}
+        steps={appTourSteps}
+        onBack={() => setAppTourStepIndex((prev) => Math.max(0, prev - 1))}
+        onNext={() =>
+          setAppTourStepIndex((prev) =>
+            Math.min(appTourSteps.length - 1, prev + 1),
+          )
+        }
+        onFinish={completeAppTour}
+        onSkip={completeAppTour}
+        nextLabel={t("appTour.next")}
+        backLabel={t("appTour.back")}
+        skipLabel={t("appTour.skip")}
+        finishLabel={t("appTour.finish")}
+        titleLabel={t("appTour.title")}
       />
     </div>
   );

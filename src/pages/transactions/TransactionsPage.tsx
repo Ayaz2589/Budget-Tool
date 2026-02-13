@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, SlidersHorizontal, Receipt } from "lucide-react";
-import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
+import { DsActionBar, DsEmptyState, DsHelpTooltip, DsSectionHeader } from "@/components/ds";
 import { TransactionsToolbar } from "./TransactionsToolbar";
 import { FiltersAndActionsDialog } from "./FiltersAndActionsDialog";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
@@ -89,6 +89,9 @@ export function TransactionsPage() {
     );
     pendingHighlightIdRef.current = params.get("highlight");
     pendingOpenEditIdRef.current = params.get("openEdit");
+    const tourSheet = params.get("tourSheet");
+    setAddTransactionOpen(tourSheet === "transactions-add");
+    setFiltersPopupOpen(tourSheet === "transactions-filters");
   }, [location.search]);
 
   const ledgerRows = useMemo(
@@ -200,10 +203,18 @@ export function TransactionsPage() {
   }, [filtered]);
 
   return (
-    <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
+    <div data-tour-page="transactions" className="flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
         <DsSectionHeader
-          title={t("transactions.title")}
+          title={
+            <span className="inline-flex items-center gap-1.5">
+              {t("transactions.title")}
+              <DsHelpTooltip
+                content={t("transactions.help.page")}
+                ariaLabel={t("common.help")}
+              />
+            </span>
+          }
           subtitle={t("transactions.subtitle")}
           showCurrencyChip
           actions={
@@ -220,7 +231,7 @@ export function TransactionsPage() {
       </div>
       <div className="flex-1 pb-24 md:pb-0">
         <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0 md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-        <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
+        <CardContent data-tour="transactions-table" className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
             <div className="px-4 pb-3 md:px-0">
               <Input
                 value={searchFilter}

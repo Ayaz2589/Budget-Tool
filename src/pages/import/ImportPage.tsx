@@ -585,7 +585,7 @@ export function ImportPage() {
     : "";
 
   return (
-    <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
+    <div data-tour-page="data" className="flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
         <DsSectionHeader
           title={t("import.title")}
@@ -599,7 +599,7 @@ export function ImportPage() {
           }
         />
       </div>
-      <div className="space-y-6 pb-24 md:pb-0 px-4 md:px-0">
+      <div data-tour="data-page" className="space-y-6 pb-24 md:pb-0 px-4 md:px-0">
       <div>
         <ImportSourceCard
           selectedSource={selectedSource}

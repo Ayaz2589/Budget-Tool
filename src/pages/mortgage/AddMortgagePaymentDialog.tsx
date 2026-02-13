@@ -41,11 +41,14 @@ export function AddMortgagePaymentDialog({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
+        data-tour="mortgage-add-sheet"
         className="flex flex-col h-full w-[85vw] max-w-sm border-l p-0 gap-0 overflow-hidden rounded-l-2xl"
       >
         <DsSheetHeader
           title={t("mortgage.addMortgagePayment")}
           description={t("mortgage.addMortgagePaymentDesc")}
+          helpContent={t("mortgage.help.addSheet")}
+          helpLabel={t("common.help")}
         />
         <form
           onSubmit={onSubmit}

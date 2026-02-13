@@ -104,7 +104,8 @@
     "totalEarned": "총 수입",
     "totalSaved": "총 저축",
     "totalSpent": "총 지출",
-    "uncategorized": "미분류"
+    "uncategorized": "미분류",
+    "help": "도움말"
   },
   "dashboard": {
     "alertEssentialsHigh": "필수 지출이 수입의 {{percent}}입니다.",
@@ -255,7 +256,18 @@
     "kpiTotalSpentDefExcludeMortgageAndDebt": "모기지와 부채 상환 모두 제외됩니다.",
     "includeDebtPayments": "부채 포함",
     "excludeDebtPayments": "부채 제외",
-    "debtPaymentsExcludedHint": "부채 상환은 대시보드 합계와 현금흐름 차트에서 제외됩니다."
+    "debtPaymentsExcludedHint": "부채 상환은 대시보드 합계와 현금흐름 차트에서 제외됩니다.",
+    "help": {
+      "page": "선택한 기간의 재무 상태를 한눈에 보여줍니다.",
+      "kpiNetCashFlow": "선택 기간의 수입에서 지출과 부채 상환을 뺀 값입니다.",
+      "kpiTotalSpent": "모기지/부채 범위 설정에 따른 총지출입니다.",
+      "kpiTotalIncome": "선택 기간에 기록된 총수입입니다.",
+      "kpiDebtOutstanding": "활성 부채의 현재 남은 잔액 합계입니다.",
+      "chartIncomeVsExpenses": "월별 수입과 지출/부채 유출을 비교합니다.",
+      "chartNetCashFlow": "각 월이 흑자인지 적자인지 보여줍니다.",
+      "expenseByOwner": "소유자별 총지출, 이체 영향, 순지출을 보여줍니다.",
+      "settingsSheet": "대시보드의 모든 카드와 차트에 적용할 범위를 설정합니다. 가구 전체 또는 개별 소유자를 선택하고, 데이터가 있는 월을 고른 뒤, 모기지와 부채 상환을 총지출에 포함할지 결정하세요."
+    }
   },
   "dashboardDebt": {
     "addDebt": "부채 추가",
@@ -311,7 +323,12 @@
     "startDateOptional": "시작일 (선택)",
     "started": "{{date}} 시작",
     "subtitle": "대출과 상환을 추적합니다.",
-    "title": "부채"
+    "title": "부채",
+    "help": {
+      "page": "부채, 잔액, 상환 내역을 관리합니다.",
+      "balanceColumn": "남은 잔액 = 초기 부채 - 기록된 상환액.",
+      "addSheet": "초기 잔액과 선택적 시작일로 부채를 생성합니다. 결제를 기록할수록 잔액이 줄어들며, 설정에 따라 부채 상환액을 대시보드 지출에 포함할 수 있습니다."
+    }
   },
   "import": {
     "addAll": "전체 추가",
@@ -404,7 +421,13 @@
     "recurringAmount": "정기 금액",
     "recurringIncome": "정기 수입",
     "subtitle": "급여, 임대료 및 기타 수입을 추적합니다.",
-    "title": "수입"
+    "title": "수입",
+    "help": {
+      "page": "월별 수입 기록을 추적하고 수정합니다.",
+      "monthTotal": "이 월 그룹의 총수입입니다.",
+      "amountColumn": "각 행의 수입 금액입니다.",
+      "addSheet": "날짜, 금액, 설명, 카테고리, 소유자와 함께 급여·임대수입·보너스 등 수입을 기록합니다. 반복 수입 규칙은 일정에 따라 예측 가능한 항목을 만들고 대시보드 수입 합계에 반영됩니다."
+    }
   },
   "landing": {
     "featureImport": "데이터 가져오기/내보내기",
@@ -444,7 +467,12 @@
     "removePaymentTitle": "주택담보대출 결제를 제거하시겠습니까?",
     "subtitle": "모기지 납부를 추적합니다.",
     "title": "주택담보대출",
-    "totalThisYear": "올해 합계: {{amount}}"
+    "totalThisYear": "올해 합계: {{amount}}",
+    "help": {
+      "page": "모기지 납부와 소유자 정보를 관리합니다.",
+      "amountColumn": "각 모기지 항목의 납부 금액입니다.",
+      "addSheet": "모기지 납부일, 금액, 소유자를 기록합니다. 모기지 항목은 거래 목록과 별도로 관리되며, 선택한 범위 설정에 따라 대시보드 지출에 포함되거나 제외됩니다."
+    }
   },
   "nav": {
     "dashboard": "대시보드",
@@ -628,7 +656,14 @@
     "visibleRowsTotal": "보이는 행 합계",
     "visibleExpenseTotal": "보이는 지출 합계",
     "includeOwnerTransfersInTableTotals": "표 합계에 소유자 이체 포함",
-    "tableTotalsDefinitionHint": "표 합계는 현재 보이는 거래 행만 기준으로 하며 부채 상환은 포함하지 않습니다."
+    "tableTotalsDefinitionHint": "표 합계는 현재 보이는 거래 행만 기준으로 하며 부채 상환은 포함하지 않습니다.",
+    "help": {
+      "page": "지출과 소유자 이체를 조회, 필터, 수정합니다.",
+      "visibleTotal": "이 월 그룹에서 현재 보이는 행의 합계입니다.",
+      "amountColumn": "거래 금액 기준으로 정렬합니다.",
+      "filtersSheet": "월, 출처, 카테고리, 소유자, 유형으로 보이는 행을 좁힙니다. 이 시트의 합계는 현재 보이는 행 기준이며, 소유자 이체 포함 여부를 선택할 수 있습니다.",
+      "addSheet": "한 번에 한 줄 또는 여러 줄을 추가할 수 있습니다. 제출 시 유효한 각 줄이 저장되며, 지출 줄은 거래를 만들고 이체 줄은 가구 지출을 바꾸지 않고 소유자 간 금액만 이동합니다."
+    }
   },
   "about": {
     "title": "Ortho 소개",
@@ -647,5 +682,110 @@
     "closingStrong": "당신의 데이터는 당신의 것입니다. 당신의 돈은 더 명확해집니다. 당신의 미래는 당신의 통제 아래 있습니다.",
     "supportBody": "Ortho가 도움이 되었다면, 여러분의 후원이 더 나은 서비스로 이어집니다.",
     "supportButton": "Patreon에서 후원하기"
+  },
+  "appTour": {
+    "title": "앱 투어",
+    "back": "이전",
+    "next": "다음",
+    "skip": "투어 건너뛰기",
+    "finish": "투어 완료",
+    "steps": {
+      "dashboard": {
+        "title": "대시보드 개요",
+        "description": "이 페이지는 월 단위 재무 상태를 요약합니다. KPI 카드, 추세 차트, 부채 스냅샷, 소유자별 지출, 소스별 분해, 소유자 이체, 최근 활동, 인사이트를 확인합니다."
+      },
+      "dashboardSettings": {
+        "title": "대시보드 설정 시트",
+        "description": "설정에서 대시보드 계산 기준을 제어합니다: 가구/개인 소유자 보기, 선택 월, 포함할 지출 범위, 부채 상환 포함 여부."
+      },
+      "transactions": {
+        "title": "거래 테이블",
+        "description": "이 페이지는 월별 지출과 소유자 이체를 보여줍니다. 정렬/검색으로 기록을 확인하고 현재 필터 기준 가시 합계를 검토하세요."
+      },
+      "transactionsAdd": {
+        "title": "새 지출 시트",
+        "description": "한 번에 하나 또는 여러 지출/이체 행을 추가합니다. 각 행에서 소스, 날짜, 금액, 카테고리, 소유자, 분할/배분을 설정할 수 있습니다."
+      },
+      "transactionsFilters": {
+        "title": "필터 및 액션 시트",
+        "description": "월, 소스, 카테고리, 소유자, 유형으로 필터링합니다. 현재 거래 보기의 합계에 소유자 이체 포함 여부도 제어합니다."
+      },
+      "income": {
+        "title": "수입 테이블",
+        "description": "이 페이지는 모든 수입을 월별 합계와 함께 그룹화합니다. 대시보드 수입 계산의 기준 데이터이며 행 단위 수정/삭제를 지원합니다."
+      },
+      "incomeAdd": {
+        "title": "수입 시트",
+        "description": "날짜, 금액, 설명, 카테고리, 소유자를 입력해 수입을 추가합니다. 여기의 정확성이 순현금흐름과 월간 비교에 직접 영향을 줍니다."
+      },
+      "debt": {
+        "title": "부채 테이블",
+        "description": "각 부채의 잔액과 결제 이력을 추적합니다. 잔액은 초기 금액에서 결제를 뺀 값이며 대시보드 부채 지표에 반영됩니다."
+      },
+      "debtAdd": {
+        "title": "부채 시트",
+        "description": "부채를 생성하고 결제를 기록합니다. 결제 행은 미상환 잔액을 줄이며 설정에 따라 대시보드 지출에 포함될 수 있습니다."
+      },
+      "mortgage": {
+        "title": "모기지 테이블",
+        "description": "모기지 결제를 거래 목록과 분리해 추적합니다. 해당 항목은 범위 설정에 따라 대시보드 지출 지표에 반영됩니다."
+      },
+      "mortgageAdd": {
+        "title": "모기지 시트",
+        "description": "날짜, 금액, 소유자로 모기지 결제를 추가합니다. 일관된 입력은 모기지 총액과 소유자별 계산 정확도를 높입니다."
+      },
+      "presets": {
+        "title": "프리셋 테이블",
+        "description": "프리셋은 빠른 거래 입력을 위한 재사용 템플릿입니다. 소스, 설명, 선택 금액, 카테고리, 기본 소유자를 저장합니다."
+      },
+      "presetsAdd": {
+        "title": "프리셋 시트",
+        "description": "프리셋 템플릿을 생성/수정합니다. 프리셋은 입력 속도를 높이고 카테고리/소유자 네이밍 일관성을 유지합니다."
+      },
+      "data": {
+        "title": "데이터 페이지",
+        "description": "이 페이지에서 가져오기/내보내기를 처리합니다. 지원 파일을 가져오고 PDF, JSON, export string으로 내보낼 수 있습니다."
+      },
+      "settings": {
+        "title": "설정 페이지",
+        "description": "설정에서는 카테고리, 소유자, 테마, 언어, 통화, 동기화 동작, Google Sheets 연결을 관리합니다."
+      },
+      "dashboardKpis": {
+        "title": "대시보드 KPI",
+        "description": "KPI 카드는 선택한 월의 순현금흐름, 총지출, 총수입, 미상환 부채를 요약합니다. 현재 상태를 가장 빠르게 파악하는 지표입니다."
+      },
+      "dashboardTrends": {
+        "title": "추세 차트",
+        "description": "시간에 따른 흐름을 보여줍니다. 수입 대 지출은 월별 유입/유출을 비교하고 순현금흐름 추세는 월별 흑자/적자를 보여줍니다."
+      },
+      "dashboardPies": {
+        "title": "분해 차트",
+        "description": "도넛 차트는 지출을 카테고리와 소유자 분할로 나눠 보여줍니다. 지출 구성과 공동/개인 패턴을 빠르게 이해할 수 있습니다."
+      },
+      "dashboardExpenseByOwner": {
+        "title": "소유자별 지출 섹션",
+        "description": "소유자별 총지출, 이체 영향, 이체 후 순액을 보여줍니다. 행을 펼치면 거래 단위 기여도를 확인할 수 있습니다."
+      },
+      "dashboardDebtSnapshot": {
+        "title": "부채 스냅샷 섹션",
+        "description": "활성 부채, 잔액, 상환 진행률을 표시합니다. 부채 모듈의 초기 금액 - 결제 기록 계산을 사용합니다."
+      },
+      "dashboardSpendBySource": {
+        "title": "소스별 지출 섹션",
+        "description": "소스(수동/카드)별 총지출을 보여줍니다. 어떤 결제 채널에 지출이 집중되는지 파악할 수 있습니다."
+      },
+      "dashboardOwnerTransfers": {
+        "title": "소유자 이체 섹션",
+        "description": "선택 월의 이체 내역과 월 합계를 표시합니다. 이체는 소유자 순액에 영향을 주지만 가구 총지출은 바꾸지 않습니다."
+      },
+      "dashboardRecentActivity": {
+        "title": "최근 활동 섹션",
+        "description": "최근 지출 기록을 빠르게 확인합니다. 최근 입력을 점검하고 카테고리/소유자 지정이 올바른지 검증하기 좋습니다."
+      },
+      "dashboardInsights": {
+        "title": "스마트 인사이트 섹션",
+        "description": "현재 데이터와 범위를 기준으로 지출 변화, 누락 수입, 미납 의무 같은 중요한 신호를 알려줍니다."
+      }
+    }
   }
 }

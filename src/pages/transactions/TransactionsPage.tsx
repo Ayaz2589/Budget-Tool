@@ -120,12 +120,14 @@ export function TransactionsPage() {
         filters,
         sortBy,
         sortDir,
+        ownersForAllocation: ownerOptions,
       }),
     [
       ledgerRows,
       filters,
       sortBy,
       sortDir,
+      ownerOptions,
     ],
   );
 

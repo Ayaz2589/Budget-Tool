@@ -2,6 +2,7 @@ import type { Expense, OwnerTransfer } from "@/types";
 import type { SortColumn, TransactionLedgerRow } from "@/types";
 import { isValidDate } from "@/lib/totals";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
+import { normalizeExpenseAllocation } from "@/lib/ownerAccounting";
 
 export type TransactionTypeFilter = "all" | "expense" | "transfer";
 
@@ -91,11 +92,13 @@ export function filterAndSortTransactionRows({
   filters,
   sortBy,
   sortDir,
+  ownersForAllocation = [],
 }: {
   rows: TransactionLedgerRow[];
   filters: TransactionFilterState;
   sortBy: SortColumn;
   sortDir: "asc" | "desc";
+  ownersForAllocation?: string[];
 }): TransactionLedgerRow[] {
   const { monthFilter, sourceFilter, categoryFilter, searchFilter, ownerFilter, typeFilter } =
     filters;
@@ -146,12 +149,33 @@ export function filterAndSortTransactionRows({
         return (row.category || "").trim().toLowerCase() === "50/50" || !row.owner;
       });
     } else {
-      list = list.filter((row) => {
-        if (row.kind === "owner-transfer") {
-          return row.transferFromOwner === ownerFilter || row.transferToOwner === ownerFilter;
-        }
-        return (row.owner ?? "") === ownerFilter;
-      });
+      list = list
+        .map((row) => {
+          if (row.kind === "owner-transfer") {
+            if (row.transferFromOwner === ownerFilter) {
+              return { ...row, amount: row.amount };
+            }
+            if (row.transferToOwner === ownerFilter) {
+              return { ...row, amount: -row.amount };
+            }
+            return null;
+          }
+          if (!row.expense) return null;
+          const allocatedAmount = normalizeExpenseAllocation(
+            row.expense,
+            ownersForAllocation,
+          ).reduce((sum, entry) => {
+            if (entry.isUnassigned || entry.owner !== ownerFilter) return sum;
+            return sum + entry.amount;
+          }, 0);
+          if (allocatedAmount <= 0) return null;
+          return {
+            ...row,
+            amount: allocatedAmount,
+            owner: ownerFilter,
+          };
+        })
+        .filter((row): row is TransactionLedgerRow => Boolean(row));
     }
   }
 

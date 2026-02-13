@@ -282,10 +282,17 @@ export function Layout() {
   const [showSyncComplete, setShowSyncComplete] = useState(false);
   const [appTourOpen, setAppTourOpen] = useState(false);
   const [appTourStepIndex, setAppTourStepIndex] = useState(0);
+  const [hasObservedSheetSetupFlow, setHasObservedSheetSetupFlow] =
+    useState(false);
   const hasInitializedTourRef = useRef(false);
   const prevSignedInRef = useRef(isSignedIn);
   const syncingStartedAtRef = useRef<number | null>(null);
   const delayedCompleteTimerRef = useRef<number | null>(null);
+  const isSheetSetupDialogOpen =
+    isSignedIn &&
+    !spreadsheetId &&
+    sheetSetupState !== "idle" &&
+    sheetSetupState !== "done";
 
   const appTourSteps = useMemo<AppTourStep[]>(
     () => [
@@ -389,9 +396,29 @@ export function Layout() {
   );
 
   useEffect(() => {
+    if (!isSignedIn) {
+      setHasObservedSheetSetupFlow(false);
+      return;
+    }
+    if (spreadsheetId) {
+      setHasObservedSheetSetupFlow(true);
+      return;
+    }
+    if (isSheetSetupDialogOpen) {
+      setHasObservedSheetSetupFlow(true);
+    }
+  }, [isSignedIn, spreadsheetId, isSheetSetupDialogOpen]);
+
+  useEffect(() => {
     if (hasInitializedTourRef.current) return;
     if (!isDesktop || !isSignedIn) return;
     if (location.pathname !== "/dashboard") return;
+    if (!spreadsheetId) {
+      // For first-time users without a linked sheet, start the app tour only
+      // after they finish the sheet setup decision (link or not now).
+      if (!hasObservedSheetSetupFlow) return;
+      if (isSheetSetupDialogOpen) return;
+    }
     hasInitializedTourRef.current = true;
     try {
       const completed = localStorage.getItem(APP_TOUR_COMPLETED_KEY) === "1";
@@ -402,7 +429,14 @@ export function Layout() {
     } catch {
       // ignore storage errors
     }
-  }, [isDesktop, isSignedIn, location.pathname]);
+  }, [
+    isDesktop,
+    isSignedIn,
+    location.pathname,
+    spreadsheetId,
+    hasObservedSheetSetupFlow,
+    isSheetSetupDialogOpen,
+  ]);
 
   useEffect(() => {
     if (!appTourOpen) return;

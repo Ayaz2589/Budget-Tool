@@ -685,107 +685,107 @@
     "supportButton": "Apóyanos en Patreon"
   },
   "appTour": {
-    "title": "App Tour",
-    "back": "Back",
-    "next": "Next",
-    "skip": "Skip tour",
-    "finish": "Finish tour",
+    "title": "Tour de la app",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "skip": "Saltar tour",
+    "finish": "Finalizar tour",
     "steps": {
       "dashboard": {
-        "title": "Dashboard overview",
-        "description": "This page gives a month-level summary of financial health. Review KPI cards, trend charts, debt snapshot, expense by owner, source breakdown, owner transfers, recent activity, and insights."
+        "title": "Resumen del dashboard",
+        "description": "Esta página muestra un resumen mensual de la salud financiera. Revisa tarjetas KPI, gráficos de tendencia, deuda, gastos por propietario, desglose por fuente, transferencias, actividad reciente e insights."
       },
       "dashboardSettings": {
-        "title": "Dashboard settings sheet",
-        "description": "Open settings to control how dashboard math is calculated: household vs individual owner, selected month, included expense scope, and whether debt payments are counted in spend."
+        "title": "Hoja de configuración del dashboard",
+        "description": "Abre Configuración para controlar cómo se calcula el dashboard: hogar vs propietario individual, mes seleccionado, alcance de gastos incluido y si los pagos de deuda se cuentan en el gasto."
       },
       "transactions": {
-        "title": "Transactions table",
-        "description": "This page lists expense and owner transfer rows by month. Use sorting and search to inspect records, and review visible totals for the current filtered view."
+        "title": "Tabla de transacciones",
+        "description": "Esta página lista gastos y transferencias entre propietarios por mes. Usa ordenación y búsqueda para revisar registros y valida los totales visibles del filtro actual."
       },
       "transactionsAdd": {
-        "title": "New expense sheet",
-        "description": "Use this sheet to add one or many expense or transfer rows in one submit. Each row supports source, date, amount, category, ownership, and split/allocation controls."
+        "title": "Hoja de nuevo gasto",
+        "description": "Usa esta hoja para agregar una o varias filas de gasto o transferencia en un solo envío. Cada fila admite fuente, fecha, monto, categoría, propietario y controles de reparto/asignación."
       },
       "transactionsFilters": {
-        "title": "Filters and actions sheet",
-        "description": "Use this sheet to filter by month, source, category, owner, and type. It also controls whether owner transfers are included in totals for the current transaction view."
+        "title": "Hoja de filtros y acciones",
+        "description": "Usa esta hoja para filtrar por mes, fuente, categoría, propietario y tipo. También controla si las transferencias entre propietarios se incluyen en los totales de la vista actual."
       },
       "income": {
-        "title": "Income table",
-        "description": "This page groups all income entries by month with totals. It is the source for dashboard income calculations and supports row-level edits and deletes."
+        "title": "Tabla de ingresos",
+        "description": "Esta página agrupa todos los ingresos por mes con totales. Es la base de los cálculos de ingresos del dashboard y permite editar o eliminar filas."
       },
       "incomeAdd": {
-        "title": "Income sheet",
-        "description": "Add income records with date, amount, description, category, and owner. Accurate entries here directly affect net cash flow and monthly comparisons."
+        "title": "Hoja de ingresos",
+        "description": "Agrega ingresos con fecha, monto, descripción, categoría y propietario. La precisión aquí impacta directamente el flujo neto y las comparaciones mensuales."
       },
       "debt": {
-        "title": "Debt table",
-        "description": "This page tracks each debt balance and payment history. Balances are derived from initial amount minus payments and feed debt snapshot metrics on dashboard."
+        "title": "Tabla de deudas",
+        "description": "Esta página rastrea el saldo de cada deuda y su historial de pagos. Los saldos se calculan como monto inicial menos pagos y alimentan métricas del dashboard."
       },
       "debtAdd": {
-        "title": "Debt sheets",
-        "description": "Use the debt sheets to create debts and record payments. Payment rows reduce outstanding balance and can be included in dashboard spend depending on settings."
+        "title": "Hojas de deuda",
+        "description": "Usa las hojas de deuda para crear deudas y registrar pagos. Los pagos reducen el saldo pendiente y pueden incluirse en gasto del dashboard según configuración."
       },
       "mortgage": {
-        "title": "Mortgage table",
-        "description": "This page tracks mortgage payment entries separately from the transaction list. Those entries are available for dashboard spend metrics based on scope settings."
+        "title": "Tabla de hipoteca",
+        "description": "Esta página registra pagos de hipoteca por separado de la lista de transacciones. Esos pagos se usan en métricas de gasto del dashboard según el alcance seleccionado."
       },
       "mortgageAdd": {
-        "title": "Mortgage sheet",
-        "description": "Add mortgage payments with date, amount, and owner. Consistent entries here keep mortgage totals and owner-level calculations accurate."
+        "title": "Hoja de hipoteca",
+        "description": "Agrega pagos de hipoteca con fecha, monto y propietario. Entradas consistentes mantienen precisos los totales de hipoteca y los cálculos por propietario."
       },
       "presets": {
-        "title": "Presets table",
-        "description": "Presets are reusable templates for fast transaction entry. They store source, description, optional amount, category, and owner defaults."
+        "title": "Tabla de presets",
+        "description": "Los presets son plantillas reutilizables para cargar transacciones rápido. Guardan fuente, descripción, monto opcional, categoría y propietario por defecto."
       },
       "presetsAdd": {
-        "title": "Preset sheet",
-        "description": "Use this sheet to create or edit a preset template. Presets speed up transaction entry and keep category/owner naming consistent."
+        "title": "Hoja de preset",
+        "description": "Usa esta hoja para crear o editar una plantilla preset. Los presets aceleran la carga y mantienen consistentes categoría y propietario."
       },
       "data": {
-        "title": "Data page",
-        "description": "This page handles import and export. You can import supported files and export your records as PDF, JSON, or export string for portability and backup."
+        "title": "Página de datos",
+        "description": "Esta página gestiona importación y exportación. Puedes importar archivos compatibles y exportar tus datos como PDF, JSON o cadena de exportación para respaldo y portabilidad."
       },
       "settings": {
-        "title": "Settings page",
-        "description": "Settings controls categories, owners, theme, language, currency, sync behavior, and Google Sheets linking. Use it to define app-wide behavior and data governance."
+        "title": "Página de configuración",
+        "description": "Configuración controla categorías, propietarios, tema, idioma, moneda, comportamiento de sync y vinculación con Google Sheets."
       },
       "dashboardKpis": {
-        "title": "Dashboard KPIs",
-        "description": "These KPI cards summarize the selected month: net cash flow, total spend, total income, and outstanding debt. They are the quickest high-level read of current financial status."
+        "title": "KPIs del dashboard",
+        "description": "Estas tarjetas KPI resumen el mes seleccionado: flujo neto, gasto total, ingreso total y deuda pendiente. Es la lectura rápida de tu estado financiero."
       },
       "dashboardTrends": {
-        "title": "Trend charts",
-        "description": "These charts explain momentum over time. Income vs expenses compares inflows and outflows by month, while net cash flow trend shows whether each month finished positive or negative."
+        "title": "Gráficos de tendencia",
+        "description": "Estos gráficos muestran la evolución en el tiempo. Ingresos vs gastos compara entradas y salidas por mes, y tendencia de flujo neto muestra si cada mes cerró en positivo o negativo."
       },
       "dashboardPies": {
-        "title": "Breakdown charts",
-        "description": "These donut charts break spending into categories and owner split. Use them to quickly understand spending composition and shared-vs-individual contribution patterns."
+        "title": "Gráficos de desglose",
+        "description": "Estos gráficos donut dividen el gasto por categorías y por propietario. Sirven para entender composición del gasto y patrón compartido vs individual."
       },
       "dashboardExpenseByOwner": {
-        "title": "Expense by owner section",
-        "description": "This section shows owner-level gross spend, transfer impact, and net after transfers. Expand rows to inspect per-transaction contributions used in owner-mode accounting."
+        "title": "Sección gasto por propietario",
+        "description": "Esta sección muestra gasto bruto por propietario, impacto de transferencias y neto después de transferencias. Expande filas para ver contribuciones por transacción."
       },
       "dashboardDebtSnapshot": {
-        "title": "Debt snapshot section",
-        "description": "Debt Snapshot lists active debts, remaining balances, and progress bars toward payoff. It uses initial amount minus recorded payments from the debt module."
+        "title": "Sección resumen de deuda",
+        "description": "Resumen de deuda lista deudas activas, saldos pendientes y progreso de pago. Usa monto inicial menos pagos registrados."
       },
       "dashboardSpendBySource": {
-        "title": "Spend by card source section",
-        "description": "This section totals spending by source (manual and cards). It helps identify where spending is concentrated across payment channels."
+        "title": "Sección gasto por fuente",
+        "description": "Esta sección totaliza gasto por fuente (manual y tarjetas). Ayuda a identificar dónde se concentra el gasto por canal de pago."
       },
       "dashboardOwnerTransfers": {
-        "title": "Owner transfers section",
-        "description": "Owner Transfers lists transfer entries for the selected month and shows the month total. These transfers affect owner net values but do not change household spend."
+        "title": "Sección transferencias de propietarios",
+        "description": "Transferencias lista las transferencias del mes seleccionado y muestra el total mensual. Afectan el neto por propietario pero no cambian el gasto del hogar."
       },
       "dashboardRecentActivity": {
-        "title": "Recent activity section",
-        "description": "Recent Activity surfaces the latest expense records for quick review. It is useful for spotting recently logged items and validating category/owner assignments."
+        "title": "Sección actividad reciente",
+        "description": "Actividad reciente muestra los últimos gastos para revisión rápida. Útil para detectar registros recientes y validar categoría/propietario."
       },
       "dashboardInsights": {
-        "title": "Smart insights section",
-        "description": "Smart Insights and Alerts highlight notable conditions such as spending shifts, missing income, or unpaid obligations, based on current dataset and dashboard scope."
+        "title": "Sección insights inteligentes",
+        "description": "Insights y alertas destacan condiciones relevantes como cambios de gasto, ingresos faltantes u obligaciones sin pago según los datos y el alcance actual."
       }
     }
   }

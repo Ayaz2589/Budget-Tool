@@ -684,107 +684,107 @@
     "supportButton": "Patreon-এ আমাদের সমর্থন করুন"
   },
   "appTour": {
-    "title": "App Tour",
-    "back": "Back",
-    "next": "Next",
-    "skip": "Skip tour",
-    "finish": "Finish tour",
+    "title": "অ্যাপ ট্যুর",
+    "back": "পেছনে",
+    "next": "পরবর্তী",
+    "skip": "ট্যুর এড়িয়ে যান",
+    "finish": "ট্যুর শেষ করুন",
     "steps": {
       "dashboard": {
-        "title": "Dashboard overview",
-        "description": "This page gives a month-level summary of financial health. Review KPI cards, trend charts, debt snapshot, expense by owner, source breakdown, owner transfers, recent activity, and insights."
+        "title": "ড্যাশবোর্ড ওভারভিউ",
+        "description": "এই পেজে মাসভিত্তিক আর্থিক সারাংশ দেখা যায়। KPI কার্ড, ট্রেন্ড চার্ট, debt snapshot, owner অনুযায়ী খরচ, source breakdown, transfer, recent activity এবং insights দেখুন।"
       },
       "dashboardSettings": {
-        "title": "Dashboard settings sheet",
-        "description": "Open settings to control how dashboard math is calculated: household vs individual owner, selected month, included expense scope, and whether debt payments are counted in spend."
+        "title": "ড্যাশবোর্ড সেটিংস শিট",
+        "description": "ড্যাশবোর্ডের হিসাব কীভাবে হবে তা এখানে ঠিক করুন: household নাকি individual owner, কোন মাস, কোন খরচ scope, এবং debt payment খরচে ধরবেন কি না।"
       },
       "transactions": {
-        "title": "Transactions table",
-        "description": "This page lists expense and owner transfer rows by month. Use sorting and search to inspect records, and review visible totals for the current filtered view."
+        "title": "ট্রানজ্যাকশন টেবিল",
+        "description": "এই পেজে মাসভিত্তিক expense ও owner transfer দেখা যায়। sort ও search ব্যবহার করে রেকর্ড দেখুন এবং বর্তমান filter অনুযায়ী visible total মিলিয়ে নিন।"
       },
       "transactionsAdd": {
-        "title": "New expense sheet",
-        "description": "Use this sheet to add one or many expense or transfer rows in one submit. Each row supports source, date, amount, category, ownership, and split/allocation controls."
+        "title": "নতুন expense শিট",
+        "description": "একসাথে এক বা একাধিক expense/transfer row যোগ করতে এই শিট ব্যবহার করুন। প্রতিটি row-তে source, date, amount, category, owner এবং split/allocation সেট করা যায়।"
       },
       "transactionsFilters": {
-        "title": "Filters and actions sheet",
-        "description": "Use this sheet to filter by month, source, category, owner, and type. It also controls whether owner transfers are included in totals for the current transaction view."
+        "title": "ফিল্টার ও অ্যাকশন শিট",
+        "description": "মাস, source, category, owner ও type দিয়ে filter করুন। বর্তমান view-এর total-এ owner transfer যোগ হবে কি না সেটিও এখানে নিয়ন্ত্রণ করা যায়।"
       },
       "income": {
-        "title": "Income table",
-        "description": "This page groups all income entries by month with totals. It is the source for dashboard income calculations and supports row-level edits and deletes."
+        "title": "ইনকাম টেবিল",
+        "description": "এই পেজে সব income মাসভিত্তিক total সহ group করা থাকে। ড্যাশবোর্ড income হিসাবের জন্য এটি source এবং row-level edit/delete সাপোর্ট করে।"
       },
       "incomeAdd": {
-        "title": "Income sheet",
-        "description": "Add income records with date, amount, description, category, and owner. Accurate entries here directly affect net cash flow and monthly comparisons."
+        "title": "ইনকাম শিট",
+        "description": "তারিখ, পরিমাণ, বিবরণ, category ও owner সহ income যোগ করুন। এখানকার সঠিক ডেটা net cash flow ও monthly comparison সরাসরি প্রভাবিত করে।"
       },
       "debt": {
-        "title": "Debt table",
-        "description": "This page tracks each debt balance and payment history. Balances are derived from initial amount minus payments and feed debt snapshot metrics on dashboard."
+        "title": "ডেট টেবিল",
+        "description": "এই পেজে প্রতিটি debt-এর balance ও payment history ট্র্যাক করা হয়। initial amount থেকে payments বাদ দিয়ে balance হিসাব করা হয়।"
       },
       "debtAdd": {
-        "title": "Debt sheets",
-        "description": "Use the debt sheets to create debts and record payments. Payment rows reduce outstanding balance and can be included in dashboard spend depending on settings."
+        "title": "ডেট শিটসমূহ",
+        "description": "Debt তৈরি ও payment রেকর্ড করতে এই শিটগুলো ব্যবহার করুন। payment row outstanding balance কমায় এবং সেটিংস অনুযায়ী ড্যাশবোর্ড spend-এ ধরা হতে পারে।"
       },
       "mortgage": {
-        "title": "Mortgage table",
-        "description": "This page tracks mortgage payment entries separately from the transaction list. Those entries are available for dashboard spend metrics based on scope settings."
+        "title": "মর্টগেজ টেবিল",
+        "description": "এই পেজে mortgage payment ট্রানজ্যাকশন তালিকা থেকে আলাদা করে রাখা হয়। scope সেটিংস অনুযায়ী এগুলো ড্যাশবোর্ড spend মেট্রিকে ব্যবহার হয়।"
       },
       "mortgageAdd": {
-        "title": "Mortgage sheet",
-        "description": "Add mortgage payments with date, amount, and owner. Consistent entries here keep mortgage totals and owner-level calculations accurate."
+        "title": "মর্টগেজ শিট",
+        "description": "date, amount, owner দিয়ে mortgage payment যোগ করুন। ধারাবাহিক এন্ট্রি mortgage total এবং owner-level হিসাবকে নির্ভুল রাখে।"
       },
       "presets": {
-        "title": "Presets table",
-        "description": "Presets are reusable templates for fast transaction entry. They store source, description, optional amount, category, and owner defaults."
+        "title": "প্রিসেট টেবিল",
+        "description": "Preset হলো দ্রুত transaction entry-এর reusable template। এতে source, description, optional amount, category ও default owner রাখা যায়।"
       },
       "presetsAdd": {
-        "title": "Preset sheet",
-        "description": "Use this sheet to create or edit a preset template. Presets speed up transaction entry and keep category/owner naming consistent."
+        "title": "প্রিসেট শিট",
+        "description": "Preset template তৈরি বা edit করতে এই শিট ব্যবহার করুন। এতে entry দ্রুত হয় এবং category/owner naming consistent থাকে।"
       },
       "data": {
-        "title": "Data page",
-        "description": "This page handles import and export. You can import supported files and export your records as PDF, JSON, or export string for portability and backup."
+        "title": "ডেটা পেজ",
+        "description": "এই পেজে import/export করা হয়। সমর্থিত ফাইল import করতে পারবেন এবং PDF, JSON বা export string এ ডেটা export করতে পারবেন।"
       },
       "settings": {
-        "title": "Settings page",
-        "description": "Settings controls categories, owners, theme, language, currency, sync behavior, and Google Sheets linking. Use it to define app-wide behavior and data governance."
+        "title": "সেটিংস পেজ",
+        "description": "Settings থেকে category, owner, theme, language, currency, sync behavior এবং Google Sheets linking নিয়ন্ত্রণ করা হয়।"
       },
       "dashboardKpis": {
-        "title": "Dashboard KPIs",
-        "description": "These KPI cards summarize the selected month: net cash flow, total spend, total income, and outstanding debt. They are the quickest high-level read of current financial status."
+        "title": "ড্যাশবোর্ড KPI",
+        "description": "এই KPI কার্ডগুলো নির্বাচিত মাসের net cash flow, total spend, total income ও outstanding debt দেখায়। দ্রুত আর্থিক অবস্থা বোঝার জন্য এগুলো সবচেয়ে গুরুত্বপূর্ণ।"
       },
       "dashboardTrends": {
-        "title": "Trend charts",
-        "description": "These charts explain momentum over time. Income vs expenses compares inflows and outflows by month, while net cash flow trend shows whether each month finished positive or negative."
+        "title": "ট্রেন্ড চার্ট",
+        "description": "এই চার্টগুলো সময়ের সাথে পরিবর্তন দেখায়। Income vs expenses মাসভিত্তিক inflow/outflow তুলনা করে, আর net cash flow trend প্রতিটি মাস positive না negative ছিল তা দেখায়।"
       },
       "dashboardPies": {
-        "title": "Breakdown charts",
-        "description": "These donut charts break spending into categories and owner split. Use them to quickly understand spending composition and shared-vs-individual contribution patterns."
+        "title": "ব্রেকডাউন চার্ট",
+        "description": "এই donut chartগুলো category এবং owner split অনুযায়ী খরচ ভাঙে। এতে spending composition ও shared বনাম individual pattern দ্রুত বোঝা যায়।"
       },
       "dashboardExpenseByOwner": {
-        "title": "Expense by owner section",
-        "description": "This section shows owner-level gross spend, transfer impact, and net after transfers. Expand rows to inspect per-transaction contributions used in owner-mode accounting."
+        "title": "Owner অনুযায়ী খরচ সেকশন",
+        "description": "এখানে owner-level gross spend, transfer impact এবং transfer-এর পর net দেখায়। row expand করলে transaction-level contribution দেখা যায়।"
       },
       "dashboardDebtSnapshot": {
-        "title": "Debt snapshot section",
-        "description": "Debt Snapshot lists active debts, remaining balances, and progress bars toward payoff. It uses initial amount minus recorded payments from the debt module."
+        "title": "Debt snapshot সেকশন",
+        "description": "এখানে active debt, remaining balance এবং payoff progress bar দেখায়। debt module-এর initial amount minus payment হিসাব ব্যবহার করে।"
       },
       "dashboardSpendBySource": {
-        "title": "Spend by card source section",
-        "description": "This section totals spending by source (manual and cards). It helps identify where spending is concentrated across payment channels."
+        "title": "Source অনুযায়ী খরচ সেকশন",
+        "description": "এই সেকশনে source (manual ও card) অনুযায়ী total spend দেখায়। কোন payment channel-এ বেশি খরচ হচ্ছে তা বোঝা যায়।"
       },
       "dashboardOwnerTransfers": {
-        "title": "Owner transfers section",
-        "description": "Owner Transfers lists transfer entries for the selected month and shows the month total. These transfers affect owner net values but do not change household spend."
+        "title": "Owner transfer সেকশন",
+        "description": "নির্বাচিত মাসের transfer entry এবং মাসিক total এখানে দেখায়। এগুলো owner net পরিবর্তন করে, household spend নয়।"
       },
       "dashboardRecentActivity": {
-        "title": "Recent activity section",
-        "description": "Recent Activity surfaces the latest expense records for quick review. It is useful for spotting recently logged items and validating category/owner assignments."
+        "title": "Recent activity সেকশন",
+        "description": "সর্বশেষ expense record দ্রুত রিভিউর জন্য দেখায়। recent entry চিহ্নিত করা এবং category/owner assignment যাচাই করা সহজ হয়।"
       },
       "dashboardInsights": {
-        "title": "Smart insights section",
-        "description": "Smart Insights and Alerts highlight notable conditions such as spending shifts, missing income, or unpaid obligations, based on current dataset and dashboard scope."
+        "title": "Smart insights সেকশন",
+        "description": "বর্তমান ডেটা ও scope অনুযায়ী spending shift, missing income, বা unpaid obligation-এর মতো গুরুত্বপূর্ণ alert এখানে দেখায়।"
       }
     }
   }

@@ -684,107 +684,107 @@
     "supportButton": "Patreonでサポートする"
   },
   "appTour": {
-    "title": "App Tour",
-    "back": "Back",
-    "next": "Next",
-    "skip": "Skip tour",
-    "finish": "Finish tour",
+    "title": "アプリツアー",
+    "back": "戻る",
+    "next": "次へ",
+    "skip": "ツアーをスキップ",
+    "finish": "ツアーを完了",
     "steps": {
       "dashboard": {
-        "title": "Dashboard overview",
-        "description": "This page gives a month-level summary of financial health. Review KPI cards, trend charts, debt snapshot, expense by owner, source breakdown, owner transfers, recent activity, and insights."
+        "title": "ダッシュボード概要",
+        "description": "このページでは月単位の財務状況を要約します。KPIカード、トレンドチャート、負債スナップショット、オーナー別支出、ソース内訳、送金、最近の活動、インサイトを確認できます。"
       },
       "dashboardSettings": {
-        "title": "Dashboard settings sheet",
-        "description": "Open settings to control how dashboard math is calculated: household vs individual owner, selected month, included expense scope, and whether debt payments are counted in spend."
+        "title": "ダッシュボード設定シート",
+        "description": "設定を開いて計算方法を調整します。世帯/個人ビュー、対象月、支出スコープ、負債返済を支出に含めるかを管理します。"
       },
       "transactions": {
-        "title": "Transactions table",
-        "description": "This page lists expense and owner transfer rows by month. Use sorting and search to inspect records, and review visible totals for the current filtered view."
+        "title": "取引テーブル",
+        "description": "このページは月ごとの支出とオーナー間送金を表示します。並び替えと検索で記録を確認し、現在のフィルタでの表示合計を確認します。"
       },
       "transactionsAdd": {
-        "title": "New expense sheet",
-        "description": "Use this sheet to add one or many expense or transfer rows in one submit. Each row supports source, date, amount, category, ownership, and split/allocation controls."
+        "title": "新規支出シート",
+        "description": "このシートで1回の送信で複数の支出/送金行を追加できます。各行でソース、日付、金額、カテゴリ、オーナー、分割設定を指定できます。"
       },
       "transactionsFilters": {
-        "title": "Filters and actions sheet",
-        "description": "Use this sheet to filter by month, source, category, owner, and type. It also controls whether owner transfers are included in totals for the current transaction view."
+        "title": "フィルタと操作シート",
+        "description": "月、ソース、カテゴリ、オーナー、種別で絞り込みます。合計にオーナー間送金を含めるかもここで制御できます。"
       },
       "income": {
-        "title": "Income table",
-        "description": "This page groups all income entries by month with totals. It is the source for dashboard income calculations and supports row-level edits and deletes."
+        "title": "収入テーブル",
+        "description": "このページではすべての収入を月別合計でグループ表示します。ダッシュボード収入計算の基礎データで、行単位の編集・削除に対応します。"
       },
       "incomeAdd": {
-        "title": "Income sheet",
-        "description": "Add income records with date, amount, description, category, and owner. Accurate entries here directly affect net cash flow and monthly comparisons."
+        "title": "収入シート",
+        "description": "日付、金額、説明、カテゴリ、オーナーで収入を追加します。ここでの正確な入力は純キャッシュフローと月次比較に直接影響します。"
       },
       "debt": {
-        "title": "Debt table",
-        "description": "This page tracks each debt balance and payment history. Balances are derived from initial amount minus payments and feed debt snapshot metrics on dashboard."
+        "title": "負債テーブル",
+        "description": "各負債の残高と支払履歴を追跡します。残高は初期金額から支払いを差し引いて計算され、ダッシュボード指標に反映されます。"
       },
       "debtAdd": {
-        "title": "Debt sheets",
-        "description": "Use the debt sheets to create debts and record payments. Payment rows reduce outstanding balance and can be included in dashboard spend depending on settings."
+        "title": "負債シート",
+        "description": "負債作成と支払い記録に使います。支払い行は未払残高を減らし、設定に応じてダッシュボード支出に含められます。"
       },
       "mortgage": {
-        "title": "Mortgage table",
-        "description": "This page tracks mortgage payment entries separately from the transaction list. Those entries are available for dashboard spend metrics based on scope settings."
+        "title": "住宅ローンテーブル",
+        "description": "住宅ローン支払いは取引一覧とは別に追跡されます。これらはスコープ設定に応じてダッシュボード支出指標に反映されます。"
       },
       "mortgageAdd": {
-        "title": "Mortgage sheet",
-        "description": "Add mortgage payments with date, amount, and owner. Consistent entries here keep mortgage totals and owner-level calculations accurate."
+        "title": "住宅ローンシート",
+        "description": "日付、金額、オーナーで住宅ローン支払いを追加します。入力の一貫性が総額とオーナー別計算の精度を保ちます。"
       },
       "presets": {
-        "title": "Presets table",
-        "description": "Presets are reusable templates for fast transaction entry. They store source, description, optional amount, category, and owner defaults."
+        "title": "プリセットテーブル",
+        "description": "プリセットは高速入力用の再利用テンプレートです。ソース、説明、任意金額、カテゴリ、既定オーナーを保存します。"
       },
       "presetsAdd": {
-        "title": "Preset sheet",
-        "description": "Use this sheet to create or edit a preset template. Presets speed up transaction entry and keep category/owner naming consistent."
+        "title": "プリセットシート",
+        "description": "プリセットテンプレートを作成・編集します。入力速度を上げ、カテゴリ/オーナー命名の一貫性を保ちます。"
       },
       "data": {
-        "title": "Data page",
-        "description": "This page handles import and export. You can import supported files and export your records as PDF, JSON, or export string for portability and backup."
+        "title": "データページ",
+        "description": "このページはインポート/エクスポートを扱います。対応ファイルの取り込みと、PDF・JSON・エクスポート文字列での出力ができます。"
       },
       "settings": {
-        "title": "Settings page",
-        "description": "Settings controls categories, owners, theme, language, currency, sync behavior, and Google Sheets linking. Use it to define app-wide behavior and data governance."
+        "title": "設定ページ",
+        "description": "設定ではカテゴリ、オーナー、テーマ、言語、通貨、同期挙動、Google Sheets連携を管理します。"
       },
       "dashboardKpis": {
-        "title": "Dashboard KPIs",
-        "description": "These KPI cards summarize the selected month: net cash flow, total spend, total income, and outstanding debt. They are the quickest high-level read of current financial status."
+        "title": "ダッシュボードKPI",
+        "description": "KPIカードは選択月の純キャッシュフロー、総支出、総収入、未払負債を要約します。現在状態を最速で把握できる指標です。"
       },
       "dashboardTrends": {
-        "title": "Trend charts",
-        "description": "These charts explain momentum over time. Income vs expenses compares inflows and outflows by month, while net cash flow trend shows whether each month finished positive or negative."
+        "title": "トレンドチャート",
+        "description": "時間変化の流れを示します。収入対支出は月次の流入/流出を比較し、純キャッシュフロートレンドは各月の黒字/赤字を示します。"
       },
       "dashboardPies": {
-        "title": "Breakdown charts",
-        "description": "These donut charts break spending into categories and owner split. Use them to quickly understand spending composition and shared-vs-individual contribution patterns."
+        "title": "内訳チャート",
+        "description": "ドーナツチャートで支出をカテゴリとオーナー分割で可視化します。支出構成と共同/個別パターンを素早く把握できます。"
       },
       "dashboardExpenseByOwner": {
-        "title": "Expense by owner section",
-        "description": "This section shows owner-level gross spend, transfer impact, and net after transfers. Expand rows to inspect per-transaction contributions used in owner-mode accounting."
+        "title": "オーナー別支出セクション",
+        "description": "オーナー別の総支出、送金影響、送金後ネットを表示します。行を展開すると取引単位の寄与を確認できます。"
       },
       "dashboardDebtSnapshot": {
-        "title": "Debt snapshot section",
-        "description": "Debt Snapshot lists active debts, remaining balances, and progress bars toward payoff. It uses initial amount minus recorded payments from the debt module."
+        "title": "負債スナップショットセクション",
+        "description": "アクティブ負債、残高、返済進捗バーを表示します。初期金額から支払いを引く計算を使用します。"
       },
       "dashboardSpendBySource": {
-        "title": "Spend by card source section",
-        "description": "This section totals spending by source (manual and cards). It helps identify where spending is concentrated across payment channels."
+        "title": "ソース別支出セクション",
+        "description": "ソース（手動/カード）ごとの総支出を表示します。どの支払いチャネルに支出が集中しているか把握できます。"
       },
       "dashboardOwnerTransfers": {
-        "title": "Owner transfers section",
-        "description": "Owner Transfers lists transfer entries for the selected month and shows the month total. These transfers affect owner net values but do not change household spend."
+        "title": "オーナー送金セクション",
+        "description": "選択月の送金明細と月合計を表示します。送金はオーナーのネット値に影響しますが、世帯支出は変えません。"
       },
       "dashboardRecentActivity": {
-        "title": "Recent activity section",
-        "description": "Recent Activity surfaces the latest expense records for quick review. It is useful for spotting recently logged items and validating category/owner assignments."
+        "title": "最近の活動セクション",
+        "description": "最新の支出記録を素早く確認できます。最近の入力確認やカテゴリ/オーナー設定の検証に便利です。"
       },
       "dashboardInsights": {
-        "title": "Smart insights section",
-        "description": "Smart Insights and Alerts highlight notable conditions such as spending shifts, missing income, or unpaid obligations, based on current dataset and dashboard scope."
+        "title": "スマートインサイトセクション",
+        "description": "現在のデータとスコープに基づき、支出変化、収入欠落、未払い義務など重要な兆候を提示します。"
       }
     }
   }

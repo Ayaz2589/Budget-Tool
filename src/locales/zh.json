@@ -685,107 +685,107 @@
     "supportButton": "在 Patreon 上支持我们"
   },
   "appTour": {
-    "title": "App Tour",
-    "back": "Back",
-    "next": "Next",
-    "skip": "Skip tour",
-    "finish": "Finish tour",
+    "title": "应用导览",
+    "back": "上一步",
+    "next": "下一步",
+    "skip": "跳过导览",
+    "finish": "完成导览",
     "steps": {
       "dashboard": {
-        "title": "Dashboard overview",
-        "description": "This page gives a month-level summary of financial health. Review KPI cards, trend charts, debt snapshot, expense by owner, source breakdown, owner transfers, recent activity, and insights."
+        "title": "仪表板总览",
+        "description": "该页面提供按月的财务健康概览。可查看 KPI 卡片、趋势图、债务快照、按成员支出、来源拆分、成员转账、最近活动和洞察。"
       },
       "dashboardSettings": {
-        "title": "Dashboard settings sheet",
-        "description": "Open settings to control how dashboard math is calculated: household vs individual owner, selected month, included expense scope, and whether debt payments are counted in spend."
+        "title": "仪表板设置面板",
+        "description": "在设置中控制仪表板计算方式：家庭视图或个人视图、所选月份、支出范围，以及是否将债务还款计入支出。"
       },
       "transactions": {
-        "title": "Transactions table",
-        "description": "This page lists expense and owner transfer rows by month. Use sorting and search to inspect records, and review visible totals for the current filtered view."
+        "title": "交易表格",
+        "description": "此页面按月列出支出和成员转账记录。可用排序和搜索检查记录，并核对当前筛选下的可见合计。"
       },
       "transactionsAdd": {
-        "title": "New expense sheet",
-        "description": "Use this sheet to add one or many expense or transfer rows in one submit. Each row supports source, date, amount, category, ownership, and split/allocation controls."
+        "title": "新增支出面板",
+        "description": "可一次提交一条或多条支出/转账。每行支持来源、日期、金额、分类、成员归属和分摊设置。"
       },
       "transactionsFilters": {
-        "title": "Filters and actions sheet",
-        "description": "Use this sheet to filter by month, source, category, owner, and type. It also controls whether owner transfers are included in totals for the current transaction view."
+        "title": "筛选与操作面板",
+        "description": "按月份、来源、分类、成员和类型筛选。也可控制当前交易视图的合计是否包含成员转账。"
       },
       "income": {
-        "title": "Income table",
-        "description": "This page groups all income entries by month with totals. It is the source for dashboard income calculations and supports row-level edits and deletes."
+        "title": "收入表格",
+        "description": "此页面按月分组显示所有收入及总额。它是仪表板收入计算的数据来源，并支持行级编辑和删除。"
       },
       "incomeAdd": {
-        "title": "Income sheet",
-        "description": "Add income records with date, amount, description, category, and owner. Accurate entries here directly affect net cash flow and monthly comparisons."
+        "title": "收入面板",
+        "description": "录入日期、金额、描述、分类和成员。这里的数据准确性会直接影响净现金流和月度对比。"
       },
       "debt": {
-        "title": "Debt table",
-        "description": "This page tracks each debt balance and payment history. Balances are derived from initial amount minus payments and feed debt snapshot metrics on dashboard."
+        "title": "债务表格",
+        "description": "此页面跟踪每笔债务余额和还款历史。余额由初始金额减去已记录还款计算，并用于仪表板债务指标。"
       },
       "debtAdd": {
-        "title": "Debt sheets",
-        "description": "Use the debt sheets to create debts and record payments. Payment rows reduce outstanding balance and can be included in dashboard spend depending on settings."
+        "title": "债务面板",
+        "description": "在此创建债务并记录还款。还款会降低未偿余额，并可按设置决定是否计入仪表板支出。"
       },
       "mortgage": {
-        "title": "Mortgage table",
-        "description": "This page tracks mortgage payment entries separately from the transaction list. Those entries are available for dashboard spend metrics based on scope settings."
+        "title": "房贷表格",
+        "description": "此页面单独记录房贷还款，不与交易列表混合。这些记录会根据范围设置参与仪表板支出指标。"
       },
       "mortgageAdd": {
-        "title": "Mortgage sheet",
-        "description": "Add mortgage payments with date, amount, and owner. Consistent entries here keep mortgage totals and owner-level calculations accurate."
+        "title": "房贷面板",
+        "description": "按日期、金额和成员添加房贷还款。持续、规范的记录可保证房贷总额与成员级计算准确。"
       },
       "presets": {
-        "title": "Presets table",
-        "description": "Presets are reusable templates for fast transaction entry. They store source, description, optional amount, category, and owner defaults."
+        "title": "预设表格",
+        "description": "预设是可复用模板，用于快速录入交易。可保存来源、描述、可选金额、分类和默认成员。"
       },
       "presetsAdd": {
-        "title": "Preset sheet",
-        "description": "Use this sheet to create or edit a preset template. Presets speed up transaction entry and keep category/owner naming consistent."
+        "title": "预设面板",
+        "description": "在此创建或编辑预设模板。预设可提升录入速度，并保持分类与成员命名一致。"
       },
       "data": {
-        "title": "Data page",
-        "description": "This page handles import and export. You can import supported files and export your records as PDF, JSON, or export string for portability and backup."
+        "title": "数据页面",
+        "description": "此页面用于导入和导出。你可以导入支持的文件，并将数据导出为 PDF、JSON 或导出字符串。"
       },
       "settings": {
-        "title": "Settings page",
-        "description": "Settings controls categories, owners, theme, language, currency, sync behavior, and Google Sheets linking. Use it to define app-wide behavior and data governance."
+        "title": "设置页面",
+        "description": "设置页管理分类、成员、主题、语言、货币、同步行为和 Google Sheets 连接，用于定义全局行为与数据管理。"
       },
       "dashboardKpis": {
-        "title": "Dashboard KPIs",
-        "description": "These KPI cards summarize the selected month: net cash flow, total spend, total income, and outstanding debt. They are the quickest high-level read of current financial status."
+        "title": "仪表板 KPI",
+        "description": "这些 KPI 卡片汇总所选月份：净现金流、总支出、总收入和未偿债务。它们是最快的财务状态总览。"
       },
       "dashboardTrends": {
-        "title": "Trend charts",
-        "description": "These charts explain momentum over time. Income vs expenses compares inflows and outflows by month, while net cash flow trend shows whether each month finished positive or negative."
+        "title": "趋势图表",
+        "description": "这些图表解释随时间变化的趋势。收入对比支出展示每月流入流出，净现金流趋势显示每个月是盈余还是赤字。"
       },
       "dashboardPies": {
-        "title": "Breakdown charts",
-        "description": "These donut charts break spending into categories and owner split. Use them to quickly understand spending composition and shared-vs-individual contribution patterns."
+        "title": "拆分图表",
+        "description": "这些环形图按分类和成员分摊展示支出结构，帮助快速理解支出构成与共享/个人模式。"
       },
       "dashboardExpenseByOwner": {
-        "title": "Expense by owner section",
-        "description": "This section shows owner-level gross spend, transfer impact, and net after transfers. Expand rows to inspect per-transaction contributions used in owner-mode accounting."
+        "title": "按成员支出板块",
+        "description": "该板块显示成员级毛支出、转账影响及转账后净值。展开行可查看交易级贡献明细。"
       },
       "dashboardDebtSnapshot": {
-        "title": "Debt snapshot section",
-        "description": "Debt Snapshot lists active debts, remaining balances, and progress bars toward payoff. It uses initial amount minus recorded payments from the debt module."
+        "title": "债务快照板块",
+        "description": "债务快照列出活跃债务、剩余余额和还清进度，基于初始金额减去已记录还款计算。"
       },
       "dashboardSpendBySource": {
-        "title": "Spend by card source section",
-        "description": "This section totals spending by source (manual and cards). It helps identify where spending is concentrated across payment channels."
+        "title": "按来源支出板块",
+        "description": "该板块按来源（手动与银行卡）汇总支出，帮助识别支出集中在哪些支付渠道。"
       },
       "dashboardOwnerTransfers": {
-        "title": "Owner transfers section",
-        "description": "Owner Transfers lists transfer entries for the selected month and shows the month total. These transfers affect owner net values but do not change household spend."
+        "title": "成员转账板块",
+        "description": "该板块列出所选月份的转账记录并显示月度总额。转账会影响成员净值，但不改变家庭总支出。"
       },
       "dashboardRecentActivity": {
-        "title": "Recent activity section",
-        "description": "Recent Activity surfaces the latest expense records for quick review. It is useful for spotting recently logged items and validating category/owner assignments."
+        "title": "最近活动板块",
+        "description": "最近活动展示最新支出记录，便于快速复核近期条目并检查分类/成员归属是否正确。"
       },
       "dashboardInsights": {
-        "title": "Smart insights section",
-        "description": "Smart Insights and Alerts highlight notable conditions such as spending shifts, missing income, or unpaid obligations, based on current dataset and dashboard scope."
+        "title": "智能洞察板块",
+        "description": "智能洞察与提醒会基于当前数据与范围提示关键情况，如支出变化、缺失收入或未付款义务。"
       }
     }
   }

@@ -684,107 +684,107 @@
     "supportButton": "Patreon에서 후원하기"
   },
   "appTour": {
-    "title": "App Tour",
-    "back": "Back",
-    "next": "Next",
-    "skip": "Skip tour",
-    "finish": "Finish tour",
+    "title": "앱 투어",
+    "back": "이전",
+    "next": "다음",
+    "skip": "투어 건너뛰기",
+    "finish": "투어 완료",
     "steps": {
       "dashboard": {
-        "title": "Dashboard overview",
-        "description": "This page gives a month-level summary of financial health. Review KPI cards, trend charts, debt snapshot, expense by owner, source breakdown, owner transfers, recent activity, and insights."
+        "title": "대시보드 개요",
+        "description": "이 페이지는 월 단위 재무 상태를 요약합니다. KPI 카드, 추세 차트, 부채 스냅샷, 소유자별 지출, 소스별 분해, 소유자 이체, 최근 활동, 인사이트를 확인합니다."
       },
       "dashboardSettings": {
-        "title": "Dashboard settings sheet",
-        "description": "Open settings to control how dashboard math is calculated: household vs individual owner, selected month, included expense scope, and whether debt payments are counted in spend."
+        "title": "대시보드 설정 시트",
+        "description": "설정에서 대시보드 계산 기준을 제어합니다: 가구/개인 소유자 보기, 선택 월, 포함할 지출 범위, 부채 상환 포함 여부."
       },
       "transactions": {
-        "title": "Transactions table",
-        "description": "This page lists expense and owner transfer rows by month. Use sorting and search to inspect records, and review visible totals for the current filtered view."
+        "title": "거래 테이블",
+        "description": "이 페이지는 월별 지출과 소유자 이체를 보여줍니다. 정렬/검색으로 기록을 확인하고 현재 필터 기준 가시 합계를 검토하세요."
       },
       "transactionsAdd": {
-        "title": "New expense sheet",
-        "description": "Use this sheet to add one or many expense or transfer rows in one submit. Each row supports source, date, amount, category, ownership, and split/allocation controls."
+        "title": "새 지출 시트",
+        "description": "한 번에 하나 또는 여러 지출/이체 행을 추가합니다. 각 행에서 소스, 날짜, 금액, 카테고리, 소유자, 분할/배분을 설정할 수 있습니다."
       },
       "transactionsFilters": {
-        "title": "Filters and actions sheet",
-        "description": "Use this sheet to filter by month, source, category, owner, and type. It also controls whether owner transfers are included in totals for the current transaction view."
+        "title": "필터 및 액션 시트",
+        "description": "월, 소스, 카테고리, 소유자, 유형으로 필터링합니다. 현재 거래 보기의 합계에 소유자 이체 포함 여부도 제어합니다."
       },
       "income": {
-        "title": "Income table",
-        "description": "This page groups all income entries by month with totals. It is the source for dashboard income calculations and supports row-level edits and deletes."
+        "title": "수입 테이블",
+        "description": "이 페이지는 모든 수입을 월별 합계와 함께 그룹화합니다. 대시보드 수입 계산의 기준 데이터이며 행 단위 수정/삭제를 지원합니다."
       },
       "incomeAdd": {
-        "title": "Income sheet",
-        "description": "Add income records with date, amount, description, category, and owner. Accurate entries here directly affect net cash flow and monthly comparisons."
+        "title": "수입 시트",
+        "description": "날짜, 금액, 설명, 카테고리, 소유자를 입력해 수입을 추가합니다. 여기의 정확성이 순현금흐름과 월간 비교에 직접 영향을 줍니다."
       },
       "debt": {
-        "title": "Debt table",
-        "description": "This page tracks each debt balance and payment history. Balances are derived from initial amount minus payments and feed debt snapshot metrics on dashboard."
+        "title": "부채 테이블",
+        "description": "각 부채의 잔액과 결제 이력을 추적합니다. 잔액은 초기 금액에서 결제를 뺀 값이며 대시보드 부채 지표에 반영됩니다."
       },
       "debtAdd": {
-        "title": "Debt sheets",
-        "description": "Use the debt sheets to create debts and record payments. Payment rows reduce outstanding balance and can be included in dashboard spend depending on settings."
+        "title": "부채 시트",
+        "description": "부채를 생성하고 결제를 기록합니다. 결제 행은 미상환 잔액을 줄이며 설정에 따라 대시보드 지출에 포함될 수 있습니다."
       },
       "mortgage": {
-        "title": "Mortgage table",
-        "description": "This page tracks mortgage payment entries separately from the transaction list. Those entries are available for dashboard spend metrics based on scope settings."
+        "title": "모기지 테이블",
+        "description": "모기지 결제를 거래 목록과 분리해 추적합니다. 해당 항목은 범위 설정에 따라 대시보드 지출 지표에 반영됩니다."
       },
       "mortgageAdd": {
-        "title": "Mortgage sheet",
-        "description": "Add mortgage payments with date, amount, and owner. Consistent entries here keep mortgage totals and owner-level calculations accurate."
+        "title": "모기지 시트",
+        "description": "날짜, 금액, 소유자로 모기지 결제를 추가합니다. 일관된 입력은 모기지 총액과 소유자별 계산 정확도를 높입니다."
       },
       "presets": {
-        "title": "Presets table",
-        "description": "Presets are reusable templates for fast transaction entry. They store source, description, optional amount, category, and owner defaults."
+        "title": "프리셋 테이블",
+        "description": "프리셋은 빠른 거래 입력을 위한 재사용 템플릿입니다. 소스, 설명, 선택 금액, 카테고리, 기본 소유자를 저장합니다."
       },
       "presetsAdd": {
-        "title": "Preset sheet",
-        "description": "Use this sheet to create or edit a preset template. Presets speed up transaction entry and keep category/owner naming consistent."
+        "title": "프리셋 시트",
+        "description": "프리셋 템플릿을 생성/수정합니다. 프리셋은 입력 속도를 높이고 카테고리/소유자 네이밍 일관성을 유지합니다."
       },
       "data": {
-        "title": "Data page",
-        "description": "This page handles import and export. You can import supported files and export your records as PDF, JSON, or export string for portability and backup."
+        "title": "데이터 페이지",
+        "description": "이 페이지에서 가져오기/내보내기를 처리합니다. 지원 파일을 가져오고 PDF, JSON, export string으로 내보낼 수 있습니다."
       },
       "settings": {
-        "title": "Settings page",
-        "description": "Settings controls categories, owners, theme, language, currency, sync behavior, and Google Sheets linking. Use it to define app-wide behavior and data governance."
+        "title": "설정 페이지",
+        "description": "설정에서는 카테고리, 소유자, 테마, 언어, 통화, 동기화 동작, Google Sheets 연결을 관리합니다."
       },
       "dashboardKpis": {
-        "title": "Dashboard KPIs",
-        "description": "These KPI cards summarize the selected month: net cash flow, total spend, total income, and outstanding debt. They are the quickest high-level read of current financial status."
+        "title": "대시보드 KPI",
+        "description": "KPI 카드는 선택한 월의 순현금흐름, 총지출, 총수입, 미상환 부채를 요약합니다. 현재 상태를 가장 빠르게 파악하는 지표입니다."
       },
       "dashboardTrends": {
-        "title": "Trend charts",
-        "description": "These charts explain momentum over time. Income vs expenses compares inflows and outflows by month, while net cash flow trend shows whether each month finished positive or negative."
+        "title": "추세 차트",
+        "description": "시간에 따른 흐름을 보여줍니다. 수입 대 지출은 월별 유입/유출을 비교하고 순현금흐름 추세는 월별 흑자/적자를 보여줍니다."
       },
       "dashboardPies": {
-        "title": "Breakdown charts",
-        "description": "These donut charts break spending into categories and owner split. Use them to quickly understand spending composition and shared-vs-individual contribution patterns."
+        "title": "분해 차트",
+        "description": "도넛 차트는 지출을 카테고리와 소유자 분할로 나눠 보여줍니다. 지출 구성과 공동/개인 패턴을 빠르게 이해할 수 있습니다."
       },
       "dashboardExpenseByOwner": {
-        "title": "Expense by owner section",
-        "description": "This section shows owner-level gross spend, transfer impact, and net after transfers. Expand rows to inspect per-transaction contributions used in owner-mode accounting."
+        "title": "소유자별 지출 섹션",
+        "description": "소유자별 총지출, 이체 영향, 이체 후 순액을 보여줍니다. 행을 펼치면 거래 단위 기여도를 확인할 수 있습니다."
       },
       "dashboardDebtSnapshot": {
-        "title": "Debt snapshot section",
-        "description": "Debt Snapshot lists active debts, remaining balances, and progress bars toward payoff. It uses initial amount minus recorded payments from the debt module."
+        "title": "부채 스냅샷 섹션",
+        "description": "활성 부채, 잔액, 상환 진행률을 표시합니다. 부채 모듈의 초기 금액 - 결제 기록 계산을 사용합니다."
       },
       "dashboardSpendBySource": {
-        "title": "Spend by card source section",
-        "description": "This section totals spending by source (manual and cards). It helps identify where spending is concentrated across payment channels."
+        "title": "소스별 지출 섹션",
+        "description": "소스(수동/카드)별 총지출을 보여줍니다. 어떤 결제 채널에 지출이 집중되는지 파악할 수 있습니다."
       },
       "dashboardOwnerTransfers": {
-        "title": "Owner transfers section",
-        "description": "Owner Transfers lists transfer entries for the selected month and shows the month total. These transfers affect owner net values but do not change household spend."
+        "title": "소유자 이체 섹션",
+        "description": "선택 월의 이체 내역과 월 합계를 표시합니다. 이체는 소유자 순액에 영향을 주지만 가구 총지출은 바꾸지 않습니다."
       },
       "dashboardRecentActivity": {
-        "title": "Recent activity section",
-        "description": "Recent Activity surfaces the latest expense records for quick review. It is useful for spotting recently logged items and validating category/owner assignments."
+        "title": "최근 활동 섹션",
+        "description": "최근 지출 기록을 빠르게 확인합니다. 최근 입력을 점검하고 카테고리/소유자 지정이 올바른지 검증하기 좋습니다."
       },
       "dashboardInsights": {
-        "title": "Smart insights section",
-        "description": "Smart Insights and Alerts highlight notable conditions such as spending shifts, missing income, or unpaid obligations, based on current dataset and dashboard scope."
+        "title": "스마트 인사이트 섹션",
+        "description": "현재 데이터와 범위를 기준으로 지출 변화, 누락 수입, 미납 의무 같은 중요한 신호를 알려줍니다."
       }
     }
   }

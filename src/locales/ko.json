@@ -447,6 +447,10 @@
   "layout": {
     "appName": "Ortho",
     "closeMenu": "메뉴 닫기",
+    "helpHintBodyEnd": "아이콘을 눌러 설명을 확인하세요.",
+    "helpHintBodyStart": "앱의 특정 부분이 헷갈리면 Ortho 곳곳의",
+    "helpHintCta": "확인",
+    "helpHintTitle": "앱 사용에 도움이 필요하신가요?",
     "language": "언어",
     "loading": "로딩 중…",
     "menu": "메뉴",

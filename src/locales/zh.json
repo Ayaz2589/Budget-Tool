@@ -448,6 +448,10 @@
   "layout": {
     "appName": "Ortho",
     "closeMenu": "关闭菜单",
+    "helpHintBodyEnd": "图标。",
+    "helpHintBodyStart": "如果你需要了解应用中的某些部分，请点击 Ortho 里的",
+    "helpHintCta": "知道了",
+    "helpHintTitle": "需要应用内帮助吗？",
     "language": "语言",
     "loading": "加载中…",
     "menu": "菜单",

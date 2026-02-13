@@ -1,5 +1,5 @@
 import { afterEach, expect, mock, test } from "bun:test";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { BudgetProvider } from "@/context";
 import { GoogleAuthContext } from "@/context";
@@ -83,6 +83,7 @@ function renderLayout(
 
 afterEach(() => {
   cleanup();
+  localStorage.removeItem("budget-tool-help-hint-seen");
   Object.defineProperty(window, "matchMedia", {
     writable: true,
     value: originalMatchMedia,
@@ -155,4 +156,56 @@ test("Layout shows sheet setup dialog when signed in without linked spreadsheet"
   expect(screen.getByText("Link a Google Sheet")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Not now" }));
   expect(dismissSheetSetupPrompt).toHaveBeenCalledTimes(1);
+});
+
+test("Layout shows help hint after sheet setup flow is resolved for first-time users", async () => {
+  localStorage.removeItem("budget-tool-help-hint-seen");
+  const { rerender } = render(
+    <BudgetProvider>
+      <GoogleAuthContext.Provider
+        value={buildAuthValue({
+          isSignedIn: true,
+          spreadsheetId: null,
+          sheetSetupState: "needs-selection",
+          availableDriveSheets: [{ id: "sheet-1", name: "Ortho Budget" }],
+        })}
+      >
+        <MemoryRouter initialEntries={["/dashboard"]}>
+          <Routes>
+            <Route path="/dashboard" element={<Layout />}>
+              <Route index element={<div>Dashboard content</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </GoogleAuthContext.Provider>
+    </BudgetProvider>,
+  );
+
+  expect(screen.getByText("Link a Google Sheet")).toBeInTheDocument();
+  expect(screen.queryByText("Need help in the app?")).not.toBeInTheDocument();
+
+  rerender(
+    <BudgetProvider>
+      <GoogleAuthContext.Provider
+        value={buildAuthValue({
+          isSignedIn: true,
+          spreadsheetId: "sheet-1",
+          sheetSetupState: "done",
+        })}
+      >
+        <MemoryRouter initialEntries={["/dashboard"]}>
+          <Routes>
+            <Route path="/dashboard" element={<Layout />}>
+              <Route index element={<div>Dashboard content</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </GoogleAuthContext.Provider>
+    </BudgetProvider>,
+  );
+
+  await waitFor(() => {
+    expect(screen.getByText("Need help in the app?")).toBeInTheDocument();
+  });
+  expect(screen.getByRole("button", { name: "Got it" })).toBeInTheDocument();
 });

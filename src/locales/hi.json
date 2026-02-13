@@ -447,6 +447,10 @@
   "layout": {
     "appName": "Ortho",
     "closeMenu": "मेनू बंद करें",
+    "helpHintBodyEnd": "आइकन पर टैप करें।",
+    "helpHintBodyStart": "अगर ऐप के किसी हिस्से को समझने में मदद चाहिए, तो Ortho में",
+    "helpHintCta": "ठीक है",
+    "helpHintTitle": "ऐप में मदद चाहिए?",
     "language": "भाषा",
     "loading": "लोड हो रहा है…",
     "menu": "मेनू",

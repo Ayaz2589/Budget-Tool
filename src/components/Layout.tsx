@@ -31,6 +31,8 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
@@ -121,6 +123,24 @@ const LANGUAGE_OPTIONS = [
   { value: "hi", label: "हिन्दी" },
   { value: "ja", label: "日本語" },
 ] as const;
+
+const HELP_HINT_SEEN_KEY = "budget-tool-help-hint-seen";
+
+function getHelpHintSeen(): boolean {
+  try {
+    return localStorage.getItem(HELP_HINT_SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function setHelpHintSeen(): void {
+  try {
+    localStorage.setItem(HELP_HINT_SEEN_KEY, "1");
+  } catch {
+    // ignore
+  }
+}
 
 function SidebarContent({
   location,
@@ -275,9 +295,17 @@ export function Layout() {
     return location.pathname === to || location.pathname.startsWith(`${to}/`);
   };
   const [showSyncComplete, setShowSyncComplete] = useState(false);
+  const [showHelpHintModal, setShowHelpHintModal] = useState(false);
   const prevSignedInRef = useRef(isSignedIn);
+  const prevSheetSetupOpenRef = useRef(false);
+  const helpHintSeenRef = useRef(getHelpHintSeen());
   const syncingStartedAtRef = useRef<number | null>(null);
   const delayedCompleteTimerRef = useRef<number | null>(null);
+  const isSheetSetupDialogOpen =
+    isSignedIn &&
+    !spreadsheetId &&
+    sheetSetupState !== "idle" &&
+    sheetSetupState !== "done";
   useEffect(() => {
     if (prevSignedInRef.current && !isSignedIn) {
       navigate("/auth");
@@ -348,6 +376,30 @@ export function Layout() {
     },
     []
   );
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      prevSheetSetupOpenRef.current = false;
+      setShowHelpHintModal(false);
+      return;
+    }
+
+    if (
+      prevSheetSetupOpenRef.current &&
+      !isSheetSetupDialogOpen &&
+      !helpHintSeenRef.current
+    ) {
+      const timer = window.setTimeout(() => {
+        setShowHelpHintModal(true);
+        helpHintSeenRef.current = true;
+        setHelpHintSeen();
+      }, 180);
+      prevSheetSetupOpenRef.current = isSheetSetupDialogOpen;
+      return () => window.clearTimeout(timer);
+    }
+
+    prevSheetSetupOpenRef.current = isSheetSetupDialogOpen;
+  }, [isSignedIn, isSheetSetupDialogOpen]);
 
   const handleLanguageChange = (locale: string) => {
     i18n.changeLanguage(locale);
@@ -549,6 +601,29 @@ export function Layout() {
         createOrthoDriveSheet={createOrthoDriveSheet}
         dismissSheetSetupPrompt={dismissSheetSetupPrompt}
       />
+      <Dialog open={showHelpHintModal} onOpenChange={setShowHelpHintModal}>
+        <DialogContent
+          className="max-w-[calc(100%-1rem)] gap-3 p-4 sm:max-w-md sm:gap-4 sm:p-5"
+          showCloseButton={false}
+        >
+          <DialogHeader>
+            <DialogTitle>{t("layout.helpHintTitle")}</DialogTitle>
+            <DialogDescription className="leading-relaxed">
+              {t("layout.helpHintBodyStart")}{" "}
+              <CircleHelp className="mx-1 inline size-4 align-[-2px]" />{" "}
+              {t("layout.helpHintBodyEnd")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="pt-1">
+            <Button
+              className="h-11 w-full"
+              onClick={() => setShowHelpHintModal(false)}
+            >
+              {t("layout.helpHintCta")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

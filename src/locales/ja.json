@@ -447,6 +447,10 @@
   "layout": {
     "appName": "Ortho",
     "closeMenu": "メニューを閉じる",
+    "helpHintBodyEnd": "アイコンをタップしてください。",
+    "helpHintBodyStart": "アプリの各機能が分かりにくいときは、Ortho内の",
+    "helpHintCta": "了解",
+    "helpHintTitle": "アプリ内ヘルプが必要ですか？",
     "language": "言語",
     "loading": "読み込み中…",
     "menu": "メニュー",

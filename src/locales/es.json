@@ -448,6 +448,10 @@
   "layout": {
     "appName": "Ortho",
     "closeMenu": "Cerrar menú",
+    "helpHintBodyEnd": "icono en Ortho cuando necesites contexto.",
+    "helpHintBodyStart": "Si necesitas ayuda para entender partes específicas de la app, toca el",
+    "helpHintCta": "Entendido",
+    "helpHintTitle": "¿Necesitas ayuda en la app?",
     "language": "Idioma",
     "loading": "Cargando…",
     "menu": "Menú",

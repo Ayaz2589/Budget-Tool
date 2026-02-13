@@ -104,7 +104,8 @@
     "totalEarned": "総収入",
     "totalSaved": "総貯蓄",
     "totalSpent": "総支出",
-    "uncategorized": "未分類"
+    "uncategorized": "未分類",
+    "help": "ヘルプ"
   },
   "dashboard": {
     "alertEssentialsHigh": "必須費は収入の{{percent}}。",
@@ -255,7 +256,18 @@
     "kpiTotalSpentDefExcludeMortgageAndDebt": "住宅ローンと借入返済を除外します。",
     "includeDebtPayments": "借入返済を含む",
     "excludeDebtPayments": "借入返済を除外",
-    "debtPaymentsExcludedHint": "借入返済はダッシュボード合計とキャッシュフローチャートから除外されています。"
+    "debtPaymentsExcludedHint": "借入返済はダッシュボード合計とキャッシュフローチャートから除外されています。",
+    "help": {
+      "page": "選択期間の家計状態を概要で表示します。",
+      "kpiNetCashFlow": "選択期間の収入から支出と負債返済を引いた金額です。",
+      "kpiTotalSpent": "住宅ローン/負債の表示設定に基づく総支出です。",
+      "kpiTotalIncome": "選択期間に記録された総収入です。",
+      "kpiDebtOutstanding": "有効な負債の現在残高合計です。",
+      "chartIncomeVsExpenses": "月次の収入と支出・負債流出を比較します。",
+      "chartNetCashFlow": "各月が黒字か赤字かを表示します。",
+      "expenseByOwner": "所有者ごとの総支出、振替影響、純支出を表示します。",
+      "settingsSheet": "ダッシュボード内のすべてのカードとチャートに適用する集計範囲を設定します。世帯全体または個別オーナーを選び、データのある月を指定し、住宅ローンと借入返済を支出合計に含めるかを設定します。"
+    }
   },
   "dashboardDebt": {
     "addDebt": "債務を追加",
@@ -311,7 +323,12 @@
     "startDateOptional": "開始日（任意）",
     "started": "{{date}}開始",
     "subtitle": "ローンと返済を追跡します。",
-    "title": "債務"
+    "title": "債務",
+    "help": {
+      "page": "負債、残高、支払い履歴を管理します。",
+      "balanceColumn": "残高 = 初期負債 - 記録済み支払い。",
+      "addSheet": "初期残高と任意の開始日で借入を作成します。支払いを記録すると残高が減り、設定に応じて借入返済をダッシュボード支出に含められます。"
+    }
   },
   "import": {
     "addAll": "すべて追加",
@@ -404,7 +421,13 @@
     "recurringAmount": "定期金額",
     "recurringIncome": "定期収入",
     "subtitle": "給与、家賃などの収入を追跡します。",
-    "title": "収入"
+    "title": "収入",
+    "help": {
+      "page": "月ごとの収入記録を管理・編集します。",
+      "monthTotal": "この月グループの収入合計です。",
+      "amountColumn": "各行の収入金額です。",
+      "addSheet": "日付、金額、説明、カテゴリ、オーナーを指定して給与・家賃収入・ボーナスなどを記録します。定期収入ルールはスケジュールに沿って予測可能な明細を作成し、ダッシュボードの収入合計に反映されます。"
+    }
   },
   "landing": {
     "featureImport": "データのインポート/エクスポート",
@@ -444,7 +467,12 @@
     "removePaymentTitle": "住宅ローン支払いを削除しますか？",
     "subtitle": "住宅ローンの支払いを追跡します。",
     "title": "住宅ローン",
-    "totalThisYear": "今年の合計：{{amount}}"
+    "totalThisYear": "今年の合計：{{amount}}",
+    "help": {
+      "page": "住宅ローン支払いと所有者情報を管理します。",
+      "amountColumn": "各住宅ローン行の支払い金額です。",
+      "addSheet": "住宅ローン支払いの日付、金額、オーナーを記録します。住宅ローン明細は取引一覧とは別に管理され、選択した集計設定に応じてダッシュボード支出に含める／除外できます。"
+    }
   },
   "nav": {
     "dashboard": "ダッシュボード",
@@ -628,7 +656,14 @@
     "visibleRowsTotal": "表示行の合計",
     "visibleExpenseTotal": "表示支出の合計",
     "includeOwnerTransfersInTableTotals": "表の合計に所有者間送金を含める",
-    "tableTotalsDefinitionHint": "表の合計は表示中の取引行のみを対象とし、借入返済は含みません。"
+    "tableTotalsDefinitionHint": "表の合計は表示中の取引行のみを対象とし、借入返済は含みません。",
+    "help": {
+      "page": "支出と所有者間振替を確認・絞り込み・編集します。",
+      "visibleTotal": "この月グループで現在表示中の行合計です。",
+      "amountColumn": "取引金額で並び替えます。",
+      "filtersSheet": "月、ソース、カテゴリ、オーナー、種別で表示行を絞り込みます。このシートの合計は現在表示中の行を基準に計算され、必要に応じてオーナー間送金を含められます。",
+      "addSheet": "1行または複数行をまとめて追加できます。送信時に有効な各行が保存され、支出行は取引を作成し、送金行は世帯支出を変えずにオーナー間で金額を移動します。"
+    }
   },
   "about": {
     "title": "Ortho について",

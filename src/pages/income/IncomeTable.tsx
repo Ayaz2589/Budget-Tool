@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { sumAmountsBy } from "@/lib/math";
 import { getMonthLabel } from "@/lib/totals";
+import { DsHelpTooltip } from "@/components/ds";
 import type { IncomeTableProps } from "@/types/income";
 
 export type { IncomeTableProps };
@@ -56,8 +57,13 @@ export function IncomeTable({
                     )
                   </span>
                 </span>
-                  <span className="text-sm font-semibold tabular-nums">
+                <span className="inline-flex items-center gap-1 text-sm font-semibold tabular-nums">
                   {formatCurrency(sumAmountsBy(monthIncome, (row) => row.amount))}
+                  <DsHelpTooltip
+                    content={t("income.help.monthTotal")}
+                    ariaLabel={t("common.help")}
+                    asChildSpan
+                  />
                 </span>
               </div>
             </AccordionTrigger>
@@ -67,7 +73,16 @@ export function IncomeTable({
                   <TableRow>
                     <TableHead>{t("common.date")}</TableHead>
                     <TableHead>{t("common.description")}</TableHead>
-                    <TableHead>{t("common.amount")}</TableHead>
+                    <TableHead>
+                      <span className="inline-flex items-center gap-1">
+                        {t("common.amount")}
+                        <DsHelpTooltip
+                          content={t("income.help.amountColumn")}
+                          ariaLabel={t("common.help")}
+                          asChildSpan
+                        />
+                      </span>
+                    </TableHead>
                     <TableHead>{t("common.owner")}</TableHead>
                     <TableHead>{t("common.category")}</TableHead>
                   </TableRow>

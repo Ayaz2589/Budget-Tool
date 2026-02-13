@@ -69,6 +69,8 @@ export function AddDebtDialog({
         <DsSheetHeader
           title={t("debt.newDebt")}
           description={t("debt.newDebtDesc")}
+          helpContent={t("debt.help.addSheet")}
+          helpLabel={t("common.help")}
         />
         <form
           onSubmit={handleSubmit}

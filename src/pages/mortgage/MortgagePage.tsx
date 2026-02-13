@@ -5,7 +5,7 @@ import type { Expense } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Home, Plus } from "lucide-react";
-import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
+import { DsActionBar, DsEmptyState, DsHelpTooltip, DsSectionHeader } from "@/components/ds";
 import {
   formatCurrencyFromNumber,
   parseCurrencyInput,
@@ -75,7 +75,15 @@ export function MortgagePage() {
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
         <DsSectionHeader
-          title={t("mortgage.title")}
+          title={
+            <span className="inline-flex items-center gap-1.5">
+              {t("mortgage.title")}
+              <DsHelpTooltip
+                content={t("mortgage.help.page")}
+                ariaLabel={t("common.help")}
+              />
+            </span>
+          }
           subtitle={t("mortgage.subtitle")}
           showCurrencyChip
           actions={

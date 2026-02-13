@@ -104,7 +104,8 @@
     "totalEarned": "总收入",
     "totalSaved": "总储蓄",
     "totalSpent": "总支出",
-    "uncategorized": "未分类"
+    "uncategorized": "未分类",
+    "help": "帮助"
   },
   "dashboard": {
     "alertEssentialsHigh": "必需支出占收入的 {{percent}}。",
@@ -255,7 +256,18 @@
     "kpiTotalSpentDefExcludeMortgageAndDebt": "房贷和债务还款均不包含。",
     "includeDebtPayments": "包含债务",
     "excludeDebtPayments": "排除债务",
-    "debtPaymentsExcludedHint": "债务还款已从仪表盘总计和现金流图表中排除。"
+    "debtPaymentsExcludedHint": "债务还款已从仪表盘总计和现金流图表中排除。",
+    "help": {
+      "page": "查看所选周期的财务健康概览。",
+      "kpiNetCashFlow": "所选周期内：收入减去支出和债务付款。",
+      "kpiTotalSpent": "按房贷/债务范围设置计算的总支出。",
+      "kpiTotalIncome": "所选周期记录的总收入。",
+      "kpiDebtOutstanding": "所有有效债务的当前剩余余额。",
+      "chartIncomeVsExpenses": "对比每月收入与支出/债务流出。",
+      "chartNetCashFlow": "显示每个月是净正还是净负。",
+      "expenseByOwner": "显示每位成员的总支出、转账影响和净额。",
+      "settingsSheet": "设置仪表板中所有卡片和图表使用的统计范围。可选择“家庭”或“单个成员”，再选择有数据的月份，并设置是否将房贷和债务还款计入总支出。"
+    }
   },
   "dashboardDebt": {
     "addDebt": "添加债务",
@@ -311,7 +323,12 @@
     "startDateOptional": "开始日期（可选）",
     "started": "开始于 {{date}}",
     "subtitle": "跟踪贷款和还款。",
-    "title": "债务"
+    "title": "债务",
+    "help": {
+      "page": "管理债务、余额和还款历史。",
+      "balanceColumn": "剩余余额 = 初始债务 - 已记录还款。",
+      "addSheet": "创建债务时可填写初始余额和可选开始日期。记录还款后余额会下降，并且可根据设置决定是否将债务还款计入仪表板支出。"
+    }
   },
   "import": {
     "addAll": "全部添加",
@@ -405,7 +422,13 @@
     "recurringAmount": "定期金额",
     "recurringIncome": "定期收入",
     "subtitle": "跟踪工资、租金及其他收入。",
-    "title": "收入"
+    "title": "收入",
+    "help": {
+      "page": "按月跟踪和编辑所有收入记录。",
+      "monthTotal": "该月份分组的收入总额。",
+      "amountColumn": "每行的收入金额。",
+      "addSheet": "记录工资、租金、奖金或其他收入，包含日期、金额、描述、分类和成员。周期性收入规则会按计划生成可预测的记录，并计入仪表板收入总额。"
+    }
   },
   "landing": {
     "featureImport": "数据导入/导出",
@@ -445,7 +468,12 @@
     "removePaymentTitle": "移除房贷还款？",
     "subtitle": "跟踪抵押贷款还款。",
     "title": "房贷",
-    "totalThisYear": "今年总计：{{amount}}"
+    "totalThisYear": "今年总计：{{amount}}",
+    "help": {
+      "page": "跟踪房贷付款和归属信息。",
+      "amountColumn": "每条房贷记录的付款金额。",
+      "addSheet": "记录房贷还款日期、金额和成员。房贷记录与交易列表分开管理，并会根据所选范围设置计入或排除在仪表板支出之外。"
+    }
   },
   "nav": {
     "dashboard": "仪表盘",
@@ -629,7 +657,14 @@
     "visibleRowsTotal": "可见行总计",
     "visibleExpenseTotal": "可见支出总计",
     "includeOwnerTransfersInTableTotals": "在表格总计中包含所有者转账",
-    "tableTotalsDefinitionHint": "表格总计仅基于当前可见交易行，不包含债务还款。"
+    "tableTotalsDefinitionHint": "表格总计仅基于当前可见交易行，不包含债务还款。",
+    "help": {
+      "page": "查看、筛选并编辑支出和成员转账。",
+      "visibleTotal": "当前月份分组中可见行的总额。",
+      "amountColumn": "按交易金额排序。",
+      "filtersSheet": "按月份、来源、分类、成员和类型筛选可见记录。本面板中的合计基于当前可见行，并且可选择是否包含成员转账。",
+      "addSheet": "可一次添加一行或多行。提交后每条有效行都会保存；支出行会创建交易，转账行会在成员之间转移金额，但不会改变家庭总支出。"
+    }
   },
   "about": {
     "title": "关于 Ortho",

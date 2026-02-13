@@ -46,6 +46,8 @@ export function AddMortgagePaymentDialog({
         <DsSheetHeader
           title={t("mortgage.addMortgagePayment")}
           description={t("mortgage.addMortgagePaymentDesc")}
+          helpContent={t("mortgage.help.addSheet")}
+          helpLabel={t("common.help")}
         />
         <form
           onSubmit={onSubmit}

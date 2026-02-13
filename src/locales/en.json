@@ -104,7 +104,8 @@
     "totalEarned": "Total Earned",
     "totalSaved": "Total Saved",
     "totalSpent": "Total Spent",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "help": "Help"
   },
   "dashboard": {
     "alertEssentialsHigh": "Essentials are {{percent}} of income.",
@@ -255,7 +256,18 @@
     "netShort": "Net",
     "sectionSpendByCardSource": "Total Spend by Card Source",
     "sectionNoSpendByCardSource": "No spend by source for selected range.",
-    "moreItemsCount": "+{{count}} more items"
+    "moreItemsCount": "+{{count}} more items",
+    "help": {
+      "page": "Overview of your financial health for the selected period.",
+      "kpiNetCashFlow": "Income minus spending and debt payments for the selected period.",
+      "kpiTotalSpent": "Total spending for the selected period based on your mortgage/debt scope settings.",
+      "kpiTotalIncome": "Total income recorded in the selected period.",
+      "kpiDebtOutstanding": "Current remaining balance across all active debts.",
+      "chartIncomeVsExpenses": "Compares monthly income against expense and debt outflows.",
+      "chartNetCashFlow": "Shows whether each month ended positive or negative.",
+      "expenseByOwner": "Shows each owner's gross spend, transfer impact, and net result.",
+      "settingsSheet": "Set the dashboard scope used by all cards and charts. Choose household or an individual owner, pick a month with data, then set whether mortgage and debt payments are included in spending totals."
+    }
   },
   "dashboardDebt": {
     "addDebt": "Add a debt",
@@ -311,7 +323,12 @@
     "startDateOptional": "Start date (optional)",
     "started": "Started {{date}}",
     "subtitle": "Track loans and debt payments.",
-    "title": "Debt"
+    "title": "Debt",
+    "help": {
+      "page": "Manage debts, balances, and payment history.",
+      "balanceColumn": "Remaining balance = initial debt minus recorded payments.",
+      "addSheet": "Create a debt with initial balance and optional start date. Debt balances decrease as payments are recorded, and debt payments can be included in dashboard spending based on your settings."
+    }
   },
   "import": {
     "addAll": "Add all",
@@ -404,7 +421,13 @@
     "recurringAmount": "Recurring amount",
     "recurringIncome": "Recurring income",
     "subtitle": "Track paychecks, rent, and other income.",
-    "title": "Income"
+    "title": "Income",
+    "help": {
+      "page": "Track and edit all income records by month.",
+      "monthTotal": "Total income for this month group.",
+      "amountColumn": "Income amount for each row.",
+      "addSheet": "Record paycheck, rent, bonus, or other income with date, amount, description, category, and owner. Recurring income rules create predictable entries on schedule and feed all dashboard income totals."
+    }
   },
   "landing": {
     "featureImport": "Data import/export",
@@ -444,7 +467,12 @@
     "removePaymentTitle": "Remove mortgage payment?",
     "subtitle": "Record mortgage payments (excluded from Transactions list).",
     "title": "Mortgage",
-    "totalThisYear": "Total this year: {{amount}}"
+    "totalThisYear": "Total this year: {{amount}}",
+    "help": {
+      "page": "Track mortgage payments and ownership details.",
+      "amountColumn": "Payment amount recorded for each mortgage entry.",
+      "addSheet": "Record mortgage payment date, amount, and owner. Mortgage entries are tracked separately from the transactions list and are included or excluded from dashboard spend depending on selected scope settings."
+    }
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -628,7 +656,14 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "help": {
+      "page": "Review, filter, and edit expenses and owner transfers.",
+      "visibleTotal": "Total of rows currently visible in this month group.",
+      "amountColumn": "Sort by transaction amount.",
+      "filtersSheet": "Filter by month, source, category, owner, and type to narrow visible rows. Totals in this sheet are based on the currently visible rows and can optionally include owner transfers.",
+      "addSheet": "Add one or many rows at once. Each valid row is saved when you submit; expense rows create transactions and transfer rows move value between owners without changing household spend."
+    }
   },
   "about": {
     "title": "About Ortho",

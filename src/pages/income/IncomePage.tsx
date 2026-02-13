@@ -5,7 +5,7 @@ import type { Income } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Wallet } from "lucide-react";
-import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
+import { DsActionBar, DsEmptyState, DsHelpTooltip, DsSectionHeader } from "@/components/ds";
 import { AddIncomeDialog } from "./AddIncomeDialog";
 import { EditIncomeDialog } from "./EditIncomeDialog";
 import { IncomeTable } from "./IncomeTable";
@@ -59,7 +59,15 @@ export function IncomePage() {
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="mb-3 px-4 md:px-0 pt-4 md:pt-0 shrink-0 bg-background/95 md:bg-transparent backdrop-blur md:backdrop-blur-none">
         <DsSectionHeader
-          title={t("income.title")}
+          title={
+            <span className="inline-flex items-center gap-1.5">
+              {t("income.title")}
+              <DsHelpTooltip
+                content={t("income.help.page")}
+                ariaLabel={t("common.help")}
+              />
+            </span>
+          }
           subtitle={t("income.subtitle")}
           showCurrencyChip
           actions={

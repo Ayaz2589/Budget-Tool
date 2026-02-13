@@ -271,6 +271,8 @@ export function AddTransactionDialog({
               : t("addTransaction.newTransaction")
           }
           description={t("addTransaction.dialogDesc")}
+          helpContent={t("transactions.help.addSheet")}
+          helpLabel={t("common.help")}
         />
         <form
           onSubmit={handleSubmit}

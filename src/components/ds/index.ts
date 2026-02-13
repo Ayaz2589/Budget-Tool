@@ -5,6 +5,7 @@ export { DsSplitToggle } from "./DsSplitToggle";
 export { DsSheetHeader } from "./DsSheetHeader";
 export { DsSheetActions } from "./DsSheetActions";
 export { DsChartCard } from "./DsChartCard";
+export { DsHelpTooltip } from "./DsHelpTooltip";
 export { DsLegendList } from "./DsLegendList";
 export { DsEmptyState } from "./DsEmptyState";
 export { DsActionBar } from "./DsActionBar";

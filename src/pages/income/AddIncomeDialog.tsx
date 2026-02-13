@@ -51,6 +51,8 @@ export function AddIncomeDialog({
         <DsSheetHeader
           title={t("income.newIncome")}
           description={t("income.newIncomeDesc")}
+          helpContent={t("income.help.addSheet")}
+          helpLabel={t("common.help")}
         />
         <AddIncomeForm
           incomeCategories={incomeCategories}

@@ -61,6 +61,8 @@ export function FiltersAndActionsDialog({
         <DsSheetHeader
           title={t("transactions.filtersActionsTitle")}
           description={t("transactions.filtersActionsDesc")}
+          helpContent={t("transactions.help.filtersSheet")}
+          helpLabel={t("common.help")}
         />
         <div className="grid gap-6 px-4 pt-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
           {/* Filters */}

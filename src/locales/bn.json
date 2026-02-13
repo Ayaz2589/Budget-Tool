@@ -104,7 +104,8 @@
     "totalEarned": "মোট আয়",
     "totalSaved": "মোট সঞ্চয়",
     "totalSpent": "মোট ব্যয়",
-    "uncategorized": "অবিভক্ত"
+    "uncategorized": "অবিভক্ত",
+    "help": "সহায়তা"
   },
   "dashboard": {
     "alertEssentialsHigh": "অপরিহার্য খরচ আয়ের {{percent}}।",
@@ -255,7 +256,18 @@
     "kpiTotalSpentDefExcludeMortgageAndDebt": "মর্টগেজ ও ঋণ পরিশোধ বাদ।",
     "includeDebtPayments": "ঋণ অন্তর্ভুক্ত",
     "excludeDebtPayments": "ঋণ বাদ",
-    "debtPaymentsExcludedHint": "ড্যাশবোর্ডের মোট ও ক্যাশ ফ্লো চার্ট থেকে ঋণ পরিশোধ বাদ দেওয়া হয়েছে।"
+    "debtPaymentsExcludedHint": "ড্যাশবোর্ডের মোট ও ক্যাশ ফ্লো চার্ট থেকে ঋণ পরিশোধ বাদ দেওয়া হয়েছে।",
+    "help": {
+      "page": "নির্বাচিত সময়ের আর্থিক অবস্থা এক নজরে দেখুন।",
+      "kpiNetCashFlow": "নির্বাচিত সময়ে আয় থেকে খরচ ও ঋণ পরিশোধ বাদ দিলে যা থাকে।",
+      "kpiTotalSpent": "মর্টগেজ/ঋণ স্কোপ সেটিং অনুযায়ী মোট খরচ।",
+      "kpiTotalIncome": "নির্বাচিত সময়ে মোট আয়।",
+      "kpiDebtOutstanding": "সব সক্রিয় ঋণের বর্তমান বাকি ব্যালান্স।",
+      "chartIncomeVsExpenses": "মাসভিত্তিক আয় বনাম খরচ ও ঋণ আউটফ্লো তুলনা করে।",
+      "chartNetCashFlow": "প্রতিটি মাসে নেট পজিটিভ না নেগেটিভ ছিল দেখায়।",
+      "expenseByOwner": "প্রতি ওনারের গ্রস খরচ, ট্রান্সফার প্রভাব ও নেট দেখায়।",
+      "settingsSheet": "ড্যাশবোর্ডের সব কার্ড ও চার্টের জন্য স্কোপ ঠিক করুন। Household বা নির্দিষ্ট একজন owner নির্বাচন করুন, ডেটা থাকা একটি মাস বেছে নিন, তারপর মোট খরচে mortgage ও debt payment ধরবেন কি না সেট করুন।"
+    }
   },
   "dashboardDebt": {
     "addDebt": "ঋণ যোগ করুন",
@@ -311,7 +323,12 @@
     "startDateOptional": "শুরুর তারিখ (ঐচ্ছিক)",
     "started": "শুরু {{date}}",
     "subtitle": "ঋণ এবং ঋণ পরিশোধ ট্র্যাক করুন।",
-    "title": "ঋণ"
+    "title": "ঋণ",
+    "help": {
+      "page": "ঋণ, ব্যালান্স ও পেমেন্ট হিস্ট্রি ম্যানেজ করুন।",
+      "balanceColumn": "বাকি ব্যালান্স = প্রাথমিক ঋণ - রেকর্ডকৃত পেমেন্ট।",
+      "addSheet": "শুরুর বকেয়া এবং ঐচ্ছিক start date দিয়ে debt তৈরি করুন। payment রেকর্ড করলে balance কমে, এবং আপনার সেটিংস অনুযায়ী debt payment ড্যাশবোর্ড খরচে অন্তর্ভুক্ত হতে পারে।"
+    }
   },
   "import": {
     "addAll": "সব যোগ করুন",
@@ -404,7 +421,13 @@
     "recurringAmount": "পুনরাবৃত্ত পরিমাণ",
     "recurringIncome": "পুনরাবৃত্ত আয়",
     "subtitle": "বেতন, ভাড়া এবং অন্যান্য আয় ট্র্যাক করুন।",
-    "title": "আয়"
+    "title": "আয়",
+    "help": {
+      "page": "মাসভিত্তিক সব আয়ের রেকর্ড ট্র্যাক ও এডিট করুন।",
+      "monthTotal": "এই মাসের গ্রুপের মোট আয়।",
+      "amountColumn": "প্রতি সারির আয়ের পরিমাণ।",
+      "addSheet": "তারিখ, পরিমাণ, বিবরণ, ক্যাটাগরি ও owner সহ paycheck, rent, bonus বা অন্যান্য income যোগ করুন। recurring income নিয়ম সময়সূচি অনুযায়ী পূর্বানুমানযোগ্য এন্ট্রি তৈরি করে এবং ড্যাশবোর্ডের income total-এ যুক্ত করে।"
+    }
   },
   "landing": {
     "featureImport": "ডেটা ইমপোর্ট/এক্সপোর্ট",
@@ -444,7 +467,12 @@
     "removePaymentTitle": "বন্ধকী পেমেন্ট সরাবেন?",
     "subtitle": "মর্টগেজ পরিশোধ ট্র্যাক করুন।",
     "title": "বন্ধকী",
-    "totalThisYear": "এই বছরের মোট: {{amount}}"
+    "totalThisYear": "এই বছরের মোট: {{amount}}",
+    "help": {
+      "page": "মর্টগেজ পেমেন্ট ও ওনারশিপ তথ্য ট্র্যাক করুন।",
+      "amountColumn": "প্রতি মর্টগেজ এন্ট্রির রেকর্ডকৃত পেমেন্ট পরিমাণ।",
+      "addSheet": "mortgage payment-এর তারিখ, পরিমাণ এবং owner রেকর্ড করুন। mortgage এন্ট্রি transaction তালিকা থেকে আলাদা রাখা হয় এবং নির্বাচিত scope সেটিংস অনুযায়ী ড্যাশবোর্ড spend-এ যোগ বা বাদ হয়।"
+    }
   },
   "nav": {
     "dashboard": "ড্যাশবোর্ড",
@@ -628,7 +656,14 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "help": {
+      "page": "খরচ ও ওনার ট্রান্সফার দেখা, ফিল্টার ও এডিট করুন।",
+      "visibleTotal": "এই মাসের গ্রুপে বর্তমানে দৃশ্যমান সারিগুলোর মোট।",
+      "amountColumn": "ট্রানজ্যাকশনের পরিমাণ অনুযায়ী সর্ট।",
+      "filtersSheet": "দেখানো সারিগুলো সংকুচিত করতে মাস, উৎস, ক্যাটাগরি, owner এবং type দিয়ে ফিল্টার করুন। এই শিটের মোট হিসাব বর্তমানে দৃশ্যমান সারির উপর ভিত্তি করে এবং চাইলে owner transfer অন্তর্ভুক্ত করতে পারে।",
+      "addSheet": "একসাথে এক বা একাধিক সারি যোগ করুন। সাবমিট করলে প্রতিটি valid সারি সেভ হবে; expense সারি transaction তৈরি করে এবং transfer সারি household spend না বদলে owner-দের মধ্যে মান স্থানান্তর করে।"
+    }
   },
   "about": {
     "title": "Ortho সম্পর্কে",

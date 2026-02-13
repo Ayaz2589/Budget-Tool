@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { MortgagePaymentsTableProps } from "@/types/mortgage";
+import { DsHelpTooltip } from "@/components/ds";
 
 export type { MortgagePaymentsTableProps };
 
@@ -33,7 +34,16 @@ export function MortgagePaymentsTable({
         <TableRow>
           <TableHead>{t("common.date")}</TableHead>
           <TableHead>{t("common.description")}</TableHead>
-          <TableHead>{t("common.amount")}</TableHead>
+          <TableHead>
+            <span className="inline-flex items-center gap-1">
+              {t("common.amount")}
+              <DsHelpTooltip
+                content={t("mortgage.help.amountColumn")}
+                ariaLabel={t("common.help")}
+                asChildSpan
+              />
+            </span>
+          </TableHead>
           <TableHead>{t("common.owner")}</TableHead>
           <TableHead>{t("common.category")}</TableHead>
         </TableRow>

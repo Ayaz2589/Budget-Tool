@@ -246,7 +246,12 @@
     "netShort": "Net",
     "sectionSpendByCardSource": "Gasto total por fuente de tarjeta",
     "sectionNoSpendByCardSource": "No hay gasto por fuente en el rango seleccionado.",
-    "moreItemsCount": "+{{count}} elementos más"
+    "moreItemsCount": "+{{count}} elementos más",
+    "kpiTotalSpentDefAllExcludeDebt": "Incluye hipoteca. Pagos de deuda excluidos.",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "Hipoteca y pagos de deuda excluidos.",
+    "includeDebtPayments": "Incluir deuda",
+    "excludeDebtPayments": "Excluir deuda",
+    "debtPaymentsExcludedHint": "Los pagos de deuda se excluyen de los totales del panel y de los gráficos de flujo de caja."
   },
   "dashboardDebt": {
     "addDebt": "Añadir una deuda",

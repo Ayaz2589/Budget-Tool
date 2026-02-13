@@ -134,6 +134,7 @@ export function Dashboard() {
   const [range, setRange] = useState<DashboardRange>("current");
   const [selectedMonthKey, setSelectedMonthKey] = useState(getCurrentMonthKey());
   const [expenseScope, setExpenseScope] = useState<DashboardExpenseScope>("all");
+  const [includeDebtPayments, setIncludeDebtPayments] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dismissedInsightIds, setDismissedInsightIds] = useState<string[]>(() =>
     parseDismissedInsightIds(sessionStorage.getItem(getInsightStorageKey())),
@@ -172,8 +173,9 @@ export function Dashboard() {
         debts,
         debtPayments,
         scope: expenseScope,
+        includeDebtPayments,
       }),
-    [currentMonthKey, expenses, income, debts, debtPayments, expenseScope],
+    [currentMonthKey, expenses, income, debts, debtPayments, expenseScope, includeDebtPayments],
   );
 
   const cashFlowRows = useMemo(
@@ -184,10 +186,21 @@ export function Dashboard() {
         income,
         debtPayments,
         scope: expenseScope,
+        includeDebtPayments,
         unassignedOwnerLabel: t("dashboard.unassigned"),
         locale: i18n.resolvedLanguage || i18n.language,
       }),
-    [monthKeys, expenses, income, debtPayments, expenseScope, t, i18n.language, i18n.resolvedLanguage],
+    [
+      monthKeys,
+      expenses,
+      income,
+      debtPayments,
+      expenseScope,
+      includeDebtPayments,
+      t,
+      i18n.language,
+      i18n.resolvedLanguage,
+    ],
   );
 
   const categorySlices = useMemo(
@@ -389,9 +402,13 @@ export function Dashboard() {
                   {t("dashboard.vsLastMonth")}: {formatSpentDeltaLabel(kpis.spentVsLastMonthPct)}
                 </span>
                 <span className="block text-xs">
-                  {expenseScope === "all"
+                  {expenseScope === "all" && includeDebtPayments
                     ? t("dashboard.kpiTotalSpentDefAll")
-                    : t("dashboard.kpiTotalSpentDefExcludeMortgage")}
+                    : expenseScope === "all" && !includeDebtPayments
+                      ? t("dashboard.kpiTotalSpentDefAllExcludeDebt")
+                      : expenseScope === "exclude-mortgage" && includeDebtPayments
+                        ? t("dashboard.kpiTotalSpentDefExcludeMortgage")
+                        : t("dashboard.kpiTotalSpentDefExcludeMortgageAndDebt")}
                 </span>
               </span>
             }
@@ -413,7 +430,14 @@ export function Dashboard() {
             <ChartContainer
               config={{
                 expenses: { label: t("dashboard.chartExpenses"), color: "var(--viz-expense)" },
-                debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" },
+                ...(includeDebtPayments
+                  ? {
+                      debtPayments: {
+                        label: t("dashboard.chartDebtPayments"),
+                        color: "var(--viz-debt)",
+                      },
+                    }
+                  : {}),
               }}
               heightMobile={220}
               heightDesktop={280}
@@ -453,12 +477,14 @@ export function Dashboard() {
                   fill="var(--viz-expense)"
                   stackId="outflow"
                 />
-                <Bar
-                  dataKey="debtPaymentsTotal"
-                  name={t("dashboard.chartDebtPayments")}
-                  fill="var(--viz-debt)"
-                  stackId="outflow"
-                />
+                {includeDebtPayments ? (
+                  <Bar
+                    dataKey="debtPaymentsTotal"
+                    name={t("dashboard.chartDebtPayments")}
+                    fill="var(--viz-debt)"
+                    stackId="outflow"
+                  />
+                ) : null}
               </BarChart>
             </ChartContainer>
           </div>
@@ -467,7 +493,14 @@ export function Dashboard() {
               config={{
                 income: { label: t("dashboard.chartIncome"), color: INCOME_OWNER_COLORS[0] },
                 expenses: { label: t("dashboard.chartExpenses"), color: "var(--viz-expense)" },
-                debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" },
+                ...(includeDebtPayments
+                  ? {
+                      debtPayments: {
+                        label: t("dashboard.chartDebtPayments"),
+                        color: "var(--viz-debt)",
+                      },
+                    }
+                  : {}),
               }}
               heightMobile={220}
               heightDesktop={280}
@@ -512,13 +545,15 @@ export function Dashboard() {
                   radius={[4, 4, 0, 0]}
                   stackId="outflow"
                 />
-                <Bar
-                  dataKey="debtPaymentsTotal"
-                  name={t("dashboard.chartDebtPayments")}
-                  fill="var(--viz-debt)"
-                  radius={[4, 4, 0, 0]}
-                  stackId="outflow"
-                />
+                {includeDebtPayments ? (
+                  <Bar
+                    dataKey="debtPaymentsTotal"
+                    name={t("dashboard.chartDebtPayments")}
+                    fill="var(--viz-debt)"
+                    radius={[4, 4, 0, 0]}
+                    stackId="outflow"
+                  />
+                ) : null}
               </BarChart>
             </ChartContainer>
           </div>
@@ -1152,6 +1187,23 @@ export function Dashboard() {
               {expenseScope === "exclude-mortgage" ? (
                 <p className="text-xs text-muted-foreground">
                   {t("dashboard.scopeMortgageExcludedHint")}
+                </p>
+              ) : null}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-muted-foreground">{t("dashboard.chartDebtPayments")}</Label>
+              <DsSplitToggle
+                className="w-full"
+                options={[
+                  { value: "include", label: t("dashboard.includeDebtPayments") },
+                  { value: "exclude", label: t("dashboard.excludeDebtPayments") },
+                ]}
+                value={includeDebtPayments ? "include" : "exclude"}
+                onChange={(next) => setIncludeDebtPayments(next === "include")}
+              />
+              {!includeDebtPayments ? (
+                <p className="text-xs text-muted-foreground">
+                  {t("dashboard.debtPaymentsExcludedHint")}
                 </p>
               ) : null}
             </div>

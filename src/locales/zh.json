@@ -246,7 +246,12 @@
     "sectionNoSpendByCardSource": "所选范围内暂无按来源支出。",
     "moreItemsCount": "+还有 {{count}} 项",
     "kpiTotalSpentDefAll": "包含债务还款和房贷。",
-    "kpiTotalSpentDefExcludeMortgage": "包含债务还款，不含房贷。"
+    "kpiTotalSpentDefExcludeMortgage": "包含债务还款，不含房贷。",
+    "kpiTotalSpentDefAllExcludeDebt": "包含房贷，不包含债务还款。",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "房贷和债务还款均不包含。",
+    "includeDebtPayments": "包含债务",
+    "excludeDebtPayments": "排除债务",
+    "debtPaymentsExcludedHint": "债务还款已从仪表盘总计和现金流图表中排除。"
   },
   "dashboardDebt": {
     "addDebt": "添加债务",

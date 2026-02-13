@@ -97,6 +97,7 @@ export function buildDashboardKpis({
   debts,
   debtPayments,
   scope,
+  includeDebtPayments = true,
 }: {
   currentMonthKey: string;
   expenses: Expense[];
@@ -104,14 +105,19 @@ export function buildDashboardKpis({
   debts: Debt[];
   debtPayments: DebtPayment[];
   scope: DashboardExpenseScope;
+  includeDebtPayments?: boolean;
 }): DashboardKpis {
   const previousMonthKey = getPreviousMonthKey(currentMonthKey);
   const currentIncome = sumIncomeForMonth(income, currentMonthKey);
   const currentExpenses = sumExpensesForMonth(expenses, currentMonthKey, scope);
-  const currentDebtPayments = sumDebtPaymentsForMonth(debtPayments, currentMonthKey);
+  const currentDebtPayments = includeDebtPayments
+    ? sumDebtPaymentsForMonth(debtPayments, currentMonthKey)
+    : 0;
   const currentSpent = currentExpenses + currentDebtPayments;
   const previousExpenses = sumExpensesForMonth(expenses, previousMonthKey, scope);
-  const previousDebtPayments = sumDebtPaymentsForMonth(debtPayments, previousMonthKey);
+  const previousDebtPayments = includeDebtPayments
+    ? sumDebtPaymentsForMonth(debtPayments, previousMonthKey)
+    : 0;
   const previousSpent = previousExpenses + previousDebtPayments;
   const spentVsLastMonthPct = computeMonthOverMonthPct(currentSpent, previousSpent);
 
@@ -140,6 +146,7 @@ export function buildCashFlowRows({
   income,
   debtPayments,
   scope,
+  includeDebtPayments = true,
   unassignedOwnerLabel = "Unassigned",
   locale = "en-US",
 }: {
@@ -148,6 +155,7 @@ export function buildCashFlowRows({
   income: Income[];
   debtPayments: DebtPayment[];
   scope: DashboardExpenseScope;
+  includeDebtPayments?: boolean;
   unassignedOwnerLabel?: string;
   locale?: string;
 }): DashboardCashFlowRow[] {
@@ -164,7 +172,9 @@ export function buildCashFlowRows({
       monthLabel: getMonthLabel(monthKey, locale),
       incomeTotal: sumIncomeForMonth(income, monthKey),
       expensesTotal: sumExpensesForMonth(expenses, monthKey, scope),
-      debtPaymentsTotal: sumDebtPaymentsForMonth(debtPayments, monthKey),
+      debtPaymentsTotal: includeDebtPayments
+        ? sumDebtPaymentsForMonth(debtPayments, monthKey)
+        : 0,
       incomeByOwner,
     };
   });

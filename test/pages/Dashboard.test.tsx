@@ -96,6 +96,18 @@ test("Dashboard shows helper text when mortgage is excluded", () => {
   });
 });
 
+test("Dashboard shows helper text when debt payments are excluded", () => {
+  localStorage.clear();
+  render(<TestWrapper />);
+  fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+  fireEvent.click(screen.getByRole("button", { name: "Exclude Debt" }));
+  return waitFor(() => {
+    expect(
+      screen.getByText("Debt payments excluded from dashboard totals and cash flow charts."),
+    ).toBeInTheDocument();
+  });
+});
+
 test("Dashboard debt row is read-only", () => {
   localStorage.clear();
   localStorage.setItem(

@@ -246,7 +246,12 @@
     "sectionNoSpendByCardSource": "चयनित अवधि में स्रोत के अनुसार कोई खर्च नहीं है।",
     "moreItemsCount": "+{{count}} और आइटम",
     "kpiTotalSpentDefAll": "इसमें ऋण भुगतान और मॉर्गेज शामिल हैं।",
-    "kpiTotalSpentDefExcludeMortgage": "इसमें ऋण भुगतान शामिल हैं। मॉर्गेज शामिल नहीं है।"
+    "kpiTotalSpentDefExcludeMortgage": "इसमें ऋण भुगतान शामिल हैं। मॉर्गेज शामिल नहीं है।",
+    "kpiTotalSpentDefAllExcludeDebt": "इसमें मॉर्गेज शामिल है। ऋण भुगतान शामिल नहीं है।",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "मॉर्गेज और ऋण भुगतान दोनों शामिल नहीं हैं।",
+    "includeDebtPayments": "ऋण शामिल करें",
+    "excludeDebtPayments": "ऋण हटाएँ",
+    "debtPaymentsExcludedHint": "डैशबोर्ड कुल और कैश फ्लो चार्ट से ऋण भुगतान हटाए गए हैं।"
   },
   "dashboardDebt": {
     "addDebt": "कर्ज जोड़ें",

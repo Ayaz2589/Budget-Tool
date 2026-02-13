@@ -246,7 +246,12 @@
     "sectionNoSpendByCardSource": "선택한 범위에 출처별 지출이 없습니다.",
     "moreItemsCount": "+{{count}}개 항목 더 보기",
     "kpiTotalSpentDefAll": "부채 상환과 모기지가 포함됩니다.",
-    "kpiTotalSpentDefExcludeMortgage": "부채 상환은 포함되고 모기지는 제외됩니다."
+    "kpiTotalSpentDefExcludeMortgage": "부채 상환은 포함되고 모기지는 제외됩니다.",
+    "kpiTotalSpentDefAllExcludeDebt": "모기지는 포함되고 부채 상환은 제외됩니다.",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "모기지와 부채 상환 모두 제외됩니다.",
+    "includeDebtPayments": "부채 포함",
+    "excludeDebtPayments": "부채 제외",
+    "debtPaymentsExcludedHint": "부채 상환은 대시보드 합계와 현금흐름 차트에서 제외됩니다."
   },
   "dashboardDebt": {
     "addDebt": "부채 추가",

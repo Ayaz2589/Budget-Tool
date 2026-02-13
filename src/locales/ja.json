@@ -246,7 +246,12 @@
     "sectionNoSpendByCardSource": "選択した期間にソース別支出はありません。",
     "moreItemsCount": "+{{count}} 件の項目",
     "kpiTotalSpentDefAll": "借入返済と住宅ローンを含みます。",
-    "kpiTotalSpentDefExcludeMortgage": "借入返済を含みます。住宅ローンは除外されます。"
+    "kpiTotalSpentDefExcludeMortgage": "借入返済を含みます。住宅ローンは除外されます。",
+    "kpiTotalSpentDefAllExcludeDebt": "住宅ローンは含みます。借入返済は除外します。",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "住宅ローンと借入返済を除外します。",
+    "includeDebtPayments": "借入返済を含む",
+    "excludeDebtPayments": "借入返済を除外",
+    "debtPaymentsExcludedHint": "借入返済はダッシュボード合計とキャッシュフローチャートから除外されています。"
   },
   "dashboardDebt": {
     "addDebt": "債務を追加",

@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import {
+  buildCashFlowRows,
   buildOwnerNetRows,
   buildCategoryBreakdown,
   buildDashboardKpis,
@@ -263,4 +264,61 @@ test("buildOwnerNetRows applies transfer impact with one aligned equation", () =
   expect(tasnuva?.net).toBe(1807.68);
   expect(tasnuva?.received).toBe(0);
   expect(tasnuva?.sent).toBe(600);
+});
+
+test("buildDashboardKpis can exclude debt payments from spend and net", () => {
+  const kpis = buildDashboardKpis({
+    currentMonthKey: "2026-02",
+    scope: "all",
+    includeDebtPayments: false,
+    expenses: [
+      {
+        id: "e1",
+        date: "2026-02-02",
+        amount: 400,
+        description: "Food",
+        category: "Food",
+        source: "manual",
+      },
+    ],
+    income: [
+      {
+        id: "i1",
+        date: "2026-02-01",
+        amount: 1000,
+        description: "Salary",
+        category: "Paycheck",
+      },
+    ],
+    debts: [{ id: "d1", name: "Loan", initialAmount: 500 }],
+    debtPayments: [{ id: "p1", debtId: "d1", date: "2026-02-10", amount: 100 }],
+  });
+
+  expect(kpis.totalSpent).toBe(400);
+  expect(kpis.netCashFlow).toBe(600);
+  expect(kpis.debtPaidThisMonth).toBe(0);
+});
+
+test("buildCashFlowRows can exclude debt payments from chart rows", () => {
+  const rows = buildCashFlowRows({
+    monthKeys: ["2026-02"],
+    scope: "all",
+    includeDebtPayments: false,
+    expenses: [
+      {
+        id: "e1",
+        date: "2026-02-02",
+        amount: 250,
+        description: "Food",
+        category: "Food",
+        source: "manual",
+      },
+    ],
+    income: [],
+    debtPayments: [{ id: "p1", debtId: "d1", date: "2026-02-10", amount: 90 }],
+  });
+
+  expect(rows).toHaveLength(1);
+  expect(rows[0]?.expensesTotal).toBe(250);
+  expect(rows[0]?.debtPaymentsTotal).toBe(0);
 });

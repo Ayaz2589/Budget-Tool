@@ -246,7 +246,12 @@
     "netShort": "Net",
     "sectionSpendByCardSource": "কার্ড উৎস অনুযায়ী মোট ব্যয়",
     "sectionNoSpendByCardSource": "নির্বাচিত সময়সীমায় উৎস অনুযায়ী কোনো ব্যয় নেই।",
-    "moreItemsCount": "+আরও {{count}} টি আইটেম"
+    "moreItemsCount": "+আরও {{count}} টি আইটেম",
+    "kpiTotalSpentDefAllExcludeDebt": "এতে মর্টগেজ অন্তর্ভুক্ত। ঋণ পরিশোধ বাদ।",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "মর্টগেজ ও ঋণ পরিশোধ বাদ।",
+    "includeDebtPayments": "ঋণ অন্তর্ভুক্ত",
+    "excludeDebtPayments": "ঋণ বাদ",
+    "debtPaymentsExcludedHint": "ড্যাশবোর্ডের মোট ও ক্যাশ ফ্লো চার্ট থেকে ঋণ পরিশোধ বাদ দেওয়া হয়েছে।"
   },
   "dashboardDebt": {
     "addDebt": "ঋণ যোগ করুন",

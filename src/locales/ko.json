@@ -240,6 +240,7 @@
     "netAfterTransfers": "이체 후 순지출",
     "transfersSent": "보낸 이체",
     "transfersReceived": "받은 이체",
+    "transferImpact": "이체 영향",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "카드 출처별 총지출",

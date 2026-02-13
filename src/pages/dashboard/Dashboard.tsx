@@ -858,8 +858,15 @@ export function Dashboard() {
                 );
                 const isExpanded = expandedOwnerKey === row.owner;
                 const ownerItems = ownerExpenseItemsByOwner.get(row.owner) ?? [];
+                const transferImpact = row.received - row.sent;
                 const netToneClass =
                   row.net >= 0 ? "text-foreground" : "text-destructive";
+                const transferToneClass =
+                  transferImpact >= 0 ? "text-emerald-500" : "text-amber-500";
+                const transferImpactDisplay =
+                  transferImpact > 0
+                    ? `+${formatCurrency(transferImpact)}`
+                    : formatCurrency(transferImpact);
                 return (
                   <DsDataRow
                     key={row.owner}
@@ -870,9 +877,20 @@ export function Dashboard() {
                     trailing={
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="text-sm font-semibold">{formatCurrency(row.gross)}</p>
-                          <p className={`text-xs font-medium ${netToneClass}`}>
+                          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                            {t("dashboard.netAfterTransfers")}
+                          </p>
+                          <p className={`text-2xl font-bold leading-none ${netToneClass}`}>
                             {formatCurrency(row.net)}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {t("dashboard.grossShort")}:{" "}
+                            <span className="font-semibold text-foreground">
+                              {formatCurrency(row.gross)}
+                            </span>
+                          </p>
+                          <p className={`text-xs font-semibold ${transferToneClass}`}>
+                            {t("dashboard.transferImpact")}: {transferImpactDisplay}
                           </p>
                         </div>
                         {isExpanded ? (
@@ -890,13 +908,23 @@ export function Dashboard() {
                       isExpanded ? (
                         <div className="space-y-2">
                           <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                            <p>{t("dashboard.grossExpenseByOwner")}: {formatCurrency(row.gross)}</p>
-                            <p className="text-right">
+                            <p>
+                              {t("dashboard.grossExpenseByOwner")}: {formatCurrency(row.gross)}
+                            </p>
+                            <p className="text-right text-sm font-semibold">
                               {t("dashboard.netAfterTransfers")}:{" "}
                               <span className={netToneClass}>{formatCurrency(row.net)}</span>
                             </p>
                             <p>{t("dashboard.transfersSent")}: {formatCurrency(row.sent)}</p>
-                            <p className="text-right">{t("dashboard.transfersReceived")}: {formatCurrency(row.received)}</p>
+                            <p className="text-right">
+                              {t("dashboard.transfersReceived")}: {formatCurrency(row.received)}
+                            </p>
+                            <p className="col-span-2 text-right">
+                              {t("dashboard.transferImpact")}:{" "}
+                              <span className={transferToneClass}>
+                                {transferImpactDisplay}
+                              </span>
+                            </p>
                           </div>
                           {ownerItems.length === 0 ? (
                             <p className="text-xs text-muted-foreground">

@@ -240,6 +240,7 @@
     "netAfterTransfers": "转账后净额",
     "transfersSent": "已转出",
     "transfersReceived": "已转入",
+    "transferImpact": "转账影响",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "按卡片来源总支出",

@@ -242,6 +242,7 @@
     "netAfterTransfers": "ট্রান্সফারের পর নেট",
     "transfersSent": "পাঠানো ট্রান্সফার",
     "transfersReceived": "প্রাপ্ত ট্রান্সফার",
+    "transferImpact": "ট্রান্সফার প্রভাব",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "কার্ড উৎস অনুযায়ী মোট ব্যয়",

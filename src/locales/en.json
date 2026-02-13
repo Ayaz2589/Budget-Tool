@@ -247,6 +247,7 @@
     "netAfterTransfers": "Net After Transfers",
     "transfersSent": "Transfers Sent",
     "transfersReceived": "Transfers Received",
+    "transferImpact": "Transfer Impact",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "Total Spend by Card Source",

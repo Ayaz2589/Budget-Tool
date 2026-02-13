@@ -240,6 +240,7 @@
     "netAfterTransfers": "ट्रांसफर के बाद शुद्ध",
     "transfersSent": "भेजे गए ट्रांसफर",
     "transfersReceived": "प्राप्त ट्रांसफर",
+    "transferImpact": "ट्रांसफर प्रभाव",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "कार्ड स्रोत के अनुसार कुल खर्च",

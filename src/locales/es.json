@@ -242,6 +242,7 @@
     "netAfterTransfers": "Neto después de transferencias",
     "transfersSent": "Transferencias enviadas",
     "transfersReceived": "Transferencias recibidas",
+    "transferImpact": "Impacto de transferencias",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "Gasto total por fuente de tarjeta",

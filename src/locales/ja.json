@@ -240,6 +240,7 @@
     "netAfterTransfers": "送金後の純額",
     "transfersSent": "送金額（支払）",
     "transfersReceived": "送金額（受取）",
+    "transferImpact": "送金影響額",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "カードソース別合計支出",

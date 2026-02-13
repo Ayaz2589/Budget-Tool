@@ -41,7 +41,6 @@ import { OwnersCard } from "./OwnersCard";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";
 const PRESET_STORAGE_KEY = "budget-tool-preset-transactions";
-const APP_TOUR_COMPLETED_KEY = "budget-tool-app-tour-completed";
 const DATE_FORMAT_OPTIONS = [
   { value: "YYYY/MM/DD", label: "YYYY/MM/DD" },
   { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
@@ -85,7 +84,6 @@ export function SettingsPage() {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-
   const [sheetIdInput, setSheetIdInput] = useState(spreadsheetId ?? "");
   const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
   const [restoreConfirmOpen, setRestoreConfirmOpen] = useState(false);
@@ -165,13 +163,8 @@ export function SettingsPage() {
     window.location.reload();
   };
 
-  const handleReplayAppTour = () => {
-    try {
-      localStorage.removeItem(APP_TOUR_COMPLETED_KEY);
-    } catch {
-      // ignore
-    }
-    navigate("/dashboard");
+  const handleReplayTour = () => {
+    navigate("/tour?replay=1");
   };
 
   return (
@@ -331,7 +324,7 @@ export function SettingsPage() {
               type="button"
               variant="outline"
               className="h-11 w-full sm:w-auto"
-              onClick={handleReplayAppTour}
+              onClick={handleReplayTour}
             >
               {t("settings.replayTour")}
             </Button>

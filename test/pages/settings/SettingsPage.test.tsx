@@ -32,6 +32,9 @@ test("SettingsPage renders title and Delete all data button", () => {
     screen.getAllByRole("heading", { name: i18n.t("settings.title") }).length,
   ).toBeGreaterThanOrEqual(1);
   expect(
+    screen.getByRole("button", { name: i18n.t("settings.replayTour") }),
+  ).toBeInTheDocument();
+  expect(
     screen.getByRole("button", { name: i18n.t("settings.deleteAllData") }),
   ).toBeInTheDocument();
 });

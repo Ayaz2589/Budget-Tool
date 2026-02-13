@@ -238,6 +238,44 @@ This document lists the equation-style logic used across the app, with examples 
 
 ```ts
 // paid = max(0, initialAmount - remaining)
+
+---
+
+## 7) Shared Owner/Household Model (`/Users/ayazuddin/Development/personal/Web/budget-tool/src/lib/financialModel.ts`)
+
+This module is the shared source for owner-scoped math used by both Dashboard and Transactions.
+
+### Owner-scoped expense amount
+
+```ts
+// ownerAllocated = sum(normalized allocation rows where row.owner == selectedOwner)
+// Example:
+// expense amount 200, split 50/50 between Ayaz/Tasnuva
+// Tasnuva allocated amount = 100
+```
+
+### Signed owner transfer amount
+
+```ts
+// if selectedOwner is sender: +transfer.amount
+// if selectedOwner is receiver: -transfer.amount
+// if unrelated owner: null
+//
+// Example:
+// transfer Tasnuva -> Ayaz, amount 600
+// Tasnuva signed impact: +600
+// Ayaz signed impact: -600
+```
+
+### Individual scope projection
+
+```ts
+// expenses: converted to owner-allocated amounts
+// income: filtered by income.owner == selectedOwner
+// debts: filtered by debt.owner == selectedOwner
+// debtPayments: filtered to scoped debt ids
+// ownerTransfers: filtered to rows where fromOwner==selectedOwner or toOwner==selectedOwner
+```
 // progress = paid / initialAmount (if initialAmount > 0 else 0)
 // Example: initial 2000, remaining 500 => paid 1500, progress 0.75
 ```

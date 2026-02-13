@@ -50,6 +50,9 @@ Use barrels for feature-level imports; only import deep files when a module is i
 
 - **Formatting/Input**
   - `src/lib/format.ts`, `src/lib/currencyInput.ts`, `src/lib/dateInput.ts`, `src/lib/fx.ts`
+- **Financial model (single source of truth)**
+  - `src/lib/financialModel.ts`
+  - Owner list derivation, owner-scoped dataset projection, allocation-aware owner amounts, signed owner-transfer impact.
 - **Import/Export**
   - `src/lib/jsonExport.ts`, `src/lib/exportString.ts`, `src/lib/minifiedPayload.ts`, `src/lib/pdfExport.ts`
 - **Google**
@@ -69,7 +72,7 @@ All utility modules should stay pure by default; side effects should be constrai
 ## Page Modules
 
 - **Dashboard:** `src/pages/dashboard/*` (selectors + insights + UI)
-- **Transactions:** `src/pages/transactions/*`
+- **Transactions:** `src/pages/transactions/*` (owner filtering now uses shared financial model helpers)
 - **Income:** `src/pages/income/*`
 - **Debt:** `src/pages/debt/*`
 - **Mortgage:** `src/pages/mortgage/*`

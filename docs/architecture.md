@@ -82,6 +82,19 @@ Current reference implementation:
 - Keep low-level modules private unless they represent a stable public contract.
 - Prefer pure utilities in `src/lib/*` and avoid hidden side effects.
 
+## Financial Source Of Truth
+
+Owner/household financial scoping and owner-transfer sign handling are centralized in:
+
+- `src/lib/financialModel.ts`
+
+Pages should not re-implement this logic locally. Current consumers:
+
+- `src/pages/dashboard/Dashboard.tsx`
+- `src/pages/transactions/transactionsLedger.ts`
+
+This keeps owner totals, net transfer impact, and scoped datasets consistent across UI surfaces.
+
 ## Testing Strategy
 
 Three layers:

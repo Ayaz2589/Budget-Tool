@@ -20,7 +20,11 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { clamp, computeNetCashFlow, percentOfTotal, sumAmountsBy } from "@/lib/math";
 import { isValidDate } from "@/lib/totals";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
-import { normalizeExpenseAllocation } from "@/lib/ownerAccounting";
+import {
+  collectFinancialOwners,
+  scopeFinancialData,
+  type FinancialViewMode,
+} from "@/lib/financialModel";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -80,7 +84,6 @@ import {
   serializeDismissedInsightIds,
 } from "@/pages/dashboard/dashboardInsights";
 import type { DashboardExpenseScope, DashboardRange } from "@/types/dashboard";
-import type { Debt, DebtPayment, Expense, OwnerTransfer } from "@/types/core";
 
 const INCOME_OWNER_COLORS = [
   "var(--viz-series-1)",
@@ -128,33 +131,6 @@ function monthLabelFromTooltipPayload(payload: unknown): string {
   return first?.payload?.monthLabel ?? "";
 }
 
-type DashboardViewMode = "household" | "individual";
-
-function buildOwnerScopedExpenses(
-  expenses: Expense[],
-  selectedOwner: string,
-  owners: string[],
-): Expense[] {
-  if (!selectedOwner) return [];
-  const rows: Expense[] = [];
-  for (const expense of expenses) {
-    const allocated = normalizeExpenseAllocation(expense, owners).reduce((sum, entry) => {
-      if (entry.isUnassigned || entry.owner !== selectedOwner) return sum;
-      return sum + entry.amount;
-    }, 0);
-    if (allocated <= 0) continue;
-    rows.push({
-      ...expense,
-      amount: allocated,
-      owner: selectedOwner,
-      paidByOwner: selectedOwner,
-      allocationMode: "single",
-      allocation: undefined,
-    });
-  }
-  return rows;
-}
-
 export function Dashboard() {
   const { t, i18n } = useTranslation();
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -164,31 +140,24 @@ export function Dashboard() {
   const [selectedMonthKey, setSelectedMonthKey] = useState(getCurrentMonthKey());
   const [expenseScope, setExpenseScope] = useState<DashboardExpenseScope>("all");
   const [includeDebtPayments, setIncludeDebtPayments] = useState(true);
-  const [viewMode, setViewMode] = useState<DashboardViewMode>("household");
+  const [viewMode, setViewMode] = useState<FinancialViewMode>("household");
   const [selectedOwner, setSelectedOwner] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dismissedInsightIds, setDismissedInsightIds] = useState<string[]>(() =>
     parseDismissedInsightIds(sessionStorage.getItem(getInsightStorageKey())),
   );
 
-  const ownerOptions = useMemo(() => {
-    const inferredOwners = new Set<string>(owners.filter(Boolean));
-    expenses.forEach((row) => {
-      if (row.owner?.trim()) inferredOwners.add(row.owner.trim());
-      if (row.paidByOwner?.trim()) inferredOwners.add(row.paidByOwner.trim());
-      row.allocation?.forEach((entry) => {
-        if (entry.owner?.trim()) inferredOwners.add(entry.owner.trim());
-      });
-    });
-    income.forEach((row) => {
-      if (row.owner?.trim()) inferredOwners.add(row.owner.trim());
-    });
-    ownerTransfers.forEach((row) => {
-      if (row.fromOwner?.trim()) inferredOwners.add(row.fromOwner.trim());
-      if (row.toOwner?.trim()) inferredOwners.add(row.toOwner.trim());
-    });
-    return Array.from(inferredOwners).sort((a, b) => a.localeCompare(b));
-  }, [owners, expenses, income, ownerTransfers]);
+  const ownerOptions = useMemo(
+    () =>
+      collectFinancialOwners({
+        owners,
+        expenses,
+        income,
+        debts,
+        ownerTransfers,
+      }),
+    [owners, expenses, income, debts, ownerTransfers],
+  );
 
   useEffect(() => {
     if (!ownerOptions.length) return;
@@ -197,43 +166,34 @@ export function Dashboard() {
     }
   }, [ownerOptions, selectedOwner]);
 
-  const ownerDebtIds = useMemo(() => {
-    if (viewMode !== "individual" || !selectedOwner) return null;
-    return new Set(
-      debts
-        .filter((debt) => (debt.owner || "").trim() === selectedOwner)
-        .map((debt) => debt.id),
-    );
-  }, [viewMode, selectedOwner, debts]);
-
-  const scopedExpenses = useMemo(() => {
-    if (viewMode === "household") return expenses;
-    return buildOwnerScopedExpenses(expenses, selectedOwner, owners);
-  }, [viewMode, expenses, selectedOwner, owners]);
-
-  const scopedIncome = useMemo(() => {
-    if (viewMode === "household") return income;
-    return income.filter((row) => (row.owner || "").trim() === selectedOwner);
-  }, [viewMode, income, selectedOwner]);
-
-  const scopedDebts = useMemo<Debt[]>(() => {
-    if (viewMode === "household") return debts;
-    return debts.filter((debt) => (debt.owner || "").trim() === selectedOwner);
-  }, [viewMode, debts, selectedOwner]);
-
-  const scopedDebtPayments = useMemo<DebtPayment[]>(() => {
-    if (viewMode === "household") return debtPayments;
-    if (!ownerDebtIds) return [];
-    return debtPayments.filter((payment) => ownerDebtIds.has(payment.debtId));
-  }, [viewMode, debtPayments, ownerDebtIds]);
-
-  const scopedOwnerTransfers = useMemo<OwnerTransfer[]>(() => {
-    if (viewMode === "household") return ownerTransfers;
-    return ownerTransfers.filter(
-      (transfer) =>
-        transfer.fromOwner === selectedOwner || transfer.toOwner === selectedOwner,
-    );
-  }, [viewMode, ownerTransfers, selectedOwner]);
+  const scopedFinancialData = useMemo(
+    () =>
+      scopeFinancialData({
+        viewMode,
+        selectedOwner,
+        owners,
+        expenses,
+        income,
+        debts,
+        debtPayments,
+        ownerTransfers,
+      }),
+    [
+      viewMode,
+      selectedOwner,
+      owners,
+      expenses,
+      income,
+      debts,
+      debtPayments,
+      ownerTransfers,
+    ],
+  );
+  const scopedExpenses = scopedFinancialData.expenses;
+  const scopedIncome = scopedFinancialData.income;
+  const scopedDebts = scopedFinancialData.debts;
+  const scopedDebtPayments = scopedFinancialData.debtPayments;
+  const scopedOwnerTransfers = scopedFinancialData.ownerTransfers;
 
   const availableMonthKeys = useMemo(() => {
     const keys = new Set<string>();
@@ -1292,7 +1252,7 @@ export function Dashboard() {
                   { value: "individual", label: t("dashboard.viewIndividual") },
                 ]}
                 value={viewMode}
-                onChange={(next) => setViewMode(next as DashboardViewMode)}
+                onChange={(next) => setViewMode(next as FinancialViewMode)}
               />
             </div>
             {viewMode === "individual" ? (

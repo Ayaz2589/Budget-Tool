@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { BudgetProvider } from "@/context/BudgetContext";
-import { PresetTransactionsProvider } from "@/context/PresetTransactionsContext";
+import { BudgetProvider } from "@/context";
+import { PresetTransactionsProvider } from "@/context";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 
 const BUDGET_STORAGE_KEY = "budget-tool-data";

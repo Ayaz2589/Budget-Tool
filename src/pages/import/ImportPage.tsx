@@ -1,11 +1,11 @@
 import { useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useBudget } from "@/context/BudgetContext";
+import { useBudget } from "@/context";
 import { parseCsv, type CsvSource } from "@/lib/parsers";
 import { extractTextFromPdf } from "@/lib/pdfText";
 import { parseExportedPdfData } from "@/lib/pdfExport";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
-import { usePresetTransactions } from "@/context/PresetTransactionsContext";
+import { usePresetTransactions } from "@/context";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
 import { ImportSourceCard } from "./ImportSourceCard";
 import type { SourceChoice } from "@/types/import";

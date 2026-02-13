@@ -25,7 +25,7 @@ import {
   dateInputToIso,
   isoToDateInput,
 } from "@/lib/dateInput";
-import { useBudget } from "@/context/BudgetContext";
+import { useBudget } from "@/context";
 import type { Owner } from "@/types/core";
 import type {
   EditIncomeFormPayload,

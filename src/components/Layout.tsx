@@ -19,7 +19,7 @@ import {
   MoreHorizontal,
   CircleHelp,
 } from "lucide-react";
-import { useGoogleAuth } from "@/context/GoogleAuthContext";
+import { useGoogleAuth } from "@/context";
 import { Button } from "@/components/ui/button";
 import {
   Select,

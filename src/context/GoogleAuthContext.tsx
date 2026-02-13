@@ -10,8 +10,8 @@ import {
 } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import i18n from "@/i18n";
-import { useBudget } from "@/context/BudgetContext";
-import { usePresetTransactions } from "@/context/PresetTransactionsContext";
+import { useBudget } from "@/context";
+import { usePresetTransactions } from "@/context";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
 import {
   ensureSheetsExist,

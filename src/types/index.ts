@@ -1,12 +1,14 @@
 /** Unified types - re-export all type modules. */
 
 export * from "./core";
+export * from "./currency";
 export * from "./totals";
 export * from "./sheets";
 export * from "./payload";
 export * from "./pdf";
 export * from "./auth";
 export * from "./budget";
+export * from "./dashboard";
 export * from "./import";
 export * from "./category";
 export * from "./context";

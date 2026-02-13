@@ -1,6 +1,6 @@
 import { beforeEach, expect, test } from "bun:test";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { BudgetProvider, useBudget } from "@/context/BudgetContext";
+import { BudgetProvider, useBudget } from "@/context";
 
 function CategorySanitizationProbe() {
   const { addExpense, setExpenseCategories, expenses } = useBudget();

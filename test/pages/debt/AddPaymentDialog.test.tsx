@@ -1,6 +1,6 @@
 import { afterEach, test, expect, mock } from "bun:test";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { BudgetProvider } from "@/context/BudgetContext";
+import { BudgetProvider } from "@/context";
 import { AddPaymentDialog } from "@/pages/debt/AddPaymentDialog";
 
 afterEach(() => cleanup());

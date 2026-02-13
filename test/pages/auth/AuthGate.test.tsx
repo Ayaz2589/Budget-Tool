@@ -2,8 +2,8 @@ import { test, expect } from "bun:test";
 import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { AuthGate, AuthLoginRoute } from "@/pages/auth/AuthGate";
-import { GoogleAuthContext, GoogleAuthProviderFallback } from "@/context/GoogleAuthContext";
-import type { GoogleAuthContextValue } from "@/context/GoogleAuthContext";
+import { GoogleAuthContext, GoogleAuthProviderFallback } from "@/context";
+import type { GoogleAuthContextValue } from "@/context";
 
 const mockAuthValueSignedOut: GoogleAuthContextValue = {
   isSignedIn: false,

@@ -3,8 +3,8 @@ import type { ExpenseSource } from "@/lib/types";
 import { ALL_EXPENSE_SOURCES } from "@/lib/types";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
-import { useBudget } from "@/context/BudgetContext";
-import { usePresetTransactions } from "@/context/PresetTransactionsContext";
+import { useBudget } from "@/context";
+import { usePresetTransactions } from "@/context";
 import {
   Card,
   CardContent,

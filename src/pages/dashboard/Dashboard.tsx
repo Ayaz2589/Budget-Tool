@@ -14,8 +14,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useBudget } from "@/context/BudgetContext";
-import { usePresetTransactions } from "@/context/PresetTransactionsContext";
+import { useBudget } from "@/context";
+import { usePresetTransactions } from "@/context";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { isValidDate } from "@/lib/totals";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";

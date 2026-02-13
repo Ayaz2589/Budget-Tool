@@ -1,11 +1,8 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { useBudget } from "@/context/BudgetContext";
-import type { Expense } from "@/lib/types";
-import type { OwnerTransfer } from "@/types/core";
-import { isValidDate } from "@/lib/totals";
-import { isMortgageCategory } from "@/lib/mortgageCategory";
+import { useBudget } from "@/context";
+import type { Expense, OwnerTransfer } from "@/types";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,9 +17,16 @@ import { ExpensesByMonthList } from "./ExpensesByMonthList";
 import { ExpenseActionsDialog } from "./ExpenseActionsDialog";
 import { EditTransactionDialog } from "./EditTransactionDialog";
 import { DeleteOneTransactionDialog } from "./DeleteTransactionDialogs";
-import type { TransactionLedgerRow } from "@/types/transactions";
 import { TransferActionsDialog } from "./TransferActionsDialog";
 import { EditTransferDialog } from "./EditTransferDialog";
+import {
+  buildOwnerOptions,
+  buildTransactionRows,
+  filterAndSortTransactionRows,
+  getDefaultOpenMonth,
+  groupTransactionsByMonth,
+  hasActiveTransactionFilters,
+} from "./transactionsLedger";
 
 export function TransactionsPage() {
   const { t } = useTranslation();
@@ -63,24 +67,15 @@ export function TransactionsPage() {
   const pendingHighlightIdRef = useRef<string | null>(null);
   const pendingOpenEditIdRef = useRef<string | null>(null);
 
-  const ownerOptions = useMemo(() => {
-    if (owners.length > 0) return owners;
-    const fromExpenses = [
-      ...new Set(
-        expenses.map((e) => e.owner).filter((m): m is string => !!m),
-      ),
-    ].sort();
-    const fromTransfers = [
-      ...new Set(
-        ownerTransfers
-          .flatMap((row) => [row.fromOwner, row.toOwner])
-          .filter((name): name is string => !!name),
-      ),
-    ].sort();
-    return Array.from(new Set([...fromExpenses, ...fromTransfers])).sort((a, b) =>
-      a.localeCompare(b),
-    );
-  }, [owners, expenses, ownerTransfers]);
+  const ownerOptions = useMemo(
+    () =>
+      buildOwnerOptions({
+        owners,
+        expenses,
+        ownerTransfers,
+      }),
+    [owners, expenses, ownerTransfers],
+  );
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -96,152 +91,59 @@ export function TransactionsPage() {
     pendingOpenEditIdRef.current = params.get("openEdit");
   }, [location.search]);
 
-  const filtered = useMemo(() => {
-    const expenseRows: TransactionLedgerRow[] = expenses
-      .filter((e) => isValidDate(e.date))
-      .filter((e) => !isMortgageCategory(e.category))
-      .map((e) => ({
-        kind: "expense",
-        id: e.id,
-        date: e.date,
-        amount: e.amount,
-        description: e.description || "—",
-        source: e.source,
-        owner: e.owner,
-        category: e.category,
-        expense: e,
-      }));
-    const transferRows: TransactionLedgerRow[] = ownerTransfers
-      .filter((row) => isValidDate(row.date))
-      .map((row) => ({
-        kind: "owner-transfer",
-        id: row.id,
-        date: row.date,
-        amount: row.amount,
-        description: `${row.fromOwner} → ${row.toOwner}`,
-        source: "manual",
-        owner: row.fromOwner,
-        category: t("transactions.typeTransfer"),
-        transferFromOwner: row.fromOwner,
-        transferToOwner: row.toOwner,
-        transferNote: row.note,
-        transfer: row,
-      }));
+  const ledgerRows = useMemo(
+    () =>
+      buildTransactionRows({
+        expenses,
+        ownerTransfers,
+        transferCategoryLabel: t("transactions.typeTransfer"),
+      }),
+    [expenses, ownerTransfers, t],
+  );
 
-    let list = [...expenseRows, ...transferRows];
-    if (monthFilter) {
-      list = list.filter((row) => row.date.startsWith(monthFilter));
-    }
-    if (sourceFilter && sourceFilter !== "all") {
-      list = list.filter((row) => row.kind !== "expense" || row.source === sourceFilter);
-    }
-    if (categoryFilter) {
-      if (categoryFilter === "__uncategorized") {
-        list = list.filter((row) => row.kind === "expense" && !row.category);
-      } else {
-        list = list.filter(
-          (row) => row.kind === "expense" && row.category === categoryFilter,
-        );
-      }
-    }
-    if (searchFilter.trim()) {
-      const q = searchFilter.trim().toLowerCase();
-      list = list.filter((row) => {
-        if (row.kind === "owner-transfer") {
-          const desc = `${row.transferFromOwner ?? ""} ${row.transferToOwner ?? ""} ${
-            row.transferNote ?? ""
-          }`.toLowerCase();
-          return desc.includes(q);
-        }
-        return row.description.toLowerCase().includes(q);
-      });
-    }
-    if (typeFilter === "expense") {
-      list = list.filter((row) => row.kind === "expense");
-    } else if (typeFilter === "transfer") {
-      list = list.filter((row) => row.kind === "owner-transfer");
-    }
-    if (ownerFilter && ownerFilter !== "all") {
-      if (ownerFilter === "_none") {
-        list = list.filter((row) => row.kind === "expense" && !row.owner);
-      } else if (ownerFilter === "_shared") {
-        list = list.filter((row) => {
-          if (row.kind !== "expense") return false;
-          return (row.category || "").trim().toLowerCase() === "50/50" || !row.owner;
-        });
-      } else {
-        list = list.filter((row) => {
-          if (row.kind === "owner-transfer") {
-            return row.transferFromOwner === ownerFilter || row.transferToOwner === ownerFilter;
-          }
-          return (row.owner ?? "") === ownerFilter;
-        });
-      }
-    }
-    const cmp = sortDir === "asc" ? 1 : -1;
-    list.sort((a: TransactionLedgerRow, b: TransactionLedgerRow) => {
-      let diff = 0;
-      switch (sortBy) {
-        case "date":
-          diff = a.date.localeCompare(b.date);
-          break;
-        case "amount":
-          diff = a.amount - b.amount;
-          break;
-        case "description":
-          diff = a.description.localeCompare(b.description);
-          break;
-        case "source":
-          diff = a.source.localeCompare(b.source);
-          break;
-        case "category":
-          diff = (a.category || "").localeCompare(b.category || "");
-          break;
-        case "owner":
-          diff = (a.owner || "").localeCompare(b.owner || "");
-          break;
-        default:
-          diff = a.date.localeCompare(b.date);
-      }
-      return diff * cmp;
-    });
-    return list;
-  }, [
-    expenses,
-    monthFilter,
-    sourceFilter,
-    categoryFilter,
-    searchFilter,
-    ownerFilter,
-    typeFilter,
-    sortBy,
-    sortDir,
-    ownerTransfers,
-    t,
-  ]);
+  const filters = useMemo(
+    () => ({
+      monthFilter,
+      sourceFilter,
+      categoryFilter,
+      searchFilter,
+      ownerFilter,
+      typeFilter,
+    }),
+    [monthFilter, sourceFilter, categoryFilter, searchFilter, ownerFilter, typeFilter],
+  );
 
-  const byMonth = useMemo(() => {
-    const map = new Map<string, TransactionLedgerRow[]>();
-    for (const row of filtered) {
-      const key = row.date.slice(0, 7);
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(row);
-    }
-    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
-  }, [filtered]);
+  const filtered = useMemo(
+    () =>
+      filterAndSortTransactionRows({
+        rows: ledgerRows,
+        filters,
+        sortBy,
+        sortDir,
+      }),
+    [
+      ledgerRows,
+      filters,
+      sortBy,
+      sortDir,
+    ],
+  );
+
+  const byMonth = useMemo(() => groupTransactionsByMonth(filtered), [filtered]);
 
   const currentMonthKey = new Date().toISOString().slice(0, 7);
-  const defaultOpenMonth = byMonth.some(([k]) => k === currentMonthKey)
-    ? currentMonthKey
-    : (byMonth[0]?.[0] ?? "");
+  const defaultOpenMonth = useMemo(
+    () =>
+      getDefaultOpenMonth({
+        byMonth,
+        currentMonthKey,
+      }),
+    [byMonth, currentMonthKey],
+  );
 
-  const hasActiveFilters = Boolean(
-    monthFilter ||
-    sourceFilter !== "all" ||
-    categoryFilter ||
-    searchFilter.trim() ||
-    ownerFilter !== "all" ||
-    typeFilter !== "all",
+  const hasActiveFilters = useMemo(
+    () => hasActiveTransactionFilters(filters),
+    [filters],
   );
 
   const clearFilters = useCallback(() => {

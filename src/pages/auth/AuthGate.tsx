@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useGoogleAuth } from "@/context/GoogleAuthContext";
+import { useGoogleAuth } from "@/context";
 import { LoginPage } from "./LoginPage";
 
 /**

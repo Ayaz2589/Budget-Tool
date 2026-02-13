@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
-import { useBudget } from "@/context/BudgetContext";
-import { usePresetTransactions } from "@/context/PresetTransactionsContext";
+import { useBudget } from "@/context";
+import { usePresetTransactions } from "@/context";
 import type { ExpenseSource, PresetTransaction } from "@/types/core";
 import {
   EXPENSE_SOURCE_BADGE_LABELS,

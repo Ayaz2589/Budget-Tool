@@ -1,5 +1,6 @@
 import { formatCurrency, formatDate } from "@/lib/format";
 import { isValidDate } from "@/lib/totals";
+import { computeMonthOverMonthPct, sumAmountsBy } from "@/lib/math";
 import type { DashboardInsight, DashboardInsightInput } from "@/types/dashboard";
 
 function monthFromDate(date: string): string {
@@ -15,13 +16,13 @@ function expenseSumForMonth(
   scope: DashboardInsightInput["scope"],
   expenses: DashboardInsightInput["expenses"],
 ): number {
-  return expenses.reduce((sum, expense) => {
-    if (!isValidDate(expense.date) || monthFromDate(expense.date) !== monthKey) return sum;
+  return sumAmountsBy(expenses, (expense) => {
+    if (!isValidDate(expense.date) || monthFromDate(expense.date) !== monthKey) return 0;
     if (scope === "exclude-mortgage" && isMortgageCategory(expense.category || "")) {
-      return sum;
+      return 0;
     }
-    return sum + expense.amount;
-  }, 0);
+    return expense.amount;
+  });
 }
 
 export function buildDashboardInsights(input: DashboardInsightInput): DashboardInsight[] {
@@ -38,18 +39,16 @@ export function buildDashboardInsights(input: DashboardInsightInput): DashboardI
   const insights: DashboardInsight[] = [];
   const currentSpent = expenseSumForMonth(currentMonthKey, scope, expenses);
   const previousSpent = expenseSumForMonth(previousMonthKey, scope, expenses);
-  if (previousSpent > 0) {
-    const pct = (currentSpent - previousSpent) / previousSpent;
-    if (pct >= 0.25) {
-      insights.push({
-        id: `spending_spike:${currentMonthKey}`,
-        type: "spending_spike",
-        messageKey: "dashboard.insightSpendingSpike",
-        messageValues: {
-          percent: `${(pct * 100).toFixed(0)}%`,
-        },
-      });
-    }
+  const pct = computeMonthOverMonthPct(currentSpent, previousSpent);
+  if (pct != null && pct >= 0.25) {
+    insights.push({
+      id: `spending_spike:${currentMonthKey}`,
+      type: "spending_spike",
+      messageKey: "dashboard.insightSpendingSpike",
+      messageValues: {
+        percent: `${(pct * 100).toFixed(0)}%`,
+      },
+    });
   }
 
   const currentMonthMortgage = expenses

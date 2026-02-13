@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { sumAmountsBy } from "@/lib/math";
 import { getMonthLabel } from "@/lib/totals";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
@@ -19,7 +20,7 @@ export function IncomeList({
     <div className="space-y-3 px-3 pb-2">
       {byMonth.map(([monthKey, monthIncome]) => {
         const isOpen = openMonth === monthKey;
-        const monthTotal = monthIncome.reduce((sum, row) => sum + row.amount, 0);
+        const monthTotal = sumAmountsBy(monthIncome, (row) => row.amount);
         return (
           <section
             key={monthKey}

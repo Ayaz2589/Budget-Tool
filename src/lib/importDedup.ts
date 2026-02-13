@@ -1,4 +1,5 @@
 import type { Expense } from "@/lib/types";
+import { amountsWithinTolerance } from "@/lib/math";
 
 const AMOUNT_TOLERANCE = 0.01;
 
@@ -8,7 +9,7 @@ const AMOUNT_TOLERANCE = 0.01;
  */
 export function isSameExpense(a: Expense, b: Expense): boolean {
   if (a.date !== b.date) return false;
-  if (Math.abs(a.amount - b.amount) >= AMOUNT_TOLERANCE) return false;
+  if (!amountsWithinTolerance(a.amount, b.amount, AMOUNT_TOLERANCE)) return false;
 
   const ownerA = (a.owner || "").trim().toLowerCase();
   const ownerB = (b.owner || "").trim().toLowerCase();

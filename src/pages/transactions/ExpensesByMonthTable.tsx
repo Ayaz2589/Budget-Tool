@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { sumAmountsBy } from "@/lib/math";
 import { getMonthLabel } from "@/lib/totals";
 import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
@@ -75,15 +76,13 @@ export function ExpensesByMonthTable({
                   )
                 </span>
               </span>
-              <span className="text-sm font-semibold tabular-nums">
-                {formatCurrency(
-                  monthExpenses.reduce((sum, row) => {
-                    if (!includeOwnerTransfersInTotals && row.kind === "owner-transfer") {
-                      return sum;
-                    }
-                    return sum + row.amount;
-                  }, 0),
-                )}
+                <span className="text-sm font-semibold tabular-nums">
+                {formatCurrency(sumAmountsBy(monthExpenses, (row) => {
+                  if (!includeOwnerTransfersInTotals && row.kind === "owner-transfer") {
+                    return 0;
+                  }
+                  return row.amount;
+                }))}
               </span>
             </div>
           </AccordionTrigger>

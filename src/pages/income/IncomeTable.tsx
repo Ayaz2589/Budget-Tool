@@ -15,6 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { sumAmountsBy } from "@/lib/math";
 import { getMonthLabel } from "@/lib/totals";
 import type { IncomeTableProps } from "@/types/income";
 
@@ -55,10 +56,8 @@ export function IncomeTable({
                     )
                   </span>
                 </span>
-                <span className="text-sm font-semibold tabular-nums">
-                  {formatCurrency(
-                    monthIncome.reduce((sum, row) => sum + row.amount, 0),
-                  )}
+                  <span className="text-sm font-semibold tabular-nums">
+                  {formatCurrency(sumAmountsBy(monthIncome, (row) => row.amount))}
                 </span>
               </div>
             </AccordionTrigger>

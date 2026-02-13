@@ -1,11 +1,13 @@
 import { expect, test } from "bun:test";
 import {
+  buildOwnerNetRows,
   buildCategoryBreakdown,
   buildDashboardKpis,
   buildFixedObligations,
   buildOwnerSplit,
   getCurrentMonthKey,
   getRangeMonthKeys,
+  sumCashFlowExpenseTotals,
 } from "@/pages/dashboard/dashboardSelectors";
 
 test("buildDashboardKpis excludes mortgage when scope is exclude-mortgage", () => {
@@ -208,4 +210,57 @@ test("range helper supports current, 6 and 12 windows", () => {
   expect(getRangeMonthKeys("current", current)).toHaveLength(1);
   expect(getRangeMonthKeys("6", current)).toHaveLength(6);
   expect(getRangeMonthKeys("12", current)).toHaveLength(12);
+});
+
+test("sumCashFlowExpenseTotals returns a range-wide expense total", () => {
+  expect(
+    sumCashFlowExpenseTotals([
+      {
+        monthKey: "2026-01",
+        monthLabel: "January 2026",
+        incomeTotal: 0,
+        expensesTotal: 1200,
+        debtPaymentsTotal: 0,
+        incomeByOwner: {},
+      },
+      {
+        monthKey: "2026-02",
+        monthLabel: "February 2026",
+        incomeTotal: 0,
+        expensesTotal: 800,
+        debtPaymentsTotal: 0,
+        incomeByOwner: {},
+      },
+    ]),
+  ).toBe(2000);
+});
+
+test("buildOwnerNetRows applies transfer impact with one aligned equation", () => {
+  const rows = buildOwnerNetRows({
+    ownerExpenseRows: [
+      { key: "ayaz", owner: "AYAZ UDDIN", label: "AYAZ UDDIN", value: 6941.2 },
+      { key: "tasnuva", owner: "TASNUVA AHMED", label: "TASNUVA AHMED", value: 1207.68 },
+    ],
+    ownerTransfers: [
+      {
+        id: "t1",
+        date: "2026-02-09",
+        fromOwner: "TASNUVA AHMED",
+        toOwner: "AYAZ UDDIN",
+        amount: 600,
+      },
+    ],
+    monthKeys: ["2026-02"],
+  });
+
+  const ayaz = rows.find((row) => row.owner === "AYAZ UDDIN");
+  const tasnuva = rows.find((row) => row.owner === "TASNUVA AHMED");
+  expect(ayaz?.gross).toBe(6941.2);
+  expect(ayaz?.net).toBe(6341.2);
+  expect(ayaz?.received).toBe(600);
+  expect(ayaz?.sent).toBe(0);
+  expect(tasnuva?.gross).toBe(1207.68);
+  expect(tasnuva?.net).toBe(1807.68);
+  expect(tasnuva?.received).toBe(0);
+  expect(tasnuva?.sent).toBe(600);
 });

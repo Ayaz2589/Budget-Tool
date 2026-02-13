@@ -34,6 +34,14 @@ export interface DashboardOwnerExpenseItem {
   totalAmount: number;
 }
 
+export interface DashboardOwnerNetRow {
+  owner: string;
+  gross: number;
+  net: number;
+  sent: number;
+  received: number;
+}
+
 export interface DashboardDebtRow {
   id: string;
   name: string;

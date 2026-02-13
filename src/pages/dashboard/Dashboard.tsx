@@ -17,6 +17,7 @@ import {
 import { useBudget } from "@/context";
 import { usePresetTransactions } from "@/context";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { clamp, computeNetCashFlow, percentOfTotal, sumAmountsBy } from "@/lib/math";
 import { isValidDate } from "@/lib/totals";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { Button } from "@/components/ui/button";
@@ -59,7 +60,9 @@ import {
   buildDashboardKpis,
   buildDebtSnapshot,
   buildOwnerExpenseItems,
+  buildOwnerNetRows,
   buildOwnerSplit,
+  sumCashFlowExpenseTotals,
   buildSpendBySource,
   buildOwnerTransfersMtd,
   buildRecentActivity,
@@ -243,45 +246,15 @@ export function Dashboard() {
     return map;
   }, [ownerExpenseRows, expenses, currentMonthKey, monthKeys, expenseScope, owners]);
   const totalSpentForSelectedRange = useMemo(
-    () => cashFlowRows.reduce((sum, row) => sum + row.expensesTotal, 0),
+    () => sumCashFlowExpenseTotals(cashFlowRows),
     [cashFlowRows],
   );
   const ownerNetRows = useMemo(() => {
-    const monthKeySet = new Set(monthKeys);
-    const grossByOwner = new Map<string, number>();
-    ownerExpenseRows.forEach((row) => {
-      if (!row.owner) return;
-      grossByOwner.set(row.owner, row.value);
+    return buildOwnerNetRows({
+      ownerExpenseRows,
+      ownerTransfers,
+      monthKeys,
     });
-
-    const sentByOwner = new Map<string, number>();
-    const receivedByOwner = new Map<string, number>();
-    ownerTransfers.forEach((row) => {
-      if (!monthKeySet.has(row.date.slice(0, 7))) return;
-      sentByOwner.set(row.fromOwner, (sentByOwner.get(row.fromOwner) ?? 0) + row.amount);
-      receivedByOwner.set(row.toOwner, (receivedByOwner.get(row.toOwner) ?? 0) + row.amount);
-    });
-
-    const ownersWithValues = new Set<string>([
-      ...grossByOwner.keys(),
-      ...sentByOwner.keys(),
-      ...receivedByOwner.keys(),
-    ]);
-
-    return Array.from(ownersWithValues)
-      .map((owner) => {
-        const gross = grossByOwner.get(owner) ?? 0;
-        const sent = sentByOwner.get(owner) ?? 0;
-        const received = receivedByOwner.get(owner) ?? 0;
-        return {
-          owner,
-          gross,
-          net: gross - received + sent,
-          sent,
-          received,
-        };
-      })
-      .sort((a, b) => b.gross - a.gross);
   }, [ownerExpenseRows, ownerTransfers, monthKeys]);
 
   const debtRows = useMemo(
@@ -299,7 +272,7 @@ export function Dashboard() {
     [ownerTransfers, currentMonthKey],
   );
   const ownerTransfersMtdTotal = useMemo(
-    () => ownerTransfersMtd.reduce((sum, row) => sum + row.amount, 0),
+    () => sumAmountsBy(ownerTransfersMtd, (row) => row.amount),
     [ownerTransfersMtd],
   );
 
@@ -363,7 +336,11 @@ export function Dashboard() {
         monthKey: row.monthKey,
         monthLabel: row.monthLabel,
         monthAxisLabel: row.monthAxisLabel,
-        netCashFlow: row.incomeTotal - row.expensesTotal - row.debtPaymentsTotal,
+        netCashFlow: computeNetCashFlow(
+          row.incomeTotal,
+          row.expensesTotal,
+          row.debtPaymentsTotal,
+        ),
       })),
     [cashFlowDisplayRows],
   );
@@ -829,10 +806,10 @@ export function Dashboard() {
               </div>
               <div>
               {ownerNetRows.map((row) => {
-                const percentOfTotal =
-                  totalSpentForSelectedRange > 0
-                    ? row.gross / totalSpentForSelectedRange
-                    : 0;
+                const ownerShareOfTotal = percentOfTotal(
+                  row.gross,
+                  totalSpentForSelectedRange,
+                );
                 const isExpanded = expandedOwnerKey === row.owner;
                 const ownerItems = ownerExpenseItemsByOwner.get(row.owner) ?? [];
                 const netToneClass =
@@ -842,7 +819,7 @@ export function Dashboard() {
                     key={row.owner}
                     title={row.owner}
                     subtitle={t("dashboard.ofTotalSpent", {
-                      percent: percentFormatter.format(percentOfTotal),
+                      percent: percentFormatter.format(ownerShareOfTotal),
                     })}
                     trailing={
                       <div className="flex items-center gap-4">
@@ -950,7 +927,10 @@ export function Dashboard() {
                       meta={
                         <>
                           <div className="mt-2 h-2 rounded bg-muted">
-                            <div className="h-2 rounded bg-primary" style={{ width: `${Math.min(100, Math.max(0, row.progress * 100))}%` }} />
+                            <div
+                              className="h-2 rounded bg-primary"
+                              style={{ width: `${clamp(row.progress * 100, 0, 100)}%` }}
+                            />
                           </div>
                           <p className="mt-1 text-xs text-muted-foreground">
                             {formatCurrency(row.paid)} / {formatCurrency(row.initialAmount)}

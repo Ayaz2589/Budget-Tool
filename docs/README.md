@@ -12,6 +12,7 @@ Documentation for the Ortho budget app. Written for both humans and AI agents.
 | [modules.md](modules.md) | File tree of `src/` with one-line description per file/module. |
 | [google-sheets.md](google-sheets.md) | Sheets API usage, sync vs restore, Data blob, sheet layout. |
 | [testing.md](testing.md) | How to run tests, setup, structure, conventions. |
+| [equations.md](equations.md) | Equation inventory for finance, conversion, date, and operational math. |
 
 ## For AI agents
 

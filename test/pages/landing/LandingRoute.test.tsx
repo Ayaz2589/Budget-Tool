@@ -117,6 +117,6 @@ test("LandingRoute renders LandingPage when tour is completed and user is not re
       </MemoryRouter>
     </GoogleAuthProviderFallback>,
   );
-  expect(within(container).getByText("Ortho")).toBeInTheDocument();
+  expect(container.querySelector('a[href="/auth"]')).not.toBeNull();
   expect(within(container).queryByText("Tour page")).not.toBeInTheDocument();
 });

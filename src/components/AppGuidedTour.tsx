@@ -130,7 +130,11 @@ export function AppGuidedTour({
     const top = belowTop + cardHeight < vh - 16 ? belowTop : Math.max(16, aboveTop);
     const centeredLeft = targetRect.left + targetRect.width / 2 - cardWidth / 2;
     const left = clamp(centeredLeft, 16, vw - cardWidth - 16);
-    return { top: `${top}px`, left: `${left}px`, width: `${cardWidth}px` };
+    return {
+      top: `${top}px`,
+      left: `${left}px`,
+      width: `${cardWidth}px`,
+    };
   }, [targetRect, cardHeight]);
 
   if (!open || !currentStep) return null;

@@ -6,6 +6,32 @@ import { GoogleAuthContext } from "@/context";
 import type { GoogleAuthContextValue } from "@/types/auth";
 import { Layout } from "@/components/Layout";
 
+const originalMatchMedia = window.matchMedia;
+
+function setViewportMode(mode: "desktop" | "mobile") {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: (query: string) => {
+      const isMinDesktop = query.includes("min-width: 768px");
+      const isMaxMobile = query.includes("max-width: 767px");
+      const matches =
+        mode === "desktop"
+          ? isMinDesktop
+          : isMaxMobile;
+      return {
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => false,
+      };
+    },
+  });
+}
+
 function buildAuthValue(
   overrides: Partial<GoogleAuthContextValue> = {},
 ): GoogleAuthContextValue {
@@ -58,16 +84,39 @@ function renderLayout(
 afterEach(() => {
   cleanup();
   localStorage.setItem("budget-tool-app-tour-completed", "1");
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: originalMatchMedia,
+  });
 });
 
 test("Layout shows desktop app tour on first dashboard visit", () => {
+  setViewportMode("desktop");
   localStorage.removeItem("budget-tool-app-tour-completed");
   renderLayout({ isSignedIn: true, spreadsheetId: "sheet-id" });
   expect(screen.getByText("App Tour 1/24")).toBeInTheDocument();
   expect(screen.getByText("Dashboard overview")).toBeInTheDocument();
 });
 
+test("Layout shows app tour on first dashboard visit in mobile", () => {
+  setViewportMode("mobile");
+  localStorage.removeItem("budget-tool-app-tour-completed");
+  renderLayout({ isSignedIn: true, spreadsheetId: "sheet-id" });
+  expect(screen.getByText("App Tour 1/10")).toBeInTheDocument();
+  expect(screen.getByText("Dashboard overview")).toBeInTheDocument();
+});
+
+test("Layout mobile tour advances to next step without getting stuck", () => {
+  setViewportMode("mobile");
+  localStorage.removeItem("budget-tool-app-tour-completed");
+  renderLayout({ isSignedIn: true, spreadsheetId: "sheet-id" });
+  fireEvent.click(screen.getByRole("button", { name: "Next" }));
+  expect(screen.getByText("App Tour 2/10")).toBeInTheDocument();
+  expect(screen.getByText("Dashboard settings sheet")).toBeInTheDocument();
+});
+
 test("Layout waits for sheet setup decision before starting first-run app tour", () => {
+  setViewportMode("desktop");
   localStorage.removeItem("budget-tool-app-tour-completed");
   const { rerender } = render(
     <BudgetProvider>

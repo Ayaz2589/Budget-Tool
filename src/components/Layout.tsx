@@ -44,6 +44,7 @@ import i18n from "@/i18n";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { SheetSetupDialog } from "@/components/SheetSetupDialog";
 import { AppGuidedTour, type AppTourStep } from "@/components/AppGuidedTour";
+import { MobileGuidedTour } from "@/components/MobileGuidedTour";
 import {
   DsSidebarBrand,
   DsSidebarNavItem,
@@ -294,7 +295,7 @@ export function Layout() {
     sheetSetupState !== "idle" &&
     sheetSetupState !== "done";
 
-  const appTourSteps = useMemo<AppTourStep[]>(
+  const desktopAppTourSteps = useMemo<AppTourStep[]>(
     () => [
       { route: "/dashboard", selector: '[data-tour=\"dashboard-header\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboard.title"), description: t("appTour.steps.dashboard.description") },
       { route: "/dashboard", selector: '[data-tour=\"dashboard-kpis\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardKpis.title"), description: t("appTour.steps.dashboardKpis.description") },
@@ -323,6 +324,24 @@ export function Layout() {
     ],
     [t],
   );
+
+  const mobileAppTourSteps = useMemo<AppTourStep[]>(
+    () => [
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-header\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboard.title"), description: t("appTour.steps.dashboard.description") },
+      { route: "/dashboard", selector: '[data-tour=\"dashboard-header\"]', fallbackSelector: '[data-tour-page=\"dashboard\"]', title: t("appTour.steps.dashboardSettings.title"), description: t("appTour.steps.dashboardSettings.description") },
+      { route: "/dashboard/transactions", selector: '[data-tour=\"transactions-table\"]', fallbackSelector: '[data-tour-page=\"transactions\"]', title: t("appTour.steps.transactions.title"), description: t("appTour.steps.transactions.description") },
+      { route: "/dashboard/transactions", selector: '[data-tour=\"transactions-table\"]', fallbackSelector: '[data-tour-page=\"transactions\"]', title: t("appTour.steps.transactionsFilters.title"), description: t("appTour.steps.transactionsFilters.description") },
+      { route: "/dashboard/income", selector: '[data-tour=\"income-table\"]', fallbackSelector: '[data-tour-page=\"income\"]', title: t("appTour.steps.income.title"), description: t("appTour.steps.income.description") },
+      { route: "/dashboard/debt", selector: '[data-tour=\"debt-table\"]', fallbackSelector: '[data-tour-page=\"debt\"]', title: t("appTour.steps.debt.title"), description: t("appTour.steps.debt.description") },
+      { route: "/dashboard/mortgage", selector: '[data-tour=\"mortgage-table\"]', fallbackSelector: '[data-tour-page=\"mortgage\"]', title: t("appTour.steps.mortgage.title"), description: t("appTour.steps.mortgage.description") },
+      { route: "/dashboard/presets", selector: '[data-tour=\"presets-table\"]', fallbackSelector: '[data-tour-page=\"presets\"]', title: t("appTour.steps.presets.title"), description: t("appTour.steps.presets.description") },
+      { route: "/dashboard/import", selector: '[data-tour=\"data-page\"]', fallbackSelector: '[data-tour-page=\"data\"]', title: t("appTour.steps.data.title"), description: t("appTour.steps.data.description") },
+      { route: "/dashboard/settings", selector: '[data-tour=\"settings-page\"]', fallbackSelector: '[data-tour-page=\"settings\"]', title: t("appTour.steps.settings.title"), description: t("appTour.steps.settings.description") },
+    ],
+    [t],
+  );
+
+  const appTourSteps = isDesktop ? desktopAppTourSteps : mobileAppTourSteps;
 
   useEffect(() => {
     if (prevSignedInRef.current && !isSignedIn) {
@@ -411,7 +430,7 @@ export function Layout() {
 
   useEffect(() => {
     if (hasInitializedTourRef.current) return;
-    if (!isDesktop || !isSignedIn) return;
+    if (!isSignedIn) return;
     if (location.pathname !== "/dashboard") return;
     if (!spreadsheetId) {
       // For first-time users without a linked sheet, start the app tour only
@@ -430,7 +449,6 @@ export function Layout() {
       // ignore storage errors
     }
   }, [
-    isDesktop,
     isSignedIn,
     location.pathname,
     spreadsheetId,
@@ -660,6 +678,24 @@ export function Layout() {
       />
       <AppGuidedTour
         open={appTourOpen && isDesktop}
+        stepIndex={appTourStepIndex}
+        steps={appTourSteps}
+        onBack={() => setAppTourStepIndex((prev) => Math.max(0, prev - 1))}
+        onNext={() =>
+          setAppTourStepIndex((prev) =>
+            Math.min(appTourSteps.length - 1, prev + 1),
+          )
+        }
+        onFinish={completeAppTour}
+        onSkip={completeAppTour}
+        nextLabel={t("appTour.next")}
+        backLabel={t("appTour.back")}
+        skipLabel={t("appTour.skip")}
+        finishLabel={t("appTour.finish")}
+        titleLabel={t("appTour.title")}
+      />
+      <MobileGuidedTour
+        open={appTourOpen && !isDesktop}
         stepIndex={appTourStepIndex}
         steps={appTourSteps}
         onBack={() => setAppTourStepIndex((prev) => Math.max(0, prev - 1))}

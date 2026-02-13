@@ -4,6 +4,7 @@ import { CardSourcesCard } from "@/pages/settings/CardSourcesCard";
 import { BudgetProvider } from "@/context";
 import { PresetTransactionsProvider } from "@/context";
 import { GoogleAuthProviderFallback } from "@/context";
+import i18n from "@/i18n";
 
 function TestWrapper() {
   return (
@@ -19,9 +20,9 @@ function TestWrapper() {
 
 test("CardSourcesCard renders title and list of sources", () => {
   render(<TestWrapper />);
-  expect(screen.getByText("Card sources")).toBeInTheDocument();
+  expect(screen.getByText(i18n.t("settings.cardSources"))).toBeInTheDocument();
   // All expense sources should appear (labels from i18n)
-  expect(screen.getAllByText("Manual").length).toBeGreaterThan(0);
+  expect(screen.getAllByText(i18n.t("addTransaction.sourceManual")).length).toBeGreaterThan(0);
 });
 
 test("CardSourcesCard renders checkboxes for each source", () => {

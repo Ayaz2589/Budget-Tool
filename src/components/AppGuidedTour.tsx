@@ -2,10 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 
 export interface AppTourStep {
   route: string;
   selector: string;
+  fallbackSelector?: string;
   title: string;
   description: string;
 }
@@ -56,9 +58,13 @@ export function AppGuidedTour({
 
     let mounted = true;
     const updateRect = () => {
-      const target = document.querySelector(currentStep.selector) as HTMLElement | null;
+      const target =
+        (document.querySelector(currentStep.selector) as HTMLElement | null) ??
+        (currentStep.fallbackSelector
+          ? (document.querySelector(currentStep.fallbackSelector) as HTMLElement | null)
+          : null);
       if (!target) {
-        if (mounted) setTargetRect(null);
+        // Keep last known position while the next route/section mounts to avoid snap-to-bottom flicker.
         return;
       }
       const nextRect = target.getBoundingClientRect();
@@ -130,55 +136,81 @@ export function AppGuidedTour({
   if (!open || !currentStep) return null;
 
   return (
-    <div className="fixed inset-0 z-[70] hidden md:block" aria-live="polite">
-      <div className="absolute inset-0 bg-black/65 pointer-events-none" />
-      {spotlightStyle ? (
-        <div
-          className="absolute rounded-xl border border-white/60 bg-transparent pointer-events-none transition-all duration-200"
-          style={{
-            ...spotlightStyle,
-            boxShadow: "0 0 0 9999px rgba(0,0,0,0.62), 0 0 0 2px rgba(255,255,255,0.22)",
-          }}
-        />
-      ) : null}
-      <div
-        ref={cardRef}
-        className={cn("absolute z-[72] pointer-events-auto")}
-        style={cardStyle}
+    <AnimatePresence>
+      <motion.div
+        key="guided-tour"
+        className="fixed inset-0 z-[70] hidden md:block"
+        aria-live="polite"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.42, ease: "easeOut" }}
       >
-        <Card className="border-[var(--border-strong)] shadow-2xl bg-[var(--surface-0)]/98 backdrop-blur">
-          <CardHeader className="pb-2">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              {titleLabel} {stepIndex + 1}/{steps.length}
-            </div>
-            <CardTitle className="text-lg">{currentStep.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {currentStep.description}
-            </p>
-            <div className="flex items-center justify-between gap-2">
-              <Button type="button" variant="ghost" onClick={onSkip}>
-                {skipLabel}
-              </Button>
-              <div className="flex items-center gap-2">
-                <Button type="button" variant="outline" onClick={onBack} disabled={isFirst}>
-                  {backLabel}
-                </Button>
-                {isLast ? (
-                  <Button type="button" onClick={onFinish}>
-                    {finishLabel}
-                  </Button>
-                ) : (
-                  <Button type="button" onClick={onNext}>
-                    {nextLabel}
-                  </Button>
-                )}
+        <motion.div
+          className="absolute inset-0 bg-black/65 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.42 }}
+        />
+        {spotlightStyle ? (
+          <motion.div
+            key={currentStep.selector}
+            className="absolute rounded-xl border border-white/60 bg-transparent pointer-events-none"
+            style={{
+              ...spotlightStyle,
+              boxShadow: "0 0 0 9999px rgba(0,0,0,0.62), 0 0 0 2px rgba(255,255,255,0.22)",
+            }}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.46, ease: "easeOut" }}
+          />
+        ) : null}
+        <motion.div
+          key={`tour-card-${stepIndex}`}
+          ref={cardRef}
+          className={cn("absolute z-[72] pointer-events-auto")}
+          style={cardStyle}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          <Card className="border-[var(--border-strong)] shadow-2xl bg-[var(--surface-0)]/98 backdrop-blur">
+            <CardHeader className="pb-2">
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                {titleLabel} {stepIndex + 1}/{steps.length}
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+              <CardTitle className="text-lg">{currentStep.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {currentStep.description}
+              </p>
+              <div className="flex items-center justify-between gap-2">
+                <Button type="button" variant="ghost" onClick={onSkip}>
+                  {skipLabel}
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Button type="button" variant="outline" onClick={onBack} disabled={isFirst}>
+                    {backLabel}
+                  </Button>
+                  {isLast ? (
+                    <Button type="button" onClick={onFinish}>
+                      {finishLabel}
+                    </Button>
+                  ) : (
+                    <Button type="button" onClick={onNext}>
+                      {nextLabel}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

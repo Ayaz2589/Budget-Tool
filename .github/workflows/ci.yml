@@ -31,6 +31,7 @@ jobs:
         run: |
           npm ci --include=optional
           npm i --no-save @rollup/rollup-linux-x64-gnu@$(node -p "require('./node_modules/rollup/package.json').version")
+          npm i --no-save lightningcss-linux-x64-gnu@$(node -p "require('./node_modules/lightningcss/package.json').version")
 
       - name: Run financial guard tests
         run: bun run test:financial
@@ -57,6 +58,7 @@ jobs:
         run: |
           npm ci --include=optional
           npm i --no-save @rollup/rollup-linux-x64-gnu@$(node -p "require('./node_modules/rollup/package.json').version")
+          npm i --no-save lightningcss-linux-x64-gnu@$(node -p "require('./node_modules/lightningcss/package.json').version")
 
       - name: Run full test suite
         run: bun test

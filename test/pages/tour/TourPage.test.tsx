@@ -63,7 +63,7 @@ test("TourPage redirects signed-in users to dashboard", () => {
   expect(screen.getAllByText("Dashboard").length).toBeGreaterThan(0);
 });
 
-test("TourPage allows signed-in replay mode", () => {
+test("TourPage allows signed-in replay mode", async () => {
   render(
     <GoogleAuthContext.Provider value={baseAuth({ isSignedIn: true })}>
       <MemoryRouter initialEntries={["/tour?replay=1"]}>
@@ -75,12 +75,19 @@ test("TourPage allows signed-in replay mode", () => {
     </GoogleAuthContext.Provider>,
   );
 
-  expect(screen.getByText("Language")).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: "Next" }));
-  expect(screen.getByText("Welcome to Ortho")).toBeInTheDocument();
-  while (!screen.queryByRole("button", { name: "Finish tour" })) {
+  expect(
+    screen.getByText("What language do you want to use Ortho?"),
+  ).toBeInTheDocument();
+  fireEvent.click(screen.getByTestId("tour-language-continue"));
+  await screen.findByText("Welcome to Ortho");
+  for (let i = 0; i < 10; i += 1) {
+    if (screen.queryByRole("button", { name: "Finish tour" })) break;
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    // allow animated card transitions to complete
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve) => setTimeout(resolve, 300));
   }
+  expect(screen.getByRole("button", { name: "Finish tour" })).toBeInTheDocument();
   expect(
     screen.getByText(
       "Your account is already connected. You can finish this walkthrough and continue to your dashboard.",
@@ -91,16 +98,24 @@ test("TourPage allows signed-in replay mode", () => {
   ).not.toBeInTheDocument();
 });
 
-test("TourPage allows stepping through tour and sign-in on final step", () => {
+test("TourPage allows stepping through tour and sign-in on final step", async () => {
   const signIn = mock(() => {});
   renderWithAuth(baseAuth({ signIn }));
 
-  expect(screen.getByText("Language")).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: "Next" }));
-  expect(screen.getByText("Welcome to Ortho")).toBeInTheDocument();
-  while (!screen.queryByRole("button", { name: "Sign in with Google" })) {
+  expect(
+    screen.getByText("What language do you want to use Ortho?"),
+  ).toBeInTheDocument();
+  fireEvent.click(screen.getByTestId("tour-language-continue"));
+  await screen.findByText("Welcome to Ortho");
+  for (let i = 0; i < 10; i += 1) {
+    if (screen.queryByRole("button", { name: "Sign in with Google" })) break;
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve) => setTimeout(resolve, 300));
   }
+  expect(
+    screen.getByRole("button", { name: "Sign in with Google" }),
+  ).toBeInTheDocument();
   expect(screen.getByText("Ready to Start")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Sign in with Google" }));
 
@@ -109,10 +124,10 @@ test("TourPage allows stepping through tour and sign-in on final step", () => {
   expect(localStorage.getItem(TOUR_COMPLETED_KEY)).toBe("1");
 });
 
-test("TourPage language selector changes tour copy", () => {
+test("TourPage language selector changes tour copy", async () => {
   renderWithAuth(baseAuth());
   fireEvent.click(screen.getByRole("combobox"));
   fireEvent.click(screen.getByText("Español"));
-  fireEvent.click(screen.getByRole("button", { name: "Siguiente" }));
-  expect(screen.getByText("Bienvenido a Ortho")).toBeInTheDocument();
+  fireEvent.click(screen.getByTestId("tour-language-continue"));
+  expect(await screen.findByText("Bienvenido a Ortho")).toBeInTheDocument();
 });

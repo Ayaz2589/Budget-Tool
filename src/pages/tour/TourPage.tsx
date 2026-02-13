@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -26,6 +27,8 @@ type TourCopy = {
   steps: TourStep[];
   signedInReplayBody: string;
   signedInReplayHighlights: string[];
+  languageCardTitle: string;
+  languageCardCta: string;
   back: string;
   next: string;
   finishTour: string;
@@ -113,6 +116,8 @@ const TOUR_COPY: Record<string, TourCopy> = {
       "Google Sheets sync is available in Settings.",
       "You can replay this tour later from Settings.",
     ],
+    languageCardTitle: "What language do you want to use Ortho?",
+    languageCardCta: "Let's get Started",
     back: "Back",
     next: "Next",
     finishTour: "Finish tour",
@@ -198,6 +203,8 @@ const TOUR_COPY: Record<string, TourCopy> = {
       "Google Sheets sync está disponible en Configuración.",
       "Puedes repetir este tour luego desde Configuración.",
     ],
+    languageCardTitle: "Que idioma quieres usar en Ortho?",
+    languageCardCta: "Comencemos",
     back: "Atrás",
     next: "Siguiente",
     finishTour: "Finalizar tour",
@@ -283,6 +290,8 @@ const TOUR_COPY: Record<string, TourCopy> = {
       "Settings-এ Google Sheets sync পাওয়া যাবে।",
       "পরে Settings থেকে tour আবার চালাতে পারবেন।",
     ],
+    languageCardTitle: "Ortho-তে আপনি কোন ভাষা ব্যবহার করতে চান?",
+    languageCardCta: "চলুন শুরু করি",
     back: "পেছনে",
     next: "পরবর্তী",
     finishTour: "ট্যুর শেষ করুন",
@@ -367,6 +376,8 @@ const TOUR_COPY: Record<string, TourCopy> = {
       "可在设置中使用 Google Sheets 同步。",
       "可在设置中重播本导览。",
     ],
+    languageCardTitle: "你想在 Ortho 中使用哪种语言？",
+    languageCardCta: "开始使用",
     back: "返回",
     next: "下一步",
     finishTour: "完成导览",
@@ -451,6 +462,8 @@ const TOUR_COPY: Record<string, TourCopy> = {
       "Google Sheets 동기화는 설정에서 사용할 수 있습니다.",
       "설정에서 이 투어를 다시 실행할 수 있습니다.",
     ],
+    languageCardTitle: "Ortho에서 어떤 언어를 사용하시겠어요?",
+    languageCardCta: "시작하기",
     back: "뒤로",
     next: "다음",
     finishTour: "투어 완료",
@@ -535,6 +548,8 @@ const TOUR_COPY: Record<string, TourCopy> = {
       "Google Sheets sync Settings में उपलब्ध है।",
       "आप इस tour को Settings से दोबारा चला सकते हैं।",
     ],
+    languageCardTitle: "आप Ortho में कौन सी भाषा उपयोग करना चाहते हैं?",
+    languageCardCta: "चलिए शुरू करें",
     back: "वापस",
     next: "आगे",
     finishTour: "टूर समाप्त करें",
@@ -620,6 +635,8 @@ const TOUR_COPY: Record<string, TourCopy> = {
       "Google Sheets 同期は設定から利用できます。",
       "このツアーは設定から再実行できます。",
     ],
+    languageCardTitle: "Orthoで使用する言語を選択してください",
+    languageCardCta: "はじめる",
     back: "戻る",
     next: "次へ",
     finishTour: "ツアーを終了",
@@ -636,6 +653,18 @@ const LANGUAGE_OPTIONS = [
   { value: "hi", label: "हिन्दी" },
   { value: "ja", label: "日本語" },
 ] as const;
+
+const TOUR_CARD_CLASS =
+  "min-h-[400px] md:min-h-[440px] flex flex-col overflow-hidden border-[var(--border-subtle)]";
+const LANGUAGE_CARD_CLASS =
+  "min-h-[260px] md:min-h-[280px] flex flex-col overflow-hidden border-[var(--border-subtle)]";
+
+const STEP_TRANSITION = {
+  initial: { opacity: 0, y: 12, scale: 0.985 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -10, scale: 0.985 },
+  transition: { duration: 0.25, ease: "easeOut" as const },
+};
 
 function setTourCompleted(): void {
   try {
@@ -703,74 +732,85 @@ export function TourPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-2xl space-y-4">
-        {isLanguageStep && (
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">{i18n.t("common.language")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {i18n.t("common.languageTourIntro")}
-              </p>
-              <Select value={tourLocale} onValueChange={handleLanguageChange}>
-                <SelectTrigger className="h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {LANGUAGE_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="flex justify-end">
-                <Button type="button" onClick={goNext}>
-                  {copy.next}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-        {!isLanguageStep && (
-          <Card>
-            <CardHeader className="space-y-2">
-              <div className="text-sm text-muted-foreground">{progressLabel}</div>
-              <CardTitle className="text-2xl">{step.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              <p className="text-base text-muted-foreground leading-relaxed">
-                {step.body}
-              </p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                {step.highlights.map((item) => (
-                  <li key={item} className="leading-relaxed">
-                    - {item}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex items-center justify-between gap-3">
-                <Button type="button" variant="outline" onClick={goBack}>
-                  {copy.back}
-                </Button>
-                {!isLast ? (
-                  <Button type="button" onClick={goNext}>
-                    {copy.next}
-                  </Button>
-                ) : isSignedIn ? (
-                  <Button type="button" onClick={handleFinishReplay}>
-                    {copy.finishTour}
-                  </Button>
-                ) : (
-                  <Button type="button" onClick={handleFinishSignIn}>
-                    {copy.signInWithGoogle}
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+      <div className="w-full max-w-2xl">
+        <AnimatePresence mode="wait" initial={false}>
+          {isLanguageStep ? (
+            <motion.div key="language-step" {...STEP_TRANSITION}>
+              <Card className={LANGUAGE_CARD_CLASS}>
+                <CardHeader className="pt-6 pb-2 text-center">
+                  <CardTitle className="text-xl md:text-2xl">
+                    {copy.languageCardTitle}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-1 flex-col items-center gap-4 text-center pt-2 pb-6">
+                  <div className="w-full max-w-md">
+                    <Select value={tourLocale} onValueChange={handleLanguageChange}>
+                      <SelectTrigger className="h-11 w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LANGUAGE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="pt-1">
+                    <Button
+                      type="button"
+                      onClick={goNext}
+                      className="h-11 min-w-52"
+                      data-testid="tour-language-continue"
+                    >
+                      {copy.languageCardCta}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ) : (
+            <motion.div key={`tour-step-${stepIndex}`} {...STEP_TRANSITION}>
+              <Card className={TOUR_CARD_CLASS}>
+                <CardHeader className="space-y-2">
+                  <div className="text-sm text-muted-foreground">{progressLabel}</div>
+                  <CardTitle className="text-2xl">{step.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-1 flex-col gap-8">
+                  <p className="text-base text-muted-foreground leading-relaxed">
+                    {step.body}
+                  </p>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    {step.highlights.map((item) => (
+                      <li key={item} className="leading-relaxed">
+                        - {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-auto flex items-center justify-between gap-3">
+                    <Button type="button" variant="outline" onClick={goBack}>
+                      {copy.back}
+                    </Button>
+                    {!isLast ? (
+                      <Button type="button" onClick={goNext}>
+                        {copy.next}
+                      </Button>
+                    ) : isSignedIn ? (
+                      <Button type="button" onClick={handleFinishReplay}>
+                        {copy.finishTour}
+                      </Button>
+                    ) : (
+                      <Button type="button" onClick={handleFinishSignIn}>
+                        {copy.signInWithGoogle}
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

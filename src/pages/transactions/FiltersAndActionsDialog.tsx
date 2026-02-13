@@ -193,8 +193,11 @@ export function FiltersAndActionsDialog({
                       onIncludeOwnerTransfersInTotalsChange(checked === true)
                     }
                   />
-                  <span>{t("transactions.includeOwnerTransfersInTotals")}</span>
+                  <span>{t("transactions.includeOwnerTransfersInTableTotals")}</span>
                 </label>
+                <p className="text-xs text-muted-foreground">
+                  {t("transactions.tableTotalsDefinitionHint")}
+                </p>
               </div>
               <div className="space-y-2">
                 <Label className="text-muted-foreground">

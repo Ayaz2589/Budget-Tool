@@ -383,7 +383,18 @@ export function Dashboard() {
           <DsMetricCard
             title={t("dashboard.kpiTotalSpentMtd")}
             value={formatCurrency(kpis.totalSpent)}
-            subtitle={`${t("dashboard.vsLastMonth")}: ${formatSpentDeltaLabel(kpis.spentVsLastMonthPct)}`}
+            subtitle={
+              <span className="space-y-0.5">
+                <span className="block">
+                  {t("dashboard.vsLastMonth")}: {formatSpentDeltaLabel(kpis.spentVsLastMonthPct)}
+                </span>
+                <span className="block text-xs">
+                  {expenseScope === "all"
+                    ? t("dashboard.kpiTotalSpentDefAll")
+                    : t("dashboard.kpiTotalSpentDefExcludeMortgage")}
+                </span>
+              </span>
+            }
           />
           <DsMetricCard
             title={t("dashboard.kpiTotalIncomeMtd")}

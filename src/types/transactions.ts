@@ -53,6 +53,7 @@ export interface ExpensesByMonthTableProps {
 export interface ExpensesByMonthListProps {
   byMonth: [string, TransactionLedgerRow[]][];
   defaultOpenMonth: string;
+  includeOwnerTransfersInTotals?: boolean;
   onRowTap: (row: TransactionLedgerRow) => void;
   t: (key: string, opts?: { count?: number }) => string;
 }

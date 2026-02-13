@@ -243,7 +243,9 @@
     "netShort": "Net",
     "sectionSpendByCardSource": "कार्ड स्रोत के अनुसार कुल खर्च",
     "sectionNoSpendByCardSource": "चयनित अवधि में स्रोत के अनुसार कोई खर्च नहीं है।",
-    "moreItemsCount": "+{{count}} और आइटम"
+    "moreItemsCount": "+{{count}} और आइटम",
+    "kpiTotalSpentDefAll": "इसमें ऋण भुगतान और मॉर्गेज शामिल हैं।",
+    "kpiTotalSpentDefExcludeMortgage": "इसमें ऋण भुगतान शामिल हैं। मॉर्गेज शामिल नहीं है।"
   },
   "dashboardDebt": {
     "addDebt": "कर्ज जोड़ें",
@@ -611,7 +613,11 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "visibleRowsTotal": "दिखाई दे रही पंक्तियों का कुल",
+    "visibleExpenseTotal": "दिखाई दे रहे खर्च का कुल",
+    "includeOwnerTransfersInTableTotals": "तालिका के कुल में मालिक ट्रांसफर शामिल करें",
+    "tableTotalsDefinitionHint": "तालिका के कुल केवल दिखाई दे रही लेनदेन पंक्तियों पर आधारित होते हैं और इनमें ऋण भुगतान शामिल नहीं होते।"
   },
   "about": {
     "title": "Ortho के बारे में",

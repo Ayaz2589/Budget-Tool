@@ -243,7 +243,9 @@
     "netShort": "Net",
     "sectionSpendByCardSource": "按卡片来源总支出",
     "sectionNoSpendByCardSource": "所选范围内暂无按来源支出。",
-    "moreItemsCount": "+还有 {{count}} 项"
+    "moreItemsCount": "+还有 {{count}} 项",
+    "kpiTotalSpentDefAll": "包含债务还款和房贷。",
+    "kpiTotalSpentDefExcludeMortgage": "包含债务还款，不含房贷。"
   },
   "dashboardDebt": {
     "addDebt": "添加债务",
@@ -612,7 +614,11 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "visibleRowsTotal": "可见行总计",
+    "visibleExpenseTotal": "可见支出总计",
+    "includeOwnerTransfersInTableTotals": "在表格总计中包含所有者转账",
+    "tableTotalsDefinitionHint": "表格总计仅基于当前可见交易行，不包含债务还款。"
   },
   "about": {
     "title": "关于 Ortho",

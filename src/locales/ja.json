@@ -243,7 +243,9 @@
     "netShort": "Net",
     "sectionSpendByCardSource": "カードソース別合計支出",
     "sectionNoSpendByCardSource": "選択した期間にソース別支出はありません。",
-    "moreItemsCount": "+{{count}} 件の項目"
+    "moreItemsCount": "+{{count}} 件の項目",
+    "kpiTotalSpentDefAll": "借入返済と住宅ローンを含みます。",
+    "kpiTotalSpentDefExcludeMortgage": "借入返済を含みます。住宅ローンは除外されます。"
   },
   "dashboardDebt": {
     "addDebt": "債務を追加",
@@ -611,7 +613,11 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "visibleRowsTotal": "表示行の合計",
+    "visibleExpenseTotal": "表示支出の合計",
+    "includeOwnerTransfersInTableTotals": "表の合計に所有者間送金を含める",
+    "tableTotalsDefinitionHint": "表の合計は表示中の取引行のみを対象とし、借入返済は含みません。"
   },
   "about": {
     "title": "Ortho について",

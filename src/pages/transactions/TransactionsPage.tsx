@@ -48,7 +48,7 @@ export function TransactionsPage() {
   const [searchFilter, setSearchFilter] = useState<string>("");
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<"all" | "expense" | "transfer">("all");
-  const [includeOwnerTransfersInTotals, setIncludeOwnerTransfersInTotals] = useState(true);
+  const [includeOwnerTransfersInTotals, setIncludeOwnerTransfersInTotals] = useState(false);
   const [sortBy, setSortBy] = useState<SortColumn>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [deleteOneExpense, setDeleteOneExpense] = useState<Expense | null>(
@@ -285,6 +285,7 @@ export function TransactionsPage() {
                     <ExpensesByMonthList
                       byMonth={byMonth}
                       defaultOpenMonth={defaultOpenMonth}
+                      includeOwnerTransfersInTotals={includeOwnerTransfersInTotals}
                       onRowTap={(row) => {
                         if (row.kind === "owner-transfer" && row.transfer) {
                           setTransferForActions(row.transfer);

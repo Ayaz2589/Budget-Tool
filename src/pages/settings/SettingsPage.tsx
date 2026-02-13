@@ -176,6 +176,7 @@ export function SettingsPage() {
 
       <div>
         <GoogleSheetsCard
+          useDummyData={useDummyData}
           isSignedIn={isSignedIn}
           signIn={signIn}
           signOut={signOut}

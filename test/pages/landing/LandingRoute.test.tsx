@@ -1,4 +1,4 @@
-import { test, expect } from "bun:test";
+import { beforeEach, test, expect } from "bun:test";
 import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { LandingRoute } from "@/pages/landing";
@@ -45,6 +45,10 @@ function clearReturningFlag() {
   }
 }
 
+beforeEach(() => {
+  clearReturningFlag();
+});
+
 test("LandingRoute redirects to /dashboard when signed in", () => {
   clearReturningFlag();
   const { container } = render(
@@ -78,11 +82,6 @@ test("LandingRoute redirects to /auth when not signed in and returning user", ()
     </GoogleAuthProviderFallback>,
   );
   expect(within(container).getByText("Login page")).toBeInTheDocument();
-  try {
-    localStorage.removeItem(RETURNING_USER_KEY);
-  } catch {
-    // ignore
-  }
 });
 
 test("LandingRoute redirects to /tour when not signed in and first-time user", () => {
@@ -118,7 +117,6 @@ test("LandingRoute renders LandingPage when tour is completed and user is not re
       </MemoryRouter>
     </GoogleAuthProviderFallback>,
   );
-  expect(within(container).getByText("Ortho")).toBeInTheDocument();
+  expect(container.querySelector('a[href="/auth"]')).not.toBeNull();
   expect(within(container).queryByText("Tour page")).not.toBeInTheDocument();
-  clearReturningFlag();
 });

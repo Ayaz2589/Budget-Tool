@@ -51,7 +51,8 @@
     "signInToContinue": "अपना डैशबोर्ड देखने के लिए Google से साइन इन करें।",
     "signInWithGoogle": "Google से साइन इन करें",
     "valuePropSubtitle": "Google Sheets के साथ सिंक। क्रेडिट कार्ड की जरूरत नहीं।",
-    "valuePropTitle": "खर्च, आय और बजट ट्रैक करें।"
+    "valuePropTitle": "खर्च, आय और बजट ट्रैक करें।",
+    "dummyDataSyncBlocked": "डमी डेटा सिंक बंद है। Google Sheets से सिंक करने के लिए Settings में डमी डेटा बंद करें।"
   },
   "common": {
     "actions": "कार्रवाइयां",
@@ -177,6 +178,9 @@
     "tasnuvasSpendingByType": "Tasnuva का प्रकार के अनुसार खर्च",
     "tasnuvasTotalSpending": "Tasnuva का कुल खर्च",
     "timeRange": "समय सीमा",
+    "viewMode": "दृश्य",
+    "viewHousehold": "परिवार",
+    "viewIndividual": "व्यक्तिगत",
     "title": "डैशबोर्ड",
     "totalEarned": "कुल आय",
     "totalEarnedVsSpentByMonth": "महीने के अनुसार कुल आय बनाम कुल खर्च।",
@@ -239,11 +243,19 @@
     "netAfterTransfers": "ट्रांसफर के बाद शुद्ध",
     "transfersSent": "भेजे गए ट्रांसफर",
     "transfersReceived": "प्राप्त ट्रांसफर",
+    "transferImpact": "ट्रांसफर प्रभाव",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "कार्ड स्रोत के अनुसार कुल खर्च",
     "sectionNoSpendByCardSource": "चयनित अवधि में स्रोत के अनुसार कोई खर्च नहीं है।",
-    "moreItemsCount": "+{{count}} और आइटम"
+    "moreItemsCount": "+{{count}} और आइटम",
+    "kpiTotalSpentDefAll": "इसमें ऋण भुगतान और मॉर्गेज शामिल हैं।",
+    "kpiTotalSpentDefExcludeMortgage": "इसमें ऋण भुगतान शामिल हैं। मॉर्गेज शामिल नहीं है।",
+    "kpiTotalSpentDefAllExcludeDebt": "इसमें मॉर्गेज शामिल है। ऋण भुगतान शामिल नहीं है।",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "मॉर्गेज और ऋण भुगतान दोनों शामिल नहीं हैं।",
+    "includeDebtPayments": "ऋण शामिल करें",
+    "excludeDebtPayments": "ऋण हटाएँ",
+    "debtPaymentsExcludedHint": "डैशबोर्ड कुल और कैश फ्लो चार्ट से ऋण भुगतान हटाए गए हैं।"
   },
   "dashboardDebt": {
     "addDebt": "कर्ज जोड़ें",
@@ -555,7 +567,8 @@
     "currencyDesc": "सभी राशि USD (canonical) में संग्रहीत रहती हैं। स्क्रीन रूपांतरण नवीनतम कैश्ड दर का उपयोग करता है।",
     "currencyDisplayLabel": "डिस्प्ले मुद्रा",
     "fxAsOf": "FX समय: {{value}}",
-    "fxFallback": "(fallback)"
+    "fxFallback": "(fallback)",
+    "dummySyncBlocked": "डमी डेटा चालू होने पर Google Sheets सिंक बंद रहता है।"
   },
   "transactions": {
     "add": "जोड़ें",
@@ -611,7 +624,11 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "visibleRowsTotal": "दिखाई दे रही पंक्तियों का कुल",
+    "visibleExpenseTotal": "दिखाई दे रहे खर्च का कुल",
+    "includeOwnerTransfersInTableTotals": "तालिका के कुल में मालिक ट्रांसफर शामिल करें",
+    "tableTotalsDefinitionHint": "तालिका के कुल केवल दिखाई दे रही लेनदेन पंक्तियों पर आधारित होते हैं और इनमें ऋण भुगतान शामिल नहीं होते।"
   },
   "about": {
     "title": "Ortho के बारे में",

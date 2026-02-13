@@ -1,11 +1,14 @@
 import { expect, test } from "bun:test";
 import {
+  buildCashFlowRows,
+  buildOwnerNetRows,
   buildCategoryBreakdown,
   buildDashboardKpis,
   buildFixedObligations,
   buildOwnerSplit,
   getCurrentMonthKey,
   getRangeMonthKeys,
+  sumCashFlowExpenseTotals,
 } from "@/pages/dashboard/dashboardSelectors";
 
 test("buildDashboardKpis excludes mortgage when scope is exclude-mortgage", () => {
@@ -208,4 +211,114 @@ test("range helper supports current, 6 and 12 windows", () => {
   expect(getRangeMonthKeys("current", current)).toHaveLength(1);
   expect(getRangeMonthKeys("6", current)).toHaveLength(6);
   expect(getRangeMonthKeys("12", current)).toHaveLength(12);
+});
+
+test("sumCashFlowExpenseTotals returns a range-wide expense total", () => {
+  expect(
+    sumCashFlowExpenseTotals([
+      {
+        monthKey: "2026-01",
+        monthLabel: "January 2026",
+        incomeTotal: 0,
+        expensesTotal: 1200,
+        debtPaymentsTotal: 0,
+        incomeByOwner: {},
+      },
+      {
+        monthKey: "2026-02",
+        monthLabel: "February 2026",
+        incomeTotal: 0,
+        expensesTotal: 800,
+        debtPaymentsTotal: 0,
+        incomeByOwner: {},
+      },
+    ]),
+  ).toBe(2000);
+});
+
+test("buildOwnerNetRows applies transfer impact with one aligned equation", () => {
+  const rows = buildOwnerNetRows({
+    ownerExpenseRows: [
+      { key: "ayaz", owner: "AYAZ UDDIN", label: "AYAZ UDDIN", value: 6941.2 },
+      { key: "tasnuva", owner: "TASNUVA AHMED", label: "TASNUVA AHMED", value: 1207.68 },
+    ],
+    ownerTransfers: [
+      {
+        id: "t1",
+        date: "2026-02-09",
+        fromOwner: "TASNUVA AHMED",
+        toOwner: "AYAZ UDDIN",
+        amount: 600,
+      },
+    ],
+    monthKeys: ["2026-02"],
+  });
+
+  const ayaz = rows.find((row) => row.owner === "AYAZ UDDIN");
+  const tasnuva = rows.find((row) => row.owner === "TASNUVA AHMED");
+  expect(ayaz?.gross).toBe(6941.2);
+  expect(ayaz?.net).toBe(6341.2);
+  expect(ayaz?.received).toBe(600);
+  expect(ayaz?.sent).toBe(0);
+  expect(tasnuva?.gross).toBe(1207.68);
+  expect(tasnuva?.net).toBe(1807.68);
+  expect(tasnuva?.received).toBe(0);
+  expect(tasnuva?.sent).toBe(600);
+});
+
+test("buildDashboardKpis can exclude debt payments from spend and net", () => {
+  const kpis = buildDashboardKpis({
+    currentMonthKey: "2026-02",
+    scope: "all",
+    includeDebtPayments: false,
+    expenses: [
+      {
+        id: "e1",
+        date: "2026-02-02",
+        amount: 400,
+        description: "Food",
+        category: "Food",
+        source: "manual",
+      },
+    ],
+    income: [
+      {
+        id: "i1",
+        date: "2026-02-01",
+        amount: 1000,
+        description: "Salary",
+        category: "Paycheck",
+      },
+    ],
+    debts: [{ id: "d1", name: "Loan", initialAmount: 500 }],
+    debtPayments: [{ id: "p1", debtId: "d1", date: "2026-02-10", amount: 100 }],
+  });
+
+  expect(kpis.totalSpent).toBe(400);
+  expect(kpis.netCashFlow).toBe(600);
+  expect(kpis.debtPaidThisMonth).toBe(0);
+});
+
+test("buildCashFlowRows can exclude debt payments from chart rows", () => {
+  const rows = buildCashFlowRows({
+    monthKeys: ["2026-02"],
+    scope: "all",
+    includeDebtPayments: false,
+    expenses: [
+      {
+        id: "e1",
+        date: "2026-02-02",
+        amount: 250,
+        description: "Food",
+        category: "Food",
+        source: "manual",
+      },
+    ],
+    income: [],
+    debtPayments: [{ id: "p1", debtId: "d1", date: "2026-02-10", amount: 90 }],
+  });
+
+  expect(rows).toHaveLength(1);
+  expect(rows[0]?.expensesTotal).toBe(250);
+  expect(rows[0]?.debtPaymentsTotal).toBe(0);
 });

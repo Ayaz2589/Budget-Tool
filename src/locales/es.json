@@ -51,7 +51,8 @@
     "signInToContinue": "Inicia sesión con Google para ver tu panel.",
     "signInWithGoogle": "Iniciar sesión con Google",
     "valuePropSubtitle": "Sincroniza con Google Sheets. No hace falta tarjeta de crédito.",
-    "valuePropTitle": "Gastos, ingresos y presupuestos."
+    "valuePropTitle": "Gastos, ingresos y presupuestos.",
+    "dummyDataSyncBlocked": "La sincronización con datos de prueba está deshabilitada. Desactiva los datos de prueba en Ajustes para sincronizar con Google Sheets."
   },
   "common": {
     "actions": "Acciones",
@@ -177,6 +178,9 @@
     "tasnuvasSpendingByType": "Gastos de Tasnuva por tipo",
     "tasnuvasTotalSpending": "Gastos totales de Tasnuva",
     "timeRange": "Rango de tiempo",
+    "viewMode": "Vista",
+    "viewHousehold": "Hogar",
+    "viewIndividual": "Individual",
     "title": "Panel",
     "totalEarned": "Total ingresado",
     "totalEarnedVsSpentByMonth": "Total ingresado vs gastado por mes.",
@@ -195,6 +199,8 @@
     "scopeMortgageExcludedHint": "Hipoteca excluida de los totales de gastos",
     "kpiNetCashFlowMtd": "Flujo neto de caja (este mes)",
     "kpiTotalSpentMtd": "Total gastado (este mes)",
+    "kpiTotalSpentDefAll": "Incluye pagos de deuda e hipoteca.",
+    "kpiTotalSpentDefExcludeMortgage": "Incluye pagos de deuda. Hipoteca excluida.",
     "kpiTotalIncomeMtd": "Ingresos totales (este mes)",
     "kpiTotalDebtOutstanding": "Deuda total pendiente",
     "vsLastMonth": "vs mes pasado",
@@ -239,11 +245,17 @@
     "netAfterTransfers": "Neto después de transferencias",
     "transfersSent": "Transferencias enviadas",
     "transfersReceived": "Transferencias recibidas",
+    "transferImpact": "Impacto de transferencias",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "Gasto total por fuente de tarjeta",
     "sectionNoSpendByCardSource": "No hay gasto por fuente en el rango seleccionado.",
-    "moreItemsCount": "+{{count}} elementos más"
+    "moreItemsCount": "+{{count}} elementos más",
+    "kpiTotalSpentDefAllExcludeDebt": "Incluye hipoteca. Pagos de deuda excluidos.",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "Hipoteca y pagos de deuda excluidos.",
+    "includeDebtPayments": "Incluir deuda",
+    "excludeDebtPayments": "Excluir deuda",
+    "debtPaymentsExcludedHint": "Los pagos de deuda se excluyen de los totales del panel y de los gráficos de flujo de caja."
   },
   "dashboardDebt": {
     "addDebt": "Añadir una deuda",
@@ -556,7 +568,8 @@
     "currencyDesc": "Todos los importes se guardan en USD (canónico). La conversión en pantalla usa la última tasa en caché.",
     "currencyDisplayLabel": "Moneda de visualización",
     "fxAsOf": "FX al {{value}}",
-    "fxFallback": "(respaldo)"
+    "fxFallback": "(respaldo)",
+    "dummySyncBlocked": "La sincronización con Google Sheets está deshabilitada mientras los datos de prueba estén activos."
   },
   "transactions": {
     "add": "Añadir",
@@ -607,7 +620,11 @@
     "typeExpense": "Gasto",
     "typeTransfer": "Transferencia entre propietarios",
     "totalsLabel": "Totales",
+    "visibleRowsTotal": "Total de filas visibles",
+    "visibleExpenseTotal": "Total de gastos visibles",
     "includeOwnerTransfersInTotals": "Incluir transferencias entre propietarios en los totales",
+    "includeOwnerTransfersInTableTotals": "Incluir transferencias entre propietarios en los totales de la tabla",
+    "tableTotalsDefinitionHint": "Los totales de la tabla se calculan sobre las filas visibles y no incluyen pagos de deuda.",
     "transfer": "Owner Transfer",
     "transferFrom": "From owner",
     "transferTo": "To owner",

@@ -4,13 +4,22 @@ import {
   isSharedExpenseByAllocation,
   normalizeExpenseAllocation,
 } from "@/lib/ownerAccounting";
-import type { Debt, DebtPayment, Expense, Income } from "@/types/core";
+import {
+  computeDebtBalance,
+  computeDebtProgress,
+  computeMonthOverMonthPct,
+  computeNetCashFlow,
+  computeOwnerNetFromTransfers,
+  sumAmountsBy,
+} from "@/lib/math";
+import type { Debt, DebtPayment, Expense, Income, OwnerTransfer } from "@/types/core";
 import type {
   DashboardCashFlowRow,
   DashboardCategorySlice,
   DashboardDebtRow,
   DashboardExpenseScope,
   DashboardKpis,
+  DashboardOwnerNetRow,
   DashboardOwnerSlice,
   DashboardOwnerExpenseItem,
   DashboardRange,
@@ -60,25 +69,25 @@ function sumExpensesForMonth(
   monthKey: string,
   scope: DashboardExpenseScope,
 ): number {
-  return expenses.reduce((sum, expense) => {
-    if (!isValidDate(expense.date) || monthFromDate(expense.date) !== monthKey) return sum;
-    if (!shouldIncludeExpense(expense, scope)) return sum;
-    return sum + expense.amount;
-  }, 0);
+  return sumAmountsBy(expenses, (expense) => {
+    if (!isValidDate(expense.date) || monthFromDate(expense.date) !== monthKey) return 0;
+    if (!shouldIncludeExpense(expense, scope)) return 0;
+    return expense.amount;
+  });
 }
 
 function sumIncomeForMonth(income: Income[], monthKey: string): number {
-  return income.reduce((sum, row) => {
-    if (!isValidDate(row.date) || monthFromDate(row.date) !== monthKey) return sum;
-    return sum + row.amount;
-  }, 0);
+  return sumAmountsBy(income, (row) => {
+    if (!isValidDate(row.date) || monthFromDate(row.date) !== monthKey) return 0;
+    return row.amount;
+  });
 }
 
 function sumDebtPaymentsForMonth(debtPayments: DebtPayment[], monthKey: string): number {
-  return debtPayments.reduce((sum, row) => {
-    if (!isValidDate(row.date) || monthFromDate(row.date) !== monthKey) return sum;
-    return sum + row.amount;
-  }, 0);
+  return sumAmountsBy(debtPayments, (row) => {
+    if (!isValidDate(row.date) || monthFromDate(row.date) !== monthKey) return 0;
+    return row.amount;
+  });
 }
 
 export function buildDashboardKpis({
@@ -88,6 +97,7 @@ export function buildDashboardKpis({
   debts,
   debtPayments,
   scope,
+  includeDebtPayments = true,
 }: {
   currentMonthKey: string;
   expenses: Expense[];
@@ -95,17 +105,21 @@ export function buildDashboardKpis({
   debts: Debt[];
   debtPayments: DebtPayment[];
   scope: DashboardExpenseScope;
+  includeDebtPayments?: boolean;
 }): DashboardKpis {
   const previousMonthKey = getPreviousMonthKey(currentMonthKey);
   const currentIncome = sumIncomeForMonth(income, currentMonthKey);
   const currentExpenses = sumExpensesForMonth(expenses, currentMonthKey, scope);
-  const currentDebtPayments = sumDebtPaymentsForMonth(debtPayments, currentMonthKey);
+  const currentDebtPayments = includeDebtPayments
+    ? sumDebtPaymentsForMonth(debtPayments, currentMonthKey)
+    : 0;
   const currentSpent = currentExpenses + currentDebtPayments;
   const previousExpenses = sumExpensesForMonth(expenses, previousMonthKey, scope);
-  const previousDebtPayments = sumDebtPaymentsForMonth(debtPayments, previousMonthKey);
+  const previousDebtPayments = includeDebtPayments
+    ? sumDebtPaymentsForMonth(debtPayments, previousMonthKey)
+    : 0;
   const previousSpent = previousExpenses + previousDebtPayments;
-  const spentVsLastMonthPct =
-    previousSpent > 0 ? (currentSpent - previousSpent) / previousSpent : null;
+  const spentVsLastMonthPct = computeMonthOverMonthPct(currentSpent, previousSpent);
 
   const debtOutstanding = debts.reduce(
     (sum, debt) => sum + getDebtBalance(debt, debtPayments),
@@ -113,7 +127,11 @@ export function buildDashboardKpis({
   );
 
   return {
-    netCashFlow: currentIncome - currentExpenses - currentDebtPayments,
+    netCashFlow: computeNetCashFlow(
+      currentIncome,
+      currentExpenses,
+      currentDebtPayments,
+    ),
     totalSpent: currentSpent,
     totalIncome: currentIncome,
     debtOutstanding,
@@ -128,6 +146,7 @@ export function buildCashFlowRows({
   income,
   debtPayments,
   scope,
+  includeDebtPayments = true,
   unassignedOwnerLabel = "Unassigned",
   locale = "en-US",
 }: {
@@ -136,6 +155,7 @@ export function buildCashFlowRows({
   income: Income[];
   debtPayments: DebtPayment[];
   scope: DashboardExpenseScope;
+  includeDebtPayments?: boolean;
   unassignedOwnerLabel?: string;
   locale?: string;
 }): DashboardCashFlowRow[] {
@@ -152,7 +172,9 @@ export function buildCashFlowRows({
       monthLabel: getMonthLabel(monthKey, locale),
       incomeTotal: sumIncomeForMonth(income, monthKey),
       expensesTotal: sumExpensesForMonth(expenses, monthKey, scope),
-      debtPaymentsTotal: sumDebtPaymentsForMonth(debtPayments, monthKey),
+      debtPaymentsTotal: includeDebtPayments
+        ? sumDebtPaymentsForMonth(debtPayments, monthKey)
+        : 0,
       incomeByOwner,
     };
   });
@@ -330,7 +352,7 @@ export function buildDebtSnapshot({
   return debts
     .map((debt) => {
       const remaining = getDebtBalance(debt, debtPayments);
-      const paid = Math.max(0, debt.initialAmount - remaining);
+      const paid = computeDebtBalance(debt.initialAmount, remaining);
       return {
         id: debt.id,
         name: debt.name,
@@ -338,7 +360,7 @@ export function buildDebtSnapshot({
         initialAmount: debt.initialAmount,
         remaining,
         paid,
-        progress: debt.initialAmount > 0 ? paid / debt.initialAmount : 0,
+        progress: computeDebtProgress(debt.initialAmount, remaining),
       };
     })
     .sort((a, b) => b.remaining - a.remaining);
@@ -385,6 +407,56 @@ export function buildOwnerTransfersMtd({
     .filter((row) => isValidDate(row.date) && monthFromDate(row.date) === currentMonthKey)
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, limit);
+}
+
+export function sumCashFlowExpenseTotals(rows: DashboardCashFlowRow[]): number {
+  return sumAmountsBy(rows, (row) => row.expensesTotal);
+}
+
+export function buildOwnerNetRows({
+  ownerExpenseRows,
+  ownerTransfers,
+  monthKeys,
+}: {
+  ownerExpenseRows: DashboardOwnerSlice[];
+  ownerTransfers: OwnerTransfer[];
+  monthKeys: string[];
+}): DashboardOwnerNetRow[] {
+  const monthKeySet = new Set(monthKeys);
+  const grossByOwner = new Map<string, number>();
+  ownerExpenseRows.forEach((row) => {
+    if (!row.owner) return;
+    grossByOwner.set(row.owner, row.value);
+  });
+
+  const sentByOwner = new Map<string, number>();
+  const receivedByOwner = new Map<string, number>();
+  ownerTransfers.forEach((row) => {
+    if (!monthKeySet.has(row.date.slice(0, 7))) return;
+    sentByOwner.set(row.fromOwner, (sentByOwner.get(row.fromOwner) ?? 0) + row.amount);
+    receivedByOwner.set(row.toOwner, (receivedByOwner.get(row.toOwner) ?? 0) + row.amount);
+  });
+
+  const ownersWithValues = new Set<string>([
+    ...grossByOwner.keys(),
+    ...sentByOwner.keys(),
+    ...receivedByOwner.keys(),
+  ]);
+
+  return Array.from(ownersWithValues)
+    .map((owner) => {
+      const gross = grossByOwner.get(owner) ?? 0;
+      const sent = sentByOwner.get(owner) ?? 0;
+      const received = receivedByOwner.get(owner) ?? 0;
+      return {
+        owner,
+        gross,
+        net: computeOwnerNetFromTransfers(gross, received, sent),
+        sent,
+        received,
+      };
+    })
+    .sort((a, b) => b.gross - a.gross);
 }
 
 export function getOwnerDrilldownParam(slice: DashboardOwnerSlice): string {

@@ -51,7 +51,8 @@
     "signInToContinue": "使用 Google 登录以查看您的仪表板。",
     "signInWithGoogle": "使用 Google 登录",
     "valuePropSubtitle": "与 Google 表格同步。无需信用卡。",
-    "valuePropTitle": "管理支出、收入和预算。"
+    "valuePropTitle": "管理支出、收入和预算。",
+    "dummyDataSyncBlocked": "示例数据同步已禁用。请在设置中关闭示例数据后再同步到 Google 表格。"
   },
   "common": {
     "actions": "操作",
@@ -177,6 +178,9 @@
     "tasnuvasSpendingByType": "Tasnuva 按类型支出",
     "tasnuvasTotalSpending": "Tasnuva 总支出",
     "timeRange": "时间范围",
+    "viewMode": "视图",
+    "viewHousehold": "家庭",
+    "viewIndividual": "个人",
     "title": "仪表盘",
     "totalEarned": "总收入",
     "totalEarnedVsSpentByMonth": "各月总收入 vs 总支出。",
@@ -239,11 +243,19 @@
     "netAfterTransfers": "转账后净额",
     "transfersSent": "已转出",
     "transfersReceived": "已转入",
+    "transferImpact": "转账影响",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "按卡片来源总支出",
     "sectionNoSpendByCardSource": "所选范围内暂无按来源支出。",
-    "moreItemsCount": "+还有 {{count}} 项"
+    "moreItemsCount": "+还有 {{count}} 项",
+    "kpiTotalSpentDefAll": "包含债务还款和房贷。",
+    "kpiTotalSpentDefExcludeMortgage": "包含债务还款，不含房贷。",
+    "kpiTotalSpentDefAllExcludeDebt": "包含房贷，不包含债务还款。",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "房贷和债务还款均不包含。",
+    "includeDebtPayments": "包含债务",
+    "excludeDebtPayments": "排除债务",
+    "debtPaymentsExcludedHint": "债务还款已从仪表盘总计和现金流图表中排除。"
   },
   "dashboardDebt": {
     "addDebt": "添加债务",
@@ -556,7 +568,8 @@
     "currencyDesc": "所有金额均以 USD（规范值）存储。界面换算使用最新缓存汇率。",
     "currencyDisplayLabel": "显示货币",
     "fxAsOf": "汇率时间：{{value}}",
-    "fxFallback": "（回退）"
+    "fxFallback": "（回退）",
+    "dummySyncBlocked": "启用示例数据时，Google 表格同步已禁用。"
   },
   "transactions": {
     "add": "添加",
@@ -612,7 +625,11 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "visibleRowsTotal": "可见行总计",
+    "visibleExpenseTotal": "可见支出总计",
+    "includeOwnerTransfersInTableTotals": "在表格总计中包含所有者转账",
+    "tableTotalsDefinitionHint": "表格总计仅基于当前可见交易行，不包含债务还款。"
   },
   "about": {
     "title": "关于 Ortho",

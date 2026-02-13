@@ -20,6 +20,7 @@ import { DsSectionHeader } from "@/components/ds";
 export type { GoogleSheetsCardProps };
 
 export function GoogleSheetsCard({
+  useDummyData,
   isSignedIn,
   signIn,
   signOut,
@@ -74,6 +75,7 @@ export function GoogleSheetsCard({
                   <Checkbox
                     id="auto-sync-toggle"
                     checked={isAutoSyncEnabled}
+                    disabled={useDummyData}
                     onCheckedChange={(checked) => onAutoSyncToggle(checked === true)}
                   />
                   <div className="space-y-1">
@@ -85,6 +87,11 @@ export function GoogleSheetsCard({
                     </p>
                   </div>
                 </div>
+                {useDummyData && (
+                  <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+                    {t("settings.dummySyncBlocked")}
+                  </p>
+                )}
 
                 <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
                   <div className="flex flex-wrap items-center gap-2">
@@ -149,7 +156,7 @@ export function GoogleSheetsCard({
                 <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                   <Button
                     onClick={() => setSyncConfirmOpen(true)}
-                    disabled={syncStatus === "syncing"}
+                    disabled={syncStatus === "syncing" || useDummyData}
                     className="h-11 w-full"
                   >
                     {syncStatus === "syncing"
@@ -158,7 +165,7 @@ export function GoogleSheetsCard({
                   </Button>
                   <Button
                     onClick={() => setRestoreConfirmOpen(true)}
-                    disabled={syncStatus === "syncing"}
+                    disabled={syncStatus === "syncing" || useDummyData}
                     variant="outline"
                     className="h-11 w-full"
                   >
@@ -205,6 +212,7 @@ export function GoogleSheetsCard({
                     {t("common.cancel")}
                   </Button>
                   <Button
+                    disabled={useDummyData}
                     onClick={() => {
                       setSyncConfirmOpen(false);
                       syncToSheets();
@@ -235,6 +243,7 @@ export function GoogleSheetsCard({
                     {t("common.cancel")}
                   </Button>
                   <Button
+                    disabled={useDummyData}
                     onClick={() => {
                       setRestoreConfirmOpen(false);
                       pullFromSheet();

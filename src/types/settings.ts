@@ -17,6 +17,7 @@ export interface OwnersCardProps {
 }
 
 export interface GoogleSheetsCardProps {
+  useDummyData: boolean;
   isSignedIn: boolean;
   signIn: () => void;
   signOut: () => void;

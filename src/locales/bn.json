@@ -51,7 +51,8 @@
     "signInToContinue": "ড্যাশবোর্ড দেখতে Google দিয়ে সাইন ইন করুন।",
     "signInWithGoogle": "গুগল দিয়ে সাইন ইন",
     "valuePropSubtitle": "Google Sheets এর সাথে সিঙ্ক। ক্রেডিট কার্ডের দরকার নেই।",
-    "valuePropTitle": "ব্যয়, আয় এবং বাজেট ট্র্যাক করুন।"
+    "valuePropTitle": "ব্যয়, আয় এবং বাজেট ট্র্যাক করুন।",
+    "dummyDataSyncBlocked": "ডামি ডেটা সিঙ্ক বন্ধ আছে। Google Sheets-এ সিঙ্ক করতে Settings থেকে ডামি ডেটা বন্ধ করুন।"
   },
   "common": {
     "actions": "কর্ম",
@@ -177,6 +178,9 @@
     "tasnuvasSpendingByType": "তাসনুভার ধরন অনুযায়ী ব্যয়",
     "tasnuvasTotalSpending": "তাসনুভার মোট ব্যয়",
     "timeRange": "সময়ের পরিসর",
+    "viewMode": "ভিউ",
+    "viewHousehold": "হাউসহোল্ড",
+    "viewIndividual": "ব্যক্তিগত",
     "title": "ড্যাশবোর্ড",
     "totalEarned": "মোট আয়",
     "totalEarnedVsSpentByMonth": "মাস অনুযায়ী মোট আয় বনাম ব্যয়।",
@@ -195,6 +199,8 @@
     "scopeMortgageExcludedHint": "খরচের মোট থেকে মর্টগেজ বাদ দেওয়া হয়েছে",
     "kpiNetCashFlowMtd": "নিট ক্যাশ ফ্লো (চলতি মাস)",
     "kpiTotalSpentMtd": "মোট খরচ (চলতি মাস)",
+    "kpiTotalSpentDefAll": "এতে ঋণ পরিশোধ ও মর্টগেজ অন্তর্ভুক্ত আছে।",
+    "kpiTotalSpentDefExcludeMortgage": "এতে ঋণ পরিশোধ অন্তর্ভুক্ত। মর্টগেজ বাদ।",
     "kpiTotalIncomeMtd": "মোট আয় (চলতি মাস)",
     "kpiTotalDebtOutstanding": "মোট বাকি ঋণ",
     "vsLastMonth": "গত মাসের তুলনায়",
@@ -239,11 +245,17 @@
     "netAfterTransfers": "ট্রান্সফারের পর নেট",
     "transfersSent": "পাঠানো ট্রান্সফার",
     "transfersReceived": "প্রাপ্ত ট্রান্সফার",
+    "transferImpact": "ট্রান্সফার প্রভাব",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "কার্ড উৎস অনুযায়ী মোট ব্যয়",
     "sectionNoSpendByCardSource": "নির্বাচিত সময়সীমায় উৎস অনুযায়ী কোনো ব্যয় নেই।",
-    "moreItemsCount": "+আরও {{count}} টি আইটেম"
+    "moreItemsCount": "+আরও {{count}} টি আইটেম",
+    "kpiTotalSpentDefAllExcludeDebt": "এতে মর্টগেজ অন্তর্ভুক্ত। ঋণ পরিশোধ বাদ।",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "মর্টগেজ ও ঋণ পরিশোধ বাদ।",
+    "includeDebtPayments": "ঋণ অন্তর্ভুক্ত",
+    "excludeDebtPayments": "ঋণ বাদ",
+    "debtPaymentsExcludedHint": "ড্যাশবোর্ডের মোট ও ক্যাশ ফ্লো চার্ট থেকে ঋণ পরিশোধ বাদ দেওয়া হয়েছে।"
   },
   "dashboardDebt": {
     "addDebt": "ঋণ যোগ করুন",
@@ -555,7 +567,8 @@
     "currencyDesc": "সব পরিমাণ USD-এ (ক্যানোনিকাল) সংরক্ষিত থাকে। প্রদর্শিত রূপান্তর সর্বশেষ ক্যাশ করা রেট ব্যবহার করে।",
     "currencyDisplayLabel": "প্রদর্শনের মুদ্রা",
     "fxAsOf": "FX সময়: {{value}}",
-    "fxFallback": "(ফলব্যাক)"
+    "fxFallback": "(ফলব্যাক)",
+    "dummySyncBlocked": "ডামি ডেটা চালু থাকলে Google Sheets সিঙ্ক বন্ধ থাকে।"
   },
   "transactions": {
     "add": "যোগ করুন",
@@ -606,7 +619,11 @@
     "typeExpense": "খরচ",
     "typeTransfer": "মালিক ট্রান্সফার",
     "totalsLabel": "মোট",
+    "visibleRowsTotal": "দেখানো সারির মোট",
+    "visibleExpenseTotal": "দেখানো খরচের মোট",
     "includeOwnerTransfersInTotals": "মোটে মালিক ট্রান্সফার অন্তর্ভুক্ত করুন",
+    "includeOwnerTransfersInTableTotals": "টেবিলের মোটে মালিক ট্রান্সফার অন্তর্ভুক্ত করুন",
+    "tableTotalsDefinitionHint": "টেবিলের মোট কেবল দৃশ্যমান লেনদেন সারি থেকে গণনা হয় এবং এতে ঋণ পরিশোধ ধরা হয় না।",
     "transfer": "Owner Transfer",
     "transferFrom": "From owner",
     "transferTo": "To owner",

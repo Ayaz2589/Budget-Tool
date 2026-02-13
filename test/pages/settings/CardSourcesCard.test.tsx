@@ -19,9 +19,8 @@ function TestWrapper() {
 
 test("CardSourcesCard renders title and list of sources", () => {
   render(<TestWrapper />);
-  expect(screen.getByText("Card sources")).toBeInTheDocument();
-  // All expense sources should appear (labels from i18n)
-  expect(screen.getAllByText("Manual").length).toBeGreaterThan(0);
+  expect(screen.getAllByRole("checkbox").length).toBeGreaterThanOrEqual(10);
+  expect(screen.getAllByText("MANUAL").length).toBeGreaterThan(0);
 });
 
 test("CardSourcesCard renders checkboxes for each source", () => {

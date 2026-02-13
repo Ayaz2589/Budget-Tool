@@ -16,11 +16,21 @@
 
 - **Entry:** `/` (index), `src/pages/dashboard/Dashboard.tsx`.
 - **Backing:** `src/lib/totals.ts` (computeMonthTotals, computeAllTotals), `src/lib/rules.ts` (getDashboardWarnings). Sections: SummaryCards, DebtSection, ByMonthSection, OverviewSection, SpendingByTypeSection, MonthSelector.
+- **Settings in-dashboard:** supports
+  - month selection from available data months
+  - range selection (current / 6 / 12)
+  - expense scope (all vs exclude mortgage)
+  - debt-payment include/exclude toggle
+  - view mode (household vs individual owner)
+- **Owner/household scoping:** uses `src/lib/financialModel.ts` so owner-mode calculations are allocation-aware and consistent with transactions totals.
 
 ## Transactions
 
 - **Entry:** `/transactions`, `src/pages/transactions/TransactionsPage.tsx`.
 - **Backing:** BudgetContext (expenses), RulesContext, PresetTransactionsContext. Components: ExpensesByMonthTable, ExpensesByMonthList, TransactionsToolbar, FiltersAndActionsDialog, AddTransactionDialog, DeleteTransactionDialogs, ExpenseActionsDialog, SyncConfirmDialog.
+- **Owner filtering math:** owner filter uses shared `src/lib/financialModel.ts` logic:
+  - allocation-aware expense amounts
+  - signed owner-transfer impact (sent positive, received negative)
 - **Add transaction:** `src/components/AddTransactionDialog.tsx` — multi-row table, source/category from cardSources and expenseCategories.
 
 ## Import

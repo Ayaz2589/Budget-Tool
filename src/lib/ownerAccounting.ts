@@ -1,4 +1,5 @@
 import type { Expense, ExpenseAllocation, OwnerTransfer } from "@/types/core";
+import { roundTo } from "@/lib/math";
 
 const UNASSIGNED_OWNER_KEY = "__unassigned__";
 
@@ -18,7 +19,7 @@ export interface OwnerBalanceRow {
 }
 
 function round2(value: number): number {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
+  return roundTo(value, 2);
 }
 
 function positive(value: unknown): number {

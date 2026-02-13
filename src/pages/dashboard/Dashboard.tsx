@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
 import {
@@ -17,8 +17,14 @@ import {
 import { useBudget } from "@/context";
 import { usePresetTransactions } from "@/context";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { clamp, computeNetCashFlow, percentOfTotal, sumAmountsBy } from "@/lib/math";
 import { isValidDate } from "@/lib/totals";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
+import {
+  collectFinancialOwners,
+  scopeFinancialData,
+  type FinancialViewMode,
+} from "@/lib/financialModel";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -59,7 +65,9 @@ import {
   buildDashboardKpis,
   buildDebtSnapshot,
   buildOwnerExpenseItems,
+  buildOwnerNetRows,
   buildOwnerSplit,
+  sumCashFlowExpenseTotals,
   buildSpendBySource,
   buildOwnerTransfersMtd,
   buildRecentActivity,
@@ -131,30 +139,87 @@ export function Dashboard() {
   const [range, setRange] = useState<DashboardRange>("current");
   const [selectedMonthKey, setSelectedMonthKey] = useState(getCurrentMonthKey());
   const [expenseScope, setExpenseScope] = useState<DashboardExpenseScope>("all");
+  const [includeDebtPayments, setIncludeDebtPayments] = useState(true);
+  const [viewMode, setViewMode] = useState<FinancialViewMode>("household");
+  const [selectedOwner, setSelectedOwner] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dismissedInsightIds, setDismissedInsightIds] = useState<string[]>(() =>
     parseDismissedInsightIds(sessionStorage.getItem(getInsightStorageKey())),
   );
 
-  const currentMonthKey = selectedMonthKey;
-  const previousMonthKey = getPreviousMonthKey(currentMonthKey);
+  const ownerOptions = useMemo(
+    () =>
+      collectFinancialOwners({
+        owners,
+        expenses,
+        income,
+        debts,
+        ownerTransfers,
+      }),
+    [owners, expenses, income, debts, ownerTransfers],
+  );
+
+  useEffect(() => {
+    if (!ownerOptions.length) return;
+    if (!selectedOwner || !ownerOptions.includes(selectedOwner)) {
+      setSelectedOwner(ownerOptions[0]!);
+    }
+  }, [ownerOptions, selectedOwner]);
+
+  const scopedFinancialData = useMemo(
+    () =>
+      scopeFinancialData({
+        viewMode,
+        selectedOwner,
+        owners,
+        expenses,
+        income,
+        debts,
+        debtPayments,
+        ownerTransfers,
+      }),
+    [
+      viewMode,
+      selectedOwner,
+      owners,
+      expenses,
+      income,
+      debts,
+      debtPayments,
+      ownerTransfers,
+    ],
+  );
+  const scopedExpenses = scopedFinancialData.expenses;
+  const scopedIncome = scopedFinancialData.income;
+  const scopedDebts = scopedFinancialData.debts;
+  const scopedDebtPayments = scopedFinancialData.debtPayments;
+  const scopedOwnerTransfers = scopedFinancialData.ownerTransfers;
+
   const availableMonthKeys = useMemo(() => {
     const keys = new Set<string>();
     keys.add(getCurrentMonthKey());
-    expenses.forEach((row) => {
+    scopedExpenses.forEach((row) => {
       if (isValidDate(row.date)) keys.add(row.date.slice(0, 7));
     });
-    income.forEach((row) => {
+    scopedIncome.forEach((row) => {
       if (isValidDate(row.date)) keys.add(row.date.slice(0, 7));
     });
-    debtPayments.forEach((row) => {
+    scopedDebtPayments.forEach((row) => {
       if (isValidDate(row.date)) keys.add(row.date.slice(0, 7));
     });
-    ownerTransfers.forEach((row) => {
+    scopedOwnerTransfers.forEach((row) => {
       if (isValidDate(row.date)) keys.add(row.date.slice(0, 7));
     });
     return Array.from(keys).sort((a, b) => b.localeCompare(a));
-  }, [expenses, income, debtPayments, ownerTransfers]);
+  }, [scopedExpenses, scopedIncome, scopedDebtPayments, scopedOwnerTransfers]);
+
+  useEffect(() => {
+    if (availableMonthKeys.includes(selectedMonthKey)) return;
+    setSelectedMonthKey(availableMonthKeys[0] ?? getCurrentMonthKey());
+  }, [availableMonthKeys, selectedMonthKey]);
+
+  const currentMonthKey = selectedMonthKey;
+  const previousMonthKey = getPreviousMonthKey(currentMonthKey);
   const monthKeys = useMemo(
     () => getRangeMonthKeys(range, currentMonthKey),
     [range, currentMonthKey],
@@ -164,44 +229,64 @@ export function Dashboard() {
     () =>
       buildDashboardKpis({
         currentMonthKey,
-        expenses,
-        income,
-        debts,
-        debtPayments,
+        expenses: scopedExpenses,
+        income: scopedIncome,
+        debts: scopedDebts,
+        debtPayments: scopedDebtPayments,
         scope: expenseScope,
+        includeDebtPayments,
       }),
-    [currentMonthKey, expenses, income, debts, debtPayments, expenseScope],
+    [
+      currentMonthKey,
+      scopedExpenses,
+      scopedIncome,
+      scopedDebts,
+      scopedDebtPayments,
+      expenseScope,
+      includeDebtPayments,
+    ],
   );
 
   const cashFlowRows = useMemo(
     () =>
       buildCashFlowRows({
         monthKeys,
-        expenses,
-        income,
-        debtPayments,
+        expenses: scopedExpenses,
+        income: scopedIncome,
+        debtPayments: scopedDebtPayments,
         scope: expenseScope,
+        includeDebtPayments,
         unassignedOwnerLabel: t("dashboard.unassigned"),
         locale: i18n.resolvedLanguage || i18n.language,
       }),
-    [monthKeys, expenses, income, debtPayments, expenseScope, t, i18n.language, i18n.resolvedLanguage],
+    [
+      monthKeys,
+      scopedExpenses,
+      scopedIncome,
+      scopedDebtPayments,
+      expenseScope,
+      includeDebtPayments,
+      t,
+      i18n.language,
+      i18n.resolvedLanguage,
+    ],
   );
 
   const categorySlices = useMemo(
     () =>
       buildCategoryBreakdown({
-        expenses,
+        expenses: scopedExpenses,
         currentMonthKey,
         scope: expenseScope,
         uncategorizedLabel: t("common.uncategorized"),
       }),
-    [expenses, currentMonthKey, expenseScope, t],
+    [scopedExpenses, currentMonthKey, expenseScope, t],
   );
 
   const ownerSlices = useMemo(
     () =>
       buildOwnerSplit({
-        expenses,
+        expenses: scopedExpenses,
         currentMonthKey,
         monthKeys,
         scope: expenseScope,
@@ -209,7 +294,7 @@ export function Dashboard() {
         sharedLabel: t("dashboard.shared"),
         unassignedLabel: t("dashboard.unassigned"),
       }),
-    [expenses, currentMonthKey, monthKeys, expenseScope, owners, t],
+    [scopedExpenses, currentMonthKey, monthKeys, expenseScope, owners, t],
   );
   const ownerExpenseRows = useMemo(
     () => ownerSlices.filter((slice) => Boolean(slice.owner)),
@@ -231,7 +316,7 @@ export function Dashboard() {
       map.set(
         row.owner,
         buildOwnerExpenseItems({
-          expenses,
+          expenses: scopedExpenses,
           currentMonthKey,
           monthKeys,
           scope: expenseScope,
@@ -241,77 +326,51 @@ export function Dashboard() {
       );
     }
     return map;
-  }, [ownerExpenseRows, expenses, currentMonthKey, monthKeys, expenseScope, owners]);
+  }, [ownerExpenseRows, scopedExpenses, currentMonthKey, monthKeys, expenseScope, owners]);
   const totalSpentForSelectedRange = useMemo(
-    () => cashFlowRows.reduce((sum, row) => sum + row.expensesTotal, 0),
+    () => sumCashFlowExpenseTotals(cashFlowRows),
     [cashFlowRows],
   );
   const ownerNetRows = useMemo(() => {
-    const monthKeySet = new Set(monthKeys);
-    const grossByOwner = new Map<string, number>();
-    ownerExpenseRows.forEach((row) => {
-      if (!row.owner) return;
-      grossByOwner.set(row.owner, row.value);
+    return buildOwnerNetRows({
+      ownerExpenseRows,
+      ownerTransfers: scopedOwnerTransfers,
+      monthKeys,
     });
-
-    const sentByOwner = new Map<string, number>();
-    const receivedByOwner = new Map<string, number>();
-    ownerTransfers.forEach((row) => {
-      if (!monthKeySet.has(row.date.slice(0, 7))) return;
-      sentByOwner.set(row.fromOwner, (sentByOwner.get(row.fromOwner) ?? 0) + row.amount);
-      receivedByOwner.set(row.toOwner, (receivedByOwner.get(row.toOwner) ?? 0) + row.amount);
-    });
-
-    const ownersWithValues = new Set<string>([
-      ...grossByOwner.keys(),
-      ...sentByOwner.keys(),
-      ...receivedByOwner.keys(),
-    ]);
-
-    return Array.from(ownersWithValues)
-      .map((owner) => {
-        const gross = grossByOwner.get(owner) ?? 0;
-        const sent = sentByOwner.get(owner) ?? 0;
-        const received = receivedByOwner.get(owner) ?? 0;
-        return {
-          owner,
-          gross,
-          net: gross - received + sent,
-          sent,
-          received,
-        };
-      })
-      .sort((a, b) => b.gross - a.gross);
-  }, [ownerExpenseRows, ownerTransfers, monthKeys]);
+  }, [ownerExpenseRows, scopedOwnerTransfers, monthKeys]);
+  const visibleOwnerNetRows = useMemo(() => {
+    if (viewMode === "household") return ownerNetRows;
+    return ownerNetRows.filter((row) => row.owner === selectedOwner);
+  }, [viewMode, ownerNetRows, selectedOwner]);
 
   const debtRows = useMemo(
-    () => buildDebtSnapshot({ debts, debtPayments }),
-    [debts, debtPayments],
+    () => buildDebtSnapshot({ debts: scopedDebts, debtPayments: scopedDebtPayments }),
+    [scopedDebts, scopedDebtPayments],
   );
 
   const ownerTransfersMtd = useMemo(
     () =>
       buildOwnerTransfersMtd({
-        ownerTransfers,
+        ownerTransfers: scopedOwnerTransfers,
         currentMonthKey,
         limit: 5,
       }),
-    [ownerTransfers, currentMonthKey],
+    [scopedOwnerTransfers, currentMonthKey],
   );
   const ownerTransfersMtdTotal = useMemo(
-    () => ownerTransfersMtd.reduce((sum, row) => sum + row.amount, 0),
+    () => sumAmountsBy(ownerTransfersMtd, (row) => row.amount),
     [ownerTransfersMtd],
   );
 
-  const recentActivity = useMemo(() => buildRecentActivity(expenses), [expenses]);
+  const recentActivity = useMemo(() => buildRecentActivity(scopedExpenses), [scopedExpenses]);
   const spendBySourceRows = useMemo(
     () =>
       buildSpendBySource({
-        expenses,
+        expenses: scopedExpenses,
         monthKeys,
         scope: expenseScope,
       }),
-    [expenses, monthKeys, expenseScope],
+    [scopedExpenses, monthKeys, expenseScope],
   );
 
   const insights = useMemo(
@@ -320,20 +379,20 @@ export function Dashboard() {
         currentMonthKey,
         previousMonthKey,
         scope: expenseScope,
-        expenses,
-        income,
-        debts,
-        debtPayments,
+        expenses: scopedExpenses,
+        income: scopedIncome,
+        debts: scopedDebts,
+        debtPayments: scopedDebtPayments,
         presetTransactions,
       }).filter((insight) => !dismissedInsightIds.includes(insight.id)),
     [
       currentMonthKey,
       previousMonthKey,
       expenseScope,
-      expenses,
-      income,
-      debts,
-      debtPayments,
+      scopedExpenses,
+      scopedIncome,
+      scopedDebts,
+      scopedDebtPayments,
       presetTransactions,
       dismissedInsightIds,
     ],
@@ -363,7 +422,11 @@ export function Dashboard() {
         monthKey: row.monthKey,
         monthLabel: row.monthLabel,
         monthAxisLabel: row.monthAxisLabel,
-        netCashFlow: row.incomeTotal - row.expensesTotal - row.debtPaymentsTotal,
+        netCashFlow: computeNetCashFlow(
+          row.incomeTotal,
+          row.expensesTotal,
+          row.debtPaymentsTotal,
+        ),
       })),
     [cashFlowDisplayRows],
   );
@@ -406,7 +469,22 @@ export function Dashboard() {
           <DsMetricCard
             title={t("dashboard.kpiTotalSpentMtd")}
             value={formatCurrency(kpis.totalSpent)}
-            subtitle={`${t("dashboard.vsLastMonth")}: ${formatSpentDeltaLabel(kpis.spentVsLastMonthPct)}`}
+            subtitle={
+              <span className="space-y-0.5">
+                <span className="block">
+                  {t("dashboard.vsLastMonth")}: {formatSpentDeltaLabel(kpis.spentVsLastMonthPct)}
+                </span>
+                <span className="block text-xs">
+                  {expenseScope === "all" && includeDebtPayments
+                    ? t("dashboard.kpiTotalSpentDefAll")
+                    : expenseScope === "all" && !includeDebtPayments
+                      ? t("dashboard.kpiTotalSpentDefAllExcludeDebt")
+                      : expenseScope === "exclude-mortgage" && includeDebtPayments
+                        ? t("dashboard.kpiTotalSpentDefExcludeMortgage")
+                        : t("dashboard.kpiTotalSpentDefExcludeMortgageAndDebt")}
+                </span>
+              </span>
+            }
           />
           <DsMetricCard
             title={t("dashboard.kpiTotalIncomeMtd")}
@@ -425,7 +503,14 @@ export function Dashboard() {
             <ChartContainer
               config={{
                 expenses: { label: t("dashboard.chartExpenses"), color: "var(--viz-expense)" },
-                debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" },
+                ...(includeDebtPayments
+                  ? {
+                      debtPayments: {
+                        label: t("dashboard.chartDebtPayments"),
+                        color: "var(--viz-debt)",
+                      },
+                    }
+                  : {}),
               }}
               heightMobile={220}
               heightDesktop={280}
@@ -465,12 +550,14 @@ export function Dashboard() {
                   fill="var(--viz-expense)"
                   stackId="outflow"
                 />
-                <Bar
-                  dataKey="debtPaymentsTotal"
-                  name={t("dashboard.chartDebtPayments")}
-                  fill="var(--viz-debt)"
-                  stackId="outflow"
-                />
+                {includeDebtPayments ? (
+                  <Bar
+                    dataKey="debtPaymentsTotal"
+                    name={t("dashboard.chartDebtPayments")}
+                    fill="var(--viz-debt)"
+                    stackId="outflow"
+                  />
+                ) : null}
               </BarChart>
             </ChartContainer>
           </div>
@@ -479,7 +566,14 @@ export function Dashboard() {
               config={{
                 income: { label: t("dashboard.chartIncome"), color: INCOME_OWNER_COLORS[0] },
                 expenses: { label: t("dashboard.chartExpenses"), color: "var(--viz-expense)" },
-                debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" },
+                ...(includeDebtPayments
+                  ? {
+                      debtPayments: {
+                        label: t("dashboard.chartDebtPayments"),
+                        color: "var(--viz-debt)",
+                      },
+                    }
+                  : {}),
               }}
               heightMobile={220}
               heightDesktop={280}
@@ -524,13 +618,15 @@ export function Dashboard() {
                   radius={[4, 4, 0, 0]}
                   stackId="outflow"
                 />
-                <Bar
-                  dataKey="debtPaymentsTotal"
-                  name={t("dashboard.chartDebtPayments")}
-                  fill="var(--viz-debt)"
-                  radius={[4, 4, 0, 0]}
-                  stackId="outflow"
-                />
+                {includeDebtPayments ? (
+                  <Bar
+                    dataKey="debtPaymentsTotal"
+                    name={t("dashboard.chartDebtPayments")}
+                    fill="var(--viz-debt)"
+                    radius={[4, 4, 0, 0]}
+                    stackId="outflow"
+                  />
+                ) : null}
               </BarChart>
             </ChartContainer>
           </div>
@@ -819,7 +915,7 @@ export function Dashboard() {
 
         <section className="space-y-2 pt-2">
           <h2 className="text-base font-semibold">{t("dashboard.sectionExpenseByOwner")}</h2>
-          {ownerNetRows.length === 0 ? (
+          {visibleOwnerNetRows.length === 0 ? (
             <DsEmptyState title={t("dashboard.sectionNoOwnerExpenses")} className="py-4" />
           ) : (
             <div className="rounded-2xl border border-border/60 bg-card">
@@ -828,28 +924,46 @@ export function Dashboard() {
                 <p className="text-right">{t("dashboard.netAfterTransfers")}</p>
               </div>
               <div>
-              {ownerNetRows.map((row) => {
-                const percentOfTotal =
-                  totalSpentForSelectedRange > 0
-                    ? row.gross / totalSpentForSelectedRange
-                    : 0;
+              {visibleOwnerNetRows.map((row) => {
+                const ownerShareOfTotal = percentOfTotal(
+                  row.gross,
+                  totalSpentForSelectedRange,
+                );
                 const isExpanded = expandedOwnerKey === row.owner;
                 const ownerItems = ownerExpenseItemsByOwner.get(row.owner) ?? [];
+                const transferImpact = row.received - row.sent;
                 const netToneClass =
                   row.net >= 0 ? "text-foreground" : "text-destructive";
+                const transferToneClass =
+                  transferImpact >= 0 ? "text-emerald-500" : "text-amber-500";
+                const transferImpactDisplay =
+                  transferImpact > 0
+                    ? `+${formatCurrency(transferImpact)}`
+                    : formatCurrency(transferImpact);
                 return (
                   <DsDataRow
                     key={row.owner}
                     title={row.owner}
                     subtitle={t("dashboard.ofTotalSpent", {
-                      percent: percentFormatter.format(percentOfTotal),
+                      percent: percentFormatter.format(ownerShareOfTotal),
                     })}
                     trailing={
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="text-sm font-semibold">{formatCurrency(row.gross)}</p>
-                          <p className={`text-xs font-medium ${netToneClass}`}>
+                          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                            {t("dashboard.netAfterTransfers")}
+                          </p>
+                          <p className={`text-2xl font-bold leading-none ${netToneClass}`}>
                             {formatCurrency(row.net)}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {t("dashboard.grossShort")}:{" "}
+                            <span className="font-semibold text-foreground">
+                              {formatCurrency(row.gross)}
+                            </span>
+                          </p>
+                          <p className={`text-xs font-semibold ${transferToneClass}`}>
+                            {t("dashboard.transferImpact")}: {transferImpactDisplay}
                           </p>
                         </div>
                         {isExpanded ? (
@@ -867,13 +981,23 @@ export function Dashboard() {
                       isExpanded ? (
                         <div className="space-y-2">
                           <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                            <p>{t("dashboard.grossExpenseByOwner")}: {formatCurrency(row.gross)}</p>
-                            <p className="text-right">
+                            <p>
+                              {t("dashboard.grossExpenseByOwner")}: {formatCurrency(row.gross)}
+                            </p>
+                            <p className="text-right text-sm font-semibold">
                               {t("dashboard.netAfterTransfers")}:{" "}
                               <span className={netToneClass}>{formatCurrency(row.net)}</span>
                             </p>
                             <p>{t("dashboard.transfersSent")}: {formatCurrency(row.sent)}</p>
-                            <p className="text-right">{t("dashboard.transfersReceived")}: {formatCurrency(row.received)}</p>
+                            <p className="text-right">
+                              {t("dashboard.transfersReceived")}: {formatCurrency(row.received)}
+                            </p>
+                            <p className="col-span-2 text-right">
+                              {t("dashboard.transferImpact")}:{" "}
+                              <span className={transferToneClass}>
+                                {transferImpactDisplay}
+                              </span>
+                            </p>
                           </div>
                           {ownerItems.length === 0 ? (
                             <p className="text-xs text-muted-foreground">
@@ -950,7 +1074,10 @@ export function Dashboard() {
                       meta={
                         <>
                           <div className="mt-2 h-2 rounded bg-muted">
-                            <div className="h-2 rounded bg-primary" style={{ width: `${Math.min(100, Math.max(0, row.progress * 100))}%` }} />
+                            <div
+                              className="h-2 rounded bg-primary"
+                              style={{ width: `${clamp(row.progress * 100, 0, 100)}%` }}
+                            />
                           </div>
                           <p className="mt-1 text-xs text-muted-foreground">
                             {formatCurrency(row.paid)} / {formatCurrency(row.initialAmount)}
@@ -1117,6 +1244,35 @@ export function Dashboard() {
           </SheetHeader>
           <div className="grid content-start gap-4 px-4 pt-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
             <div className="space-y-2">
+              <Label className="text-muted-foreground">{t("dashboard.viewMode")}</Label>
+              <DsSplitToggle
+                className="w-full"
+                options={[
+                  { value: "household", label: t("dashboard.viewHousehold") },
+                  { value: "individual", label: t("dashboard.viewIndividual") },
+                ]}
+                value={viewMode}
+                onChange={(next) => setViewMode(next as FinancialViewMode)}
+              />
+            </div>
+            {viewMode === "individual" ? (
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">{t("common.owner")}</Label>
+                <Select value={selectedOwner} onValueChange={setSelectedOwner}>
+                  <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
+                    <SelectValue placeholder={t("common.noOwner")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ownerOptions.map((owner) => (
+                      <SelectItem key={owner} value={owner}>
+                        {owner}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
+            <div className="space-y-2">
               <Label className="text-muted-foreground">{t("common.month")}</Label>
               <Select
                 value={selectedMonthKey}
@@ -1161,6 +1317,23 @@ export function Dashboard() {
               {expenseScope === "exclude-mortgage" ? (
                 <p className="text-xs text-muted-foreground">
                   {t("dashboard.scopeMortgageExcludedHint")}
+                </p>
+              ) : null}
+            </div>
+            <div className="space-y-2">
+              <Label className="text-muted-foreground">{t("dashboard.chartDebtPayments")}</Label>
+              <DsSplitToggle
+                className="w-full"
+                options={[
+                  { value: "include", label: t("dashboard.includeDebtPayments") },
+                  { value: "exclude", label: t("dashboard.excludeDebtPayments") },
+                ]}
+                value={includeDebtPayments ? "include" : "exclude"}
+                onChange={(next) => setIncludeDebtPayments(next === "include")}
+              />
+              {!includeDebtPayments ? (
+                <p className="text-xs text-muted-foreground">
+                  {t("dashboard.debtPaymentsExcludedHint")}
                 </p>
               ) : null}
             </div>

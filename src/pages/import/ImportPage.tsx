@@ -5,6 +5,7 @@ import { parseCsv, type CsvSource } from "@/lib/parsers";
 import { extractTextFromPdf } from "@/lib/pdfText";
 import { parseExportedPdfData } from "@/lib/pdfExport";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
+import { amountsWithinTolerance } from "@/lib/math";
 import { usePresetTransactions } from "@/context";
 import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
 import { ImportSourceCard } from "./ImportSourceCard";
@@ -153,7 +154,7 @@ export function ImportPage() {
       const sameEntry = income.some(
         (existing) =>
           existing.date === i.date &&
-          Math.abs(existing.amount - i.amount) < 0.01 &&
+          amountsWithinTolerance(existing.amount, i.amount, 0.01) &&
           (existing.category || "").toLowerCase() ===
             (i.category || "").toLowerCase()
       );

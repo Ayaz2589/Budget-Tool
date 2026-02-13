@@ -51,7 +51,8 @@
     "signInToContinue": "대시보드를 보려면 Google로 로그인하세요.",
     "signInWithGoogle": "Google로 로그인",
     "valuePropSubtitle": "Google 스프레드시트와 동기화. 신용카드 불필요.",
-    "valuePropTitle": "지출, 수입, 예산을 관리하세요."
+    "valuePropTitle": "지출, 수입, 예산을 관리하세요.",
+    "dummyDataSyncBlocked": "더미 데이터 동기화는 비활성화되어 있습니다. Google Sheets와 동기화하려면 설정에서 더미 데이터를 끄세요."
   },
   "common": {
     "actions": "작업",
@@ -177,6 +178,9 @@
     "tasnuvasSpendingByType": "Tasnuva 유형별 지출",
     "tasnuvasTotalSpending": "Tasnuva 총 지출",
     "timeRange": "기간",
+    "viewMode": "보기",
+    "viewHousehold": "가구",
+    "viewIndividual": "개인",
     "title": "대시보드",
     "totalEarned": "총 수입",
     "totalEarnedVsSpentByMonth": "월별 총 수입 vs 총 지출.",
@@ -239,11 +243,19 @@
     "netAfterTransfers": "이체 후 순지출",
     "transfersSent": "보낸 이체",
     "transfersReceived": "받은 이체",
+    "transferImpact": "이체 영향",
     "grossShort": "Gross",
     "netShort": "Net",
     "sectionSpendByCardSource": "카드 출처별 총지출",
     "sectionNoSpendByCardSource": "선택한 범위에 출처별 지출이 없습니다.",
-    "moreItemsCount": "+{{count}}개 항목 더 보기"
+    "moreItemsCount": "+{{count}}개 항목 더 보기",
+    "kpiTotalSpentDefAll": "부채 상환과 모기지가 포함됩니다.",
+    "kpiTotalSpentDefExcludeMortgage": "부채 상환은 포함되고 모기지는 제외됩니다.",
+    "kpiTotalSpentDefAllExcludeDebt": "모기지는 포함되고 부채 상환은 제외됩니다.",
+    "kpiTotalSpentDefExcludeMortgageAndDebt": "모기지와 부채 상환 모두 제외됩니다.",
+    "includeDebtPayments": "부채 포함",
+    "excludeDebtPayments": "부채 제외",
+    "debtPaymentsExcludedHint": "부채 상환은 대시보드 합계와 현금흐름 차트에서 제외됩니다."
   },
   "dashboardDebt": {
     "addDebt": "부채 추가",
@@ -555,7 +567,8 @@
     "currencyDesc": "모든 금액은 USD(기준값)로 저장됩니다. 화면 변환은 최신 캐시 환율을 사용합니다.",
     "currencyDisplayLabel": "표시 통화",
     "fxAsOf": "환율 기준 시각: {{value}}",
-    "fxFallback": "(대체값)"
+    "fxFallback": "(대체값)",
+    "dummySyncBlocked": "더미 데이터가 켜져 있는 동안에는 Google Sheets 동기화가 비활성화됩니다."
   },
   "transactions": {
     "add": "추가",
@@ -611,7 +624,11 @@
     "transferFrom": "From owner",
     "transferTo": "To owner",
     "transferNote": "Note",
-    "transferValidationOwnersDifferent": "From owner and to owner must be different"
+    "transferValidationOwnersDifferent": "From owner and to owner must be different",
+    "visibleRowsTotal": "보이는 행 합계",
+    "visibleExpenseTotal": "보이는 지출 합계",
+    "includeOwnerTransfersInTableTotals": "표 합계에 소유자 이체 포함",
+    "tableTotalsDefinitionHint": "표 합계는 현재 보이는 거래 행만 기준으로 하며 부채 상환은 포함하지 않습니다."
   },
   "about": {
     "title": "Ortho 소개",

@@ -2,6 +2,11 @@ import type { Expense, OwnerTransfer } from "@/types";
 import type { SortColumn, TransactionLedgerRow } from "@/types";
 import { isValidDate } from "@/lib/totals";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
+import {
+  collectFinancialOwners,
+  getOwnerAllocatedExpenseAmount,
+  getSignedOwnerTransferAmount,
+} from "@/lib/financialModel";
 
 export type TransactionTypeFilter = "all" | "expense" | "transfer";
 
@@ -23,23 +28,12 @@ export function buildOwnerOptions({
   expenses: Expense[];
   ownerTransfers: OwnerTransfer[];
 }): string[] {
-  if (owners.length > 0) return owners;
-
-  const fromExpenses = [
-    ...new Set(expenses.map((e) => e.owner).filter((m): m is string => !!m)),
-  ].sort();
-
-  const fromTransfers = [
-    ...new Set(
-      ownerTransfers
-        .flatMap((row) => [row.fromOwner, row.toOwner])
-        .filter((name): name is string => !!name),
-    ),
-  ].sort();
-
-  return Array.from(new Set([...fromExpenses, ...fromTransfers])).sort((a, b) =>
-    a.localeCompare(b),
-  );
+  return collectFinancialOwners({
+    owners,
+    expenses,
+    income: [],
+    ownerTransfers,
+  });
 }
 
 export function buildTransactionRows({
@@ -91,11 +85,13 @@ export function filterAndSortTransactionRows({
   filters,
   sortBy,
   sortDir,
+  ownersForAllocation = [],
 }: {
   rows: TransactionLedgerRow[];
   filters: TransactionFilterState;
   sortBy: SortColumn;
   sortDir: "asc" | "desc";
+  ownersForAllocation?: string[];
 }): TransactionLedgerRow[] {
   const { monthFilter, sourceFilter, categoryFilter, searchFilter, ownerFilter, typeFilter } =
     filters;
@@ -146,12 +142,33 @@ export function filterAndSortTransactionRows({
         return (row.category || "").trim().toLowerCase() === "50/50" || !row.owner;
       });
     } else {
-      list = list.filter((row) => {
-        if (row.kind === "owner-transfer") {
-          return row.transferFromOwner === ownerFilter || row.transferToOwner === ownerFilter;
-        }
-        return (row.owner ?? "") === ownerFilter;
-      });
+      list = list
+        .map((row) => {
+          if (row.kind === "owner-transfer") {
+            if (!row.transfer) return null;
+            const signedTransferAmount = getSignedOwnerTransferAmount({
+              transfer: row.transfer,
+              selectedOwner: ownerFilter,
+            });
+            if (signedTransferAmount == null) return null;
+            return { ...row, amount: signedTransferAmount };
+          }
+          if (!row.expense) {
+            return null;
+          }
+          const allocatedAmount = getOwnerAllocatedExpenseAmount({
+            expense: row.expense,
+            selectedOwner: ownerFilter,
+            owners: ownersForAllocation,
+          });
+          if (allocatedAmount <= 0) return null;
+          return {
+            ...row,
+            amount: allocatedAmount,
+            owner: ownerFilter,
+          };
+        })
+        .filter((row): row is TransactionLedgerRow => Boolean(row));
     }
   }
 

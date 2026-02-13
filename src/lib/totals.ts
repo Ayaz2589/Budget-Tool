@@ -1,6 +1,7 @@
 import type { Expense, Income } from "@/types/core";
 import type { MonthTotals, TotalsInput } from "@/types/totals";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
+import { safeDivide, sumAmountsBy } from "@/lib/math";
 
 export type { MonthTotals, TotalsInput };
 
@@ -43,18 +44,18 @@ export function computeMonthTotals(
     (i) => isValidDate(i.date) && getMonthKey(i.date) === monthKey
   );
 
-  const totalEarned = monthIncome.reduce((s, i) => s + i.amount, 0);
-  const totalSpent = monthExpenses.reduce((s, e) => s + e.amount, 0);
+  const totalEarned = sumAmountsBy(monthIncome, (row) => row.amount);
+  const totalSpent = sumAmountsBy(monthExpenses, (row) => row.amount);
   const totalSpentWithoutMortgage = monthExpenses
     .filter((e) => !isMortgageCategory(e.category))
-    .reduce((s, e) => s + e.amount, 0);
+    .reduce((sum, row) => sum + row.amount, 0);
   const total5050Spent = monthExpenses
     .filter((e) => e.category === "50/50")
-    .reduce((s, e) => s + e.amount, 0);
+    .reduce((sum, row) => sum + row.amount, 0);
   const split5050 = total5050Spent / 2;
   const tasnuvasPurchase = monthExpenses
     .filter((e) => e.category === "Tasnuva's Purchases")
-    .reduce((s, e) => s + e.amount, 0);
+    .reduce((sum, row) => sum + row.amount, 0);
   const tasnuvasTotalSpending = tasnuvasPurchase + split5050;
   // My total spending = expenses that are mine (not Tasnuva's, not 50/50, not Mortgage) + my half of 50/50
   const myCategoriesSpent = monthExpenses
@@ -64,12 +65,11 @@ export function computeMonthTotals(
         e.category !== "50/50" &&
         !isMortgageCategory(e.category)
     )
-    .reduce((s, e) => s + e.amount, 0);
+    .reduce((sum, row) => sum + row.amount, 0);
   const myTotalSpendingWithoutMortgage = myCategoriesSpent + split5050;
 
   const totalSaved = totalEarned - totalSpent;
-  const personalSavingsRate =
-    totalEarned > 0 ? totalSaved / totalEarned : 0;
+  const personalSavingsRate = safeDivide(totalSaved, totalEarned, 0);
   const investingTotal = hysa + investing;
 
   return {
@@ -118,32 +118,27 @@ export function computeAllTotals(input: TotalsInput): MonthTotals[] {
 }
 
 export function computeGrandTotals(months: MonthTotals[]): MonthTotals {
+  const totalEarned = sumAmountsBy(months, (month) => month.totalEarned);
+  const totalSaved = sumAmountsBy(months, (month) => month.totalSaved);
   return {
     monthKey: "TOTALS",
     monthLabel: "TOTALS",
-    totalEarned: months.reduce((s, m) => s + m.totalEarned, 0),
-    totalSpent: months.reduce((s, m) => s + m.totalSpent, 0),
-    totalSpentWithoutMortgage: months.reduce(
-      (s, m) => s + m.totalSpentWithoutMortgage,
-      0
+    totalEarned,
+    totalSpent: sumAmountsBy(months, (month) => month.totalSpent),
+    totalSpentWithoutMortgage: sumAmountsBy(months, (month) => month.totalSpentWithoutMortgage),
+    total5050Spent: sumAmountsBy(months, (month) => month.total5050Spent),
+    split5050: sumAmountsBy(months, (month) => month.split5050),
+    novasPurchase: sumAmountsBy(months, (month) => month.novasPurchase),
+    novasTotalSpending: sumAmountsBy(months, (month) => month.novasTotalSpending),
+    iOweNova: sumAmountsBy(months, (month) => month.iOweNova),
+    myTotalSpendingWithoutMortgage: sumAmountsBy(
+      months,
+      (month) => month.myTotalSpendingWithoutMortgage,
     ),
-    total5050Spent: months.reduce((s, m) => s + m.total5050Spent, 0),
-    split5050: months.reduce((s, m) => s + m.split5050, 0),
-    novasPurchase: months.reduce((s, m) => s + m.novasPurchase, 0),
-    novasTotalSpending: months.reduce((s, m) => s + m.novasTotalSpending, 0),
-    iOweNova: months.reduce((s, m) => s + m.iOweNova, 0),
-    myTotalSpendingWithoutMortgage: months.reduce(
-      (s, m) => s + m.myTotalSpendingWithoutMortgage,
-      0
-    ),
-    totalSaved: months.reduce((s, m) => s + m.totalSaved, 0),
-    personalSavingsRate:
-      months.reduce((s, m) => s + m.totalEarned, 0) > 0
-        ? months.reduce((s, m) => s + m.totalSaved, 0) /
-          months.reduce((s, m) => s + m.totalEarned, 0)
-        : 0,
-    hysa: months.reduce((s, m) => s + m.hysa, 0),
-    investingSp500: months.reduce((s, m) => s + m.investingSp500, 0),
-    investingTotal: months.reduce((s, m) => s + m.investingTotal, 0),
+    totalSaved,
+    personalSavingsRate: safeDivide(totalSaved, totalEarned, 0),
+    hysa: sumAmountsBy(months, (month) => month.hysa),
+    investingSp500: sumAmountsBy(months, (month) => month.investingSp500),
+    investingTotal: sumAmountsBy(months, (month) => month.investingTotal),
   };
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { sumAmountsBy } from "@/lib/math";
 import { getMonthLabel } from "@/lib/totals";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
@@ -12,6 +13,7 @@ export type { ExpensesByMonthListProps };
 export function ExpensesByMonthList({
   byMonth,
   defaultOpenMonth,
+  includeOwnerTransfersInTotals = false,
   onRowTap,
   t,
 }: ExpensesByMonthListProps) {
@@ -48,7 +50,12 @@ export function ExpensesByMonthList({
     <div className="space-y-3 px-3 pb-2">
       {byMonth.map(([monthKey, monthExpenses]) => {
         const isOpen = openMonth === monthKey;
-        const monthTotal = monthExpenses.reduce((sum, row) => sum + row.amount, 0);
+        const monthTotal = sumAmountsBy(monthExpenses, (row) => {
+          if (!includeOwnerTransfersInTotals && row.kind === "owner-transfer") {
+            return 0;
+          }
+          return row.amount;
+        });
         return (
           <section
             key={monthKey}
@@ -69,9 +76,16 @@ export function ExpensesByMonthList({
                 </p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-sm font-semibold tabular-nums">
-                  {formatCurrency(monthTotal)}
-                </span>
+                <div className="text-right">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                    {includeOwnerTransfersInTotals
+                      ? t("transactions.visibleRowsTotal")
+                      : t("transactions.visibleExpenseTotal")}
+                  </p>
+                  <p className="text-sm font-semibold tabular-nums">
+                    {formatCurrency(monthTotal)}
+                  </p>
+                </div>
                 <ChevronDown
                   className={cn(
                     "size-4 text-muted-foreground transition-transform",

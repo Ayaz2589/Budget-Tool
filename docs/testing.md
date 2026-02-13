@@ -2,10 +2,15 @@
 
 ## Commands
 
+- Run financial guard subset: `bun run test:financial`
 - Run full suite: `bun test`
 - Build check: `npm run build`
 
-Use both before merge. `bun test` validates logic and UI flows; `npm run build` catches type-level regressions.
+Use financial guard first, then full suite and build before merge:
+
+1. `bun run test:financial` for equation-critical coverage.
+2. `bun test` for full logic/UI coverage.
+3. `npm run build` for type/build regressions.
 
 ## Test Environment
 

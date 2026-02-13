@@ -5,6 +5,7 @@ export * from "./dateRepair";
 export * from "./debtUtils";
 export * from "./dummyData";
 export * from "./exportString";
+export * from "./financialModel";
 export * from "./format";
 export * from "./fx";
 export * from "./googleDrive";

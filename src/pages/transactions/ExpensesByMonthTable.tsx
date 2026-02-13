@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { sumAmountsBy } from "@/lib/math";
 import { getMonthLabel } from "@/lib/totals";
 import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
@@ -44,7 +45,7 @@ function SortIcon({
 export function ExpensesByMonthTable({
   byMonth,
   defaultOpenMonth,
-  includeOwnerTransfersInTotals = true,
+  includeOwnerTransfersInTotals = false,
   sortBy,
   sortDir,
   onSort,
@@ -75,15 +76,22 @@ export function ExpensesByMonthTable({
                   )
                 </span>
               </span>
-              <span className="text-sm font-semibold tabular-nums">
-                {formatCurrency(
-                  monthExpenses.reduce((sum, row) => {
-                    if (!includeOwnerTransfersInTotals && row.kind === "owner-transfer") {
-                      return sum;
-                    }
-                    return sum + row.amount;
-                  }, 0),
-                )}
+              <span className="flex flex-col items-end gap-0.5">
+                <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                  {includeOwnerTransfersInTotals
+                    ? t("transactions.visibleRowsTotal")
+                    : t("transactions.visibleExpenseTotal")}
+                </span>
+                <span className="text-sm font-semibold tabular-nums">
+                  {formatCurrency(
+                    sumAmountsBy(monthExpenses, (row) => {
+                      if (!includeOwnerTransfersInTotals && row.kind === "owner-transfer") {
+                        return 0;
+                      }
+                      return row.amount;
+                    }),
+                  )}
+                </span>
               </span>
             </div>
           </AccordionTrigger>

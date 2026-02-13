@@ -6,6 +6,7 @@ import { PresetTransactionsProvider } from "@/context";
 import { GoogleAuthProviderFallback } from "@/context";
 import { Layout } from "@/components/Layout";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
+import i18n from "@/i18n";
 
 function TestWrapper() {
   return (
@@ -28,15 +29,15 @@ function TestWrapper() {
 test("SettingsPage renders title and Delete all data button", () => {
   render(<TestWrapper />);
   expect(
-    screen.getAllByRole("heading", { name: "Settings" }).length,
+    screen.getAllByRole("heading", { name: i18n.t("settings.title") }).length,
   ).toBeGreaterThanOrEqual(1);
   expect(
-    screen.getByRole("button", { name: "Delete all data" }),
+    screen.getByRole("button", { name: i18n.t("settings.deleteAllData") }),
   ).toBeInTheDocument();
 });
 
 test("SettingsPage shows expense and income category cards", () => {
   render(<TestWrapper />);
-  expect(screen.getAllByText("Expense categories").length).toBeGreaterThanOrEqual(1);
-  expect(screen.getAllByText("Income categories").length).toBeGreaterThanOrEqual(1);
+  expect(screen.getAllByText(i18n.t("settings.expenseCategories")).length).toBeGreaterThanOrEqual(1);
+  expect(screen.getAllByText(i18n.t("settings.incomeCategories")).length).toBeGreaterThanOrEqual(1);
 });

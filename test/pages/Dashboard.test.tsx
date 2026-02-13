@@ -96,6 +96,18 @@ test("Dashboard shows helper text when mortgage is excluded", () => {
   });
 });
 
+test("Dashboard shows helper text when debt payments are excluded", () => {
+  localStorage.clear();
+  render(<TestWrapper />);
+  fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+  fireEvent.click(screen.getByRole("button", { name: "Exclude Debt" }));
+  return waitFor(() => {
+    expect(
+      screen.getByText("Debt payments excluded from dashboard totals and cash flow charts."),
+    ).toBeInTheDocument();
+  });
+});
+
 test("Dashboard debt row is read-only", () => {
   localStorage.clear();
   localStorage.setItem(
@@ -122,4 +134,53 @@ test("Dashboard debt row is read-only", () => {
   render(<TestWrapper />);
   expect(screen.getByText("Car loan")).toBeInTheDocument();
   expect(screen.queryByText("/dashboard/debt?debtId=d1")).toBeNull();
+});
+
+test("Dashboard can switch between household and individual view", async () => {
+  localStorage.clear();
+  localStorage.setItem(
+    BUDGET_STORAGE_KEY,
+    JSON.stringify({
+      expenses: [
+        {
+          id: "e1",
+          date: "2026-02-01",
+          amount: 1200,
+          description: "Rent",
+          category: "Housing",
+          source: "manual",
+          paidByOwner: "Ayaz",
+        },
+        {
+          id: "e2",
+          date: "2026-02-03",
+          amount: 300,
+          description: "Groceries",
+          category: "Food",
+          source: "manual",
+          paidByOwner: "Tasnuva",
+        },
+      ],
+      income: [],
+      debts: [],
+      debtPayments: [],
+      owners: ["Ayaz", "Tasnuva"],
+      iOweNova: {},
+      cardSources: ["manual"],
+      expenseCategories: ["Housing", "Food"],
+      incomeCategories: [],
+    }),
+  );
+
+  render(<TestWrapper />);
+  expect(screen.getAllByText(/Ayaz/i).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/Tasnuva/i).length).toBeGreaterThan(0);
+
+  fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+  fireEvent.click(screen.getByRole("button", { name: "Individual" }));
+
+  await waitFor(() => {
+    expect(screen.getAllByText(/Ayaz/i).length).toBeGreaterThan(0);
+    expect(screen.queryAllByText(/Tasnuva/i).length).toBe(0);
+  });
 });

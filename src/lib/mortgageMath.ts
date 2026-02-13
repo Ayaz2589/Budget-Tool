@@ -1,5 +1,6 @@
 import type { Expense } from "@/types/core";
 import type { MortgageProfile } from "@/types/mortgage";
+import { roundTo, sumAmountsBy } from "@/lib/math";
 
 export interface MortgageScenarioInput {
   extraMonthlyPayment?: number;
@@ -43,7 +44,7 @@ export interface ScenarioDelta {
 }
 
 function round2(value: number): number {
-  return Math.round(value * 100) / 100;
+  return roundTo(value, 2);
 }
 
 function toMonthKey(isoDate: string): string {
@@ -234,10 +235,8 @@ export function computeScenarioDelta(
 ): ScenarioDelta {
   const baseMonths = base.length;
   const scenarioMonths = scenario.length;
-  const baseInterest = round2(base.reduce((sum, row) => sum + row.interest, 0));
-  const scenarioInterest = round2(
-    scenario.reduce((sum, row) => sum + row.interest, 0)
-  );
+  const baseInterest = round2(sumAmountsBy(base, (row) => row.interest));
+  const scenarioInterest = round2(sumAmountsBy(scenario, (row) => row.interest));
   return {
     monthsSaved: Math.max(0, baseMonths - scenarioMonths),
     interestSaved: round2(Math.max(0, baseInterest - scenarioInterest)),

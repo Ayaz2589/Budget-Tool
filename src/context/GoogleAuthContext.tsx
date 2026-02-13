@@ -524,6 +524,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   ]);
 
   const budget = useBudget();
+  const isDummyDataActive = budget.useDummyData;
   const { presetTransactions, setPresets } = usePresetTransactions();
   const syncSignature = useMemo(
     () =>
@@ -615,6 +616,12 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, [accessToken, spreadsheetId, setSpreadsheetId]);
 
   const runSync = useCallback(async () => {
+    if (isDummyDataActive) {
+      setSyncStatus("error");
+      setSyncErrorMessage(i18n.t("auth.dummyDataSyncBlocked"));
+      setSyncHealth("warning");
+      return;
+    }
     if (!accessToken || !spreadsheetId) {
       setSyncStatus("error");
       setSyncErrorMessage(i18n.t("auth.notSignedInOrNoSpreadsheet"));
@@ -741,6 +748,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, [
     accessToken,
     spreadsheetId,
+    isDummyDataActive,
     clearSession,
     getSyncSnapshot,
     ensureLinkedSheetActive,
@@ -751,6 +759,11 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   }, [runSync]);
 
   useEffect(() => {
+    if (isDummyDataActive) {
+      setHasUnsyncedChanges(false);
+      setSyncHealth("healthy");
+      return;
+    }
     if (!accessToken || !spreadsheetId) {
       setHasUnsyncedChanges(false);
       lastSyncedSignatureRef.current = null;
@@ -770,10 +783,11 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       latestSyncSignatureRef.current !== lastSyncedSignatureRef.current;
     setHasUnsyncedChanges(changed);
     setSyncHealth(changed ? "warning" : "healthy");
-  }, [accessToken, spreadsheetId, syncSignature]);
+  }, [accessToken, spreadsheetId, syncSignature, isDummyDataActive]);
 
   useEffect(() => {
     if (!isAutoSyncEnabled) return;
+    if (isDummyDataActive) return;
     if (!accessToken || !spreadsheetId) return;
     if (!hasUnsyncedChanges) return;
     const timer = window.setTimeout(() => {
@@ -783,6 +797,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(timer);
   }, [
     isAutoSyncEnabled,
+    isDummyDataActive,
     accessToken,
     spreadsheetId,
     hasUnsyncedChanges,
@@ -791,13 +806,18 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!initialSyncAfterCreateRef.current) return;
+    if (isDummyDataActive) {
+      initialSyncAfterCreateRef.current = false;
+      return;
+    }
     if (!accessToken || !spreadsheetId) return;
     initialSyncAfterCreateRef.current = false;
     void runSync();
-  }, [accessToken, spreadsheetId, runSync]);
+  }, [accessToken, spreadsheetId, runSync, isDummyDataActive]);
 
   useEffect(() => {
     if (!isAutoSyncEnabled) return;
+    if (isDummyDataActive) return;
     if (!accessToken || !spreadsheetId) return;
     const interval = window.setInterval(() => {
       if (!hasUnsyncedChanges) return;
@@ -807,6 +827,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     return () => window.clearInterval(interval);
   }, [
     isAutoSyncEnabled,
+    isDummyDataActive,
     accessToken,
     spreadsheetId,
     hasUnsyncedChanges,
@@ -814,6 +835,12 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
   ]);
 
   const pullFromSheet = useCallback(async () => {
+    if (isDummyDataActive) {
+      setSyncStatus("error");
+      setSyncErrorMessage(i18n.t("auth.dummyDataSyncBlocked"));
+      setSyncHealth("warning");
+      return;
+    }
     if (!accessToken || !spreadsheetId) {
       setSyncStatus("error");
       setSyncErrorMessage(i18n.t("auth.notSignedInOrNoSpreadsheet"));
@@ -1096,6 +1123,7 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
       setSyncHealth("error");
     }
   }, [
+    isDummyDataActive,
     accessToken,
     spreadsheetId,
     clearSession,

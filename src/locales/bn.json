@@ -51,7 +51,8 @@
     "signInToContinue": "ড্যাশবোর্ড দেখতে Google দিয়ে সাইন ইন করুন।",
     "signInWithGoogle": "গুগল দিয়ে সাইন ইন",
     "valuePropSubtitle": "Google Sheets এর সাথে সিঙ্ক। ক্রেডিট কার্ডের দরকার নেই।",
-    "valuePropTitle": "ব্যয়, আয় এবং বাজেট ট্র্যাক করুন।"
+    "valuePropTitle": "ব্যয়, আয় এবং বাজেট ট্র্যাক করুন।",
+    "dummyDataSyncBlocked": "ডামি ডেটা সিঙ্ক বন্ধ আছে। Google Sheets-এ সিঙ্ক করতে Settings থেকে ডামি ডেটা বন্ধ করুন।"
   },
   "common": {
     "actions": "কর্ম",
@@ -557,7 +558,8 @@
     "currencyDesc": "সব পরিমাণ USD-এ (ক্যানোনিকাল) সংরক্ষিত থাকে। প্রদর্শিত রূপান্তর সর্বশেষ ক্যাশ করা রেট ব্যবহার করে।",
     "currencyDisplayLabel": "প্রদর্শনের মুদ্রা",
     "fxAsOf": "FX সময়: {{value}}",
-    "fxFallback": "(ফলব্যাক)"
+    "fxFallback": "(ফলব্যাক)",
+    "dummySyncBlocked": "ডামি ডেটা চালু থাকলে Google Sheets সিঙ্ক বন্ধ থাকে।"
   },
   "transactions": {
     "add": "যোগ করুন",

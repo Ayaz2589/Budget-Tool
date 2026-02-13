@@ -51,7 +51,8 @@
     "signInToContinue": "使用 Google 登录以查看您的仪表板。",
     "signInWithGoogle": "使用 Google 登录",
     "valuePropSubtitle": "与 Google 表格同步。无需信用卡。",
-    "valuePropTitle": "管理支出、收入和预算。"
+    "valuePropTitle": "管理支出、收入和预算。",
+    "dummyDataSyncBlocked": "示例数据同步已禁用。请在设置中关闭示例数据后再同步到 Google 表格。"
   },
   "common": {
     "actions": "操作",
@@ -558,7 +559,8 @@
     "currencyDesc": "所有金额均以 USD（规范值）存储。界面换算使用最新缓存汇率。",
     "currencyDisplayLabel": "显示货币",
     "fxAsOf": "汇率时间：{{value}}",
-    "fxFallback": "（回退）"
+    "fxFallback": "（回退）",
+    "dummySyncBlocked": "启用示例数据时，Google 表格同步已禁用。"
   },
   "transactions": {
     "add": "添加",

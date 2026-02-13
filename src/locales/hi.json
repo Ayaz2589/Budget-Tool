@@ -51,7 +51,8 @@
     "signInToContinue": "अपना डैशबोर्ड देखने के लिए Google से साइन इन करें।",
     "signInWithGoogle": "Google से साइन इन करें",
     "valuePropSubtitle": "Google Sheets के साथ सिंक। क्रेडिट कार्ड की जरूरत नहीं।",
-    "valuePropTitle": "खर्च, आय और बजट ट्रैक करें।"
+    "valuePropTitle": "खर्च, आय और बजट ट्रैक करें।",
+    "dummyDataSyncBlocked": "डमी डेटा सिंक बंद है। Google Sheets से सिंक करने के लिए Settings में डमी डेटा बंद करें।"
   },
   "common": {
     "actions": "कार्रवाइयां",
@@ -557,7 +558,8 @@
     "currencyDesc": "सभी राशि USD (canonical) में संग्रहीत रहती हैं। स्क्रीन रूपांतरण नवीनतम कैश्ड दर का उपयोग करता है।",
     "currencyDisplayLabel": "डिस्प्ले मुद्रा",
     "fxAsOf": "FX समय: {{value}}",
-    "fxFallback": "(fallback)"
+    "fxFallback": "(fallback)",
+    "dummySyncBlocked": "डमी डेटा चालू होने पर Google Sheets सिंक बंद रहता है।"
   },
   "transactions": {
     "add": "जोड़ें",

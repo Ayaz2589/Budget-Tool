@@ -6,7 +6,6 @@ import type {
   OwnerTransfer,
 } from "@/types/core";
 import {
-  ALL_EXPENSE_SOURCES,
   DEFAULT_EXPENSE_CATEGORIES,
   DEFAULT_INCOME_CATEGORIES,
 } from "@/lib/types";
@@ -26,137 +25,194 @@ export type DummyBudgetData = {
 
 export function buildDummyBudget(currentMonthKey: string): DummyBudgetData {
   const [year, month] = currentMonthKey.split("-").map((n) => Number(n));
-  const monthKeys = Array.from({ length: 5 }, (_, index) => {
+  const monthKeys = Array.from({ length: 2 }, (_, index) => {
     const d = new Date(year, (month ?? 1) - 1 - index, 1);
     return d.toISOString().slice(0, 7);
   });
-  const [currentKey, prevKey, prev2Key, prev3Key, prev4Key] = monthKeys;
+  const [currentKey, previousKey] = monthKeys;
+  const resolvedCurrentKey = currentKey ?? currentMonthKey;
+  const resolvedPreviousKey =
+    previousKey ??
+    new Date(year, (month ?? 1) - 2, 1).toISOString().slice(0, 7);
 
   const owners = ["Ayaz", "Tasnuva"];
   const expenseCategories = Array.from(
-    new Set([...DEFAULT_EXPENSE_CATEGORIES, "Mortgage", "Travel", "Utilities"])
+    new Set([...DEFAULT_EXPENSE_CATEGORIES, "Mortgage", "Utilities"])
   );
 
   const incomeCategories = Array.from(
     new Set([...DEFAULT_INCOME_CATEGORIES, "Side Hustle"])
   );
-
-  const expenseSeeds = [
-    { description: "Groceries", category: "My Purchase", base: 65 },
-    { description: "Coffee", category: "My Purchase", base: 8 },
-    { description: "Gas", category: "My Purchase", base: 45 },
-    { description: "Dining", category: "50/50", base: 38 },
-    { description: "Utilities", category: "Utilities", base: 120 },
-    { description: "Amazon", category: "Amazon", base: 55 },
-    { description: "Clothes", category: "Tasnuva's Purchases", base: 70 },
-    { description: "Travel", category: "Travel", base: 150 },
-    { description: "Internet", category: "Utilities", base: 75 },
-    { description: "Pharmacy", category: "Health", base: 30 },
-  ];
-
-  const incomeSeeds = [
-    { description: "Paycheck", category: "Paycheck", base: 4800, owner: "Ayaz" },
-    { description: "Rent", category: "Rent", base: 2000, owner: "Tasnuva" },
-    { description: "Bonus", category: "Bonus", base: 600, owner: "Ayaz" },
-    { description: "Freelance", category: "Side Hustle", base: 700, owner: "Tasnuva" },
-    { description: "Consulting", category: "Side Hustle", base: 850, owner: "Ayaz" },
-  ];
-
-  const buildMonthlyExpenses = (monthKey: string, monthIndex: number) => {
-    const out: Expense[] = [];
-    const days = 28;
-    for (let i = 0; i < 49; i++) {
-      const seed = expenseSeeds[i % expenseSeeds.length]!;
-      const owner = seed.category === "Tasnuva's Purchases" ? "Tasnuva" : owners[i % owners.length]!;
-      const amount = seed.base + ((i + monthIndex * 7) % 9) * 5;
-      const day = ((i * 3 + monthIndex * 5) % days) + 1;
-      out.push({
-        id: `exp-${monthKey}-${i}`,
-        date: `${monthKey}-${String(day).padStart(2, "0")}`,
-        amount,
-        description: seed.description,
-        category: seed.category,
-        source: "manual",
-        owner,
-      });
-    }
-
-    out.push({
-      id: `exp-${monthKey}-mortgage`,
-      date: `${monthKey}-10`,
-      amount: 860 + monthIndex * 5,
+  const expenses: Expense[] = [
+    {
+      id: `exp-${resolvedCurrentKey}-groceries`,
+      date: `${resolvedCurrentKey}-03`,
+      amount: 180,
+      description: "Groceries",
+      category: "My Purchase",
+      source: "amex",
+      owner: "Ayaz",
+    },
+    {
+      id: `exp-${resolvedCurrentKey}-dining`,
+      date: `${resolvedCurrentKey}-06`,
+      amount: 90,
+      description: "Dining",
+      category: "50/50",
+      source: "manual",
+      owner: "Tasnuva",
+    },
+    {
+      id: `exp-${resolvedCurrentKey}-utilities`,
+      date: `${resolvedCurrentKey}-09`,
+      amount: 120,
+      description: "Utilities",
+      category: "Utilities",
+      source: "td",
+      owner: "Ayaz",
+    },
+    {
+      id: `exp-${resolvedCurrentKey}-mortgage`,
+      date: `${resolvedCurrentKey}-10`,
+      amount: 1600,
       description: "Mortgage",
       category: "Mortgage",
       source: "manual",
       owner: "Ayaz",
-    });
+    },
+    {
+      id: `exp-${resolvedCurrentKey}-pharmacy`,
+      date: `${resolvedCurrentKey}-14`,
+      amount: 45,
+      description: "Pharmacy",
+      category: "Health",
+      source: "manual",
+      owner: "Tasnuva",
+    },
+    {
+      id: `exp-${resolvedPreviousKey}-groceries`,
+      date: `${resolvedPreviousKey}-03`,
+      amount: 160,
+      description: "Groceries",
+      category: "My Purchase",
+      source: "amex",
+      owner: "Ayaz",
+    },
+    {
+      id: `exp-${resolvedPreviousKey}-dining`,
+      date: `${resolvedPreviousKey}-06`,
+      amount: 80,
+      description: "Dining",
+      category: "50/50",
+      source: "manual",
+      owner: "Tasnuva",
+    },
+    {
+      id: `exp-${resolvedPreviousKey}-utilities`,
+      date: `${resolvedPreviousKey}-09`,
+      amount: 110,
+      description: "Utilities",
+      category: "Utilities",
+      source: "td",
+      owner: "Ayaz",
+    },
+    {
+      id: `exp-${resolvedPreviousKey}-mortgage`,
+      date: `${resolvedPreviousKey}-10`,
+      amount: 1600,
+      description: "Mortgage",
+      category: "Mortgage",
+      source: "manual",
+      owner: "Ayaz",
+    },
+  ];
 
-    return out;
-  };
-
-  const buildMonthlyIncome = (monthKey: string, monthIndex: number) => {
-    const out: Income[] = [];
-    for (let i = 0; i < 12; i++) {
-      const seed = incomeSeeds[i % incomeSeeds.length]!;
-      const amount = seed.base + ((i + monthIndex * 3) % 6) * 75;
-      const day = ((i * 2 + monthIndex * 4) % 26) + 1;
-      out.push({
-        id: `inc-${monthKey}-${i}`,
-        date: `${monthKey}-${String(day).padStart(2, "0")}`,
-        amount,
-        description: seed.description,
-        category: seed.category,
-        owner: seed.owner,
-      });
-    }
-    return out;
-  };
-
-  const expenses = monthKeys.flatMap((key, index) =>
-    buildMonthlyExpenses(key, index)
-  );
-  const income = monthKeys.flatMap((key, index) =>
-    buildMonthlyIncome(key, index)
-  );
+  const income: Income[] = [
+    {
+      id: `inc-${resolvedCurrentKey}-paycheck-ayaz`,
+      date: `${resolvedCurrentKey}-01`,
+      amount: 3500,
+      description: "Paycheck",
+      category: "Paycheck",
+      owner: "Ayaz",
+    },
+    {
+      id: `inc-${resolvedCurrentKey}-paycheck-tasnuva`,
+      date: `${resolvedCurrentKey}-01`,
+      amount: 2200,
+      description: "Paycheck",
+      category: "Paycheck",
+      owner: "Tasnuva",
+    },
+    {
+      id: `inc-${resolvedCurrentKey}-side-hustle`,
+      date: `${resolvedCurrentKey}-12`,
+      amount: 300,
+      description: "Side Hustle",
+      category: "Side Hustle",
+      owner: "Tasnuva",
+    },
+    {
+      id: `inc-${resolvedPreviousKey}-paycheck-ayaz`,
+      date: `${resolvedPreviousKey}-01`,
+      amount: 3400,
+      description: "Paycheck",
+      category: "Paycheck",
+      owner: "Ayaz",
+    },
+    {
+      id: `inc-${resolvedPreviousKey}-paycheck-tasnuva`,
+      date: `${resolvedPreviousKey}-01`,
+      amount: 2100,
+      description: "Paycheck",
+      category: "Paycheck",
+      owner: "Tasnuva",
+    },
+  ];
 
   const debts: Debt[] = [
     {
       id: "debt-1",
-      name: "Car Loan",
-      initialAmount: 12000,
-      startDate: `${prev4Key}-01`,
-      owner: "Ayaz",
+      name: "Credit Card",
+      initialAmount: 2400,
+      startDate: `${resolvedPreviousKey}-01`,
+      owner: "Tasnuva",
     },
   ];
 
   const debtPayments: DebtPayment[] = [
     {
-      id: "dp-1",
+      id: `dp-${resolvedPreviousKey}-1`,
       debtId: "debt-1",
-      date: `${prev3Key}-15`,
-      amount: 400,
-      note: "Payment",
+      date: `${resolvedPreviousKey}-15`,
+      amount: 250,
+      note: "Monthly payment",
     },
     {
-      id: "dp-2",
+      id: `dp-${resolvedCurrentKey}-1`,
       debtId: "debt-1",
-      date: `${prev2Key}-15`,
-      amount: 400,
-      note: "Payment",
+      date: `${resolvedCurrentKey}-15`,
+      amount: 250,
+      note: "Monthly payment",
+    },
+  ];
+
+  const ownerTransfers: OwnerTransfer[] = [
+    {
+      id: `transfer-${resolvedCurrentKey}-1`,
+      date: `${resolvedCurrentKey}-18`,
+      fromOwner: "Tasnuva",
+      toOwner: "Ayaz",
+      amount: 200,
+      note: "Utilities share",
     },
     {
-      id: "dp-3",
-      debtId: "debt-1",
-      date: `${prevKey}-15`,
-      amount: 400,
-      note: "Payment",
-    },
-    {
-      id: "dp-4",
-      debtId: "debt-1",
-      date: `${currentKey}-15`,
-      amount: 400,
-      note: "Payment",
+      id: `transfer-${resolvedPreviousKey}-1`,
+      date: `${resolvedPreviousKey}-18`,
+      fromOwner: "Ayaz",
+      toOwner: "Tasnuva",
+      amount: 120,
+      note: "Dining share",
     },
   ];
 
@@ -166,15 +222,12 @@ export function buildDummyBudget(currentMonthKey: string): DummyBudgetData {
     income,
     debts,
     debtPayments,
-    ownerTransfers: [],
+    ownerTransfers,
     iOweNova: {
-      [currentKey]: 320,
-      [prevKey]: 180,
-      [prev2Key]: 210,
-      [prev3Key]: 140,
-      [prev4Key]: 260,
+      [resolvedCurrentKey]: 80,
+      [resolvedPreviousKey]: 40,
     },
-    cardSources: [...ALL_EXPENSE_SOURCES],
+    cardSources: ["amex", "manual", "td", "chase"],
     expenseCategories,
     incomeCategories,
   };

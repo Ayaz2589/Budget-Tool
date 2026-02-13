@@ -51,7 +51,8 @@
     "signInToContinue": "Sign in with Google to view your dashboard.",
     "signInWithGoogle": "Google",
     "valuePropSubtitle": "Sync with Google Sheets. No credit card needed.",
-    "valuePropTitle": "Track expenses, income, and budgets."
+    "valuePropTitle": "Track expenses, income, and budgets.",
+    "dummyDataSyncBlocked": "Dummy data sync and restore are disabled. Turn off dummy data in Settings to use Google Sheets."
   },
   "common": {
     "actions": "Actions",
@@ -557,7 +558,8 @@
     "currencyDesc": "All amounts are stored in USD (canonical). Display conversion uses the latest cached rate.",
     "currencyDisplayLabel": "Display currency",
     "fxAsOf": "FX as of {{value}}",
-    "fxFallback": "(fallback)"
+    "fxFallback": "(fallback)",
+    "dummySyncBlocked": "Google Sheets sync and restore are disabled while dummy data is enabled."
   },
   "transactions": {
     "add": "Add",

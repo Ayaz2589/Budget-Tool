@@ -51,7 +51,8 @@
     "signInToContinue": "대시보드를 보려면 Google로 로그인하세요.",
     "signInWithGoogle": "Google로 로그인",
     "valuePropSubtitle": "Google 스프레드시트와 동기화. 신용카드 불필요.",
-    "valuePropTitle": "지출, 수입, 예산을 관리하세요."
+    "valuePropTitle": "지출, 수입, 예산을 관리하세요.",
+    "dummyDataSyncBlocked": "더미 데이터 동기화는 비활성화되어 있습니다. Google Sheets와 동기화하려면 설정에서 더미 데이터를 끄세요."
   },
   "common": {
     "actions": "작업",
@@ -557,7 +558,8 @@
     "currencyDesc": "모든 금액은 USD(기준값)로 저장됩니다. 화면 변환은 최신 캐시 환율을 사용합니다.",
     "currencyDisplayLabel": "표시 통화",
     "fxAsOf": "환율 기준 시각: {{value}}",
-    "fxFallback": "(대체값)"
+    "fxFallback": "(대체값)",
+    "dummySyncBlocked": "더미 데이터가 켜져 있는 동안에는 Google Sheets 동기화가 비활성화됩니다."
   },
   "transactions": {
     "add": "추가",

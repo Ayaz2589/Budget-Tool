@@ -51,7 +51,8 @@
     "signInToContinue": "ダッシュボードを表示するにはGoogleでサインインしてください。",
     "signInWithGoogle": "Googleでサインイン",
     "valuePropSubtitle": "Googleスプレッドシートと同期。クレジットカード不要。",
-    "valuePropTitle": "支出・収入・予算を管理。"
+    "valuePropTitle": "支出・収入・予算を管理。",
+    "dummyDataSyncBlocked": "ダミーデータの同期は無効です。Google Sheets に同期するには設定でダミーデータをオフにしてください。"
   },
   "common": {
     "actions": "操作",
@@ -557,7 +558,8 @@
     "currencyDesc": "すべての金額はUSD（基準値）で保存されます。表示換算には最新のキャッシュレートを使用します。",
     "currencyDisplayLabel": "表示通貨",
     "fxAsOf": "為替時点: {{value}}",
-    "fxFallback": "(フォールバック)"
+    "fxFallback": "(フォールバック)",
+    "dummySyncBlocked": "ダミーデータが有効な間は Google Sheets 同期は無効です。"
   },
   "transactions": {
     "add": "追加",

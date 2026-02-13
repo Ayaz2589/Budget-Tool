@@ -51,7 +51,8 @@
     "signInToContinue": "Inicia sesión con Google para ver tu panel.",
     "signInWithGoogle": "Iniciar sesión con Google",
     "valuePropSubtitle": "Sincroniza con Google Sheets. No hace falta tarjeta de crédito.",
-    "valuePropTitle": "Gastos, ingresos y presupuestos."
+    "valuePropTitle": "Gastos, ingresos y presupuestos.",
+    "dummyDataSyncBlocked": "La sincronización con datos de prueba está deshabilitada. Desactiva los datos de prueba en Ajustes para sincronizar con Google Sheets."
   },
   "common": {
     "actions": "Acciones",
@@ -558,7 +559,8 @@
     "currencyDesc": "Todos los importes se guardan en USD (canónico). La conversión en pantalla usa la última tasa en caché.",
     "currencyDisplayLabel": "Moneda de visualización",
     "fxAsOf": "FX al {{value}}",
-    "fxFallback": "(respaldo)"
+    "fxFallback": "(respaldo)",
+    "dummySyncBlocked": "La sincronización con Google Sheets está deshabilitada mientras los datos de prueba estén activos."
   },
   "transactions": {
     "add": "Añadir",

@@ -29,10 +29,19 @@ GitHub Actions runs two sequential jobs on PRs and pushes to `main`:
 ## Architecture
 
 ### State Management
-React Context API with three providers (no Redux/Zustand):
-- **BudgetContext** (`src/context/BudgetContext.tsx`) — all financial data: expenses, income, debts, mortgage, settings. Persists to `localStorage`.
-- **GoogleAuthContext** (`src/context/GoogleAuthContext.tsx`) — Google OAuth session and Sheets sync state.
+React Context API with modular providers (no Redux/Zustand). Top-level contexts:
+- **BudgetContext** (`src/context/BudgetContext.tsx`) — composes domain-specific sub-contexts and persists to `localStorage`.
+- **GoogleAuthContext** (`src/context/GoogleAuthContext.tsx`) — Google OAuth session.
 - **PresetTransactionsContext** (`src/context/PresetTransactionsContext.tsx`) — user-defined transaction templates.
+
+Domain sub-contexts (composed by BudgetContext):
+- **ExpensesContext** — expense CRUD and state
+- **IncomeContext** — income CRUD and state
+- **DebtContext** — debt tracking and payments
+- **OwnerTransfersContext** — owner split/transfer ledger
+- **SettingsContext** — app settings (owners, currency, categories)
+- **SyncContext** — Google Sheets sync orchestration
+- **SheetSetupContext** — spreadsheet setup and connection
 
 All data lives in `localStorage`. There is no backend database.
 
@@ -64,7 +73,10 @@ Bun's built-in test runner + React Testing Library + happy-dom. Tests in `test/`
 
 ## Key Conventions
 
-- `src/lib/` contains pure helper functions (math, formatting, parsing). I/O modules (Google Sheets, PDF) are isolated in their own files.
+- `src/lib/` contains pure helper functions and I/O modules, organized into subdirectories:
+  - `src/lib/math/` — core financial math (`core.ts`)
+  - `src/lib/sheets/` — Google Sheets sync (12 modules: api, sync, data, formatting, per-domain files)
+  - `src/lib/parsers/` — bank-specific CSV parsers (amex, apple, csv-utils)
 - `src/components/ui/` is shadcn/ui components; `src/components/ds/` is the custom design system.
 - Path alias `@/` maps to `src/`.
 - TypeScript strict mode is enabled (`noUnusedLocals`, `noUnusedParameters`).

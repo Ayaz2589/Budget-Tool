@@ -17,7 +17,7 @@ import {
 import i18n, { persistLocale } from "@/i18n";
 import { storage } from "@/lib/storage";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "lucide-react";
 
 type TourStep = {
   title: string;
@@ -1188,7 +1188,7 @@ export function TourPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8">
+    <div className="fixed inset-0 overflow-hidden bg-background flex items-center justify-center md:px-4 py-8">
       <div className={`w-full max-w-2xl ${isMobile ? "overflow-hidden" : ""}`}>
         <AnimatePresence mode="wait" initial={false} custom={direction}>
           {isLanguageStep ? (
@@ -1202,7 +1202,7 @@ export function TourPage() {
               transition={STEP_TRANSITION_DURATION}
             >
               <div className={LANGUAGE_STEP_CLASS}>
-                <div className="relative pt-6 pb-2 text-center">
+                <div className="relative pt-6 pb-2 text-center px-4">
                   <button
                     type="button"
                     onClick={handleQuitTour}
@@ -1216,7 +1216,7 @@ export function TourPage() {
                     {copy.languageCardTitle}
                   </h2>
                 </div>
-                <div className="flex flex-1 flex-col items-center gap-4 text-center pt-2 pb-6">
+                <div className="flex flex-1 flex-col items-center gap-4 text-center pt-2 pb-6 px-4">
                   <div className="w-full max-w-md">
                     <Select value={tourLocale} onValueChange={handleLanguageChange}>
                       <SelectTrigger className="h-11 w-full">
@@ -1263,7 +1263,7 @@ export function TourPage() {
                 : {})}
             >
               <div className={TOUR_STEP_CLASS}>
-                <div className="relative space-y-2 pb-2">
+                <div className="relative space-y-2 pb-2 px-4">
                   <button
                     type="button"
                     onClick={handleQuitTour}
@@ -1276,7 +1276,7 @@ export function TourPage() {
                   <div className="text-sm text-muted-foreground">{progressLabel}</div>
                   <h2 className="text-2xl font-semibold leading-none tracking-tight">{step.title}</h2>
                 </div>
-                <div className="flex flex-1 flex-col gap-8 pt-4">
+                <div className="flex flex-1 flex-col gap-8 pt-4 px-4">
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                       key={`content-${stepIndex}-${isSimplified}`}
@@ -1297,38 +1297,57 @@ export function TourPage() {
                       </ul>
                     </motion.div>
                   </AnimatePresence>
-                  <div className="mt-auto flex items-center justify-between gap-3">
-                    <Button type="button" variant="outline" onClick={goBack}>
-                      {copy.back}
-                    </Button>
-                    <button
-                      type="button"
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2 decoration-dotted"
-                      onClick={() => setIsSimplified((prev) => !prev)}
-                      aria-label={
-                        isSimplified
-                          ? copy.toggleDetailed
-                          : copy.toggleSimplified
-                      }
-                      data-testid="tour-text-toggle"
-                    >
-                      {isSimplified
-                        ? copy.toggleDetailed
-                        : copy.toggleSimplified}
-                    </button>
-                    {!isLast ? (
-                      <Button type="button" onClick={goNext}>
-                        {copy.next}
-                      </Button>
-                    ) : isSignedIn ? (
-                      <Button type="button" onClick={handleFinishReplay}>
-                        {copy.finishTour}
-                      </Button>
-                    ) : (
-                      <Button type="button" onClick={handleFinishSignIn}>
-                        {copy.signInWithGoogle}
-                      </Button>
+                  <div className="mt-auto flex flex-col gap-4">
+                    {isLast && (
+                      <div className="flex justify-center">
+                        {isSignedIn ? (
+                          <Button type="button" onClick={handleFinishReplay}>
+                            {copy.finishTour}
+                          </Button>
+                        ) : (
+                          <Button type="button" onClick={handleFinishSignIn}>
+                            {copy.signInWithGoogle}
+                          </Button>
+                        )}
+                      </div>
                     )}
+                    <div className="flex items-center justify-between gap-3">
+                      <button
+                        type="button"
+                        onClick={goBack}
+                        className="inline-flex size-10 items-center justify-center rounded-full border border-input bg-background text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
+                        aria-label={copy.back}
+                      >
+                        <ArrowLeft className="size-5" />
+                      </button>
+                      <button
+                        type="button"
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2 decoration-dotted"
+                        onClick={() => setIsSimplified((prev) => !prev)}
+                        aria-label={
+                          isSimplified
+                            ? copy.toggleDetailed
+                            : copy.toggleSimplified
+                        }
+                        data-testid="tour-text-toggle"
+                      >
+                        {isSimplified
+                          ? copy.toggleDetailed
+                          : copy.toggleSimplified}
+                      </button>
+                      {!isLast ? (
+                        <button
+                          type="button"
+                          onClick={goNext}
+                          className="inline-flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
+                          aria-label={copy.next}
+                        >
+                          <ArrowRight className="size-5" />
+                        </button>
+                      ) : (
+                        <div className="size-10" />
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

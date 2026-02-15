@@ -207,7 +207,10 @@ export function ImportPage() {
         >
           <AccordionItem value="import-source" className={accordionItemClass}>
             <AccordionTrigger className={accordionTriggerClass}>
-              {t("import.uploadStatement")}
+              <div className="flex flex-col items-start gap-0.5">
+                <span>{t("import.uploadStatement")}</span>
+                <span className="text-xs font-normal text-muted-foreground">{t("import.uploadStatementDesc")}</span>
+              </div>
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
               <ImportSourceCard bare {...importSourceProps} />
@@ -222,7 +225,10 @@ export function ImportPage() {
 
           <AccordionItem value="export-string" className={accordionItemClass}>
             <AccordionTrigger className={accordionTriggerClass}>
-              {t("import.exportStringTitle")}
+              <div className="flex flex-col items-start gap-0.5">
+                <span>{t("import.exportStringTitle")}</span>
+                <span className="text-xs font-normal text-muted-foreground">{t("import.exportStringDesc")}</span>
+              </div>
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
               <div className="space-y-3">{exportStringInner}</div>
@@ -231,7 +237,10 @@ export function ImportPage() {
 
           <AccordionItem value="json-import" className={accordionItemClass}>
             <AccordionTrigger className={accordionTriggerClass}>
-              {t("import.jsonImportTitle")}
+              <div className="flex flex-col items-start gap-0.5">
+                <span>{t("import.jsonImportTitle")}</span>
+                <span className="text-xs font-normal text-muted-foreground">{t("import.jsonImportDesc")}</span>
+              </div>
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
               <div className="space-y-3">{jsonImportInner}</div>
@@ -240,7 +249,10 @@ export function ImportPage() {
 
           <AccordionItem value="export" className={accordionItemClass}>
             <AccordionTrigger className={accordionTriggerClass}>
-              {t("import.exportTitle")}
+              <div className="flex flex-col items-start gap-0.5">
+                <span>{t("import.exportTitle")}</span>
+                <span className="text-xs font-normal text-muted-foreground">{t("import.exportDesc")}</span>
+              </div>
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
               <div className="flex flex-col gap-2">{exportInner}</div>

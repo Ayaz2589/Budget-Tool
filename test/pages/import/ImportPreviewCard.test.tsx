@@ -6,6 +6,33 @@ const mockT = (key: string) => key;
 
 afterEach(() => cleanup());
 
+test("ImportPreviewCard bare mode renders without section header", () => {
+  render(
+    <ImportPreviewCard
+      bare
+      previewExpenses={[
+        {
+          id: "e1",
+          date: "2026-02-01",
+          amount: 5,
+          description: "Test",
+          category: "",
+          source: "manual",
+        },
+      ]}
+      previewIncome={[]}
+      previewDebts={[]}
+      previewDebtPayments={[]}
+      expenseCategories={[]}
+      onUpdateCategory={() => {}}
+      lastDetected="amex"
+      t={mockT}
+    />,
+  );
+  expect(screen.queryByText("import.previewTitle")).not.toBeInTheDocument();
+  expect(screen.getAllByText("import.expensesToAdd").length).toBeGreaterThan(0);
+});
+
 test("ImportPreviewCard shows Preview title and description when empty", () => {
   render(
     <ImportPreviewCard

@@ -19,6 +19,8 @@ export interface ImportPreviewCardProps {
   onUpdateCategory: (id: string, category: string) => void;
   lastDetected: string;
   t: (key: string, options?: Record<string, unknown>) => string;
+  /** When true, render without Card wrapper and section header (for accordion layout) */
+  bare?: boolean;
 }
 
 export interface ImportSourceCardProps {
@@ -42,4 +44,6 @@ export interface ImportSourceCardProps {
   statusText?: string;
   showPrimaryAction?: boolean;
   primaryActionLabel?: string;
+  /** When true, render without Card wrapper and section header (for accordion layout) */
+  bare?: boolean;
 }

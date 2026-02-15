@@ -1,15 +1,4 @@
-import { useRef, useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { useBudget } from "@/context";
-import { parseCsv, type CsvSource } from "@/lib/parsers";
-import { extractTextFromPdf } from "@/lib/pdfText";
-import { parseExportedPdfData } from "@/lib/pdfExport";
-import { filterOutExistingExpenses } from "@/lib/importDedup";
-import { amountsWithinTolerance } from "@/lib/math";
-import { usePresetTransactions } from "@/context";
-import type { Debt, DebtPayment, Expense, Income } from "@/lib/types";
 import { ImportSourceCard } from "./ImportSourceCard";
-import type { SourceChoice } from "@/types/import";
 import { ImportPreviewCard } from "./ImportPreviewCard";
 import {
   Dialog,
@@ -20,569 +9,51 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import type { OwnerTransfer, PresetTransaction } from "@/types/core";
-import { collectMissingImportMeta, normalizeImportedData } from "@/lib/importNormalize";
-import { parseFromBlob } from "@/lib/minifiedPayload";
-import { parseBudgetJson } from "@/lib/jsonExport";
-import type { ExpandedPayload } from "@/types/payload";
-import type { ParsedExportedPdf } from "@/types/pdf";
-import { isDisplayCurrency } from "@/types/currency";
-import { downloadTransactionsAndIncomePdf } from "@/lib/pdfExport";
-import { getCategoryColor } from "@/lib/categoryColors";
-import { buildExpandedPayload, downloadBudgetJson } from "@/lib/jsonExport";
-import { buildExportString, downloadExportString } from "@/lib/exportString";
 import {
   Card,
   CardContent,
 } from "@/components/ui/card";
 import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
+import { useImportState } from "./useImportState";
 
 export function ImportPage() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const jsonInputRef = useRef<HTMLInputElement>(null);
-  const [selectedSource, setSelectedSource] = useState<SourceChoice>("amex");
-  const [previewExpenses, setPreviewExpenses] = useState<Expense[]>([]);
-  const [previewIncome, setPreviewIncome] = useState<Income[]>([]);
-  const [previewDebts, setPreviewDebts] = useState<Debt[]>([]);
-  const [previewDebtPayments, setPreviewDebtPayments] = useState<DebtPayment[]>(
-    []
-  );
-  const [previewOwnerTransfers, setPreviewOwnerTransfers] = useState<
-    OwnerTransfer[]
-  >([]);
-  const [sourceLabel, setSourceLabel] = useState<string>("");
-  const [lastDetected, setLastDetected] = useState<string>("");
-  const [skippedDuplicates, setSkippedDuplicates] = useState<number>(0);
-  const [importError, setImportError] = useState<string>("");
-  const [exportString, setExportString] = useState<string>("");
-  const [exportStringError, setExportStringError] = useState<string>("");
-  const [jsonImportError, setJsonImportError] = useState<string>("");
-  const [missingMetaOpen, setMissingMetaOpen] = useState(false);
-  const [missingExpenseCategories, setMissingExpenseCategories] = useState<string[]>([]);
-  const [missingIncomeCategories, setMissingIncomeCategories] = useState<string[]>([]);
-  const [missingOwners, setMissingOwners] = useState<string[]>([]);
-  const [pendingParsed, setPendingParsed] = useState<{
-    expenses: Expense[];
-    income: Income[];
-    debts: Debt[];
-    debtPayments: DebtPayment[];
-    ownerTransfers: OwnerTransfer[];
-    presetTransactions: PresetTransaction[];
-    cardSources: string[];
-    sourceLabel: string;
-  } | null>(null);
   const {
-    expenses,
-    income,
-    debts,
-    debtPayments,
-    addExpenses,
-    addIncomes,
-    addDebts,
-    addDebtPayments,
-    addOwnerTransfer,
+    fileInputRef,
+    jsonInputRef,
+    selectedSource,
+    previewExpenses,
+    previewIncome,
+    previewDebts,
+    previewDebtPayments,
+    lastDetected,
+    skippedDuplicates,
+    importError,
+    exportString,
+    exportStringError,
+    jsonImportError,
+    missingMetaOpen,
+    missingExpenseCategories,
+    missingIncomeCategories,
+    missingOwners,
+    hasPreview,
+    primaryAddLabel,
+    importStatusText,
     expenseCategories,
-    incomeCategories,
     cardSources,
-    setCardSources,
-    setExpenseCategories,
-    setIncomeCategories,
-    setOwners,
-    owners,
-    ownerTransfers,
-    uiFormatSettings,
-    setUiFormatSettings,
-  } = useBudget();
-  const { setPresets, presetTransactions } = usePresetTransactions();
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    if (
-      selectedSource !== "pdf-export" &&
-      !cardSources.includes(selectedSource)
-    ) {
-      const firstValid =
-        cardSources.includes("amex") || cardSources.includes("amex-gold")
-          ? "amex"
-          : cardSources.includes("chase")
-          ? "chase"
-          : cardSources.includes("apple")
-          ? "apple"
-          : "pdf-export";
-      setSelectedSource(firstValid as SourceChoice);
-    }
-  }, [cardSources, selectedSource]);
-
-  const expandedToParsed = (expanded: ExpandedPayload): ParsedExportedPdf => ({
-    expenses: Array.isArray(expanded.expenses) ? expanded.expenses : [],
-    income: Array.isArray(expanded.income) ? expanded.income : [],
-    debts: Array.isArray(expanded.debts) ? expanded.debts : [],
-    debtPayments: Array.isArray(expanded.debtPayments) ? expanded.debtPayments : [],
-    ownerTransfers: Array.isArray(expanded.ownerTransfers)
-      ? expanded.ownerTransfers
-      : [],
-    presetTransactions: Array.isArray(expanded.presetTransactions)
-      ? expanded.presetTransactions
-      : [],
-    expenseCategoriesWithColors: expanded.expenseCategoriesWithColors,
-    incomeCategoriesWithColors: expanded.incomeCategoriesWithColors,
-    owners: expanded.owners,
-    cardSources: expanded.cardSources,
-    displayCurrency: expanded.displayCurrency,
-    baseCurrency: expanded.baseCurrency,
-    fxAsOf: expanded.fxAsOf,
-  });
-
-  const hasParsedRows = (parsed: ParsedExportedPdf): boolean =>
-    parsed.expenses.length > 0 ||
-    parsed.income.length > 0 ||
-    parsed.debts.length > 0 ||
-    parsed.debtPayments.length > 0 ||
-    (parsed.ownerTransfers?.length ?? 0) > 0 ||
-    parsed.presetTransactions.length > 0;
-
-  const handleParsedExport = (
-    parsed: ParsedExportedPdf,
-    label: string
-  ) => {
-    const existingExpenseIds = new Set(expenses.map((ex) => ex.id));
-    const toAddExpenses = parsed.expenses.filter(
-      (ex) => !existingExpenseIds.has(ex.id)
-    );
-    const toAddIncome = parsed.income.filter((i) => {
-      if (income.some((existing) => existing.id === i.id)) return false;
-      const sameEntry = income.some(
-        (existing) =>
-          existing.date === i.date &&
-          amountsWithinTolerance(existing.amount, i.amount, 0.01) &&
-          (existing.category || "").toLowerCase() ===
-            (i.category || "").toLowerCase()
-      );
-      return !sameEntry;
-    });
-    const existingDebtIds = new Set(debts.map((d) => d.id));
-    const existingPaymentIds = new Set(debtPayments.map((p) => p.id));
-    const existingTransferIds = new Set(ownerTransfers.map((row) => row.id));
-    const toAddDebts = parsed.debts.filter((d) => !existingDebtIds.has(d.id));
-    const toAddDebtPayments = parsed.debtPayments.filter(
-      (p) => !existingPaymentIds.has(p.id)
-    );
-    const toAddOwnerTransfers = (parsed.ownerTransfers ?? []).filter(
-      (row) => !existingTransferIds.has(row.id)
-    );
-    const missingMeta = collectMissingImportMeta(
-      parsed,
-      expenseCategories,
-      incomeCategories,
-      owners
-    );
-    if (
-      missingMeta.missingExpenseCategories.length > 0 ||
-      missingMeta.missingIncomeCategories.length > 0 ||
-      missingMeta.missingOwners.length > 0
-    ) {
-      setMissingExpenseCategories(missingMeta.missingExpenseCategories);
-      setMissingIncomeCategories(missingMeta.missingIncomeCategories);
-      setMissingOwners(missingMeta.missingOwners);
-      setPendingParsed({
-        expenses: toAddExpenses,
-        income: toAddIncome,
-        debts: toAddDebts,
-        debtPayments: toAddDebtPayments,
-        ownerTransfers: toAddOwnerTransfers,
-        presetTransactions: parsed.presetTransactions,
-        cardSources: parsed.cardSources ?? [],
-        sourceLabel: label,
-      });
-      setMissingMetaOpen(true);
-      return;
-    }
-
-    if (parsed.presetTransactions.length > 0) {
-      setPresets(parsed.presetTransactions);
-    }
-    if (Array.isArray(parsed.cardSources) && parsed.cardSources.length > 0) {
-      setCardSources(parsed.cardSources);
-    }
-    if (
-      Array.isArray(parsed.expenseCategoriesWithColors) &&
-      parsed.expenseCategoriesWithColors.length > 0
-    ) {
-      setExpenseCategories(
-        parsed.expenseCategoriesWithColors.map((x) => x.name)
-      );
-    }
-    if (
-      Array.isArray(parsed.incomeCategoriesWithColors) &&
-      parsed.incomeCategoriesWithColors.length > 0
-    ) {
-      setIncomeCategories(
-        parsed.incomeCategoriesWithColors.map((x) => x.name)
-      );
-    }
-    if (Array.isArray(parsed.owners) && parsed.owners.length > 0) {
-      setOwners(parsed.owners);
-    }
-    if (isDisplayCurrency(parsed.displayCurrency)) {
-      setUiFormatSettings({
-        ...uiFormatSettings,
-        currency: parsed.displayCurrency,
-        baseCurrency: "USD",
-        fxRate: uiFormatSettings.fxRate,
-        fxAsOf: parsed.fxAsOf ?? uiFormatSettings.fxAsOf,
-      });
-    }
-    setPreviewExpenses(toAddExpenses);
-    setPreviewIncome(toAddIncome);
-    setPreviewDebts(toAddDebts);
-    setPreviewDebtPayments(toAddDebtPayments);
-    setPreviewOwnerTransfers(toAddOwnerTransfers);
-    setSourceLabel(label);
-    setLastDetected("pdf-export");
-    setSkippedDuplicates(0);
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImportError("");
-    if (selectedSource === "pdf-export") {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const buffer = reader.result as ArrayBuffer;
-          const text = await extractTextFromPdf(buffer);
-          const parsed = parseExportedPdfData(text);
-          if (
-            parsed.expenses.length === 0 &&
-            parsed.income.length === 0 &&
-            parsed.debts.length === 0 &&
-            parsed.debtPayments.length === 0 &&
-            (parsed.ownerTransfers?.length ?? 0) === 0 &&
-            parsed.presetTransactions.length === 0 &&
-            text.trim().length > 0
-          ) {
-            setImportError(t("import.exportedPdfInvalid"));
-            setPreviewExpenses([]);
-            setPreviewIncome([]);
-            setPreviewDebts([]);
-            setPreviewDebtPayments([]);
-            setPreviewOwnerTransfers([]);
-            setLastDetected("");
-            setSourceLabel("");
-            return;
-          }
-          handleParsedExport(parsed, t("import.exportedPdf"));
-        } catch (err) {
-          setImportError(
-            err instanceof Error ? err.message : t("import.pdfImportFailed")
-          );
-          setPreviewExpenses([]);
-          setPreviewIncome([]);
-          setPreviewDebts([]);
-          setPreviewDebtPayments([]);
-          setPreviewOwnerTransfers([]);
-          setLastDetected("");
-          setSourceLabel("");
-          setSkippedDuplicates(0);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    } else {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const text = String(reader.result);
-          const csvSource: CsvSource =
-            selectedSource === "amex" ? "amex" : (selectedSource as CsvSource);
-          const result = parseCsv(text, csvSource);
-          let toAdd = filterOutExistingExpenses(result.expenses, expenses);
-          if (selectedSource === "amex") {
-            const source =
-              cardSources.includes("amex") ? "amex" : "amex-gold";
-            toAdd = toAdd.map((e) => ({ ...e, source }));
-          }
-          setSkippedDuplicates(result.expenses.length - toAdd.length);
-          setPreviewExpenses(toAdd);
-          setPreviewIncome([]);
-          setPreviewDebts([]);
-          setPreviewDebtPayments([]);
-          setPreviewOwnerTransfers([]);
-          const label =
-            selectedSource === "amex"
-              ? t("import.amexCard")
-              : selectedSource === "chase"
-              ? t("import.chaseCard")
-              : selectedSource === "apple"
-              ? t("import.appleCard")
-              : t("import.chooseCsvFile");
-          setSourceLabel(label);
-          setLastDetected(selectedSource);
-        } catch (err) {
-          setImportError(err instanceof Error ? err.message : t("import.importFailed"));
-          setPreviewExpenses([]);
-          setPreviewIncome([]);
-          setPreviewDebts([]);
-          setPreviewDebtPayments([]);
-          setPreviewOwnerTransfers([]);
-          setLastDetected("");
-          setSourceLabel("");
-          setSkippedDuplicates(0);
-        }
-      };
-      reader.readAsText(file, "UTF-8");
-    }
-    e.target.value = "";
-  };
-
-  const handleExportStringImport = () => {
-    setExportStringError("");
-    setImportError("");
-    const raw = exportString.trim();
-    if (!raw) {
-      setExportStringError(t("import.exportStringPasteFirst"));
-      return;
-    }
-    try {
-      let parsed: ParsedExportedPdf | null = null;
-      if (raw.includes("BUDGET_TOOL_DATA_START")) {
-        parsed = parseExportedPdfData(raw);
-      } else if (raw.replace(/\s/g, "").startsWith("V2")) {
-        const expanded = parseFromBlob(raw);
-        parsed = expandedToParsed(expanded);
-      }
-      if (!parsed || !hasParsedRows(parsed)) {
-        setExportStringError(t("import.exportStringNotRecognized"));
-        return;
-      }
-      handleParsedExport(parsed, t("import.importExportString"));
-    } catch (err) {
-      setExportStringError(
-        err instanceof Error ? err.message : t("import.exportStringImportFailed")
-      );
-    }
-  };
-
-  const handleJsonFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setJsonImportError("");
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const text = String(reader.result);
-        const expanded = parseBudgetJson(text);
-        const parsed = expandedToParsed(expanded);
-        if (!hasParsedRows(parsed)) {
-          setJsonImportError(t("import.jsonNoData"));
-          return;
-        }
-        handleParsedExport(parsed, t("import.importJson"));
-      } catch (err) {
-        setJsonImportError(
-          err instanceof Error ? err.message : t("import.jsonImportFailed")
-        );
-      }
-    };
-    reader.readAsText(file, "UTF-8");
-    e.target.value = "";
-  };
-
-  const updatePreviewCategory = (id: string, category: string) => {
-    setPreviewExpenses((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, category } : e))
-    );
-  };
-
-  const addToTransactions = () => {
-    const expenseCatSet = new Set(expenseCategories);
-    const incomeCatSet = new Set(incomeCategories);
-    const normalizedExpenses = previewExpenses.map((e) => ({
-      ...e,
-      category: expenseCatSet.has(e.category) ? e.category : "",
-    }));
-    const normalizedIncome = previewIncome.map((i) => ({
-      ...i,
-      category: incomeCatSet.has(i.category) ? i.category : "",
-    }));
-    addExpenses(normalizedExpenses);
-    if (normalizedIncome.length > 0) addIncomes(normalizedIncome);
-    if (previewDebts.length > 0) addDebts(previewDebts);
-    if (previewDebtPayments.length > 0) addDebtPayments(previewDebtPayments);
-    if (previewOwnerTransfers.length > 0) {
-      previewOwnerTransfers.forEach((row) =>
-        addOwnerTransfer({
-          id: row.id,
-          date: row.date,
-          fromOwner: row.fromOwner,
-          toOwner: row.toOwner,
-          amount: row.amount,
-          note: row.note,
-        })
-      );
-    }
-    setPreviewExpenses([]);
-    setPreviewIncome([]);
-    setPreviewDebts([]);
-    setPreviewDebtPayments([]);
-    setPreviewOwnerTransfers([]);
-    setSourceLabel("");
-    setLastDetected("");
-    setSkippedDuplicates(0);
-    setImportError("");
-  };
-
-  const handleDownloadPdf = () => {
-    const expenseCategoriesWithColors = expenseCategories.map((name) => ({
-      name,
-      color: getCategoryColor(name, "expense"),
-    }));
-    const incomeCategoriesWithColors = incomeCategories.map((name) => ({
-      name,
-      color: getCategoryColor(name, "income"),
-    }));
-    downloadTransactionsAndIncomePdf(
-      expenses,
-      income,
-      debts,
-      debtPayments,
-      presetTransactions,
-      expenseCategoriesWithColors,
-      incomeCategoriesWithColors,
-      owners,
-      cardSources,
-    );
-  };
-
-  const handleDownloadJson = () => {
-    const expenseCategoriesWithColors = expenseCategories.map((name) => ({
-      name,
-      color: getCategoryColor(name, "expense"),
-    }));
-    const incomeCategoriesWithColors = incomeCategories.map((name) => ({
-      name,
-      color: getCategoryColor(name, "income"),
-    }));
-    const payload = buildExpandedPayload(
-      expenses,
-      income,
-      debts,
-      debtPayments,
-      presetTransactions,
-      expenseCategoriesWithColors,
-      incomeCategoriesWithColors,
-      owners,
-      cardSources,
-      ownerTransfers,
-      uiFormatSettings.currency,
-      "USD",
-      uiFormatSettings.fxAsOf,
-    );
-    downloadBudgetJson(payload);
-  };
-
-  const handleDownloadExportString = () => {
-    const expenseCategoriesWithColors = expenseCategories.map((name) => ({
-      name,
-      color: getCategoryColor(name, "expense"),
-    }));
-    const incomeCategoriesWithColors = incomeCategories.map((name) => ({
-      name,
-      color: getCategoryColor(name, "income"),
-    }));
-    const exportString = buildExportString(
-      expenses,
-      income,
-      debts,
-      debtPayments,
-      presetTransactions,
-      expenseCategoriesWithColors,
-      incomeCategoriesWithColors,
-      owners,
-      cardSources,
-      ownerTransfers,
-      uiFormatSettings.currency,
-      "USD",
-      uiFormatSettings.fxAsOf,
-    );
-    downloadExportString(exportString);
-  };
-
-  const applyPendingImport = (normalize: boolean) => {
-    if (!pendingParsed) return;
-    const normalized = normalize
-      ? normalizeImportedData(
-          pendingParsed,
-          expenseCategories,
-          incomeCategories,
-          owners
-        )
-      : {
-          expenses: pendingParsed.expenses,
-          income: pendingParsed.income,
-          debts: pendingParsed.debts,
-          ownerTransfers: pendingParsed.ownerTransfers,
-          presetTransactions: pendingParsed.presetTransactions,
-        };
-
-    if (!normalize) {
-      if (missingExpenseCategories.length > 0) {
-        setExpenseCategories([...expenseCategories, ...missingExpenseCategories]);
-      }
-      if (missingIncomeCategories.length > 0) {
-        setIncomeCategories([...incomeCategories, ...missingIncomeCategories]);
-      }
-      if (missingOwners.length > 0) {
-        setOwners([...owners, ...missingOwners]);
-      }
-    }
-
-    if (pendingParsed.presetTransactions.length > 0) {
-      setPresets(normalized.presetTransactions);
-    }
-    if (pendingParsed.cardSources.length > 0) {
-      setCardSources(pendingParsed.cardSources);
-    }
-
-    setPreviewExpenses(normalized.expenses);
-    setPreviewIncome(normalized.income);
-    setPreviewDebts(normalized.debts);
-    setPreviewDebtPayments(pendingParsed.debtPayments);
-    setPreviewOwnerTransfers(pendingParsed.ownerTransfers);
-    setSourceLabel(pendingParsed.sourceLabel);
-    setLastDetected("pdf-export");
-    setSkippedDuplicates(0);
-    setMissingMetaOpen(false);
-    setPendingParsed(null);
-  };
-
-  const hasPreview =
-    previewExpenses.length > 0 ||
-    previewIncome.length > 0 ||
-    previewDebts.length > 0 ||
-    previewDebtPayments.length > 0 ||
-    previewOwnerTransfers.length > 0;
-  const primaryAddLabel = t(
-    lastDetected === "pdf-export" ? "import.addAll" : "import.addToTransactions",
-  );
-  const importStatusText = lastDetected
-    ? `${sourceLabel} · ${t("import.rowsToAddSummary", {
-        count:
-          lastDetected === "pdf-export"
-            ? previewExpenses.length +
-              previewIncome.length +
-              previewDebts.length +
-              previewDebtPayments.length +
-              previewOwnerTransfers.length
-            : previewExpenses.length,
-      })}${
-        lastDetected === "pdf-export"
-          ? ` (${t("import.existingIdsOmitted")})`
-          : skippedDuplicates > 0
-            ? ` (${t("import.duplicatesSkipped", { count: skippedDuplicates })})`
-            : ""
-      }`
-    : "";
+    setSelectedSource,
+    setExportString,
+    setMissingMetaOpen,
+    handleFileChange,
+    handleExportStringImport,
+    handleJsonFileChange,
+    updatePreviewCategory,
+    addToTransactions,
+    handleDownloadPdf,
+    handleDownloadJson,
+    handleDownloadExportString,
+    applyPendingImport,
+    t,
+  } = useImportState();
 
   return (
     <div data-tour-page="data" className="flex flex-col min-h-0 flex-1 overflow-hidden">
@@ -609,7 +80,7 @@ export function ImportPage() {
           onFileChange={handleFileChange}
           importError={importError}
           lastDetected={lastDetected}
-          sourceLabel={sourceLabel}
+          sourceLabel={importStatusText ? importStatusText.split(" \u00B7 ")[0] ?? "" : ""}
           previewExpensesCount={previewExpenses.length}
           previewIncomeCount={previewIncome.length}
           previewDebtsCount={previewDebts.length}

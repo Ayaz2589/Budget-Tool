@@ -26,7 +26,7 @@ function setupStorage() {
       income: [],
       debts: [],
       debtPayments: [],
-      iOweNova: {},
+      ownerBalances: {},
       cardSources: ["manual", "amex"],
       expenseCategories: ["Food", "Groceries"],
       incomeCategories: [],

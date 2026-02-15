@@ -2,10 +2,11 @@ import { cn } from "@/lib/utils";
 import type { CategoryType } from "@/types/category";
 
 const EXPENSE_COLORS: Record<string, string> = {
-  "My Purchase": "bg-blue-500",
-  "Tasnuva's Purchases": "bg-rose-500",
-  "50/50": "bg-amber-500",
+  Groceries: "bg-green-500",
+  Dining: "bg-rose-500",
+  Transport: "bg-amber-500",
   Mortgage: "bg-slate-500",
+  Shopping: "bg-blue-500",
   Amazon: "bg-orange-500",
 };
 

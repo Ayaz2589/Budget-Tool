@@ -87,7 +87,7 @@ function seedBudget(expenses: ExpenseFixture[] = DEFAULT_EXPENSES) {
       income: [],
       debts: [],
       debtPayments: [],
-      iOweNova: {},
+      ownerBalances: {},
       cardSources: ["amex", "td", "manual", "chase"],
       expenseCategories: ["Food", "Bills"],
       incomeCategories: ["Paycheck"],

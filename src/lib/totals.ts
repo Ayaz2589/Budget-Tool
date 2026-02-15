@@ -2,6 +2,10 @@ import type { Expense, Income } from "@/types/core";
 import type { MonthTotals, TotalsInput } from "@/types/totals";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
 import { safeDivide, sumAmountsBy } from "@/lib/math";
+import {
+  normalizeExpenseAllocation,
+  isSharedExpenseByAllocation,
+} from "@/lib/ownerAccounting";
 
 export type { MonthTotals, TotalsInput };
 
@@ -33,7 +37,8 @@ export function computeMonthTotals(
   monthKey: string,
   expenses: Expense[],
   income: Income[],
-  iOweNova: number,
+  ownerBalances: Record<string, number>,
+  owners: string[],
   hysa = 0,
   investing = 0
 ): MonthTotals {
@@ -49,24 +54,36 @@ export function computeMonthTotals(
   const totalSpentWithoutMortgage = monthExpenses
     .filter((e) => !isMortgageCategory(e.category))
     .reduce((sum, row) => sum + row.amount, 0);
-  const total5050Spent = monthExpenses
-    .filter((e) => e.category === "50/50")
-    .reduce((sum, row) => sum + row.amount, 0);
-  const split5050 = total5050Spent / 2;
-  const tasnuvasPurchase = monthExpenses
-    .filter((e) => e.category === "Tasnuva's Purchases")
-    .reduce((sum, row) => sum + row.amount, 0);
-  const tasnuvasTotalSpending = tasnuvasPurchase + split5050;
-  // My total spending = expenses that are mine (not Tasnuva's, not 50/50, not Mortgage) + my half of 50/50
-  const myCategoriesSpent = monthExpenses
-    .filter(
-      (e) =>
-        e.category !== "Tasnuva's Purchases" &&
-        e.category !== "50/50" &&
-        !isMortgageCategory(e.category)
-    )
-    .reduce((sum, row) => sum + row.amount, 0);
-  const myTotalSpendingWithoutMortgage = myCategoriesSpent + split5050;
+
+  // Compute allocation-based spending metrics
+  let sharedSpent = 0;
+  const sharedSplit: Record<string, number> = {};
+  const ownerSpending: Record<string, number> = {};
+
+  // Initialize owners
+  for (const owner of owners) {
+    sharedSplit[owner] = 0;
+    ownerSpending[owner] = 0;
+  }
+
+  for (const expense of monthExpenses) {
+    if (isMortgageCategory(expense.category)) continue;
+
+    const allocation = normalizeExpenseAllocation(expense, owners);
+    const isShared = isSharedExpenseByAllocation(allocation);
+
+    if (isShared) {
+      sharedSpent += expense.amount;
+    }
+
+    for (const entry of allocation) {
+      if (entry.isUnassigned) continue;
+      if (isShared) {
+        sharedSplit[entry.owner] = (sharedSplit[entry.owner] ?? 0) + entry.amount;
+      }
+      ownerSpending[entry.owner] = (ownerSpending[entry.owner] ?? 0) + entry.amount;
+    }
+  }
 
   const totalSaved = totalEarned - totalSpent;
   const personalSavingsRate = safeDivide(totalSaved, totalEarned, 0);
@@ -78,12 +95,10 @@ export function computeMonthTotals(
     totalEarned,
     totalSpent,
     totalSpentWithoutMortgage,
-    total5050Spent,
-    split5050,
-    novasPurchase: tasnuvasPurchase,
-    novasTotalSpending: tasnuvasTotalSpending,
-    iOweNova,
-    myTotalSpendingWithoutMortgage,
+    sharedSpent,
+    sharedSplit,
+    ownerSpending,
+    ownerBalances,
     totalSaved,
     personalSavingsRate,
     hysa,
@@ -93,7 +108,14 @@ export function computeMonthTotals(
 }
 
 export function computeAllTotals(input: TotalsInput): MonthTotals[] {
-  const { expenses, income, iOweNovaByMonth, hysaByMonth = {}, investingByMonth = {} } = input;
+  const {
+    expenses,
+    income,
+    ownerBalancesByMonth,
+    owners,
+    hysaByMonth = {},
+    investingByMonth = {},
+  } = input;
   const monthKeys = new Set<string>();
   for (const e of expenses) {
     const key = getMonthKey(e.date);
@@ -110,11 +132,23 @@ export function computeAllTotals(input: TotalsInput): MonthTotals[] {
       monthKey,
       expenses,
       income,
-      iOweNovaByMonth[monthKey] ?? 0,
+      ownerBalancesByMonth[monthKey] ?? {},
+      owners,
       hysaByMonth[monthKey] ?? 0,
       investingByMonth[monthKey] ?? 0
     )
   );
+}
+
+function sumRecords(records: Record<string, number>[]): Record<string, number> {
+  const result: Record<string, number> = {};
+  for (const record of records) {
+    if (!record) continue;
+    for (const [key, value] of Object.entries(record)) {
+      result[key] = (result[key] ?? 0) + value;
+    }
+  }
+  return result;
 }
 
 export function computeGrandTotals(months: MonthTotals[]): MonthTotals {
@@ -126,15 +160,10 @@ export function computeGrandTotals(months: MonthTotals[]): MonthTotals {
     totalEarned,
     totalSpent: sumAmountsBy(months, (month) => month.totalSpent),
     totalSpentWithoutMortgage: sumAmountsBy(months, (month) => month.totalSpentWithoutMortgage),
-    total5050Spent: sumAmountsBy(months, (month) => month.total5050Spent),
-    split5050: sumAmountsBy(months, (month) => month.split5050),
-    novasPurchase: sumAmountsBy(months, (month) => month.novasPurchase),
-    novasTotalSpending: sumAmountsBy(months, (month) => month.novasTotalSpending),
-    iOweNova: sumAmountsBy(months, (month) => month.iOweNova),
-    myTotalSpendingWithoutMortgage: sumAmountsBy(
-      months,
-      (month) => month.myTotalSpendingWithoutMortgage,
-    ),
+    sharedSpent: sumAmountsBy(months, (month) => month.sharedSpent),
+    sharedSplit: sumRecords(months.map((m) => m.sharedSplit)),
+    ownerSpending: sumRecords(months.map((m) => m.ownerSpending)),
+    ownerBalances: sumRecords(months.map((m) => m.ownerBalances)),
     totalSaved,
     personalSavingsRate: safeDivide(totalSaved, totalEarned, 0),
     hysa: sumAmountsBy(months, (month) => month.hysa),

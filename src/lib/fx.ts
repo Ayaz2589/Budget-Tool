@@ -1,4 +1,5 @@
 import { type DisplayCurrency } from "@/types/currency";
+import { storage, STORAGE_KEYS } from "@/lib/storage";
 
 const FX_TTL_MS = 12 * 60 * 60 * 1000;
 const FALLBACK_RATE = 1;
@@ -17,12 +18,12 @@ const inFlight = new Map<
 >();
 
 function getCacheKey(currency: SupportedCurrency): string {
-  return `budget-tool-fx-usd-${currency.toLowerCase()}`;
+  return `${STORAGE_KEYS.FX_CACHE_PREFIX}${currency.toLowerCase()}`;
 }
 
 function readCache(currency: SupportedCurrency): CachedFx | null {
   try {
-    const raw = localStorage.getItem(getCacheKey(currency));
+    const raw = storage.getItem(getCacheKey(currency));
     if (!raw) return null;
     const data = JSON.parse(raw) as Partial<CachedFx>;
     if (
@@ -55,11 +56,7 @@ export function getCachedUsdFxRate(
 }
 
 function writeCache(currency: SupportedCurrency, cache: CachedFx): void {
-  try {
-    localStorage.setItem(getCacheKey(currency), JSON.stringify(cache));
-  } catch {
-    // ignore
-  }
+  storage.setItem(getCacheKey(currency), JSON.stringify(cache));
 }
 
 async function fetchUsdRate(currency: Exclude<SupportedCurrency, "USD">): Promise<CachedFx> {

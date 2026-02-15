@@ -2,22 +2,15 @@ import { Navigate } from "react-router-dom";
 import { useGoogleAuth } from "@/context";
 import { RETURNING_USER_KEY } from "@/context";
 import { TOUR_COMPLETED_KEY } from "@/context";
+import { storage } from "@/lib/storage";
 import { LandingPage } from "./LandingPage";
 
 function isReturningUser(): boolean {
-  try {
-    return !!localStorage.getItem(RETURNING_USER_KEY);
-  } catch {
-    return false;
-  }
+  return !!storage.getItem(RETURNING_USER_KEY);
 }
 
 function isTourCompleted(): boolean {
-  try {
-    return !!localStorage.getItem(TOUR_COMPLETED_KEY);
-  } catch {
-    return false;
-  }
+  return !!storage.getItem(TOUR_COMPLETED_KEY);
 }
 
 /**

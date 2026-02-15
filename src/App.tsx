@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import {
@@ -7,18 +8,68 @@ import {
   GoogleAuthProviderFallback,
 } from "@/context";
 import { Layout } from "@/components";
-import { AboutPage } from "@/pages/about";
 import { AuthGate, AuthLoginRoute } from "@/pages/auth";
-import { Dashboard } from "@/pages/dashboard";
-import { DebtPage } from "@/pages/debt";
-import { ImportPage } from "@/pages/import";
-import { IncomePage } from "@/pages/income";
 import { LandingRoute } from "@/pages/landing";
-import { MortgagePage } from "@/pages/mortgage";
-import { PresetsPage } from "@/pages/presets";
-import { SettingsPage } from "@/pages/settings";
-import { TourPage } from "@/pages/tour";
-import { TransactionsPage } from "@/pages/transactions";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+
+/* ---- Route-level lazy imports ---- */
+const Dashboard = lazy(() =>
+  import("@/pages/dashboard/Dashboard").then((m) => ({ default: m.Dashboard })),
+);
+const ImportPage = lazy(() =>
+  import("@/pages/import/ImportPage").then((m) => ({ default: m.ImportPage })),
+);
+const TransactionsPage = lazy(() =>
+  import("@/pages/transactions/TransactionsPage").then((m) => ({
+    default: m.TransactionsPage,
+  })),
+);
+const IncomePage = lazy(() =>
+  import("@/pages/income/IncomePage").then((m) => ({
+    default: m.IncomePage,
+  })),
+);
+const DebtPage = lazy(() =>
+  import("@/pages/debt/DebtPage").then((m) => ({ default: m.DebtPage })),
+);
+const MortgagePage = lazy(() =>
+  import("@/pages/mortgage/MortgagePage").then((m) => ({
+    default: m.MortgagePage,
+  })),
+);
+const PresetsPage = lazy(() =>
+  import("@/pages/presets/PresetsPage").then((m) => ({
+    default: m.PresetsPage,
+  })),
+);
+const AboutPage = lazy(() =>
+  import("@/pages/about/AboutPage").then((m) => ({ default: m.AboutPage })),
+);
+const SettingsPage = lazy(() =>
+  import("@/pages/settings/SettingsPage").then((m) => ({
+    default: m.SettingsPage,
+  })),
+);
+const TourPage = lazy(() =>
+  import("@/pages/tour/TourPage").then((m) => ({ default: m.TourPage })),
+);
+
+/* ---- Shared loading fallback ---- */
+function PageLoader() {
+  return (
+    <div className="flex h-[50dvh] items-center justify-center">
+      <div className="size-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+    </div>
+  );
+}
+
+function LazyRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<PageLoader />}>{children}</Suspense>
+    </ErrorBoundary>
+  );
+}
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
@@ -27,19 +78,89 @@ function AppContent() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingRoute />} />
-        <Route path="/tour" element={<TourPage />} />
+        <Route
+          path="/tour"
+          element={
+            <LazyRoute>
+              <TourPage />
+            </LazyRoute>
+          }
+        />
         <Route path="/auth" element={<AuthLoginRoute />} />
         <Route element={<AuthGate />}>
           <Route path="dashboard" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="import" element={<ImportPage />} />
-            <Route path="transactions" element={<TransactionsPage />} />
-            <Route path="income" element={<IncomePage />} />
-            <Route path="debt" element={<DebtPage />} />
-            <Route path="mortgage" element={<MortgagePage />} />
-            <Route path="presets" element={<PresetsPage />} />
-            <Route path="about" element={<AboutPage />} />
-            <Route path="settings" element={<SettingsPage />} />
+            <Route
+              index
+              element={
+                <LazyRoute>
+                  <Dashboard />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="import"
+              element={
+                <LazyRoute>
+                  <ImportPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="transactions"
+              element={
+                <LazyRoute>
+                  <TransactionsPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="income"
+              element={
+                <LazyRoute>
+                  <IncomePage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="debt"
+              element={
+                <LazyRoute>
+                  <DebtPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="mortgage"
+              element={
+                <LazyRoute>
+                  <MortgagePage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="presets"
+              element={
+                <LazyRoute>
+                  <PresetsPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="about"
+              element={
+                <LazyRoute>
+                  <AboutPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="settings"
+              element={
+                <LazyRoute>
+                  <SettingsPage />
+                </LazyRoute>
+              }
+            />
           </Route>
         </Route>
       </Routes>

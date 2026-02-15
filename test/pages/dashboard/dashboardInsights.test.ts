@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { buildDashboardInsights } from "@/pages/dashboard/dashboardInsights";
+import { buildDashboardInsights } from "@/pages/dashboard/insightsBuilder";
 
 test("buildDashboardInsights includes spending spike and missing income", () => {
   const insights = buildDashboardInsights({

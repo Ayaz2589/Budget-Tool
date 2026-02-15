@@ -16,6 +16,7 @@ import {
   useGoogleAuth,
 } from "@/context";
 import i18n, { persistLocale } from "@/i18n";
+import { storage } from "@/lib/storage";
 
 type TourStep = {
   title: string;
@@ -667,12 +668,8 @@ const STEP_TRANSITION = {
 };
 
 function setTourCompleted(): void {
-  try {
-    localStorage.setItem(TOUR_COMPLETED_KEY, "1");
-    localStorage.setItem(RETURNING_USER_KEY, "1");
-  } catch {
-    // ignore
-  }
+  storage.setItem(TOUR_COMPLETED_KEY, "1");
+  storage.setItem(RETURNING_USER_KEY, "1");
 }
 
 export function TourPage() {

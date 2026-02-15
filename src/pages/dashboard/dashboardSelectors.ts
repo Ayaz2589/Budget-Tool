@@ -12,6 +12,7 @@ import {
   computeOwnerNetFromTransfers,
   sumAmountsBy,
 } from "@/lib/math";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 import type { Debt, DebtPayment, Expense, Income, OwnerTransfer } from "@/types/core";
 import type {
   DashboardCashFlowRow,
@@ -34,7 +35,7 @@ function monthFromDate(date: string): string {
 }
 
 function isMortgage(expense: Expense): boolean {
-  return (expense.category || "").trim().toLowerCase() === "mortgage";
+  return isMortgageCategory(expense.category);
 }
 
 function shouldIncludeExpense(expense: Expense, scope: DashboardExpenseScope): boolean {

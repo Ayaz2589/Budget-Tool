@@ -7,14 +7,10 @@ import zh from "./locales/zh.json";
 import ko from "./locales/ko.json";
 import hi from "./locales/hi.json";
 import ja from "./locales/ja.json";
-
-const LOCALE_STORAGE_KEY = "ortho-locale";
+import { storage, STORAGE_KEYS } from "@/lib/storage";
 
 const SUPPORTED_LOCALES = ["en", "es", "bn", "zh", "ko", "hi", "ja"] as const;
-const savedLng =
-  typeof localStorage !== "undefined"
-    ? localStorage.getItem(LOCALE_STORAGE_KEY)
-    : null;
+const savedLng = storage.getItem(STORAGE_KEYS.LOCALE);
 const initialLng: string =
   savedLng && SUPPORTED_LOCALES.includes(savedLng as (typeof SUPPORTED_LOCALES)[number])
     ? savedLng
@@ -36,9 +32,7 @@ i18n.use(initReactI18next).init({
 });
 
 export function persistLocale(locale: string): void {
-  if (typeof localStorage !== "undefined") {
-    localStorage.setItem(LOCALE_STORAGE_KEY, locale);
-  }
+  storage.setItem(STORAGE_KEYS.LOCALE, locale);
 }
 
 export default i18n;

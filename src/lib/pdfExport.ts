@@ -62,7 +62,8 @@ export function downloadTransactionsAndIncomePdf(
     currentMonthKey,
     expenses,
     income,
-    0,
+    {},
+    owners,
     0,
     0,
   );
@@ -77,9 +78,15 @@ export function downloadTransactionsAndIncomePdf(
     ["Total Earned", formatCurrency(selectedMonth.totalEarned)],
     ["Total Spent", formatCurrency(selectedMonth.totalSpent)],
     ["Total Spent w/o Mortgage", formatCurrency(selectedMonth.totalSpentWithoutMortgage)],
-    ["50/50 Split", formatCurrency(selectedMonth.split5050)],
-    ["Tasnuva's Total Spending", formatCurrency(selectedMonth.novasTotalSpending)],
-    ["My Total Spending w/o Mortgage", formatCurrency(selectedMonth.myTotalSpendingWithoutMortgage)],
+    ["Shared Spent", formatCurrency(selectedMonth.sharedSpent)],
+    ...owners.map((ownerName): [string, string] => [
+      `${ownerName}'s Total Spending`,
+      formatCurrency(selectedMonth.ownerSpending[ownerName] ?? 0),
+    ]),
+    ...owners.map((ownerName): [string, string] => [
+      `${ownerName}'s Balance`,
+      formatCurrency(selectedMonth.ownerBalances[ownerName] ?? 0),
+    ]),
     ["Total Saved", formatCurrency(selectedMonth.totalSaved)],
     ["Personal Savings Rate", formatPercent(selectedMonth.personalSavingsRate)],
   ];

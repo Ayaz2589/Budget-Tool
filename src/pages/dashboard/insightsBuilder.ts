@@ -1,14 +1,11 @@
 import { formatCurrency, formatDate } from "@/lib/format";
 import { isValidDate } from "@/lib/totals";
 import { computeMonthOverMonthPct, sumAmountsBy } from "@/lib/math";
+import { isMortgageCategory } from "@/lib/mortgageCategory";
 import type { DashboardInsight, DashboardInsightInput } from "@/types/dashboard";
 
 function monthFromDate(date: string): string {
   return date.slice(0, 7);
-}
-
-function isMortgageCategory(category: string): boolean {
-  return category.trim().toLowerCase() === "mortgage";
 }
 
 function expenseSumForMonth(

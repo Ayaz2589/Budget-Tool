@@ -48,7 +48,7 @@ beforeEach(() => {
       debts: [],
       debtPayments: [],
       ownerTransfers: [],
-      iOweNova: {},
+      ownerBalances: {},
       cardSources: ["manual", "td"],
       expenseCategories: ["Food", "Transport"],
       incomeCategories: ["Paycheck"],

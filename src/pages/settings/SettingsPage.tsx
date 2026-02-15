@@ -38,9 +38,8 @@ import { CardSourcesCard } from "./CardSourcesCard";
 import { ExpenseCategoriesCard } from "./ExpenseCategoriesCard";
 import { IncomeCategoriesCard } from "./IncomeCategoriesCard";
 import { OwnersCard } from "./OwnersCard";
+import { storage, STORAGE_KEYS } from "@/lib/storage";
 
-const BUDGET_STORAGE_KEY = "budget-tool-data";
-const PRESET_STORAGE_KEY = "budget-tool-preset-transactions";
 const DATE_FORMAT_OPTIONS = [
   { value: "YYYY/MM/DD", label: "YYYY/MM/DD" },
   { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
@@ -157,8 +156,8 @@ export function SettingsPage() {
   };
 
   const handleDeleteAllData = () => {
-    localStorage.removeItem(BUDGET_STORAGE_KEY);
-    localStorage.removeItem(PRESET_STORAGE_KEY);
+    storage.removeItem(STORAGE_KEYS.BUDGET_DATA);
+    storage.removeItem(STORAGE_KEYS.PRESET_TRANSACTIONS);
     setDeleteAllConfirmOpen(false);
     window.location.reload();
   };

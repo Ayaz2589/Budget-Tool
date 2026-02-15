@@ -1,3 +1,3 @@
 export * from "./Dashboard";
-export * from "./dashboardInsights";
+export * from "./insightsBuilder";
 export * from "./dashboardSelectors";

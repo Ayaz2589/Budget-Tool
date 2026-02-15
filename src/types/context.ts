@@ -34,8 +34,8 @@ export interface BudgetContextValue extends BudgetState {
   setIncomeCategories: (categories: string[]) => void;
   setOwners: (owners: string[]) => void;
   setCardSources: (sources: string[]) => void;
-  setIOweNova: (monthKey: string, amount: number) => void;
-  iOweNova: Record<string, number>;
+  setOwnerBalance: (monthKey: string, owner: string, amount: number) => void;
+  ownerBalances: Record<string, Record<string, number>>;
   repairCorruptedDates: () => { fixedExpenses: number; fixedIncome: number };
   uiFormatSettings: UiFormatSettings;
   setUiFormatSettings: (settings: UiFormatSettings) => void;

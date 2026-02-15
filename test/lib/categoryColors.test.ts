@@ -2,8 +2,8 @@ import { test, expect } from "bun:test";
 import { getCategoryColor } from "@/lib/categoryColors";
 
 test("getCategoryColor expense categories", () => {
-  expect(getCategoryColor("My Purchase", "expense")).toBe("bg-blue-500");
-  expect(getCategoryColor("50/50", "expense")).toBe("bg-amber-500");
+  expect(getCategoryColor("Shopping", "expense")).toBe("bg-blue-500");
+  expect(getCategoryColor("Transport", "expense")).toBe("bg-amber-500");
   expect(getCategoryColor("Unknown", "expense")).toBe("bg-gray-400");
 });
 
@@ -14,7 +14,7 @@ test("getCategoryColor income categories", () => {
 });
 
 test("getCategoryColor without type checks both", () => {
-  expect(getCategoryColor("My Purchase")).toBe("bg-blue-500");
+  expect(getCategoryColor("Shopping")).toBe("bg-blue-500");
   expect(getCategoryColor("Rent")).toBe("bg-emerald-500");
   expect(getCategoryColor("Unknown")).toBe("bg-gray-400");
 });

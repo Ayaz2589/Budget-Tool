@@ -1,32 +1,5 @@
 import type { Expense, ParseResult } from "@/lib/types";
-
-function hashId(date: string, description: string, amount: number, owner: string): string {
-  const str = `${date}|${description}|${amount}|${owner}`;
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    const c = str.charCodeAt(i);
-    h = (h << 5) - h + c;
-    h |= 0;
-  }
-  return `amex-${Math.abs(h).toString(36)}`;
-}
-
-function parseAmexDate(value: string): string {
-  // MM/DD/YYYY or MM/DD/YY
-  const parts = value.trim().split("/");
-  if (parts.length !== 3) return value;
-  const [m, d, y] = parts;
-  const year = y!.length === 2 ? `20${y}` : y;
-  const month = m!.padStart(2, "0");
-  const day = d!.padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function parseAmount(value: string): number {
-  const cleaned = value.replace(/[$,]/g, "").trim();
-  const n = parseFloat(cleaned);
-  return Number.isNaN(n) ? 0 : Math.abs(n);
-}
+import { hashId, parseAmount, parseCsvLine, parseDate } from "./csv-utils";
 
 /**
  * Clean Amex/Apple Pay description for display: remove prefix, domains, normalize spaces.
@@ -71,8 +44,8 @@ export function parseAmexCsv(csvText: string): ParseResult {
 
     if (!dateRaw || amount <= 0) continue;
 
-    const date = parseAmexDate(dateRaw);
-    const id = hashId(date, rawDescription, amount, owner);
+    const date = parseDate(dateRaw);
+    const id = hashId("amex", date, rawDescription, String(amount), owner);
 
     expenses.push({
       id,
@@ -86,23 +59,4 @@ export function parseAmexCsv(csvText: string): ParseResult {
   }
 
   return { expenses, source: "amex" };
-}
-
-function parseCsvLine(line: string): string[] {
-  const result: string[] = [];
-  let current = "";
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') {
-      inQuotes = !inQuotes;
-    } else if (c === "," && !inQuotes) {
-      result.push(current);
-      current = "";
-    } else {
-      current += c;
-    }
-  }
-  result.push(current);
-  return result;
 }

@@ -1,6 +1,6 @@
-export type AppTheme = "light" | "dark" | "system";
+import { storage, STORAGE_KEYS } from "@/lib/storage";
 
-const THEME_STORAGE_KEY = "ortho-theme";
+export type AppTheme = "light" | "dark" | "system";
 
 function getThemeMediaQuery(): MediaQueryList | null {
   if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
@@ -20,14 +20,9 @@ export function resolveTheme(theme: AppTheme): "light" | "dark" {
 }
 
 export function getStoredTheme(): AppTheme {
-  if (typeof window === "undefined") return "dark";
-  try {
-    const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-    if (stored === "light" || stored === "dark" || stored === "system") {
-      return stored;
-    }
-  } catch {
-    // ignore
+  const stored = storage.getItem(STORAGE_KEYS.THEME);
+  if (stored === "light" || stored === "dark" || stored === "system") {
+    return stored;
   }
   return "dark";
 }
@@ -47,13 +42,7 @@ export function initializeTheme(): AppTheme {
 }
 
 export function persistTheme(theme: AppTheme): void {
-  if (typeof window !== "undefined") {
-    try {
-      window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-    } catch {
-      // ignore
-    }
-  }
+  storage.setItem(STORAGE_KEYS.THEME, theme);
   applyTheme(theme);
 }
 

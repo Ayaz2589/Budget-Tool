@@ -16,7 +16,7 @@ export type DummyBudgetData = {
   debts: Debt[];
   debtPayments: DebtPayment[];
   ownerTransfers: OwnerTransfer[];
-  iOweNova: Record<string, number>;
+  ownerBalances: Record<string, Record<string, number>>;
   cardSources: string[];
   expenseCategories: string[];
   incomeCategories: string[];
@@ -49,18 +49,25 @@ export function buildDummyBudget(currentMonthKey: string): DummyBudgetData {
       date: `${resolvedCurrentKey}-03`,
       amount: 180,
       description: "Groceries",
-      category: "My Purchase",
+      category: "Groceries",
       source: "amex",
       owner: "Ayaz",
+      paidByOwner: "Ayaz",
     },
     {
       id: `exp-${resolvedCurrentKey}-dining`,
       date: `${resolvedCurrentKey}-06`,
       amount: 90,
       description: "Dining",
-      category: "50/50",
+      category: "Dining",
       source: "manual",
       owner: "Tasnuva",
+      paidByOwner: "Tasnuva",
+      allocationMode: "equal" as const,
+      allocation: [
+        { owner: "Ayaz", percent: 50 },
+        { owner: "Tasnuva", percent: 50 },
+      ],
     },
     {
       id: `exp-${resolvedCurrentKey}-utilities`,
@@ -94,18 +101,25 @@ export function buildDummyBudget(currentMonthKey: string): DummyBudgetData {
       date: `${resolvedPreviousKey}-03`,
       amount: 160,
       description: "Groceries",
-      category: "My Purchase",
+      category: "Groceries",
       source: "amex",
       owner: "Ayaz",
+      paidByOwner: "Ayaz",
     },
     {
       id: `exp-${resolvedPreviousKey}-dining`,
       date: `${resolvedPreviousKey}-06`,
       amount: 80,
       description: "Dining",
-      category: "50/50",
+      category: "Dining",
       source: "manual",
       owner: "Tasnuva",
+      paidByOwner: "Tasnuva",
+      allocationMode: "equal" as const,
+      allocation: [
+        { owner: "Ayaz", percent: 50 },
+        { owner: "Tasnuva", percent: 50 },
+      ],
     },
     {
       id: `exp-${resolvedPreviousKey}-utilities`,
@@ -223,9 +237,9 @@ export function buildDummyBudget(currentMonthKey: string): DummyBudgetData {
     debts,
     debtPayments,
     ownerTransfers,
-    iOweNova: {
-      [resolvedCurrentKey]: 80,
-      [resolvedPreviousKey]: 40,
+    ownerBalances: {
+      [resolvedCurrentKey]: { Ayaz: 80 },
+      [resolvedPreviousKey]: { Ayaz: 40 },
     },
     cardSources: ["amex", "manual", "td", "chase"],
     expenseCategories,

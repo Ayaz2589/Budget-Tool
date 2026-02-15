@@ -38,8 +38,8 @@ export interface FiltersAndActionsDialogProps {
   onMonthFilterChange: (value: string) => void;
   sourceFilter: string;
   onSourceFilterChange: (value: string) => void;
-  categoryFilter: string;
-  onCategoryFilterChange: (value: string) => void;
+  categoryFilter: string[];
+  onCategoryFilterChange: (value: string[]) => void;
   ownerFilter: string;
   onOwnerFilterChange: (value: string) => void;
   typeFilter: "all" | "expense" | "transfer";

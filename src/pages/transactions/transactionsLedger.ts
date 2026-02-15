@@ -17,7 +17,7 @@ export type TransactionTypeFilter = "all" | "expense" | "transfer";
 export interface TransactionFilterState {
   monthFilter: string;
   sourceFilter: string;
-  categoryFilter: string;
+  categoryFilter: string[];
   searchFilter: string;
   ownerFilter: string;
   typeFilter: TransactionTypeFilter;
@@ -110,12 +110,15 @@ export function filterAndSortTransactionRows({
     list = list.filter((row) => row.kind !== "expense" || row.source === sourceFilter);
   }
 
-  if (categoryFilter) {
-    if (categoryFilter === "__uncategorized") {
-      list = list.filter((row) => row.kind === "expense" && !row.category);
-    } else {
-      list = list.filter((row) => row.kind === "expense" && row.category === categoryFilter);
-    }
+  if (categoryFilter.length > 0) {
+    const hasUncategorized = categoryFilter.includes("__uncategorized");
+    const namedCategories = categoryFilter.filter((c) => c !== "__uncategorized");
+    list = list.filter((row) => {
+      if (row.kind !== "expense") return false;
+      if (hasUncategorized && !row.category) return true;
+      if (namedCategories.length > 0 && namedCategories.includes(row.category ?? "")) return true;
+      return false;
+    });
   }
 
   if (searchFilter.trim()) {
@@ -236,7 +239,7 @@ export function hasActiveTransactionFilters(filters: TransactionFilterState): bo
   return Boolean(
     filters.monthFilter ||
       filters.sourceFilter !== "all" ||
-      filters.categoryFilter ||
+      filters.categoryFilter.length > 0 ||
       filters.searchFilter.trim() ||
       filters.ownerFilter !== "all" ||
       filters.typeFilter !== "all",

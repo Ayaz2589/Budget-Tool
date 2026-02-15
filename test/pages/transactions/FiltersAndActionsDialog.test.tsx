@@ -14,7 +14,7 @@ test("FiltersAndActionsDialog shows title and Filters section when open", () => 
       onMonthFilterChange={() => {}}
       sourceFilter="all"
       onSourceFilterChange={() => {}}
-      categoryFilter=""
+      categoryFilter={[]}
       onCategoryFilterChange={() => {}}
       ownerFilter="all"
       onOwnerFilterChange={() => {}}
@@ -45,7 +45,7 @@ test("FiltersAndActionsDialog month picker updates month filter", () => {
       onMonthFilterChange={onMonthFilterChange}
       sourceFilter="all"
       onSourceFilterChange={() => {}}
-      categoryFilter=""
+      categoryFilter={[]}
       onCategoryFilterChange={() => {}}
       ownerFilter="all"
       onOwnerFilterChange={() => {}}

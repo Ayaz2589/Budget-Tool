@@ -58,14 +58,12 @@ export function ImportPage() {
     t,
   } = useImportState();
 
-  const [openItems, setOpenItems] = useState<string[]>(["import-source"]);
+  const [openItem, setOpenItem] = useState("import-source");
 
   const prevHasPreview = useRef(false);
   useEffect(() => {
     if (hasPreview && !prevHasPreview.current) {
-      setOpenItems((prev) =>
-        prev.includes("import-source") ? prev : [...prev, "import-source"]
-      );
+      setOpenItem("import-source");
     }
     prevHasPreview.current = hasPreview;
   }, [hasPreview]);
@@ -192,9 +190,10 @@ export function ImportPage() {
       </div>
 
       <Accordion
-        type="multiple"
-        value={openItems}
-        onValueChange={setOpenItems}
+        type="single"
+        collapsible
+        value={openItem}
+        onValueChange={setOpenItem}
         className="space-y-3 pb-24 px-4 md:px-0"
         data-tour="data-page"
       >

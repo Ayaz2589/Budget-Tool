@@ -28,6 +28,12 @@ export function DsHelpTooltip({
             tabIndex={0}
             aria-label={ariaLabel}
             className={triggerClassName}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                (e.currentTarget as HTMLElement).click();
+              }
+            }}
           >
             <CircleHelp className="size-3.5" />
           </span>

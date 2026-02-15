@@ -3,6 +3,10 @@ import type { SortColumn, TransactionLedgerRow } from "@/types";
 import { isValidDate } from "@/lib/totals";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
 import {
+  isSharedExpenseByAllocation,
+  normalizeExpenseAllocation,
+} from "@/lib/ownerAccounting";
+import {
   collectFinancialOwners,
   getOwnerAllocatedExpenseAmount,
   getSignedOwnerTransferAmount,
@@ -138,8 +142,9 @@ export function filterAndSortTransactionRows({
       list = list.filter((row) => row.kind === "expense" && !row.owner);
     } else if (ownerFilter === "_shared") {
       list = list.filter((row) => {
-        if (row.kind !== "expense") return false;
-        return (row.category || "").trim().toLowerCase() === "50/50" || !row.owner;
+        if (row.kind !== "expense" || !row.expense) return false;
+        const allocation = normalizeExpenseAllocation(row.expense, ownersForAllocation);
+        return isSharedExpenseByAllocation(allocation);
       });
     } else {
       list = list

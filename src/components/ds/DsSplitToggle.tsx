@@ -33,6 +33,7 @@ export function DsSplitToggle({
           <button
             key={option.value}
             type="button"
+            aria-pressed={isActive}
             className={cn(
               "h-11 min-h-[44px] rounded-[calc(var(--radius-control)-4px)] px-2 text-sm font-medium transition-colors ds-label focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--focus-ring)]/45",
               isActive

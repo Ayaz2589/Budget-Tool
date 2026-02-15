@@ -2,13 +2,12 @@ import type { ParseResult } from "@/types/core";
 import type { CsvSource } from "@/types/import";
 import { parseAmexCsv } from "./amex";
 import { parseAppleCsv } from "./apple";
+import { stripBom } from "./csv-utils";
 
 export type { CsvSource } from "@/types/import";
 
-const STRIP_BOM = /^\uFEFF/;
-
 export function detectCsvSource(csvText: string): CsvSource {
-  const trimmed = csvText.replace(STRIP_BOM, "").trim();
+  const trimmed = stripBom(csvText).trim();
   const firstLine = trimmed.split(/\r?\n/)[0] ?? "";
   const lower = firstLine.toLowerCase();
   if (lower.includes("card member") && lower.includes("amount") && lower.includes("description")) {
@@ -26,7 +25,7 @@ export function detectCsvSource(csvText: string): CsvSource {
 }
 
 export function parseCsv(csvText: string, source?: CsvSource): ParseResult {
-  const cleanText = csvText.replace(STRIP_BOM, "").trim();
+  const cleanText = stripBom(csvText).trim();
   const detected = source ?? detectCsvSource(cleanText);
   switch (detected) {
     case "amex":

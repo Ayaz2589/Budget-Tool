@@ -1,57 +1,6 @@
 import type { Expense, ParseResult } from "@/lib/types";
 import { cleanDescription } from "./amex";
-
-function hashId(
-  date: string,
-  description: string,
-  amount: number,
-  purchasedBy: string
-): string {
-  const str = `${date}|${description}|${amount}|${purchasedBy}`;
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    const c = str.charCodeAt(i);
-    h = (h << 5) - h + c;
-    h |= 0;
-  }
-  return `apple-${Math.abs(h).toString(36)}`;
-}
-
-function parseCsvLine(line: string): string[] {
-  const result: string[] = [];
-  let current = "";
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') {
-      inQuotes = !inQuotes;
-    } else if (c === "," && !inQuotes) {
-      result.push(current);
-      current = "";
-    } else {
-      current += c;
-    }
-  }
-  result.push(current);
-  return result;
-}
-
-function parseAppleDate(value: string): string {
-  // MM/DD/YYYY
-  const parts = value.trim().split("/");
-  if (parts.length !== 3) return value;
-  const [m, d, y] = parts;
-  const year = y!.length === 2 ? `20${y}` : y;
-  const month = m!.padStart(2, "0");
-  const day = d!.padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function parseAmount(value: string): number {
-  const cleaned = value.replace(/[$,]/g, "").trim();
-  const n = parseFloat(cleaned);
-  return Number.isNaN(n) ? 0 : Math.abs(n);
-}
+import { hashId, parseAmount, parseCsvLine, parseDate, stripBom } from "./csv-utils";
 
 /**
  * Apple Card CSV: Transaction Date, Clearing Date, Description, Merchant,
@@ -59,12 +8,12 @@ function parseAmount(value: string): number {
  * We import Purchase and Installment rows only (skip Payment).
  */
 export function parseAppleCsv(csvText: string): ParseResult {
-  const cleanText = csvText.replace(/^\uFEFF/, "").trim();
+  const cleanText = stripBom(csvText).trim();
   const lines = cleanText.split(/\r?\n/);
   if (lines.length < 2) return { expenses: [], source: "apple" };
 
   const headerLine = lines[0];
-  const cols = parseCsvLine(headerLine).map((c) => c.trim().replace(/^\uFEFF/, ""));
+  const cols = parseCsvLine(headerLine).map((c) => stripBom(c.trim()));
   const colLower = cols.map((c) => c.toLowerCase());
 
   const dateIdx = colLower.indexOf("transaction date");
@@ -95,8 +44,8 @@ export function parseAppleCsv(csvText: string): ParseResult {
 
     if (!dateRaw || amount <= 0) continue;
 
-    const date = parseAppleDate(dateRaw);
-    const id = hashId(date, rawDescription, amount, purchasedBy);
+    const date = parseDate(dateRaw);
+    const id = hashId("apple", date, rawDescription, String(amount), purchasedBy);
 
     expenses.push({
       id,

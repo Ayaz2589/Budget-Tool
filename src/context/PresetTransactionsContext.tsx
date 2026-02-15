@@ -8,8 +8,7 @@ import {
 import type { ReactNode } from "react";
 import type { PresetTransaction } from "@/types/core";
 import type { PresetTransactionsContextValue } from "@/types/context";
-
-const PRESET_STORAGE_KEY = "budget-tool-preset-transactions";
+import { storage, STORAGE_KEYS } from "@/lib/storage";
 
 function generatePresetId(): string {
   return `preset-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -26,7 +25,7 @@ export function PresetTransactionsProvider({
   const [presetTransactions, setPresetTransactions] = useState<
     PresetTransaction[]
   >(() => {
-    const raw = localStorage.getItem(PRESET_STORAGE_KEY);
+    const raw = storage.getItem(STORAGE_KEYS.PRESET_TRANSACTIONS);
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as PresetTransaction[];
@@ -46,7 +45,7 @@ export function PresetTransactionsProvider({
 
   const persist = useCallback((next: PresetTransaction[]) => {
     setPresetTransactions(next);
-    localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(next));
+    storage.setItem(STORAGE_KEYS.PRESET_TRANSACTIONS, JSON.stringify(next));
   }, []);
 
   const addPreset = useCallback(

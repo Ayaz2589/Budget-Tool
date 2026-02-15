@@ -1,4 +1,5 @@
 import { DISPLAY_CURRENCIES } from "@/types/currency";
+import { storage, STORAGE_KEYS } from "@/lib/storage";
 
 const LEGACY_STORAGE_KEYS = [
   "budget-tool-dashboard-dummy",
@@ -12,11 +13,9 @@ const LEGACY_STORAGE_PREFIXES = [
   "budget-tool-tour-seen-",
 ];
 
-const FX_STORAGE_PREFIX = "budget-tool-fx-usd-";
-
 function isSupportedFxKey(key: string): boolean {
-  if (!key.startsWith(FX_STORAGE_PREFIX)) return true;
-  const code = key.slice(FX_STORAGE_PREFIX.length).toUpperCase();
+  if (!key.startsWith(STORAGE_KEYS.FX_CACHE_PREFIX)) return true;
+  const code = key.slice(STORAGE_KEYS.FX_CACHE_PREFIX.length).toUpperCase();
   return (
     code !== "USD" &&
     (DISPLAY_CURRENCIES as string[]).includes(code)
@@ -28,9 +27,12 @@ export function runStorageCleanupMigration(): void {
 
   try {
     for (const key of LEGACY_STORAGE_KEYS) {
-      localStorage.removeItem(key);
+      storage.removeItem(key);
     }
 
+    // Iterate over raw localStorage to discover keys that need cleaning.
+    // The StorageAdapter interface doesn't expose iteration, so we access
+    // localStorage directly here -- guarded by the typeof check above.
     const toRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i += 1) {
       const key = localStorage.key(i);
@@ -47,7 +49,7 @@ export function runStorageCleanupMigration(): void {
     }
 
     for (const key of toRemove) {
-      localStorage.removeItem(key);
+      storage.removeItem(key);
     }
   } catch {
     // ignore localStorage cleanup failures

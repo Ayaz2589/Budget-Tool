@@ -45,7 +45,7 @@ test("computeMonthTotals sums income and expenses for month", () => {
   const incomeList: Income[] = [
     income({ date: "2025-02-01", amount: 200 }),
   ];
-  const result = computeMonthTotals("2025-02", expenses, incomeList, 0);
+  const result = computeMonthTotals("2025-02", expenses, incomeList, {}, []);
   expect(result.totalEarned).toBe(200);
   expect(result.totalSpent).toBe(50);
   expect(result.totalSaved).toBe(150);
@@ -59,7 +59,8 @@ test("computeAllTotals returns one entry per month", () => {
       expense({ date: "2025-02-01", amount: 20 }),
     ],
     income: [income({ date: "2025-01-01", amount: 100 })],
-    iOweNovaByMonth: {},
+    ownerBalancesByMonth: {},
+    owners: [],
   };
   const months = computeAllTotals(input);
   expect(months.length).toBe(2);

@@ -16,5 +16,6 @@ export * from "./ui";
 export * from "./debt";
 export * from "./income";
 export * from "./transactions";
+export * from "./transactions-ui";
 export * from "./settings";
 export * from "./mortgage";

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -1019,10 +1018,10 @@ const LANGUAGE_OPTIONS = [
   { value: "ja", label: "日本語" },
 ] as const;
 
-const TOUR_CARD_CLASS =
-  "min-h-[400px] md:min-h-[440px] flex flex-col overflow-hidden border-[var(--border-subtle)]";
-const LANGUAGE_CARD_CLASS =
-  "min-h-[260px] md:min-h-[280px] flex flex-col overflow-hidden border-[var(--border-subtle)]";
+const TOUR_STEP_CLASS =
+  "min-h-[400px] md:min-h-[440px] flex flex-col overflow-hidden";
+const LANGUAGE_STEP_CLASS =
+  "min-h-[260px] md:min-h-[280px] flex flex-col overflow-hidden";
 
 const STEP_TRANSITION_DURATION = { duration: 0.45, ease: "easeOut" as const };
 
@@ -1202,8 +1201,8 @@ export function TourPage() {
               exit="exit"
               transition={STEP_TRANSITION_DURATION}
             >
-              <Card className={LANGUAGE_CARD_CLASS}>
-                <CardHeader className="relative pt-6 pb-2 text-center">
+              <div className={LANGUAGE_STEP_CLASS}>
+                <div className="relative pt-6 pb-2 text-center">
                   <button
                     type="button"
                     onClick={handleQuitTour}
@@ -1213,11 +1212,11 @@ export function TourPage() {
                     <X className="size-6" />
                     <span className="sr-only">Close</span>
                   </button>
-                  <CardTitle className="text-xl md:text-2xl">
+                  <h2 className="text-xl md:text-2xl font-semibold leading-none tracking-tight">
                     {copy.languageCardTitle}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-1 flex-col items-center gap-4 text-center pt-2 pb-6">
+                  </h2>
+                </div>
+                <div className="flex flex-1 flex-col items-center gap-4 text-center pt-2 pb-6">
                   <div className="w-full max-w-md">
                     <Select value={tourLocale} onValueChange={handleLanguageChange}>
                       <SelectTrigger className="h-11 w-full">
@@ -1242,8 +1241,8 @@ export function TourPage() {
                       {copy.languageCardCta}
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -1263,21 +1262,21 @@ export function TourPage() {
                   }
                 : {})}
             >
-              <Card className={TOUR_CARD_CLASS}>
-                <CardHeader className="relative space-y-2">
+              <div className={TOUR_STEP_CLASS}>
+                <div className="relative space-y-2 pb-2">
                   <button
                     type="button"
                     onClick={handleQuitTour}
-                    className="absolute right-3 top-3 inline-flex size-11 items-center justify-center rounded-lg text-foreground/80 transition-colors hover:bg-[var(--surface-2)] hover:text-foreground focus:ring-2 focus:ring-[var(--focus-ring)]/45 focus:ring-offset-2 focus:outline-none"
+                    className="absolute right-3 top-0 inline-flex size-11 items-center justify-center rounded-lg text-foreground/80 transition-colors hover:bg-[var(--surface-2)] hover:text-foreground focus:ring-2 focus:ring-[var(--focus-ring)]/45 focus:ring-offset-2 focus:outline-none"
                     data-testid="tour-close"
                   >
                     <X className="size-6" />
                     <span className="sr-only">Close</span>
                   </button>
                   <div className="text-sm text-muted-foreground">{progressLabel}</div>
-                  <CardTitle className="text-2xl">{step.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-1 flex-col gap-8">
+                  <h2 className="text-2xl font-semibold leading-none tracking-tight">{step.title}</h2>
+                </div>
+                <div className="flex flex-1 flex-col gap-8 pt-4">
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                       key={`content-${stepIndex}-${isSimplified}`}
@@ -1331,8 +1330,8 @@ export function TourPage() {
                       </Button>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

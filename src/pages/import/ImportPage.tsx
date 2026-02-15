@@ -11,18 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { DsActionBar, DsEmptyState, DsSectionHeader } from "@/components/ds";
+import { DsActionBar, DsSectionHeader } from "@/components/ds";
 import { useImportState } from "./useImportState";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export function ImportPage() {
   const {
@@ -63,18 +58,17 @@ export function ImportPage() {
     t,
   } = useImportState();
 
-  const isMobile = useMediaQuery("(max-width: 767px)");
   const [openItems, setOpenItems] = useState<string[]>(["import-source"]);
 
   const prevHasPreview = useRef(false);
   useEffect(() => {
-    if (hasPreview && !prevHasPreview.current && isMobile) {
+    if (hasPreview && !prevHasPreview.current) {
       setOpenItems((prev) =>
         prev.includes("import-source") ? prev : [...prev, "import-source"]
       );
     }
     prevHasPreview.current = hasPreview;
-  }, [hasPreview, isMobile]);
+  }, [hasPreview]);
 
   const importSourceProps = {
     selectedSource,
@@ -197,137 +191,67 @@ export function ImportPage() {
         />
       </div>
 
-      {isMobile ? (
-        <Accordion
-          type="multiple"
-          value={openItems}
-          onValueChange={setOpenItems}
-          className="space-y-3 pb-24 px-4"
-          data-tour="data-page"
-        >
-          <AccordionItem value="import-source" className={accordionItemClass}>
-            <AccordionTrigger className={accordionTriggerClass}>
-              <div className="flex flex-col items-start gap-0.5">
-                <span>{t("import.uploadStatement")}</span>
-                <span className="text-xs font-normal text-muted-foreground">{t("import.uploadStatementDesc")}</span>
+      <Accordion
+        type="multiple"
+        value={openItems}
+        onValueChange={setOpenItems}
+        className="space-y-3 pb-24 px-4 md:px-0"
+        data-tour="data-page"
+      >
+        <AccordionItem value="import-source" className={accordionItemClass}>
+          <AccordionTrigger className={accordionTriggerClass}>
+            <div className="flex flex-col items-start gap-0.5">
+              <span>{t("import.uploadStatement")}</span>
+              <span className="text-xs font-normal text-muted-foreground">{t("import.uploadStatementDesc")}</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="pb-3 pt-0">
+            <ImportSourceCard bare {...importSourceProps} />
+            {hasPreview && (
+              <div className="mt-4 border-t border-[var(--border-subtle)] pt-4">
+                <h3 className="text-sm font-semibold mb-3">{t("import.previewTitle")}</h3>
+                <ImportPreviewCard bare {...previewProps} />
               </div>
-            </AccordionTrigger>
-            <AccordionContent className="pb-3 pt-0">
-              <ImportSourceCard bare {...importSourceProps} />
-              {hasPreview && (
-                <div className="mt-4 border-t border-[var(--border-subtle)] pt-4">
-                  <h3 className="text-sm font-semibold mb-3">{t("import.previewTitle")}</h3>
-                  <ImportPreviewCard bare {...previewProps} />
-                </div>
-              )}
-            </AccordionContent>
-          </AccordionItem>
+            )}
+          </AccordionContent>
+        </AccordionItem>
 
-          <AccordionItem value="export-string" className={accordionItemClass}>
-            <AccordionTrigger className={accordionTriggerClass}>
-              <div className="flex flex-col items-start gap-0.5">
-                <span>{t("import.exportStringTitle")}</span>
-                <span className="text-xs font-normal text-muted-foreground">{t("import.exportStringDesc")}</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pb-3 pt-0">
-              <div className="space-y-3">{exportStringInner}</div>
-            </AccordionContent>
-          </AccordionItem>
+        <AccordionItem value="export-string" className={accordionItemClass}>
+          <AccordionTrigger className={accordionTriggerClass}>
+            <div className="flex flex-col items-start gap-0.5">
+              <span>{t("import.exportStringTitle")}</span>
+              <span className="text-xs font-normal text-muted-foreground">{t("import.exportStringDesc")}</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="pb-3 pt-0">
+            <div className="space-y-3">{exportStringInner}</div>
+          </AccordionContent>
+        </AccordionItem>
 
-          <AccordionItem value="json-import" className={accordionItemClass}>
-            <AccordionTrigger className={accordionTriggerClass}>
-              <div className="flex flex-col items-start gap-0.5">
-                <span>{t("import.jsonImportTitle")}</span>
-                <span className="text-xs font-normal text-muted-foreground">{t("import.jsonImportDesc")}</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pb-3 pt-0">
-              <div className="space-y-3">{jsonImportInner}</div>
-            </AccordionContent>
-          </AccordionItem>
+        <AccordionItem value="json-import" className={accordionItemClass}>
+          <AccordionTrigger className={accordionTriggerClass}>
+            <div className="flex flex-col items-start gap-0.5">
+              <span>{t("import.jsonImportTitle")}</span>
+              <span className="text-xs font-normal text-muted-foreground">{t("import.jsonImportDesc")}</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="pb-3 pt-0">
+            <div className="space-y-3">{jsonImportInner}</div>
+          </AccordionContent>
+        </AccordionItem>
 
-          <AccordionItem value="export" className={accordionItemClass}>
-            <AccordionTrigger className={accordionTriggerClass}>
-              <div className="flex flex-col items-start gap-0.5">
-                <span>{t("import.exportTitle")}</span>
-                <span className="text-xs font-normal text-muted-foreground">{t("import.exportDesc")}</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pb-3 pt-0">
-              <div className="flex flex-col gap-2">{exportInner}</div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      ) : (
-        <div data-tour="data-page" className="space-y-6 pb-0 px-0">
-          <div>
-            <ImportSourceCard {...importSourceProps} />
-          </div>
-          <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-            <div className="px-4 py-4 md:px-0 md:py-0">
-              <DsSectionHeader
-                title={t("import.exportStringTitle")}
-                subtitle={t("import.exportStringDesc")}
-                titleClassName="text-lg md:text-xl"
-                subtitleClassName="text-xs md:text-sm"
-              />
+        <AccordionItem value="export" className={accordionItemClass}>
+          <AccordionTrigger className={accordionTriggerClass}>
+            <div className="flex flex-col items-start gap-0.5">
+              <span>{t("import.exportTitle")}</span>
+              <span className="text-xs font-normal text-muted-foreground">{t("import.exportDesc")}</span>
             </div>
-            <CardContent className="space-y-3 px-4 md:px-0">
-              <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-3">
-                {exportStringInner}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-            <div className="px-4 py-4 md:px-0 md:py-0">
-              <DsSectionHeader
-                title={t("import.jsonImportTitle")}
-                subtitle={t("import.jsonImportDesc")}
-                titleClassName="text-lg md:text-xl"
-                subtitleClassName="text-xs md:text-sm"
-              />
-            </div>
-            <CardContent className="space-y-3 px-4 md:px-0">
-              <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-3">
-                {jsonImportInner}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-            <div className="px-4 py-4 md:px-0 md:py-0">
-              <DsSectionHeader
-                title={t("import.exportTitle")}
-                subtitle={t("import.exportDesc")}
-                titleClassName="text-lg md:text-xl"
-                subtitleClassName="text-xs md:text-sm"
-              />
-            </div>
-            <CardContent className="px-4 md:px-0">
-              <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 flex flex-col md:flex-row gap-2">
-                {exportInner}
-              </div>
-            </CardContent>
-          </Card>
-          {hasPreview && (
-            <div>
-              <ImportPreviewCard {...previewProps} />
-            </div>
-          )}
-          {!hasPreview && !importError && !jsonImportError && !exportStringError ? (
-            <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
-              <CardContent className="px-0">
-                <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5">
-                  <DsEmptyState
-                    title={t("import.previewTitle")}
-                    description={t("import.emptyStateDescription")}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          ) : null}
-        </div>
-      )}
+          </AccordionTrigger>
+          <AccordionContent className="pb-3 pt-0">
+            <div className="flex flex-col md:flex-row gap-2">{exportInner}</div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       <Dialog open={missingMetaOpen} onOpenChange={setMissingMetaOpen}>
         <DialogContent>

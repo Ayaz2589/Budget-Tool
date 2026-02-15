@@ -36,6 +36,35 @@ test("ImportSourceCard shows upload card title and source buttons", () => {
   expect(screen.getByRole("button", { name: /import\.exportedpdf/i })).toBeInTheDocument();
 });
 
+test("ImportSourceCard bare mode renders without Card wrapper and section header", () => {
+  const fileInputRef = createRef<HTMLInputElement | null>();
+  render(
+    <ImportSourceCard
+      bare
+      selectedSource="amex"
+      onSourceChange={() => {}}
+      fileInputRef={fileInputRef}
+      accept=".csv"
+      onFileChange={() => {}}
+      importError=""
+      lastDetected=""
+      sourceLabel=""
+      previewExpensesCount={0}
+      previewIncomeCount={0}
+      previewDebtsCount={0}
+      previewDebtPaymentsCount={0}
+      skippedDuplicates={0}
+      onAddToTransactions={() => {}}
+      isPdfExport={false}
+      cardSources={["amex", "amex-gold", "apple", "chase"]}
+      t={mockT}
+    />,
+  );
+  expect(screen.queryByText("import.uploadStatement")).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /import\.amexcard/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /import\.exportedpdf/i })).toBeInTheDocument();
+});
+
 test("ImportSourceCard hides unavailable sources and shows add button for preview", () => {
   const onAddToTransactions = mock(() => {});
   render(

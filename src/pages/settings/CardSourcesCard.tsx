@@ -12,7 +12,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { DsSectionHeader } from "@/components/ds";
 
-export function CardSourcesCard() {
+export function CardSourcesCard({ bare = false }: { bare?: boolean } = {}) {
   const { t } = useTranslation();
   const { cardSources, setCardSources } = useBudget();
   const { presetTransactions, setPresets } = usePresetTransactions();
@@ -38,6 +38,53 @@ export function CardSourcesCard() {
 
   const onlyOneEnabled = cardSources.length <= 1;
 
+  const content = (
+    <>
+      <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+        {ALL_EXPENSE_SOURCES.map((sourceId) => {
+          const enabled = cardSources.includes(sourceId);
+          const isLast = cardSources.length === 1 && enabled;
+          return (
+            <li
+              key={sourceId}
+              className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/60 px-3 py-2.5"
+            >
+              <Checkbox
+                id={`card-source-${sourceId}`}
+                checked={enabled}
+                onCheckedChange={(checked) =>
+                  handleToggle(sourceId, checked === true)
+                }
+                disabled={isLast}
+                aria-label={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
+              />
+              <label
+                htmlFor={`card-source-${sourceId}`}
+                className="flex items-center gap-2 flex-1 cursor-pointer min-w-0"
+              >
+                <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
+                  {EXPENSE_SOURCE_BADGE_LABELS[sourceId]}
+                </span>
+                <span className="text-sm font-medium truncate">
+                  {t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
+                </span>
+              </label>
+            </li>
+          );
+        })}
+      </ul>
+      {onlyOneEnabled && (
+        <p className="text-xs text-muted-foreground">
+          {t("settings.cardSourcesOneRequired")}
+        </p>
+      )}
+    </>
+  );
+
+  if (bare) {
+    return <div className="space-y-3">{content}</div>;
+  }
+
   return (
     <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
       <div className="px-4 py-4 md:px-0 md:py-0">
@@ -50,45 +97,8 @@ export function CardSourcesCard() {
       </div>
       <CardContent className="px-4 md:px-0">
         <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5">
-          <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
-            {ALL_EXPENSE_SOURCES.map((sourceId) => {
-              const enabled = cardSources.includes(sourceId);
-              const isLast = cardSources.length === 1 && enabled;
-              return (
-                <li
-                  key={sourceId}
-                  className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/60 px-3 py-2.5"
-                >
-                  <Checkbox
-                    id={`card-source-${sourceId}`}
-                    checked={enabled}
-                    onCheckedChange={(checked) =>
-                      handleToggle(sourceId, checked === true)
-                    }
-                    disabled={isLast}
-                    aria-label={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
-                  />
-                  <label
-                    htmlFor={`card-source-${sourceId}`}
-                    className="flex items-center gap-2 flex-1 cursor-pointer min-w-0"
-                  >
-                    <span className="inline-flex items-center justify-center rounded-md bg-muted text-[10px] px-2 py-0.5 text-muted-foreground">
-                      {EXPENSE_SOURCE_BADGE_LABELS[sourceId]}
-                    </span>
-                    <span className="text-sm font-medium truncate">
-                      {t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[sourceId]}`)}
-                    </span>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
+          {content}
         </div>
-        {onlyOneEnabled && (
-          <p className="text-xs text-muted-foreground">
-            {t("settings.cardSourcesOneRequired")}
-          </p>
-        )}
       </CardContent>
     </Card>
   );

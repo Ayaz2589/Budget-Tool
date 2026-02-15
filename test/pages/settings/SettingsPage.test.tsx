@@ -26,16 +26,19 @@ function TestWrapper() {
   );
 }
 
-test("SettingsPage renders title and Delete all data button", () => {
+test("SettingsPage renders title and accordion sections", () => {
   render(<TestWrapper />);
   expect(
     screen.getAllByRole("heading", { name: i18n.t("settings.title") }).length,
   ).toBeGreaterThanOrEqual(1);
   expect(
-    screen.getByRole("button", { name: i18n.t("settings.replayTour") }),
+    screen.getByText(i18n.t("settings.googleSheets")),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("button", { name: i18n.t("settings.deleteAllData") }),
+    screen.getByText(i18n.t("settings.preferencesTitle")),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByText(i18n.t("settings.deleteAllData")),
   ).toBeInTheDocument();
 });
 

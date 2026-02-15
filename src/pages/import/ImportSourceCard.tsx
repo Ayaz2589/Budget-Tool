@@ -88,42 +88,41 @@ export function ImportSourceCard({
       }`
     : "";
 
-  const content = (
+  const sourceGrid = (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+      {filteredSourceOptions.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          onClick={() => {
+            onSourceChange(opt.value);
+            if (fileInputRef.current) {
+              fileInputRef.current.accept =
+                opt.value === "pdf-export" ? ".pdf" : ".csv";
+              fileInputRef.current.click();
+            }
+          }}
+          className={cn(
+            "flex min-h-11 flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors text-left bg-background/60",
+            "hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            selectedSource === opt.value
+              ? "border-primary bg-primary/5"
+              : "border-border hover:border-muted-foreground/30"
+          )}
+        >
+          <span className="inline-flex items-center justify-center rounded-md bg-muted text-[11px] px-2.5 py-1 text-muted-foreground">
+            {opt.badge}
+          </span>
+          <span className="text-xs font-medium text-center leading-tight min-h-[2rem] flex items-center">
+            {opt.label}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+
+  const statusBlock = (
     <>
-      <div className={cn("rounded-xl border border-border/70 bg-card/40", bare ? "p-4" : "p-4 md:p-5")}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {filteredSourceOptions.map((opt) => {
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => {
-                  onSourceChange(opt.value);
-                  if (fileInputRef.current) {
-                    fileInputRef.current.accept =
-                      opt.value === "pdf-export" ? ".pdf" : ".csv";
-                    fileInputRef.current.click();
-                  }
-                }}
-                className={cn(
-                  "flex min-h-11 flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors text-left bg-background/60",
-                  "hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  selectedSource === opt.value
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-muted-foreground/30"
-                )}
-              >
-                <span className="inline-flex items-center justify-center rounded-md bg-muted text-[11px] px-2.5 py-1 text-muted-foreground">
-                  {opt.badge}
-                </span>
-                <span className="text-xs font-medium text-center leading-tight min-h-[2rem] flex items-center">
-                  {opt.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
       <input
         ref={fileInputRef}
         type="file"
@@ -146,7 +145,12 @@ export function ImportSourceCard({
   );
 
   if (bare) {
-    return <div className="space-y-4">{content}</div>;
+    return (
+      <div className="space-y-3">
+        {sourceGrid}
+        {statusBlock}
+      </div>
+    );
   }
 
   return (
@@ -160,7 +164,10 @@ export function ImportSourceCard({
         />
       </div>
       <CardContent className="space-y-4 px-4 md:px-0">
-        {content}
+        <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5">
+          {sourceGrid}
+        </div>
+        {statusBlock}
       </CardContent>
     </Card>
   );

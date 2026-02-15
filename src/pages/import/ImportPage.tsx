@@ -110,8 +110,8 @@ export function ImportPage() {
     t,
   } as const;
 
-  const exportStringContent = (
-    <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-3">
+  const exportStringInner = (
+    <>
       <textarea
         value={exportString}
         onChange={(e) => setExportString(e.target.value)}
@@ -126,11 +126,11 @@ export function ImportPage() {
       <Button onClick={handleExportStringImport} className="h-11 w-full md:w-auto">
         {t("import.importExportString")}
       </Button>
-    </div>
+    </>
   );
 
-  const jsonImportContent = (
-    <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-3">
+  const jsonImportInner = (
+    <>
       <input
         ref={jsonInputRef}
         type="file"
@@ -149,11 +149,11 @@ export function ImportPage() {
           {jsonImportError}
         </span>
       )}
-    </div>
+    </>
   );
 
-  const exportContent = (
-    <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 flex flex-col md:flex-row gap-2">
+  const exportInner = (
+    <>
       <Button
         variant="outline"
         onClick={handleDownloadPdf}
@@ -175,7 +175,7 @@ export function ImportPage() {
       >
         {t("import.downloadExportString")}
       </Button>
-    </div>
+    </>
   );
 
   const accordionItemClass = "rounded-2xl border border-border/60 bg-card px-4";
@@ -225,7 +225,7 @@ export function ImportPage() {
               {t("import.exportStringTitle")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
-              {exportStringContent}
+              <div className="space-y-3">{exportStringInner}</div>
             </AccordionContent>
           </AccordionItem>
 
@@ -234,7 +234,7 @@ export function ImportPage() {
               {t("import.jsonImportTitle")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
-              {jsonImportContent}
+              <div className="space-y-3">{jsonImportInner}</div>
             </AccordionContent>
           </AccordionItem>
 
@@ -243,7 +243,7 @@ export function ImportPage() {
               {t("import.exportTitle")}
             </AccordionTrigger>
             <AccordionContent className="pb-3 pt-0">
-              {exportContent}
+              <div className="flex flex-col gap-2">{exportInner}</div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -262,7 +262,9 @@ export function ImportPage() {
               />
             </div>
             <CardContent className="space-y-3 px-4 md:px-0">
-              {exportStringContent}
+              <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-3">
+                {exportStringInner}
+              </div>
             </CardContent>
           </Card>
           <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
@@ -275,7 +277,9 @@ export function ImportPage() {
               />
             </div>
             <CardContent className="space-y-3 px-4 md:px-0">
-              {jsonImportContent}
+              <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-3">
+                {jsonImportInner}
+              </div>
             </CardContent>
           </Card>
           <Card className="md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
@@ -288,7 +292,9 @@ export function ImportPage() {
               />
             </div>
             <CardContent className="px-4 md:px-0">
-              {exportContent}
+              <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 flex flex-col md:flex-row gap-2">
+                {exportInner}
+              </div>
             </CardContent>
           </Card>
           {hasPreview && (

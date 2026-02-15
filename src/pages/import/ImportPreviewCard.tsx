@@ -34,8 +34,8 @@ export function ImportPreviewCard({
 }: ImportPreviewCardProps) {
   const isPdfExport = lastDetected === "pdf-export";
 
-  const content = (
-    <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-6">
+  const sections = (
+    <>
     {previewExpenses.length > 0 && (
       <section className="space-y-2">
         <h3 className="text-sm font-medium ds-label">{t("import.expensesToAdd")}</h3>
@@ -269,11 +269,11 @@ export function ImportPreviewCard({
         </div>
       </section>
     )}
-    </div>
+    </>
   );
 
   if (bare) {
-    return content;
+    return <div className="space-y-6">{sections}</div>;
   }
 
   return (
@@ -287,7 +287,9 @@ export function ImportPreviewCard({
         />
       </div>
       <CardContent className="px-4 pb-4 md:px-0">
-        {content}
+        <div className="rounded-xl border border-border/70 bg-card/40 p-4 md:p-5 space-y-6">
+          {sections}
+        </div>
       </CardContent>
     </Card>
   );

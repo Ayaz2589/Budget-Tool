@@ -1188,7 +1188,7 @@ export function TourPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center md:px-4 py-8">
+    <div className="fixed inset-0 overflow-hidden bg-background flex items-center justify-center md:px-4 py-8">
       <div className={`w-full max-w-2xl ${isMobile ? "overflow-hidden" : ""}`}>
         <AnimatePresence mode="wait" initial={false} custom={direction}>
           {isLanguageStep ? (

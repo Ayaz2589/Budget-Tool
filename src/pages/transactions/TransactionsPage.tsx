@@ -44,7 +44,7 @@ export function TransactionsPage() {
   } = useBudget();
   const [monthFilter, setMonthFilter] = useState<string>("");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
   const [searchFilter, setSearchFilter] = useState<string>("");
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<"all" | "expense" | "transfer">("all");
@@ -81,7 +81,8 @@ export function TransactionsPage() {
     const params = new URLSearchParams(location.search);
     setMonthFilter(params.get("month") ?? "");
     setSourceFilter(params.get("source") ?? "all");
-    setCategoryFilter(params.get("category") ?? "");
+    const categoryParam = params.get("category") ?? "";
+    setCategoryFilter(categoryParam ? categoryParam.split(",") : []);
     setOwnerFilter(params.get("owner") ?? "all");
     const nextType = params.get("type");
     setTypeFilter(
@@ -154,7 +155,7 @@ export function TransactionsPage() {
   const clearFilters = useCallback(() => {
     setMonthFilter("");
     setSourceFilter("all");
-    setCategoryFilter("");
+    setCategoryFilter([]);
     setSearchFilter("");
     setOwnerFilter("all");
     setTypeFilter("all");

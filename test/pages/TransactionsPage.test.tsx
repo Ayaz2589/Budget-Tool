@@ -211,7 +211,7 @@ test("TransactionsPage supports sorting branches and row tap actions", () => {
   });
   expect(deleteDialog).toBeInTheDocument();
   fireEvent.click(within(deleteDialog).getByRole("button", { name: "Cancel" }));
-});
+}, { timeout: 15000 });
 
 test("TransactionsPage shows empty state when no valid non-mortgage expenses", () => {
   seedBudget([

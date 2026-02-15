@@ -17,7 +17,7 @@ import {
 import i18n, { persistLocale } from "@/i18n";
 import { storage } from "@/lib/storage";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "lucide-react";
 
 type TourStep = {
   title: string;
@@ -1297,38 +1297,57 @@ export function TourPage() {
                       </ul>
                     </motion.div>
                   </AnimatePresence>
-                  <div className="mt-auto flex items-center justify-between gap-3">
-                    <Button type="button" variant="outline" onClick={goBack}>
-                      {copy.back}
-                    </Button>
-                    <button
-                      type="button"
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2 decoration-dotted"
-                      onClick={() => setIsSimplified((prev) => !prev)}
-                      aria-label={
-                        isSimplified
-                          ? copy.toggleDetailed
-                          : copy.toggleSimplified
-                      }
-                      data-testid="tour-text-toggle"
-                    >
-                      {isSimplified
-                        ? copy.toggleDetailed
-                        : copy.toggleSimplified}
-                    </button>
-                    {!isLast ? (
-                      <Button type="button" onClick={goNext}>
-                        {copy.next}
-                      </Button>
-                    ) : isSignedIn ? (
-                      <Button type="button" onClick={handleFinishReplay}>
-                        {copy.finishTour}
-                      </Button>
-                    ) : (
-                      <Button type="button" onClick={handleFinishSignIn}>
-                        {copy.signInWithGoogle}
-                      </Button>
+                  <div className="mt-auto flex flex-col gap-4">
+                    {isLast && (
+                      <div className="flex justify-center">
+                        {isSignedIn ? (
+                          <Button type="button" onClick={handleFinishReplay}>
+                            {copy.finishTour}
+                          </Button>
+                        ) : (
+                          <Button type="button" onClick={handleFinishSignIn}>
+                            {copy.signInWithGoogle}
+                          </Button>
+                        )}
+                      </div>
                     )}
+                    <div className="flex items-center justify-between gap-3">
+                      <button
+                        type="button"
+                        onClick={goBack}
+                        className="inline-flex size-10 items-center justify-center rounded-full border border-input bg-background text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
+                        aria-label={copy.back}
+                      >
+                        <ArrowLeft className="size-5" />
+                      </button>
+                      <button
+                        type="button"
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2 decoration-dotted"
+                        onClick={() => setIsSimplified((prev) => !prev)}
+                        aria-label={
+                          isSimplified
+                            ? copy.toggleDetailed
+                            : copy.toggleSimplified
+                        }
+                        data-testid="tour-text-toggle"
+                      >
+                        {isSimplified
+                          ? copy.toggleDetailed
+                          : copy.toggleSimplified}
+                      </button>
+                      {!isLast ? (
+                        <button
+                          type="button"
+                          onClick={goNext}
+                          className="inline-flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
+                          aria-label={copy.next}
+                        >
+                          <ArrowRight className="size-5" />
+                        </button>
+                      ) : (
+                        <div className="size-10" />
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

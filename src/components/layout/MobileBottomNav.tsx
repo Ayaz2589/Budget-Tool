@@ -6,6 +6,7 @@ import {
   LogOut,
   Globe,
   MoreHorizontal,
+  MessageSquarePlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ interface MobileBottomNavProps {
   userProfile: { name: string; picture: string; email: string } | null;
   signIn: () => void;
   signOut: () => void;
+  onFeedbackOpen: () => void;
 }
 
 export function MobileBottomNav({
@@ -43,6 +45,7 @@ export function MobileBottomNav({
   userProfile,
   signIn,
   signOut,
+  onFeedbackOpen,
 }: MobileBottomNavProps) {
   const { t } = useTranslation();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -109,6 +112,17 @@ export function MobileBottomNav({
                 </Link>
               </DialogClose>
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                setMoreOpen(false);
+                onFeedbackOpen();
+              }}
+              className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-control)] text-sm font-medium border border-transparent transition-colors text-[var(--text-primary)] hover:bg-[var(--control-hover)] hover:border-[var(--border-subtle)]"
+            >
+              <MessageSquarePlus className="size-5 shrink-0" />
+              {t("feedback.buttonLabel")}
+            </button>
             <div className="my-2 pt-2 flex flex-col gap-2">
               <div className="px-2 text-xs font-medium text-muted-foreground">
                 {t("layout.language")}

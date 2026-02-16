@@ -795,5 +795,29 @@
         "description": "Smart Insights and Alerts highlight notable conditions such as spending shifts, missing income, or unpaid obligations, based on current dataset and dashboard scope."
       }
     }
+  },
+  "feedback": {
+    "title": "Send Feedback",
+    "subtitle": "Report a bug, request a feature, or share feedback.",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Brief summary of your feedback",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Describe the issue or idea in detail...",
+    "categoryLabel": "Category",
+    "categoryBug": "Bug Report",
+    "categoryFeature": "Feature Request",
+    "categoryFeedback": "General Feedback",
+    "teamLabel": "Team",
+    "teamPlaceholder": "Select a team",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "submitError": "Failed to submit feedback. Please try again.",
+    "teamsLoadError": "Could not load teams. Please try again.",
+    "successTitle": "Feedback submitted!",
+    "successDesc": "Your feedback has been recorded as {{identifier}}.",
+    "viewOnLinear": "View on Linear",
+    "submitAnother": "Submit another",
+    "close": "Close",
+    "buttonLabel": "Feedback"
   }
 }

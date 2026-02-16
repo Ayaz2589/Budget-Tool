@@ -3,6 +3,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { clamp } from "@/lib/math";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import {
+  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
@@ -38,7 +39,7 @@ export function DashboardDebtSnapshot({
   const { t } = useTranslation();
 
   return (
-    <>
+    <Accordion type="multiple" defaultValue={["debt", "spend-source"]} className="space-y-3">
       <AccordionItem
         value="debt"
         data-tour="dashboard-debt-snapshot"
@@ -168,6 +169,6 @@ export function DashboardDebtSnapshot({
           )}
         </AccordionContent>
       </AccordionItem>
-    </>
+    </Accordion>
   );
 }

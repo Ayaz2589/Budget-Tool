@@ -1,6 +1,6 @@
+import { type ReactNode, useMemo } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Accordion } from "@/components/ui/accordion";
 import {
   DsActionBar,
   DsHelpTooltip,
@@ -13,19 +13,111 @@ import { DashboardCashFlowChart } from "./DashboardCashFlowChart";
 import { DashboardNetCashFlowChart } from "./DashboardNetCashFlowChart";
 import { DashboardCategoryChart } from "./DashboardCategoryChart";
 import { DashboardOwnerSplit } from "./DashboardOwnerSplit";
+import { DashboardSpendingPace } from "./DashboardSpendingPace";
+import { DashboardSavingsRate } from "./DashboardSavingsRate";
+import { DashboardCategoryTrends } from "./DashboardCategoryTrends";
+import { DashboardQuickStats } from "./DashboardQuickStats";
 import { DashboardDebtSnapshot } from "./DashboardDebtSnapshot";
 import { DashboardInsights } from "./DashboardInsights";
 import { DashboardFilters } from "./DashboardFilters";
+import { type WidgetId, getVisibleWidgets, getWidgetMeta } from "./dashboardWidgets";
 
 export function Dashboard() {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const data = useDashboardData();
   const { t } = data;
 
+  const visibleWidgets = useMemo(
+    () => getVisibleWidgets(data.widgetConfig),
+    [data.widgetConfig],
+  );
+
+  function renderWidget(id: WidgetId): ReactNode {
+    switch (id) {
+      case "quick-stats":
+        return <DashboardQuickStats stats={data.quickStats} />;
+      case "spending-pace":
+        return <DashboardSpendingPace pace={data.spendingPace} />;
+      case "savings-rate":
+        return <DashboardSavingsRate savingsRate={data.savingsRate} />;
+      case "cash-flow":
+        return (
+          <DashboardCashFlowChart
+            cashFlowDisplayRows={data.cashFlowDisplayRows}
+            incomeOwnerKeys={data.incomeOwnerKeys}
+            includeDebtPayments={data.includeDebtPayments}
+          />
+        );
+      case "net-cash-flow":
+        return (
+          <DashboardNetCashFlowChart
+            netCashFlowRows={data.netCashFlowRows}
+            range={data.range}
+          />
+        );
+      case "category-breakdown":
+        return <DashboardCategoryChart categorySlices={data.categorySlices} />;
+      case "owner-split":
+        return (
+          <DashboardOwnerSplit
+            ownerSlices={data.ownerSlices}
+            visibleOwnerNetRows={data.visibleOwnerNetRows}
+            ownerExpenseItemsByOwner={data.ownerExpenseItemsByOwner}
+            totalSpentForSelectedRange={data.totalSpentForSelectedRange}
+            percentFormatter={data.percentFormatter}
+          />
+        );
+      case "category-trends":
+        return <DashboardCategoryTrends trends={data.categoryTrends} />;
+      case "debt-transfers":
+        return (
+          <DashboardDebtSnapshot
+            debtRows={data.debtRows}
+            spendBySourceRows={data.spendBySourceRows}
+            ownerTransfersMtd={data.ownerTransfersMtd}
+            ownerTransfersMtdTotal={data.ownerTransfersMtdTotal}
+            recentActivity={data.recentActivity}
+          />
+        );
+      case "insights":
+        return (
+          <DashboardInsights
+            insights={data.insights}
+            onDismiss={data.dismissInsight}
+          />
+        );
+    }
+  }
+
+  // Group consecutive half-width widgets into 2-col grid rows
+  const widgetRows: ReactNode[] = [];
+  let i = 0;
+  while (i < visibleWidgets.length) {
+    const id = visibleWidgets[i]!;
+    const meta = getWidgetMeta(id);
+    const nextId = visibleWidgets[i + 1];
+    const nextMeta = nextId ? getWidgetMeta(nextId) : undefined;
+
+    if (meta.size === "half" && nextMeta?.size === "half") {
+      widgetRows.push(
+        <div key={`${id}-${nextId}`} className="min-w-0 grid grid-cols-1 gap-3 lg:grid-cols-2">
+          {renderWidget(id)}
+          {renderWidget(nextId!)}
+        </div>,
+      );
+      i += 2;
+    } else {
+      widgetRows.push(
+        <div key={id}>{renderWidget(id)}</div>,
+      );
+      i += 1;
+    }
+  }
+
   return (
     <div data-tour-page="dashboard" className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
-      <div className="min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-4">
-        <div className="space-y-3" data-tour="dashboard-header">
+      <div className="min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-3">
+        <div className="space-y-2" data-tour="dashboard-header">
           <DsSectionHeader
             title={
               <span className="inline-flex items-center gap-1.5">
@@ -59,46 +151,7 @@ export function Dashboard() {
           includeDebtPayments={data.includeDebtPayments}
         />
 
-        <div data-tour="dashboard-trends" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <DashboardCashFlowChart
-            cashFlowDisplayRows={data.cashFlowDisplayRows}
-            incomeOwnerKeys={data.incomeOwnerKeys}
-            includeDebtPayments={data.includeDebtPayments}
-          />
-          <DashboardNetCashFlowChart
-            netCashFlowRows={data.netCashFlowRows}
-            range={data.range}
-          />
-        </div>
-
-        <section data-tour="dashboard-pies" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <DashboardCategoryChart categorySlices={data.categorySlices} />
-          <DashboardOwnerSplit
-            ownerSlices={data.ownerSlices}
-            visibleOwnerNetRows={data.visibleOwnerNetRows}
-            ownerExpenseItemsByOwner={data.ownerExpenseItemsByOwner}
-            totalSpentForSelectedRange={data.totalSpentForSelectedRange}
-            percentFormatter={data.percentFormatter}
-          />
-        </section>
-
-        <Accordion
-          type="multiple"
-          defaultValue={["debt", "spend-source"]}
-          className="space-y-3 pb-4 pt-2"
-        >
-          <DashboardDebtSnapshot
-            debtRows={data.debtRows}
-            spendBySourceRows={data.spendBySourceRows}
-            ownerTransfersMtd={data.ownerTransfersMtd}
-            ownerTransfersMtdTotal={data.ownerTransfersMtdTotal}
-            recentActivity={data.recentActivity}
-          />
-          <DashboardInsights
-            insights={data.insights}
-            onDismiss={data.dismissInsight}
-          />
-        </Accordion>
+        {widgetRows}
       </div>
 
       {isMobile ? (
@@ -132,6 +185,8 @@ export function Dashboard() {
         setExpenseScope={data.setExpenseScope}
         includeDebtPayments={data.includeDebtPayments}
         setIncludeDebtPayments={data.setIncludeDebtPayments}
+        widgetConfig={data.widgetConfig}
+        onWidgetConfigChange={data.setWidgetConfig}
       />
     </div>
   );

@@ -10,6 +10,7 @@ import {
   computeMonthOverMonthPct,
   computeNetCashFlow,
   computeOwnerNetFromTransfers,
+  safeDivide,
   sumAmountsBy,
 } from "@/lib/math";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
@@ -17,14 +18,19 @@ import type { Debt, DebtPayment, Expense, Income, OwnerTransfer } from "@/types/
 import type {
   DashboardCashFlowRow,
   DashboardCategorySlice,
+  DashboardCategoryTrend,
+  DashboardCategoryTrendPoint,
   DashboardDebtRow,
   DashboardExpenseScope,
   DashboardKpis,
   DashboardOwnerNetRow,
   DashboardOwnerSlice,
   DashboardOwnerExpenseItem,
+  DashboardQuickStats,
   DashboardRange,
   DashboardRecentItem,
+  DashboardSavingsRate,
+  DashboardSpendingPace,
 } from "@/types/dashboard";
 
 const SHARED_BUCKET_KEY = "_shared";
@@ -463,4 +469,160 @@ export function buildOwnerNetRows({
 export function getOwnerDrilldownParam(slice: DashboardOwnerSlice): string {
   if (slice.owner) return slice.owner;
   return slice.key === SHARED_BUCKET_KEY ? "_shared" : "_none";
+}
+
+export function buildSpendingPace({
+  currentMonthKey,
+  expenses,
+  debtPayments,
+  scope,
+  includeDebtPayments = true,
+}: {
+  currentMonthKey: string;
+  expenses: Expense[];
+  debtPayments: DebtPayment[];
+  scope: DashboardExpenseScope;
+  includeDebtPayments?: boolean;
+}): DashboardSpendingPace {
+  const [y, m] = currentMonthKey.split("-").map(Number);
+  const daysInMonth = new Date(y ?? 0, m ?? 0, 0).getDate();
+
+  const now = new Date();
+  const isCurrentMonth =
+    now.getFullYear() === (y ?? 0) && now.getMonth() + 1 === (m ?? 0);
+  const dayOfMonth = isCurrentMonth ? now.getDate() : daysInMonth;
+
+  const currentExpenses = sumExpensesForMonth(expenses, currentMonthKey, scope);
+  const currentDebt = includeDebtPayments
+    ? sumDebtPaymentsForMonth(debtPayments, currentMonthKey)
+    : 0;
+  const totalSpent = currentExpenses + currentDebt;
+
+  const dailyAverage = safeDivide(totalSpent, dayOfMonth, 0);
+  const projectedTotal = dailyAverage * daysInMonth;
+
+  const previousMonthKey = getPreviousMonthKey(currentMonthKey);
+  const prevExpenses = sumExpensesForMonth(expenses, previousMonthKey, scope);
+  const prevDebt = includeDebtPayments
+    ? sumDebtPaymentsForMonth(debtPayments, previousMonthKey)
+    : 0;
+  const lastMonthTotal = prevExpenses + prevDebt;
+
+  const paceVsLastMonth =
+    lastMonthTotal > 0 ? projectedTotal - lastMonthTotal : null;
+
+  return {
+    dayOfMonth,
+    daysInMonth,
+    dailyAverage,
+    projectedTotal,
+    lastMonthTotal,
+    paceVsLastMonth,
+  };
+}
+
+export function buildSavingsRate({
+  totalIncome,
+  totalSpent,
+}: {
+  totalIncome: number;
+  totalSpent: number;
+}): DashboardSavingsRate {
+  const amountSaved = totalIncome - totalSpent;
+  const savingsRate = safeDivide(amountSaved, totalIncome, 0);
+  return { savingsRate, amountSaved, totalIncome, totalSpent };
+}
+
+export function buildCategoryTrends({
+  expenses,
+  currentMonthKey,
+  scope,
+  uncategorizedLabel = "Uncategorized",
+  locale = "en-US",
+}: {
+  expenses: Expense[];
+  currentMonthKey: string;
+  scope: DashboardExpenseScope;
+  uncategorizedLabel?: string;
+  locale?: string;
+}): DashboardCategoryTrend[] {
+  const topSlices = buildCategoryBreakdown({
+    expenses,
+    currentMonthKey,
+    scope,
+    uncategorizedLabel,
+  }).slice(0, 4);
+
+  if (topSlices.length === 0) return [];
+
+  const trendMonthKeys = getRangeMonthKeys("6", currentMonthKey);
+  const topCategoryNames = new Set(topSlices.map((s) => s.label));
+
+  const byCategoryMonth = new Map<string, Map<string, number>>();
+  for (const name of topCategoryNames) {
+    byCategoryMonth.set(name, new Map());
+  }
+
+  for (const expense of expenses) {
+    if (!isValidDate(expense.date)) continue;
+    const mk = monthFromDate(expense.date);
+    if (!trendMonthKeys.includes(mk)) continue;
+    if (!shouldIncludeExpense(expense, scope)) continue;
+    const category =
+      (expense.category || "").trim() || uncategorizedLabel;
+    const monthMap = byCategoryMonth.get(category);
+    if (!monthMap) continue;
+    monthMap.set(mk, (monthMap.get(mk) ?? 0) + expense.amount);
+  }
+
+  return topSlices.map((slice) => {
+    const monthMap = byCategoryMonth.get(slice.label)!;
+    const points: DashboardCategoryTrendPoint[] = trendMonthKeys.map(
+      (mk) => ({
+        monthKey: mk,
+        monthLabel: getMonthLabel(mk, locale),
+        amount: monthMap.get(mk) ?? 0,
+      }),
+    );
+    return {
+      category: slice.label,
+      currentAmount: slice.value,
+      points,
+    };
+  });
+}
+
+export function buildQuickStats({
+  expenses,
+  debtPayments,
+  currentMonthKey,
+  scope,
+}: {
+  expenses: Expense[];
+  debtPayments: DebtPayment[];
+  currentMonthKey: string;
+  scope: DashboardExpenseScope;
+}): DashboardQuickStats {
+  const fixedObligations = buildFixedObligations({
+    expenses,
+    debtPayments,
+    currentMonthKey,
+  });
+
+  let largestExpense: DashboardQuickStats["largestExpense"] = null;
+  let transactionCount = 0;
+  for (const expense of expenses) {
+    if (!isValidDate(expense.date) || monthFromDate(expense.date) !== currentMonthKey) continue;
+    if (!shouldIncludeExpense(expense, scope)) continue;
+    transactionCount += 1;
+    if (!largestExpense || expense.amount > largestExpense.amount) {
+      largestExpense = {
+        description: expense.description || "\u2014",
+        amount: expense.amount,
+        category: expense.category || "",
+      };
+    }
+  }
+
+  return { fixedObligations, largestExpense, transactionCount };
 }

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
+  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
@@ -20,6 +21,7 @@ export function DashboardInsights({
   const { t } = useTranslation();
 
   return (
+    <Accordion type="multiple" defaultValue={["insights"]}>
     <AccordionItem
       value="insights"
       data-tour="dashboard-insights"
@@ -56,5 +58,6 @@ export function DashboardInsights({
         )}
       </AccordionContent>
     </AccordionItem>
+    </Accordion>
   );
 }

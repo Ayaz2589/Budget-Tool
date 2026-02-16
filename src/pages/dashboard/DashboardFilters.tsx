@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next";
+import { Reorder } from "framer-motion";
+import { GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Sheet,
   SheetContent,
@@ -18,6 +21,12 @@ import {
 import { DsHelpTooltip, DsSplitToggle } from "@/components/ds";
 import type { FinancialViewMode } from "@/lib/financialModel";
 import type { DashboardExpenseScope, DashboardRange } from "@/types/dashboard";
+import {
+  type DashboardWidgetConfig,
+  type WidgetId,
+  DEFAULT_CONFIG,
+  WIDGET_REGISTRY,
+} from "@/pages/dashboard/dashboardWidgets";
 
 function formatMonthKeyNumeric(monthKey: string): string {
   const [year, month] = monthKey.split("-");
@@ -42,6 +51,8 @@ interface DashboardFiltersProps {
   setExpenseScope: (scope: DashboardExpenseScope) => void;
   includeDebtPayments: boolean;
   setIncludeDebtPayments: (include: boolean) => void;
+  widgetConfig: DashboardWidgetConfig;
+  onWidgetConfigChange: (config: DashboardWidgetConfig) => void;
 }
 
 export function DashboardFilters({
@@ -61,8 +72,25 @@ export function DashboardFilters({
   setExpenseScope,
   includeDebtPayments,
   setIncludeDebtPayments,
+  widgetConfig,
+  onWidgetConfigChange,
 }: DashboardFiltersProps) {
   const { t } = useTranslation();
+
+  const handleReorder = (newOrder: WidgetId[]) => {
+    onWidgetConfigChange({ ...widgetConfig, order: newOrder });
+  };
+
+  const handleToggle = (id: WidgetId, visible: boolean) => {
+    const hidden = visible
+      ? widgetConfig.hidden.filter((h) => h !== id)
+      : [...widgetConfig.hidden, id];
+    onWidgetConfigChange({ ...widgetConfig, hidden });
+  };
+
+  const handleReset = () => {
+    onWidgetConfigChange(DEFAULT_CONFIG);
+  };
 
   return (
     <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -181,6 +209,45 @@ export function DashboardFilters({
                 {t("dashboard.debtPaymentsExcludedHint")}
               </p>
             ) : null}
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-muted-foreground">{t("dashboard.widgetsSection")}</Label>
+              <Button
+                type="button"
+                variant="link"
+                className="h-auto p-0 text-xs"
+                onClick={handleReset}
+              >
+                {t("dashboard.resetWidgets")}
+              </Button>
+            </div>
+            <Reorder.Group
+              axis="y"
+              values={widgetConfig.order}
+              onReorder={handleReorder}
+              className="space-y-1"
+            >
+              {widgetConfig.order.map((id) => {
+                const meta = WIDGET_REGISTRY.find((w) => w.id === id);
+                if (!meta) return null;
+                const isVisible = !widgetConfig.hidden.includes(id);
+                return (
+                  <Reorder.Item
+                    key={id}
+                    value={id}
+                    className="flex items-center gap-2 rounded-lg border border-border/60 bg-card px-3 py-2 select-none"
+                  >
+                    <GripVertical className="size-4 shrink-0 cursor-grab text-muted-foreground active:cursor-grabbing" />
+                    <span className="flex-1 text-sm truncate">{t(meta.labelKey)}</span>
+                    <Switch
+                      checked={isVisible}
+                      onCheckedChange={(checked) => handleToggle(id, !!checked)}
+                    />
+                  </Reorder.Item>
+                );
+              })}
+            </Reorder.Group>
           </div>
           <Button
             type="button"

@@ -13,11 +13,15 @@ import {
 import {
   buildCashFlowRows,
   buildCategoryBreakdown,
+  buildCategoryTrends,
   buildDashboardKpis,
   buildDebtSnapshot,
   buildOwnerExpenseItems,
   buildOwnerNetRows,
   buildOwnerSplit,
+  buildQuickStats,
+  buildSavingsRate,
+  buildSpendingPace,
   sumCashFlowExpenseTotals,
   buildSpendBySource,
   buildOwnerTransfersMtd,
@@ -33,6 +37,11 @@ import {
   serializeDismissedInsightIds,
 } from "@/pages/dashboard/insightsBuilder";
 import type { DashboardExpenseScope, DashboardRange } from "@/types/dashboard";
+import {
+  type DashboardWidgetConfig,
+  loadWidgetConfig,
+  saveWidgetConfig,
+} from "@/pages/dashboard/dashboardWidgets";
 
 function formatMonthKeyNumeric(monthKey: string): string {
   const [year, month] = monthKey.split("-");
@@ -59,6 +68,7 @@ export function useDashboardData() {
   const [viewMode, setViewMode] = useState<FinancialViewMode>("household");
   const [selectedOwner, setSelectedOwner] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [widgetConfig, setWidgetConfigState] = useState<DashboardWidgetConfig>(loadWidgetConfig);
   const [dismissedInsightIds, setDismissedInsightIds] = useState<string[]>(() =>
     parseDismissedInsightIds(sessionStorage.getItem(getInsightStorageKey())),
   );
@@ -314,10 +324,59 @@ export function useDashboardData() {
     [cashFlowDisplayRows],
   );
 
+  const spendingPace = useMemo(
+    () =>
+      buildSpendingPace({
+        currentMonthKey,
+        expenses: scopedExpenses,
+        debtPayments: scopedDebtPayments,
+        scope: expenseScope,
+        includeDebtPayments,
+      }),
+    [currentMonthKey, scopedExpenses, scopedDebtPayments, expenseScope, includeDebtPayments],
+  );
+
+  const savingsRate = useMemo(
+    () =>
+      buildSavingsRate({
+        totalIncome: kpis.totalIncome,
+        totalSpent: kpis.totalSpent,
+      }),
+    [kpis.totalIncome, kpis.totalSpent],
+  );
+
+  const categoryTrends = useMemo(
+    () =>
+      buildCategoryTrends({
+        expenses: scopedExpenses,
+        currentMonthKey,
+        scope: expenseScope,
+        uncategorizedLabel: t("common.uncategorized"),
+        locale: i18n.resolvedLanguage || i18n.language,
+      }),
+    [scopedExpenses, currentMonthKey, expenseScope, t, i18n.resolvedLanguage, i18n.language],
+  );
+
+  const quickStats = useMemo(
+    () =>
+      buildQuickStats({
+        expenses: scopedExpenses,
+        debtPayments: scopedDebtPayments,
+        currentMonthKey,
+        scope: expenseScope,
+      }),
+    [scopedExpenses, scopedDebtPayments, currentMonthKey, expenseScope],
+  );
+
   const dismissInsight = (id: string) => {
     const next = [...dismissedInsightIds, id];
     setDismissedInsightIds(next);
     sessionStorage.setItem(getInsightStorageKey(), serializeDismissedInsightIds(next));
+  };
+
+  const setWidgetConfig = (next: DashboardWidgetConfig) => {
+    setWidgetConfigState(next);
+    saveWidgetConfig(next);
   };
 
   return {
@@ -355,5 +414,11 @@ export function useDashboardData() {
     recentActivity,
     insights,
     dismissInsight,
+    spendingPace,
+    savingsRate,
+    categoryTrends,
+    quickStats,
+    widgetConfig,
+    setWidgetConfig,
   };
 }

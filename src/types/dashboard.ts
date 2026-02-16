@@ -98,3 +98,37 @@ export interface DashboardInsightInput {
   debtPayments: DebtPayment[];
   presetTransactions: PresetTransaction[];
 }
+
+export interface DashboardSpendingPace {
+  dayOfMonth: number;
+  daysInMonth: number;
+  dailyAverage: number;
+  projectedTotal: number;
+  lastMonthTotal: number;
+  paceVsLastMonth: number | null;
+}
+
+export interface DashboardSavingsRate {
+  savingsRate: number;
+  amountSaved: number;
+  totalIncome: number;
+  totalSpent: number;
+}
+
+export interface DashboardCategoryTrendPoint {
+  monthKey: string;
+  monthLabel: string;
+  amount: number;
+}
+
+export interface DashboardCategoryTrend {
+  category: string;
+  currentAmount: number;
+  points: DashboardCategoryTrendPoint[];
+}
+
+export interface DashboardQuickStats {
+  fixedObligations: number;
+  largestExpense: { description: string; amount: number; category: string } | null;
+  transactionCount: number;
+}

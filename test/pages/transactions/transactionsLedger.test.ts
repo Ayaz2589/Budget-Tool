@@ -31,7 +31,7 @@ test("owner filter uses allocation-aware expense amounts and signed transfer imp
     filters: {
       monthFilter: "",
       sourceFilter: "all",
-      categoryFilter: "",
+      categoryFilter: [],
       searchFilter: "",
       ownerFilter: "Tasnuva",
       typeFilter: "all",
@@ -46,7 +46,7 @@ test("owner filter uses allocation-aware expense amounts and signed transfer imp
     filters: {
       monthFilter: "",
       sourceFilter: "all",
-      categoryFilter: "",
+      categoryFilter: [],
       searchFilter: "",
       ownerFilter: "Ayaz",
       typeFilter: "all",

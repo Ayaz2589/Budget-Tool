@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { MessageSquarePlus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DsSectionHeader } from "@/components/ds";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 
 export function AboutPage() {
   const { t } = useTranslation();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
@@ -63,24 +67,19 @@ export function AboutPage() {
                 <p className="text-sm text-muted-foreground">
                   {t("about.supportBody")}
                 </p>
-                <Button asChild className="h-11">
-                  <a href="#" className="inline-flex items-center gap-2">
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 24 24"
-                      className="size-4 fill-current"
-                    >
-                      <circle cx="15.5" cy="7.5" r="4.5" />
-                      <rect x="4" y="3" width="4" height="18" rx="1" />
-                    </svg>
-                    <span>{t("about.supportButton")}</span>
-                  </a>
+                <Button
+                  className="h-11 inline-flex items-center gap-2"
+                  onClick={() => setFeedbackOpen(true)}
+                >
+                  <MessageSquarePlus className="size-4" />
+                  <span>{t("feedback.title")}</span>
                 </Button>
               </div>
             </section>
           </CardContent>
         </Card>
       </div>
+      <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Landmark, CircleHelp } from "lucide-react";
+import { Landmark, CircleHelp, MessageSquarePlus } from "lucide-react";
 import { useGoogleAuth } from "@/context";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,7 @@ import i18n from "@/i18n";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { SheetSetupDialog } from "@/components/SheetSetupDialog";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { SidebarContent } from "@/components/layout/Sidebar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 
@@ -58,6 +59,7 @@ export function Layout() {
   };
   const [showSyncComplete, setShowSyncComplete] = useState(false);
   const [showHelpHintModal, setShowHelpHintModal] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const prevSignedInRef = useRef(isSignedIn);
   const prevSheetSetupOpenRef = useRef(false);
   const helpHintSeenRef = useRef(getHelpHintSeen());
@@ -224,6 +226,7 @@ export function Layout() {
         userProfile={userProfile}
         signIn={signIn}
         signOut={signOut}
+        onFeedbackOpen={() => setFeedbackOpen(true)}
       />
 
       {showSyncStatusUi && (
@@ -266,6 +269,17 @@ export function Layout() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Feedback FAB – desktop only; mobile uses the menu tray */}
+      <button
+        type="button"
+        onClick={() => setFeedbackOpen(true)}
+        className="hidden md:flex fixed z-30 bottom-6 right-6 size-12 rounded-full bg-primary text-primary-foreground shadow-lg items-center justify-center hover:bg-primary/90 transition-colors"
+        aria-label={t("feedback.buttonLabel")}
+      >
+        <MessageSquarePlus className="size-5" />
+      </button>
+      <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </div>
   );
 }

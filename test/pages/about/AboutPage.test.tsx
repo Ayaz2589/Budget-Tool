@@ -70,13 +70,13 @@ test("AboutPage shows closing statement", () => {
   expect(screen.getByText(i18n.t("about.closingStrong"))).toBeInTheDocument();
 });
 
-test("AboutPage shows support section with Patreon button", () => {
+test("AboutPage shows support section with feedback button", () => {
   render(<TestWrapper />);
   expect(screen.getByText(i18n.t("about.supportBody"))).toBeInTheDocument();
-  const supportLink = screen.getByRole("link", {
-    name: new RegExp(i18n.t("about.supportButton"), "i"),
+  const feedbackButton = screen.getByRole("button", {
+    name: new RegExp(i18n.t("feedback.title"), "i"),
   });
-  expect(supportLink).toBeInTheDocument();
+  expect(feedbackButton).toBeInTheDocument();
 });
 
 test("AboutPage has an accessible mission section landmark", () => {

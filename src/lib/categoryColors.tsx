@@ -17,14 +17,45 @@ const INCOME_COLORS: Record<string, string> = {
   Other: "bg-gray-400",
 };
 
-const DEFAULT_COLOR = "bg-gray-400";
+/**
+ * Palette of distinct colors for categories that aren't in the hardcoded maps.
+ * Uses Tailwind classes so Tailwind's content scanner picks them up.
+ */
+const COLOR_PALETTE = [
+  "bg-red-500",
+  "bg-orange-500",
+  "bg-amber-500",
+  "bg-yellow-500",
+  "bg-lime-500",
+  "bg-green-500",
+  "bg-emerald-500",
+  "bg-teal-500",
+  "bg-cyan-500",
+  "bg-sky-500",
+  "bg-blue-500",
+  "bg-indigo-500",
+  "bg-violet-500",
+  "bg-purple-500",
+  "bg-fuchsia-500",
+  "bg-pink-500",
+  "bg-rose-500",
+] as const;
+
+/** Simple string hash → deterministic palette index. */
+function hashColor(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash * 31 + name.charCodeAt(i)) | 0;
+  }
+  return COLOR_PALETTE[Math.abs(hash) % COLOR_PALETTE.length]!;
+}
 
 export type { CategoryType } from "@/types/category";
 
 export function getCategoryColor(name: string, type?: CategoryType): string {
-  if (type === "expense") return EXPENSE_COLORS[name] ?? DEFAULT_COLOR;
-  if (type === "income") return INCOME_COLORS[name] ?? DEFAULT_COLOR;
-  return EXPENSE_COLORS[name] ?? INCOME_COLORS[name] ?? DEFAULT_COLOR;
+  if (type === "expense") return EXPENSE_COLORS[name] ?? hashColor(name);
+  if (type === "income") return INCOME_COLORS[name] ?? hashColor(name);
+  return EXPENSE_COLORS[name] ?? INCOME_COLORS[name] ?? hashColor(name);
 }
 
 export function CategoryOption({

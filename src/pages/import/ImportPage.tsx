@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ImportSourceCard } from "./ImportSourceCard";
 import { ImportPreviewCard } from "./ImportPreviewCard";
 import {
@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Accordion,
   AccordionItem,
@@ -59,6 +60,41 @@ export function ImportPage() {
   } = useImportState();
 
   const [openItem, setOpenItem] = useState("import-source");
+  const [selectedExpCats, setSelectedExpCats] = useState<Set<string>>(new Set());
+  const [selectedIncCats, setSelectedIncCats] = useState<Set<string>>(new Set());
+  const [selectedOwners, setSelectedOwners] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (missingMetaOpen) {
+      setSelectedExpCats(new Set(missingExpenseCategories));
+      setSelectedIncCats(new Set(missingIncomeCategories));
+      setSelectedOwners(new Set(missingOwners));
+    }
+  }, [missingMetaOpen, missingExpenseCategories, missingIncomeCategories, missingOwners]);
+
+  const totalMissing = missingExpenseCategories.length + missingIncomeCategories.length + missingOwners.length;
+  const totalSelected = selectedExpCats.size + selectedIncCats.size + selectedOwners.size;
+  const allSelected = totalSelected === totalMissing;
+
+  const toggleAll = useCallback(() => {
+    if (allSelected) {
+      setSelectedExpCats(new Set());
+      setSelectedIncCats(new Set());
+      setSelectedOwners(new Set());
+    } else {
+      setSelectedExpCats(new Set(missingExpenseCategories));
+      setSelectedIncCats(new Set(missingIncomeCategories));
+      setSelectedOwners(new Set(missingOwners));
+    }
+  }, [allSelected, missingExpenseCategories, missingIncomeCategories, missingOwners]);
+
+  const handleApplySelected = useCallback(() => {
+    applyPendingImport({
+      expenseCategories: [...selectedExpCats],
+      incomeCategories: [...selectedIncCats],
+      owners: [...selectedOwners],
+    });
+  }, [applyPendingImport, selectedExpCats, selectedIncCats, selectedOwners]);
 
   const prevHasPreview = useRef(false);
   useEffect(() => {
@@ -258,38 +294,90 @@ export function ImportPage() {
             <DialogTitle>{t("import.missingMetaTitle")}</DialogTitle>
             <DialogDescription>{t("import.missingMetaDesc")}</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-sm max-h-[50vh] overflow-y-auto">
+            <div className="flex items-center justify-end">
+              <Button variant="ghost" size="sm" onClick={toggleAll}>
+                {allSelected ? t("common.deselectAll") : t("common.selectAll")}
+              </Button>
+            </div>
             {missingExpenseCategories.length > 0 && (
-              <div>
+              <div className="space-y-1.5">
                 <div className="text-xs font-medium text-muted-foreground">
                   {t("import.missingExpenseCategories")}
                 </div>
-                <div>{missingExpenseCategories.join(", ")}</div>
+                {missingExpenseCategories.map((cat) => (
+                  <label key={cat} className="flex items-center gap-2 cursor-pointer py-0.5">
+                    <Checkbox
+                      checked={selectedExpCats.has(cat)}
+                      onCheckedChange={(checked) => {
+                        setSelectedExpCats((prev) => {
+                          const next = new Set(prev);
+                          if (checked) next.add(cat);
+                          else next.delete(cat);
+                          return next;
+                        });
+                      }}
+                    />
+                    <span>{cat}</span>
+                  </label>
+                ))}
               </div>
             )}
             {missingIncomeCategories.length > 0 && (
-              <div>
+              <div className="space-y-1.5">
                 <div className="text-xs font-medium text-muted-foreground">
                   {t("import.missingIncomeCategories")}
                 </div>
-                <div>{missingIncomeCategories.join(", ")}</div>
+                {missingIncomeCategories.map((cat) => (
+                  <label key={cat} className="flex items-center gap-2 cursor-pointer py-0.5">
+                    <Checkbox
+                      checked={selectedIncCats.has(cat)}
+                      onCheckedChange={(checked) => {
+                        setSelectedIncCats((prev) => {
+                          const next = new Set(prev);
+                          if (checked) next.add(cat);
+                          else next.delete(cat);
+                          return next;
+                        });
+                      }}
+                    />
+                    <span>{cat}</span>
+                  </label>
+                ))}
               </div>
             )}
             {missingOwners.length > 0 && (
-              <div>
+              <div className="space-y-1.5">
                 <div className="text-xs font-medium text-muted-foreground">
                   {t("import.missingOwners")}
                 </div>
-                <div>{missingOwners.join(", ")}</div>
+                {missingOwners.map((name) => (
+                  <label key={name} className="flex items-center gap-2 cursor-pointer py-0.5">
+                    <Checkbox
+                      checked={selectedOwners.has(name)}
+                      onCheckedChange={(checked) => {
+                        setSelectedOwners((prev) => {
+                          const next = new Set(prev);
+                          if (checked) next.add(name);
+                          else next.delete(name);
+                          return next;
+                        });
+                      }}
+                    />
+                    <span>{name}</span>
+                  </label>
+                ))}
               </div>
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => applyPendingImport(true)}>
+            <Button variant="outline" onClick={() => applyPendingImport({ expenseCategories: [], incomeCategories: [], owners: [] })}>
               {t("import.skipMissing")}
             </Button>
-            <Button onClick={() => applyPendingImport(false)}>
-              {t("import.addMissing")}
+            <Button onClick={handleApplySelected}>
+              {totalSelected > 0
+                ? t("import.addSelected", { count: totalSelected })
+                : t("import.addMissing")}
             </Button>
           </DialogFooter>
         </DialogContent>

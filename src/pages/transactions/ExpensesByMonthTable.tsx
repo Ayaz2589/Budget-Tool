@@ -1,3 +1,5 @@
+import type React from "react";
+import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -16,9 +18,17 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { sumAmountsBy } from "@/lib/math";
 import { getMonthLabel } from "@/lib/totals";
 import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DsHelpTooltip } from "@/components/ds";
+import { CategoryOption } from "@/lib/categoryColors";
 import type {
   SortColumn,
   ExpensesByMonthTableProps,
@@ -43,6 +53,71 @@ function SortIcon({
   );
 }
 
+/**
+ * Renders plain text by default; only mounts the heavy Radix Select
+ * when the user clicks the cell. This avoids mounting 2×N Select
+ * components for N visible rows.
+ */
+function InlineSelectCell({
+  value,
+  onValueChange,
+  displayContent,
+  children,
+}: {
+  value: string;
+  onValueChange: (v: string) => void;
+  displayContent: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const [active, setActive] = useState(false);
+
+  if (!active) {
+    return (
+      <span
+        role="button"
+        tabIndex={0}
+        className="cursor-pointer rounded px-1 -mx-1 hover:bg-muted/50"
+        onClick={(e) => {
+          e.stopPropagation();
+          setActive(true);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.stopPropagation();
+            e.preventDefault();
+            setActive(true);
+          }
+        }}
+      >
+        {displayContent}
+      </span>
+    );
+  }
+
+  return (
+    <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+      <Select
+        value={value}
+        onValueChange={(v) => {
+          onValueChange(v);
+          setActive(false);
+        }}
+        defaultOpen
+        onOpenChange={(open) => {
+          if (!open) setActive(false);
+        }}
+      >
+        <SelectTrigger className="h-auto border-0 bg-transparent shadow-none px-0 py-0 text-muted-foreground hover:bg-muted/50 rounded data-[size=default]:h-auto">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {children}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
 export function ExpensesByMonthTable({
   byMonth,
   defaultOpenMonth,
@@ -53,7 +128,12 @@ export function ExpensesByMonthTable({
   onRowTap,
   sourceLabelKeys,
   t,
+  onUpdateCategory,
+  onUpdateOwner,
+  expenseCategories,
+  ownerOptions,
 }: ExpensesByMonthTableProps) {
+  const inlineEditing = !!(onUpdateCategory && onUpdateOwner && expenseCategories && ownerOptions);
   return (
     <Accordion
       type="single"
@@ -240,14 +320,49 @@ export function ExpensesByMonthTable({
                       </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {row.kind === "owner-transfer"
-                        ? `${row.transferFromOwner} -> ${row.transferToOwner}`
-                        : row.owner || t("common.noOwner")}
+                      {row.kind === "owner-transfer" ? (
+                        `${row.transferFromOwner} -> ${row.transferToOwner}`
+                      ) : inlineEditing ? (
+                        <InlineSelectCell
+                          value={row.owner || "_none"}
+                          onValueChange={(v) => onUpdateOwner(row.id, v === "_none" ? "" : v)}
+                          displayContent={row.owner || t("common.noOwner")}
+                        >
+                          <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                          {ownerOptions.map((o) => (
+                            <SelectItem key={o} value={o}>{o}</SelectItem>
+                          ))}
+                        </InlineSelectCell>
+                      ) : (
+                        row.owner || t("common.noOwner")
+                      )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {row.kind === "owner-transfer"
-                        ? t("transactions.typeTransfer")
-                        : row.category || t("common.uncategorized")}
+                      {row.kind === "owner-transfer" ? (
+                        t("transactions.typeTransfer")
+                      ) : inlineEditing ? (
+                        <InlineSelectCell
+                          value={row.category || "_"}
+                          onValueChange={(v) => onUpdateCategory(row.id, v === "_" ? "" : v)}
+                          displayContent={
+                            <CategoryOption
+                              name={row.category || t("common.uncategorized")}
+                              type="expense"
+                            />
+                          }
+                        >
+                          <SelectItem value="_">
+                            <CategoryOption name={t("common.uncategorized")} type="expense" />
+                          </SelectItem>
+                          {expenseCategories.map((c) => (
+                            <SelectItem key={c} value={c}>
+                              <CategoryOption name={c} type="expense" />
+                            </SelectItem>
+                          ))}
+                        </InlineSelectCell>
+                      ) : (
+                        row.category || t("common.uncategorized")
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

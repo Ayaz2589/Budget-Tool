@@ -1,4 +1,5 @@
-import { SlidersHorizontal } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Plus, SlidersHorizontal, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion } from "@/components/ui/accordion";
 import {
@@ -7,6 +8,9 @@ import {
   DsSectionHeader,
 } from "@/components/ds";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useBudget, usePresetTransactions } from "@/context";
+import { AddTransactionDialog } from "@/components/AddTransactionDialog";
+import { AddIncomeDialog } from "@/pages/income/AddIncomeDialog";
 import { useDashboardData } from "./useDashboardData";
 import { DashboardKpiCards } from "./DashboardKpiCards";
 import { DashboardCashFlowChart } from "./DashboardCashFlowChart";
@@ -16,11 +20,36 @@ import { DashboardOwnerSplit } from "./DashboardOwnerSplit";
 import { DashboardDebtSnapshot } from "./DashboardDebtSnapshot";
 import { DashboardInsights } from "./DashboardInsights";
 import { DashboardFilters } from "./DashboardFilters";
+import { DashboardQuickAdd } from "./DashboardQuickAdd";
 
 export function Dashboard() {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const data = useDashboardData();
   const { t } = data;
+  const { incomeCategories, owners, addIncome, uiFormatSettings } = useBudget();
+  const { presetTransactions } = usePresetTransactions();
+
+  const [addTransactionOpen, setAddTransactionOpen] = useState(false);
+  const [addIncomeOpen, setAddIncomeOpen] = useState(false);
+  const [selectedPresetId, setSelectedPresetId] = useState<string | undefined>();
+
+  const handlePresetTap = useCallback((presetId: string) => {
+    setSelectedPresetId(presetId);
+    setAddTransactionOpen(true);
+  }, []);
+
+  const handleAddTransactionOpenChange = useCallback((open: boolean) => {
+    setAddTransactionOpen(open);
+    if (!open) setSelectedPresetId(undefined);
+  }, []);
+
+  const handleAddIncome = useCallback(
+    (payload: Parameters<typeof addIncome>[0]) => {
+      addIncome(payload);
+      setAddIncomeOpen(false);
+    },
+    [addIncome],
+  );
 
   return (
     <div data-tour-page="dashboard" className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
@@ -40,14 +69,32 @@ export function Dashboard() {
             showCurrencyChip
             actions={
               !isMobile ? (
-                <Button
-                  variant="outline"
-                  className="h-11 gap-2"
-                  onClick={() => data.setSettingsOpen(true)}
-                >
-                  <SlidersHorizontal className="size-4" />
-                  <span>{t("settings.title")}</span>
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="default"
+                    className="h-11 gap-2"
+                    onClick={() => setAddTransactionOpen(true)}
+                  >
+                    <Plus className="size-4" />
+                    <span>{t("dashboard.addExpense")}</span>
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="h-11 gap-2"
+                    onClick={() => setAddIncomeOpen(true)}
+                  >
+                    <Wallet className="size-4" />
+                    <span>{t("dashboard.addIncome")}</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-11 gap-2"
+                    onClick={() => data.setSettingsOpen(true)}
+                  >
+                    <SlidersHorizontal className="size-4" />
+                    <span>{t("settings.title")}</span>
+                  </Button>
+                </div>
               ) : undefined
             }
           />
@@ -57,6 +104,12 @@ export function Dashboard() {
           kpis={data.kpis}
           expenseScope={data.expenseScope}
           includeDebtPayments={data.includeDebtPayments}
+        />
+
+        <DashboardQuickAdd
+          presets={presetTransactions}
+          onPresetTap={handlePresetTap}
+          onAddBlank={() => setAddTransactionOpen(true)}
         />
 
         <div data-tour="dashboard-trends" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -112,8 +165,41 @@ export function Dashboard() {
           >
             <SlidersHorizontal className="size-4" />
           </Button>
+          <Button
+            variant="secondary"
+            density="compact"
+            onClick={() => setAddIncomeOpen(true)}
+            className="h-11 w-11 rounded-full p-0"
+            aria-label={t("dashboard.addIncome")}
+          >
+            <Wallet className="size-4" />
+          </Button>
+          <Button
+            variant="default"
+            density="compact"
+            onClick={() => setAddTransactionOpen(true)}
+            className="h-11 w-11 rounded-full p-0"
+            aria-label={t("dashboard.addExpense")}
+          >
+            <Plus className="size-4" />
+          </Button>
         </DsActionBar>
       ) : null}
+
+      <AddTransactionDialog
+        open={addTransactionOpen}
+        onOpenChange={handleAddTransactionOpenChange}
+        initialPresetId={selectedPresetId}
+      />
+
+      <AddIncomeDialog
+        open={addIncomeOpen}
+        onOpenChange={setAddIncomeOpen}
+        incomeCategories={incomeCategories}
+        owners={owners}
+        dateFormat={uiFormatSettings.dateFormat}
+        onSubmit={handleAddIncome}
+      />
 
       <DashboardFilters
         settingsOpen={data.settingsOpen}

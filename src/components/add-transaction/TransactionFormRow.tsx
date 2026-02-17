@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DsCreatableSelect } from "@/components/ds";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { PresetSelector } from "./PresetSelector";
@@ -42,6 +43,8 @@ interface TransactionFormRowProps {
   dateFormat: DateFormat;
   fieldClass: string;
   selectTriggerClass: string;
+  onCreateCategory?: (name: string) => void;
+  onCreateOwner?: (name: string) => void;
 }
 
 export function TransactionFormRow({
@@ -57,6 +60,8 @@ export function TransactionFormRow({
   dateFormat,
   fieldClass,
   selectTriggerClass,
+  onCreateCategory,
+  onCreateOwner,
 }: TransactionFormRowProps) {
   const { t } = useTranslation();
 
@@ -110,6 +115,8 @@ export function TransactionFormRow({
           dateFormat={dateFormat}
           fieldClass={fieldClass}
           selectTriggerClass={selectTriggerClass}
+          onCreateCategory={onCreateCategory}
+          onCreateOwner={onCreateOwner}
         />
       )}
     </div>
@@ -129,6 +136,8 @@ function ExpenseFields({
   dateFormat,
   fieldClass,
   selectTriggerClass,
+  onCreateCategory,
+  onCreateOwner,
 }: {
   row: TransactionRow;
   onUpdate: (updates: Partial<TransactionRow>) => void;
@@ -142,6 +151,8 @@ function ExpenseFields({
   dateFormat: DateFormat;
   fieldClass: string;
   selectTriggerClass: string;
+  onCreateCategory?: (name: string) => void;
+  onCreateOwner?: (name: string) => void;
 }) {
   const { t } = useTranslation();
 
@@ -233,29 +244,42 @@ function ExpenseFields({
         <div className="text-xs text-muted-foreground">
           {t("addTransaction.category")}
         </div>
-        <Select
-          value={row.category || "_"}
-          onValueChange={(v) =>
-            onUpdate({ category: v === "_" ? "" : v })
-          }
-        >
-          <SelectTrigger className={selectTriggerClass}>
-            <SelectValue placeholder="\u2014" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="_">
-              <CategoryOption
-                name={t("addTransaction.uncategorized")}
-                type="expense"
-              />
-            </SelectItem>
-            {expenseCategories.map((c) => (
-              <SelectItem key={c} value={c}>
-                <CategoryOption name={c} type="expense" />
+        {onCreateCategory ? (
+          <DsCreatableSelect
+            value={row.category || "_"}
+            onValueChange={(v) => onUpdate({ category: v === "_" ? "" : v })}
+            options={expenseCategories}
+            onCreateNew={onCreateCategory}
+            noneLabel={t("addTransaction.uncategorized")}
+            noneValue="_"
+            renderOption={(name) => <CategoryOption name={name} type="expense" />}
+            className={selectTriggerClass}
+          />
+        ) : (
+          <Select
+            value={row.category || "_"}
+            onValueChange={(v) =>
+              onUpdate({ category: v === "_" ? "" : v })
+            }
+          >
+            <SelectTrigger className={selectTriggerClass}>
+              <SelectValue placeholder="\u2014" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_">
+                <CategoryOption
+                  name={t("addTransaction.uncategorized")}
+                  type="expense"
+                />
               </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              {expenseCategories.map((c) => (
+                <SelectItem key={c} value={c}>
+                  <CategoryOption name={c} type="expense" />
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <div className="space-y-0.5">
@@ -276,33 +300,56 @@ function ExpenseFields({
         <div className="text-xs text-muted-foreground">
           {t("addTransaction.paidBy")}
         </div>
-        <Select
-          value={row.paidByOwner || "_none"}
-          onValueChange={(v) => {
-            const nextOwner = v === "_none" ? "" : v;
-            const nextAllocationOwners =
-              row.allocationMode === "single" && nextOwner
-                ? [nextOwner]
-                : row.allocationOwners;
-            onUpdate({
-              owner: nextOwner,
-              paidByOwner: nextOwner,
-              allocationOwners: nextAllocationOwners,
-            });
-          }}
-        >
-          <SelectTrigger className={selectTriggerClass}>
-            <SelectValue placeholder={t("common.noOwner")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
-            {ownerOptions.map((name) => (
-              <SelectItem key={name} value={name}>
-                {name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {onCreateOwner ? (
+          <DsCreatableSelect
+            value={row.paidByOwner || "_none"}
+            onValueChange={(v) => {
+              const nextOwner = v === "_none" ? "" : v;
+              const nextAllocationOwners =
+                row.allocationMode === "single" && nextOwner
+                  ? [nextOwner]
+                  : row.allocationOwners;
+              onUpdate({
+                owner: nextOwner,
+                paidByOwner: nextOwner,
+                allocationOwners: nextAllocationOwners,
+              });
+            }}
+            options={ownerOptions}
+            onCreateNew={onCreateOwner}
+            noneLabel={t("common.noOwner")}
+            noneValue="_none"
+            className={selectTriggerClass}
+          />
+        ) : (
+          <Select
+            value={row.paidByOwner || "_none"}
+            onValueChange={(v) => {
+              const nextOwner = v === "_none" ? "" : v;
+              const nextAllocationOwners =
+                row.allocationMode === "single" && nextOwner
+                  ? [nextOwner]
+                  : row.allocationOwners;
+              onUpdate({
+                owner: nextOwner,
+                paidByOwner: nextOwner,
+                allocationOwners: nextAllocationOwners,
+              });
+            }}
+          >
+            <SelectTrigger className={selectTriggerClass}>
+              <SelectValue placeholder={t("common.noOwner")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+              {ownerOptions.map((name) => (
+                <SelectItem key={name} value={name}>
+                  {name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <AllocationEditor

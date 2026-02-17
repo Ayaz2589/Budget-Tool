@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/sheet";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context";
-import { DsSheetActions, DsSheetHeader } from "@/components/ds";
+import { DsCreatableSelect, DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 function parsePercentValue(raw: string): number | null {
   const value = Number(raw);
@@ -53,7 +53,7 @@ export function EditTransactionDialog({
   cardSources,
 }: EditTransactionDialogProps) {
   const { t } = useTranslation();
-  const { uiFormatSettings } = useBudget();
+  const { uiFormatSettings, setExpenseCategories, owners: allOwners, setOwners } = useBudget();
   const [date, setDate] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -233,29 +233,25 @@ export function EditTransactionDialog({
 
           <div className="space-y-2">
             <Label>{t("common.category")}</Label>
-            <Select
+            <DsCreatableSelect
               value={category || "_"}
               onValueChange={(v) => setCategory(v === "_" ? "" : v)}
-            >
-              <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="_">
-                  <CategoryOption name={t("common.uncategorized")} type="expense" />
-                </SelectItem>
-                {expenseCategories.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    <CategoryOption name={c} type="expense" />
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              options={expenseCategories}
+              onCreateNew={(name) => {
+                if (!expenseCategories.includes(name)) {
+                  setExpenseCategories([...expenseCategories, name]);
+                }
+              }}
+              noneLabel={t("common.uncategorized")}
+              noneValue="_"
+              renderOption={(name) => <CategoryOption name={name} type="expense" />}
+              className="h-11 w-full"
+            />
           </div>
 
           <div className="space-y-2">
             <Label>{t("addTransaction.paidBy")}</Label>
-            <Select
+            <DsCreatableSelect
               value={paidByOwner || "_none"}
               onValueChange={(v) => {
                 const nextOwner = v === "_none" ? "" : v;
@@ -265,19 +261,16 @@ export function EditTransactionDialog({
                   setAllocationOwners([nextOwner]);
                 }
               }}
-            >
-              <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
-                {ownerOptions.map((o) => (
-                  <SelectItem key={o} value={o}>
-                    {o}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              options={ownerOptions}
+              onCreateNew={(name) => {
+                if (!allOwners.includes(name)) {
+                  setOwners([...allOwners, name]);
+                }
+              }}
+              noneLabel={t("common.noOwner")}
+              noneValue="_none"
+              className="h-11 w-full"
+            />
           </div>
 
           <div className="space-y-2">

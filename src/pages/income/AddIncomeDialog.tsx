@@ -29,7 +29,8 @@ import type {
   AddIncomeFormPayload,
   AddIncomeDialogProps,
 } from "@/types/income";
-import { DsSheetActions, DsSheetHeader } from "@/components/ds";
+import { useBudget } from "@/context";
+import { DsCreatableSelect, DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { AddIncomeFormPayload, AddIncomeDialogProps };
 
@@ -42,6 +43,7 @@ export function AddIncomeDialog({
   onSubmit,
 }: AddIncomeDialogProps) {
   const { t } = useTranslation();
+  const { setIncomeCategories, setOwners } = useBudget();
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -61,6 +63,16 @@ export function AddIncomeDialog({
           dateFormat={dateFormat}
           onSubmit={onSubmit}
           onCancel={() => onOpenChange(false)}
+          onCreateCategory={(name) => {
+            if (!incomeCategories.includes(name)) {
+              setIncomeCategories([...incomeCategories, name]);
+            }
+          }}
+          onCreateOwner={(name) => {
+            if (!owners.includes(name)) {
+              setOwners([...owners, name]);
+            }
+          }}
           t={t}
         />
       </SheetContent>
@@ -74,6 +86,8 @@ function AddIncomeForm({
   dateFormat = "YYYY/MM/DD",
   onSubmit,
   onCancel,
+  onCreateCategory,
+  onCreateOwner,
   t,
 }: {
   incomeCategories: string[];
@@ -81,6 +95,8 @@ function AddIncomeForm({
   dateFormat?: "YYYY/MM/DD" | "MM/DD/YYYY";
   onSubmit: (payload: AddIncomeFormPayload) => void;
   onCancel: () => void;
+  onCreateCategory?: (name: string) => void;
+  onCreateOwner?: (name: string) => void;
   t: (key: string) => string;
 }) {
   const [date, setDate] = useState(() =>
@@ -145,43 +161,68 @@ function AddIncomeForm({
         </div>
         <div className="space-y-2">
           <Label>{t("income.category")}</Label>
-          <Select
-            value={category || "_"}
-            onValueChange={(v) => setCategory(v === "_" ? "" : v)}
-          >
-            <SelectTrigger className={selectTriggerClass}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="_">
-                <CategoryOption name={t("common.uncategorized")} type="income" />
-              </SelectItem>
-              {incomeCategories.map((c) => (
-                <SelectItem key={c} value={c}>
-                  <CategoryOption name={c} type="income" />
+          {onCreateCategory ? (
+            <DsCreatableSelect
+              value={category || "_"}
+              onValueChange={(v) => setCategory(v === "_" ? "" : v)}
+              options={incomeCategories}
+              onCreateNew={onCreateCategory}
+              noneLabel={t("common.uncategorized")}
+              noneValue="_"
+              renderOption={(name) => <CategoryOption name={name} type="income" />}
+              className={selectTriggerClass}
+            />
+          ) : (
+            <Select
+              value={category || "_"}
+              onValueChange={(v) => setCategory(v === "_" ? "" : v)}
+            >
+              <SelectTrigger className={selectTriggerClass}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_">
+                  <CategoryOption name={t("common.uncategorized")} type="income" />
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                {incomeCategories.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    <CategoryOption name={c} type="income" />
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
         <div className="space-y-2">
           <Label>{t("income.owner")}</Label>
-          <Select
-            value={owner || "_none"}
-            onValueChange={(v) => setOwner(v === "_none" ? "" : v)}
-          >
-            <SelectTrigger className={selectTriggerClass}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
-              {owners.map((o) => (
-                <SelectItem key={o} value={o}>
-                  {o}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {onCreateOwner ? (
+            <DsCreatableSelect
+              value={owner || "_none"}
+              onValueChange={(v) => setOwner(v === "_none" ? "" : v)}
+              options={owners}
+              onCreateNew={onCreateOwner}
+              noneLabel={t("common.noOwner")}
+              noneValue="_none"
+              className={selectTriggerClass}
+            />
+          ) : (
+            <Select
+              value={owner || "_none"}
+              onValueChange={(v) => setOwner(v === "_none" ? "" : v)}
+            >
+              <SelectTrigger className={selectTriggerClass}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                {owners.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
       </div>
       <DsSheetActions className="grid grid-cols-2 gap-2 pt-2">

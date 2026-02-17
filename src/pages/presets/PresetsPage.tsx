@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import { useBudget } from "@/context";
 import { usePresetTransactions } from "@/context";
@@ -48,6 +48,7 @@ import {
 import { cn } from "@/lib/utils";
 import {
   DsActionBar,
+  DsCreatableSelect,
   DsDataRow,
   DsEmptyState,
   DsSectionHeader,
@@ -58,7 +59,8 @@ import {
 export function PresetsPage() {
   const { t } = useTranslation();
   const location = useLocation();
-  const { expenseCategories, cardSources, owners } = useBudget();
+  const navigate = useNavigate();
+  const { expenseCategories, setExpenseCategories, cardSources, owners, setOwners } = useBudget();
   const { presetTransactions, addPreset, removePreset, setPresets } =
     usePresetTransactions();
 
@@ -306,44 +308,35 @@ export function PresetsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>{t("presetTransactions.category")}</Label>
-                    <Select
+                    <DsCreatableSelect
                       value={presetCategory}
                       onValueChange={setPresetCategory}
-                    >
-                      <SelectTrigger className={selectTriggerClass}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {expenseCategories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>
-                            {cat}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      options={expenseCategories}
+                      onCreateNew={(name) => {
+                        if (!expenseCategories.includes(name)) {
+                          setExpenseCategories([...expenseCategories, name]);
+                        }
+                      }}
+                      className={selectTriggerClass}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>{t("common.owner")}</Label>
-                    <Select
+                    <DsCreatableSelect
                       value={presetMember || "_none"}
                       onValueChange={(v) =>
                         setPresetMember(v === "_none" ? "" : v)
                       }
-                    >
-                      <SelectTrigger className={selectTriggerClass}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="_none">
-                          {t("common.noOwner")}
-                        </SelectItem>
-                        {ownerOptions.map((member) => (
-                          <SelectItem key={member} value={member}>
-                            {member}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      options={ownerOptions}
+                      onCreateNew={(name) => {
+                        if (!owners.includes(name)) {
+                          setOwners([...owners, name]);
+                        }
+                      }}
+                      noneLabel={t("common.noOwner")}
+                      noneValue="_none"
+                      className={selectTriggerClass}
+                    />
                   </div>
                 </div>
                 <DsSheetActions className="-mx-4 -mb-4">
@@ -371,7 +364,24 @@ export function PresetsPage() {
                   ? t("presetTransactions.emptyNoCategories")
                   : t("presetTransactions.empty")
               }
+              description={
+                expenseCategories.length === 0
+                  ? t("presetTransactions.emptyNoCategoriesHint")
+                  : t("presetTransactions.emptyHint")
+              }
               className="py-6"
+              actions={
+                expenseCategories.length === 0 ? (
+                  <Button variant="secondary" onClick={() => navigate("/dashboard/settings")}>
+                    {t("presetTransactions.goToSettings")}
+                  </Button>
+                ) : (
+                  <Button onClick={openForNew}>
+                    <Plus className="size-4" />
+                    {t("presetTransactions.addPreset")}
+                  </Button>
+                )
+              }
             />
           ) : (
             <>

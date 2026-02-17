@@ -39,8 +39,10 @@ export function AddTransactionDialog({
     addExpense,
     addOwnerTransfer,
     expenseCategories,
+    setExpenseCategories,
     cardSources,
     owners,
+    setOwners,
     uiFormatSettings,
   } = useBudget();
   const { presetTransactions } = usePresetTransactions();
@@ -368,6 +370,16 @@ export function AddTransactionDialog({
                     dateFormat={uiFormatSettings.dateFormat}
                     fieldClass={fieldClass}
                     selectTriggerClass={selectTriggerClass}
+                    onCreateCategory={(name) => {
+                      if (!expenseCategories.includes(name)) {
+                        setExpenseCategories([...expenseCategories, name]);
+                      }
+                    }}
+                    onCreateOwner={(name) => {
+                      if (!owners.includes(name)) {
+                        setOwners([...owners, name]);
+                      }
+                    }}
                   />
                 )}
               </div>

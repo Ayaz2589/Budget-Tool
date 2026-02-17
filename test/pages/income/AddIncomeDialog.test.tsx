@@ -1,11 +1,16 @@
 import { afterEach, test, expect, mock } from "bun:test";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { BudgetProvider } from "@/context";
 import { AddIncomeDialog } from "@/pages/income/AddIncomeDialog";
 
 afterEach(() => cleanup());
 
+function renderWithProvider(ui: React.ReactElement) {
+  return render(<BudgetProvider>{ui}</BudgetProvider>);
+}
+
 test("AddIncomeDialog does not show dialog content when closed", () => {
-  render(
+  renderWithProvider(
     <AddIncomeDialog
       open={false}
       onOpenChange={() => {}}
@@ -17,7 +22,7 @@ test("AddIncomeDialog does not show dialog content when closed", () => {
 });
 
 test("AddIncomeDialog shows New income title when open", () => {
-  render(
+  renderWithProvider(
     <AddIncomeDialog
       open={true}
       onOpenChange={() => {}}
@@ -32,7 +37,7 @@ test("AddIncomeDialog shows New income title when open", () => {
 test("AddIncomeDialog submits payload", () => {
   const onSubmit = mock(() => {});
   const todayIso = new Date().toISOString().slice(0, 10);
-  render(
+  renderWithProvider(
     <AddIncomeDialog
       open={true}
       onOpenChange={() => {}}

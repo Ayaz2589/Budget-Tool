@@ -7,7 +7,7 @@ import { extractTextFromPdf } from "@/lib/pdfText";
 import { parseExportedPdfData } from "@/lib/pdfExport";
 import { filterOutExistingExpenses } from "@/lib/importDedup";
 import { amountsWithinTolerance } from "@/lib/math";
-import { collectMissingImportMeta, normalizeImportedData } from "@/lib/importNormalize";
+import { collectMissingImportMeta } from "@/lib/importNormalize";
 import { parseFromBlob } from "@/lib/minifiedPayload";
 import { parseBudgetJson } from "@/lib/jsonExport";
 import { isDisplayCurrency } from "@/types/currency";
@@ -603,37 +603,45 @@ export function useImportState() {
     downloadExportString(result);
   };
 
-  const applyPendingImport = (normalize: boolean) => {
+  const applyPendingImport = (
+    selected?: {
+      expenseCategories: string[];
+      incomeCategories: string[];
+      owners: string[];
+    },
+  ) => {
     if (!state.pendingParsed) return;
-    const normalized = normalize
-      ? normalizeImportedData(
-          state.pendingParsed,
-          expenseCategories,
-          incomeCategories,
-          owners,
-        )
-      : {
-          expenses: state.pendingParsed.expenses,
-          income: state.pendingParsed.income,
-          debts: state.pendingParsed.debts,
-          ownerTransfers: state.pendingParsed.ownerTransfers,
-          presetTransactions: state.pendingParsed.presetTransactions,
-        };
 
-    if (!normalize) {
-      if (state.missingExpenseCategories.length > 0) {
-        setExpenseCategories([...expenseCategories, ...state.missingExpenseCategories]);
-      }
-      if (state.missingIncomeCategories.length > 0) {
-        setIncomeCategories([...incomeCategories, ...state.missingIncomeCategories]);
-      }
-      if (state.missingOwners.length > 0) {
-        setOwners([...owners, ...state.missingOwners]);
-      }
+    const addExpCats = selected?.expenseCategories ?? state.missingExpenseCategories;
+    const addIncCats = selected?.incomeCategories ?? state.missingIncomeCategories;
+    const addOwnersList = selected?.owners ?? state.missingOwners;
+
+    if (addExpCats.length > 0) {
+      setExpenseCategories([...expenseCategories, ...addExpCats]);
+    }
+    if (addIncCats.length > 0) {
+      setIncomeCategories([...incomeCategories, ...addIncCats]);
+    }
+    if (addOwnersList.length > 0) {
+      setOwners([...owners, ...addOwnersList]);
     }
 
+    const skipExpCats = new Set(
+      state.missingExpenseCategories.filter((c) => !addExpCats.includes(c)),
+    );
+    const skipIncCats = new Set(
+      state.missingIncomeCategories.filter((c) => !addIncCats.includes(c)),
+    );
+
+    const resultExpenses = state.pendingParsed.expenses.map((e) =>
+      skipExpCats.has(e.category) ? { ...e, category: "" } : e,
+    );
+    const resultIncome = state.pendingParsed.income.map((i) =>
+      skipIncCats.has(i.category) ? { ...i, category: "" } : i,
+    );
+
     if (state.pendingParsed.presetTransactions.length > 0) {
-      setPresets(normalized.presetTransactions);
+      setPresets(state.pendingParsed.presetTransactions);
     }
     if (state.pendingParsed.cardSources.length > 0) {
       setCardSources(state.pendingParsed.cardSources);
@@ -642,9 +650,9 @@ export function useImportState() {
     dispatch({
       type: "SET_PREVIEW",
       payload: {
-        previewExpenses: normalized.expenses,
-        previewIncome: normalized.income,
-        previewDebts: normalized.debts,
+        previewExpenses: resultExpenses,
+        previewIncome: resultIncome,
+        previewDebts: state.pendingParsed.debts,
         previewDebtPayments: state.pendingParsed.debtPayments,
         previewOwnerTransfers: state.pendingParsed.ownerTransfers,
         sourceLabel: state.pendingParsed.sourceLabel,

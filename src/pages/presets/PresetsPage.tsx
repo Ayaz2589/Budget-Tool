@@ -48,6 +48,7 @@ import {
 import { cn } from "@/lib/utils";
 import {
   DsActionBar,
+  DsCreatableSelect,
   DsDataRow,
   DsEmptyState,
   DsSectionHeader,
@@ -58,7 +59,7 @@ import {
 export function PresetsPage() {
   const { t } = useTranslation();
   const location = useLocation();
-  const { expenseCategories, cardSources, owners } = useBudget();
+  const { expenseCategories, setExpenseCategories, cardSources, owners, setOwners } = useBudget();
   const { presetTransactions, addPreset, removePreset, setPresets } =
     usePresetTransactions();
 
@@ -306,44 +307,35 @@ export function PresetsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>{t("presetTransactions.category")}</Label>
-                    <Select
+                    <DsCreatableSelect
                       value={presetCategory}
                       onValueChange={setPresetCategory}
-                    >
-                      <SelectTrigger className={selectTriggerClass}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {expenseCategories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>
-                            {cat}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      options={expenseCategories}
+                      onCreateNew={(name) => {
+                        if (!expenseCategories.includes(name)) {
+                          setExpenseCategories([...expenseCategories, name]);
+                        }
+                      }}
+                      className={selectTriggerClass}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>{t("common.owner")}</Label>
-                    <Select
+                    <DsCreatableSelect
                       value={presetMember || "_none"}
                       onValueChange={(v) =>
                         setPresetMember(v === "_none" ? "" : v)
                       }
-                    >
-                      <SelectTrigger className={selectTriggerClass}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="_none">
-                          {t("common.noOwner")}
-                        </SelectItem>
-                        {ownerOptions.map((member) => (
-                          <SelectItem key={member} value={member}>
-                            {member}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      options={ownerOptions}
+                      onCreateNew={(name) => {
+                        if (!owners.includes(name)) {
+                          setOwners([...owners, name]);
+                        }
+                      }}
+                      noneLabel={t("common.noOwner")}
+                      noneValue="_none"
+                      className={selectTriggerClass}
+                    />
                   </div>
                 </div>
                 <DsSheetActions className="-mx-4 -mb-4">

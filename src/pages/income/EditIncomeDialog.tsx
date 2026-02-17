@@ -8,13 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { CategoryOption } from "@/lib/categoryColors";
 import {
   formatCurrencyFromNumber,
@@ -31,7 +24,7 @@ import type {
   EditIncomeFormPayload,
   EditIncomeDialogProps,
 } from "@/types/income";
-import { DsSheetActions, DsSheetHeader } from "@/components/ds";
+import { DsCreatableSelect, DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { EditIncomeFormPayload, EditIncomeDialogProps };
 
@@ -48,7 +41,7 @@ export function EditIncomeDialog({
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [owner, setOwner] = useState<Owner>("");
-  const { uiFormatSettings } = useBudget();
+  const { uiFormatSettings, setIncomeCategories, setOwners: setAllOwners } = useBudget();
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   useEffect(() => {
@@ -126,43 +119,36 @@ export function EditIncomeDialog({
             </div>
             <div className="space-y-2">
               <Label>{t("income.category")}</Label>
-              <Select
+              <DsCreatableSelect
                 value={category || "_"}
                 onValueChange={(v) => setCategory(v === "_" ? "" : v)}
-              >
-                <SelectTrigger className={selectTriggerClass}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_">
-                    <CategoryOption name={t("common.uncategorized")} type="income" />
-                  </SelectItem>
-                  {incomeCategories.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      <CategoryOption name={c} type="income" />
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                options={incomeCategories}
+                onCreateNew={(name) => {
+                  if (!incomeCategories.includes(name)) {
+                    setIncomeCategories([...incomeCategories, name]);
+                  }
+                }}
+                noneLabel={t("common.uncategorized")}
+                noneValue="_"
+                renderOption={(name) => <CategoryOption name={name} type="income" />}
+                className={selectTriggerClass}
+              />
             </div>
             <div className="space-y-2">
               <Label>{t("income.owner")}</Label>
-              <Select
+              <DsCreatableSelect
                 value={owner || "_none"}
                 onValueChange={(v) => setOwner(v === "_none" ? "" : v)}
-              >
-                <SelectTrigger className={selectTriggerClass}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
-                  {owners.map((o) => (
-                    <SelectItem key={o} value={o}>
-                      {o}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                options={owners}
+                onCreateNew={(name) => {
+                  if (!owners.includes(name)) {
+                    setAllOwners([...owners, name]);
+                  }
+                }}
+                noneLabel={t("common.noOwner")}
+                noneValue="_none"
+                className={selectTriggerClass}
+              />
             </div>
           </div>
           <DsSheetActions className="grid grid-cols-2 gap-2 pt-2">

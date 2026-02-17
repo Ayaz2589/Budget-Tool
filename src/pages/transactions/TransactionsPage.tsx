@@ -293,6 +293,17 @@ export function TransactionsPage() {
                       }}
                       sourceLabelKeys={SOURCE_LABEL_KEYS}
                       t={t}
+                      onUpdateCategory={(id, category) => updateExpense(id, { category })}
+                      onUpdateOwner={(id, owner) =>
+                        updateExpense(id, {
+                          owner: owner || undefined,
+                          paidByOwner: owner || undefined,
+                          allocationMode: owner ? "single" : undefined,
+                          allocation: owner ? [{ owner, percent: 100 }] : undefined,
+                        })
+                      }
+                      expenseCategories={expenseCategories}
+                      ownerOptions={ownerOptions}
                     />
                   </div>
                   <div className="md:hidden">

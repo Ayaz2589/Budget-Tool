@@ -112,6 +112,10 @@ export function IncomePage() {
                   byMonth={byMonth}
                   defaultOpenMonth={defaultOpenMonth}
                   onIncomeTap={setIncomeForActions}
+                  onUpdateCategory={(id, category) => updateIncome(id, { category })}
+                  onUpdateOwner={(id, owner) => updateIncome(id, { owner: owner || undefined })}
+                  incomeCategories={incomeCategories}
+                  ownerOptions={owners}
                 />
               </div>
               <div className="md:hidden">

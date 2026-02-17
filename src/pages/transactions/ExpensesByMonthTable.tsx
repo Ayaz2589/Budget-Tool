@@ -16,9 +16,17 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { sumAmountsBy } from "@/lib/math";
 import { getMonthLabel } from "@/lib/totals";
 import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DsHelpTooltip } from "@/components/ds";
+import { CategoryOption } from "@/lib/categoryColors";
 import type {
   SortColumn,
   ExpensesByMonthTableProps,
@@ -53,7 +61,12 @@ export function ExpensesByMonthTable({
   onRowTap,
   sourceLabelKeys,
   t,
+  onUpdateCategory,
+  onUpdateOwner,
+  expenseCategories,
+  ownerOptions,
 }: ExpensesByMonthTableProps) {
+  const inlineEditing = !!(onUpdateCategory && onUpdateOwner && expenseCategories && ownerOptions);
   return (
     <Accordion
       type="single"
@@ -240,14 +253,56 @@ export function ExpensesByMonthTable({
                       </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {row.kind === "owner-transfer"
-                        ? `${row.transferFromOwner} -> ${row.transferToOwner}`
-                        : row.owner || t("common.noOwner")}
+                      {row.kind === "owner-transfer" ? (
+                        `${row.transferFromOwner} -> ${row.transferToOwner}`
+                      ) : inlineEditing ? (
+                        <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                          <Select
+                            value={row.owner || "_none"}
+                            onValueChange={(v) => onUpdateOwner(row.id, v === "_none" ? "" : v)}
+                          >
+                            <SelectTrigger className="h-auto border-0 bg-transparent shadow-none px-0 py-0 text-muted-foreground hover:bg-muted/50 rounded data-[size=default]:h-auto">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                              {ownerOptions.map((o) => (
+                                <SelectItem key={o} value={o}>{o}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      ) : (
+                        row.owner || t("common.noOwner")
+                      )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {row.kind === "owner-transfer"
-                        ? t("transactions.typeTransfer")
-                        : row.category || t("common.uncategorized")}
+                      {row.kind === "owner-transfer" ? (
+                        t("transactions.typeTransfer")
+                      ) : inlineEditing ? (
+                        <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                          <Select
+                            value={row.category || "_"}
+                            onValueChange={(v) => onUpdateCategory(row.id, v === "_" ? "" : v)}
+                          >
+                            <SelectTrigger className="h-auto border-0 bg-transparent shadow-none px-0 py-0 text-muted-foreground hover:bg-muted/50 rounded data-[size=default]:h-auto">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="_">
+                                <CategoryOption name={t("common.uncategorized")} type="expense" />
+                              </SelectItem>
+                              {expenseCategories.map((c) => (
+                                <SelectItem key={c} value={c}>
+                                  <CategoryOption name={c} type="expense" />
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      ) : (
+                        row.category || t("common.uncategorized")
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

@@ -22,6 +22,10 @@ export interface ExpensesByMonthTableProps {
   onRowTap: (row: TransactionLedgerRow) => void;
   sourceLabelKeys: Record<string, string>;
   t: (key: string, opts?: { count?: number }) => string;
+  onUpdateCategory?: (id: string, category: string) => void;
+  onUpdateOwner?: (id: string, owner: string) => void;
+  expenseCategories?: string[];
+  ownerOptions?: string[];
 }
 
 export interface ExpensesByMonthListProps {

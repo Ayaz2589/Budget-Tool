@@ -8,6 +8,7 @@ export { DsChartCard } from "./DsChartCard";
 export { DsHelpTooltip } from "./DsHelpTooltip";
 export { DsLegendList } from "./DsLegendList";
 export { DsEmptyState } from "./DsEmptyState";
+export { DsCreatableSelect } from "./DsCreatableSelect";
 export { DsActionBar } from "./DsActionBar";
 export { DsSidebarBrand } from "./DsSidebarBrand";
 export { DsSidebarNavItem } from "./DsSidebarNavItem";

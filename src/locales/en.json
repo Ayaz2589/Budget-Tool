@@ -106,7 +106,8 @@
     "totalSaved": "Total Saved",
     "totalSpent": "Total Spent",
     "uncategorized": "Uncategorized",
-    "help": "Help"
+    "help": "Help",
+    "createNew": "Create new…"
   },
   "dashboard": {
     "alertEssentialsHigh": "Essentials are {{percent}} of income.",
@@ -258,6 +259,9 @@
     "sectionSpendByCardSource": "Total Spend by Card Source",
     "sectionNoSpendByCardSource": "No spend by source for selected range.",
     "moreItemsCount": "+{{count}} more items",
+    "quickAdd": "Quick add",
+    "addExpense": "Add Expense",
+    "addIncome": "Add Income",
     "help": {
       "page": "Overview of your financial health for the selected period.",
       "kpiNetCashFlow": "Income minus spending and debt payments for the selected period.",
@@ -307,6 +311,7 @@
     "newDebt": "New debt",
     "newDebtDesc": "Enter the debt name and initial amount owed.",
     "noDebtsYet": "No debts yet. Add a debt to start tracking payments.",
+    "emptyStateHint": "Track credit cards, loans, or other debts and log payments.",
     "noPaymentsYet": "No payments yet.",
     "noteOptional": "Note (optional)",
     "paymentHistory": "Payment history",
@@ -333,6 +338,7 @@
   },
   "import": {
     "addAll": "Add all",
+    "addSelected": "Add {{count}} selected",
     "addMissing": "Add to settings",
     "addToTransactions": "Add to transactions",
     "amexCard": "AMEX Card",
@@ -417,6 +423,7 @@
     "newIncome": "New income",
     "newIncomeDesc": "Enter the date, amount, description, and category.",
     "noIncomeEntries": "No income yet. Add your first entry to get started.",
+    "emptyStateHint": "Track salaries, freelance payments, or other income.",
     "owner": "Owner",
     "placeholderDescription": "e.g. Paycheck, Basement Rent",
     "recurringAmount": "Recurring amount",
@@ -499,7 +506,10 @@
     "description": "Templates for quick-fill when adding transactions.",
     "descriptionLabel": "Description",
     "empty": "No presets yet. Add one to quick-fill when adding transactions.",
+    "emptyHint": "Presets let you quickly fill in recurring transactions.",
     "emptyNoCategories": "Add at least one expense category in Settings to create presets.",
+    "emptyNoCategoriesHint": "You need at least one expense category before creating presets.",
+    "goToSettings": "Go to Settings",
     "member": "Member",
     "newPreset": "New preset",
     "source": "Source",
@@ -630,6 +640,8 @@
     "filtersActionsTitle": "Filters & actions",
     "month": "Month",
     "noTransactions": "No transactions yet. Import a CSV or add one manually.",
+    "emptyStateHint": "Add a transaction manually or import from a bank statement.",
+    "importCsv": "Import CSV",
     "searchDescription": "Search description",
     "sourceAmexGold": "Amex Gold Card",
     "sourceAmexPlatinum": "Amex Platinum Card",

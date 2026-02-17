@@ -9,6 +9,7 @@ import type { TransactionLedgerRow, SortColumn } from "./transactions";
 export interface AddTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialPresetId?: string;
 }
 
 export interface ExpensesByMonthTableProps {

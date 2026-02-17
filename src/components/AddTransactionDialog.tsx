@@ -31,6 +31,7 @@ import { TransactionFormRow } from "./add-transaction/TransactionFormRow";
 export function AddTransactionDialog({
   open,
   onOpenChange,
+  initialPresetId,
 }: AddTransactionDialogProps) {
   const { t } = useTranslation();
   const {
@@ -58,18 +59,33 @@ export function AddTransactionDialog({
   useEffect(() => {
     if (open) {
       const fallback = (cardSources[0] as ExpenseSource) ?? "manual";
-      setRows([
-        createDefaultTransactionRow({
-          defaultSource: fallback,
-          dateValue: isoToDateInput(
-            new Date().toISOString().slice(0, 10),
-            uiFormatSettings.dateFormat,
-          ),
-        }),
-      ]);
+      const defaultRow = createDefaultTransactionRow({
+        defaultSource: fallback,
+        dateValue: isoToDateInput(
+          new Date().toISOString().slice(0, 10),
+          uiFormatSettings.dateFormat,
+        ),
+      });
+      if (initialPresetId) {
+        const preset = presetTransactions.find((p) => p.id === initialPresetId);
+        if (preset) {
+          defaultRow.entryType = "expense";
+          defaultRow.source = preset.source;
+          defaultRow.description = preset.description;
+          defaultRow.amount =
+            typeof preset.amount === "number" && Number.isFinite(preset.amount)
+              ? formatCurrencyFromNumber(preset.amount)
+              : "";
+          defaultRow.category = preset.category;
+          defaultRow.owner = preset.owner;
+          defaultRow.paidByOwner = preset.owner;
+          defaultRow.presetId = preset.id;
+        }
+      }
+      setRows([defaultRow]);
       setActiveRowIndex(0);
     }
-  }, [open, cardSources, uiFormatSettings.dateFormat]);
+  }, [open, cardSources, uiFormatSettings.dateFormat, initialPresetId, presetTransactions]);
 
   const ownerOptions = useMemo(() => {
     if (owners.length > 0) return owners;

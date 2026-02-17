@@ -1,3 +1,5 @@
+import type React from "react";
+import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -29,6 +31,67 @@ import { CategoryOption } from "@/lib/categoryColors";
 import type { IncomeTableProps } from "@/types/income";
 
 export type { IncomeTableProps };
+
+/** Shows plain text; only mounts Radix Select on click. */
+function InlineSelectCell({
+  value,
+  onValueChange,
+  displayContent,
+  children,
+}: {
+  value: string;
+  onValueChange: (v: string) => void;
+  displayContent: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const [active, setActive] = useState(false);
+
+  if (!active) {
+    return (
+      <span
+        role="button"
+        tabIndex={0}
+        className="cursor-pointer rounded px-1 -mx-1 hover:bg-muted/50"
+        onClick={(e) => {
+          e.stopPropagation();
+          setActive(true);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.stopPropagation();
+            e.preventDefault();
+            setActive(true);
+          }
+        }}
+      >
+        {displayContent}
+      </span>
+    );
+  }
+
+  return (
+    <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+      <Select
+        value={value}
+        onValueChange={(v) => {
+          onValueChange(v);
+          setActive(false);
+        }}
+        defaultOpen
+        onOpenChange={(open) => {
+          if (!open) setActive(false);
+        }}
+      >
+        <SelectTrigger className="h-auto border-0 bg-transparent shadow-none px-0 py-0 text-muted-foreground hover:bg-muted/50 rounded data-[size=default]:h-auto">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {children}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
 
 export function IncomeTable({
   byMonth,
@@ -132,48 +195,41 @@ export function IncomeTable({
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {inlineEditing ? (
-                          <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
-                            <Select
-                              value={i.owner || "_none"}
-                              onValueChange={(v) => onUpdateOwner(i.id, v === "_none" ? "" : v)}
-                            >
-                              <SelectTrigger className="h-auto border-0 bg-transparent shadow-none px-0 py-0 text-muted-foreground hover:bg-muted/50 rounded data-[size=default]:h-auto">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
-                                {ownerOptions.map((o) => (
-                                  <SelectItem key={o} value={o}>{o}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                          <InlineSelectCell
+                            value={i.owner || "_none"}
+                            onValueChange={(v) => onUpdateOwner(i.id, v === "_none" ? "" : v)}
+                            displayContent={i.owner || t("common.noOwner")}
+                          >
+                            <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                            {ownerOptions.map((o) => (
+                              <SelectItem key={o} value={o}>{o}</SelectItem>
+                            ))}
+                          </InlineSelectCell>
                         ) : (
                           i.owner || t("common.noOwner")
                         )}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {inlineEditing ? (
-                          <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
-                            <Select
-                              value={i.category || "_"}
-                              onValueChange={(v) => onUpdateCategory(i.id, v === "_" ? "" : v)}
-                            >
-                              <SelectTrigger className="h-auto border-0 bg-transparent shadow-none px-0 py-0 text-muted-foreground hover:bg-muted/50 rounded data-[size=default]:h-auto">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="_">
-                                  <CategoryOption name={t("common.uncategorized")} type="income" />
-                                </SelectItem>
-                                {incomeCategories.map((c) => (
-                                  <SelectItem key={c} value={c}>
-                                    <CategoryOption name={c} type="income" />
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                          <InlineSelectCell
+                            value={i.category || "_"}
+                            onValueChange={(v) => onUpdateCategory(i.id, v === "_" ? "" : v)}
+                            displayContent={
+                              <CategoryOption
+                                name={i.category || t("common.uncategorized")}
+                                type="income"
+                              />
+                            }
+                          >
+                            <SelectItem value="_">
+                              <CategoryOption name={t("common.uncategorized")} type="income" />
+                            </SelectItem>
+                            {incomeCategories.map((c) => (
+                              <SelectItem key={c} value={c}>
+                                <CategoryOption name={c} type="income" />
+                              </SelectItem>
+                            ))}
+                          </InlineSelectCell>
                         ) : (
                           i.category || t("common.uncategorized")
                         )}

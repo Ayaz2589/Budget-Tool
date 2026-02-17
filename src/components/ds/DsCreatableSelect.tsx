@@ -86,13 +86,14 @@ export function DsCreatableSelect({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="w-[var(--radix-popover-trigger-width)] min-w-[8rem] p-0"
+        className="w-[var(--radix-popover-trigger-width)] min-w-[8rem] p-0 flex flex-col max-h-[var(--radix-popover-content-available-height)]"
+        collisionPadding={8}
         onOpenAutoFocus={(e) => {
           // Don't steal focus from items when opening
           e.preventDefault();
         }}
       >
-        <div className="max-h-60 overflow-y-auto p-1">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-1">
           {noneLabel && noneValue ? (
             <button
               type="button"
@@ -131,7 +132,7 @@ export function DsCreatableSelect({
             </button>
           ))}
         </div>
-        <div className="border-t border-border p-2">
+        <div className="shrink-0 border-t border-border p-2">
           <form
             className="flex items-center gap-1.5"
             onSubmit={(e) => {

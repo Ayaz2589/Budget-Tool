@@ -10,6 +10,8 @@ export { DsLegendList } from "./DsLegendList";
 export { DsEmptyState } from "./DsEmptyState";
 export { DsCreatableSelect } from "./DsCreatableSelect";
 export { DsActionBar } from "./DsActionBar";
+export { DsWidgetShell } from "./DsWidgetShell";
+export { DsWidgetCatalog } from "./DsWidgetCatalog";
 export { DsSidebarBrand } from "./DsSidebarBrand";
 export { DsSidebarNavItem } from "./DsSidebarNavItem";
 export {

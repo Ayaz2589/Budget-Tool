@@ -106,4 +106,7 @@ export const STORAGE_KEYS = {
 
   // Layout help hint
   HELP_HINT_SEEN: "budget-tool-help-hint-seen",
+
+  // Dashboard widget layout
+  DASHBOARD_LAYOUT: "budget-tool-dashboard-layout",
 } as const;

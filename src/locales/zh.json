@@ -793,5 +793,38 @@
         "description": "智能洞察与提醒会基于当前数据与范围提示关键情况，如支出变化、缺失收入或未付款义务。"
       }
     }
+  },
+  "widget": {
+    "kpiNetCashFlow": "Net Cash Flow",
+    "kpiTotalSpent": "Total Spent",
+    "kpiTotalIncome": "Total Income",
+    "kpiTotalDebt": "Total Debt",
+    "quickAdd": "Quick Add",
+    "chartCashFlow": "Income vs Expenses",
+    "chartNetTrend": "Net Cash Flow Trend",
+    "chartCategory": "Category Breakdown",
+    "chartOwnerSplit": "Owner Split",
+    "debtSnapshot": "Debt Snapshot",
+    "spendBySource": "Spend by Source",
+    "ownerTransfers": "Owner Transfers",
+    "recentActivity": "Recent Activity",
+    "smartInsights": "Smart Insights",
+    "editLayout": "Edit layout",
+    "doneEditing": "Done",
+    "editingHint": "Drag widgets to rearrange",
+    "manageWidgets": "Manage widgets",
+    "resetLayout": "Reset layout",
+    "resetConfirmTitle": "Reset to default layout?",
+    "resetConfirmDescription": "This will restore all widgets to their original positions, sizes, and visibility. Your current layout will be lost.",
+    "resetConfirmAction": "Reset",
+    "noWidgetsVisible": "No widgets visible",
+    "addWidgets": "Manage widgets",
+    "resize": "Resize",
+    "hide": "Hide widget",
+    "visible": "Visible",
+    "addWidget": "Add",
+    "catalogDescription": "Toggle widgets on or off",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   }
 }

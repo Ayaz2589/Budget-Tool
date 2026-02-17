@@ -792,5 +792,38 @@
         "description": "현재 데이터와 범위를 기준으로 지출 변화, 누락 수입, 미납 의무 같은 중요한 신호를 알려줍니다."
       }
     }
+  },
+  "widget": {
+    "kpiNetCashFlow": "Net Cash Flow",
+    "kpiTotalSpent": "Total Spent",
+    "kpiTotalIncome": "Total Income",
+    "kpiTotalDebt": "Total Debt",
+    "quickAdd": "Quick Add",
+    "chartCashFlow": "Income vs Expenses",
+    "chartNetTrend": "Net Cash Flow Trend",
+    "chartCategory": "Category Breakdown",
+    "chartOwnerSplit": "Owner Split",
+    "debtSnapshot": "Debt Snapshot",
+    "spendBySource": "Spend by Source",
+    "ownerTransfers": "Owner Transfers",
+    "recentActivity": "Recent Activity",
+    "smartInsights": "Smart Insights",
+    "editLayout": "Edit layout",
+    "doneEditing": "Done",
+    "editingHint": "Drag widgets to rearrange",
+    "manageWidgets": "Manage widgets",
+    "resetLayout": "Reset layout",
+    "resetConfirmTitle": "Reset to default layout?",
+    "resetConfirmDescription": "This will restore all widgets to their original positions, sizes, and visibility. Your current layout will be lost.",
+    "resetConfirmAction": "Reset",
+    "noWidgetsVisible": "No widgets visible",
+    "addWidgets": "Manage widgets",
+    "resize": "Resize",
+    "hide": "Hide widget",
+    "visible": "Visible",
+    "addWidget": "Add",
+    "catalogDescription": "Toggle widgets on or off",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   }
 }

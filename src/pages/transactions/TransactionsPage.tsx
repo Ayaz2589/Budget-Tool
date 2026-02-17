@@ -272,7 +272,16 @@ export function TransactionsPage() {
                 <DsEmptyState
                   icon={<Receipt className="size-8" />}
                   title={t("transactions.noTransactions")}
+                  description={t("transactions.emptyStateHint")}
                   className="py-12"
+                  actions={
+                    <>
+                      <Button onClick={() => setAddTransactionOpen(true)}>
+                        <Plus className="size-4" />
+                        {t("common.add")}
+                      </Button>
+                    </>
+                  }
                 />
               ) : (
                 <>

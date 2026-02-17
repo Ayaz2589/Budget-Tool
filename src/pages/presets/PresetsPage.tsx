@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import { useBudget } from "@/context";
 import { usePresetTransactions } from "@/context";
@@ -59,6 +59,7 @@ import {
 export function PresetsPage() {
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const { expenseCategories, setExpenseCategories, cardSources, owners, setOwners } = useBudget();
   const { presetTransactions, addPreset, removePreset, setPresets } =
     usePresetTransactions();
@@ -363,7 +364,24 @@ export function PresetsPage() {
                   ? t("presetTransactions.emptyNoCategories")
                   : t("presetTransactions.empty")
               }
+              description={
+                expenseCategories.length === 0
+                  ? t("presetTransactions.emptyNoCategoriesHint")
+                  : t("presetTransactions.emptyHint")
+              }
               className="py-6"
+              actions={
+                expenseCategories.length === 0 ? (
+                  <Button variant="secondary" onClick={() => navigate("/dashboard/settings")}>
+                    {t("presetTransactions.goToSettings")}
+                  </Button>
+                ) : (
+                  <Button onClick={openForNew}>
+                    <Plus className="size-4" />
+                    {t("presetTransactions.addPreset")}
+                  </Button>
+                )
+              }
             />
           ) : (
             <>

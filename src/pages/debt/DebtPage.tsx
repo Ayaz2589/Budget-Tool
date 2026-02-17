@@ -118,6 +118,13 @@ export function DebtPage() {
             <DsEmptyState
               icon={<CreditCard className="size-8" />}
               title={t("debt.noDebtsYet")}
+              description={t("debt.emptyStateHint")}
+              actions={
+                <Button onClick={() => setAddDebtOpen(true)}>
+                  <Plus className="size-4" />
+                  {t("debt.addDebt")}
+                </Button>
+              }
             />
           ) : (
             <>

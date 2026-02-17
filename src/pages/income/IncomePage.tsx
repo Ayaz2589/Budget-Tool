@@ -104,6 +104,13 @@ export function IncomePage() {
             <DsEmptyState
               icon={<Wallet className="size-8" />}
               title={t("income.noIncomeEntries")}
+              description={t("income.emptyStateHint")}
+              actions={
+                <Button onClick={() => setAddOpen(true)}>
+                  <Plus className="size-4" />
+                  {t("income.addIncome")}
+                </Button>
+              }
             />
           ) : (
             <>

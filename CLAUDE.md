@@ -85,6 +85,8 @@ Bun's built-in test runner + React Testing Library + happy-dom. Tests in `test/`
 ## Active Technologies
 - TypeScript 5.x (strict mode) + None (pure `fetch`-based, no external libraries) (002-sheets-db-layer)
 - Google Sheets v4 REST API (client-side, no backend) (002-sheets-db-layer)
+- TypeScript 5.x (strict mode) + None (pure `fetch`-based, no external libraries) + Google Sheets v4 REST API (client-side, no backend) (003-generic-sheets-db)
+- Google Sheets (remote), localStorage (local — unchanged) (003-generic-sheets-db)
 
 ## Recent Changes
 - 002-sheets-db-layer: Added TypeScript 5.x (strict mode) + None (pure `fetch`-based, no external libraries)

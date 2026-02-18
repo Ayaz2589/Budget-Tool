@@ -1,5 +1,5 @@
 /**
- * Sheet name constants and A1-notation ranges used across the Google Sheets integration.
+ * Sheet name constants, A1-notation ranges, and header definitions.
  */
 
 export const SHEET_NAMES = {
@@ -14,10 +14,8 @@ export const SHEET_NAMES = {
   totals: "Totals",
 } as const;
 
-/** All sheet titles that must exist in a synced spreadsheet. */
 export const ALL_SHEET_TITLES = Object.values(SHEET_NAMES);
 
-/** A1-notation read ranges (header row excluded where data starts at row 2). */
 export const SHEET_RANGES = {
   expensesRead: `${SHEET_NAMES.expenses}!A2:G`,
   mortgageRead: `${SHEET_NAMES.mortgage}!A2:G`,
@@ -29,7 +27,6 @@ export const SHEET_RANGES = {
   dataCell: `${SHEET_NAMES.data}!A1`,
 } as const;
 
-/** A1-notation write ranges (including header row). */
 export const SHEET_WRITE_RANGES = {
   expenses: `${SHEET_NAMES.expenses}!A1:G`,
   mortgage: `${SHEET_NAMES.mortgage}!A1:G`,
@@ -42,7 +39,6 @@ export const SHEET_WRITE_RANGES = {
   totals: `${SHEET_NAMES.totals}!A1:Z100`,
 } as const;
 
-/** A1-notation ranges used for batch-clear before a full sync. */
 export const SHEET_CLEAR_RANGES = [
   `${SHEET_NAMES.expenses}!A1:G10000`,
   `${SHEET_NAMES.mortgage}!A1:G10000`,
@@ -54,3 +50,10 @@ export const SHEET_CLEAR_RANGES = [
   `${SHEET_NAMES.data}!A1:A1`,
   `${SHEET_NAMES.totals}!A1:O1000`,
 ] as const;
+
+export const EXPENSE_HEADERS = ["ID", "Date", "Amount", "Description", "Category", "Source", "Owner"];
+export const INCOME_HEADERS = ["Date", "Amount", "Description", "Category", "Owner"];
+export const DEBT_HEADERS = ["Id", "Name", "Initial Amount", "Start Date", "Owner"];
+export const DEBT_PAYMENT_HEADERS = ["Id", "Debt Id", "Date", "Amount", "Note"];
+export const OWNER_TRANSFER_HEADERS = ["Id", "Date", "From Owner", "To Owner", "Amount", "Note"];
+export const PRESET_HEADERS = ["Id", "Source", "Description", "Category", "Owner"];

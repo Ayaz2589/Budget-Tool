@@ -2,10 +2,11 @@
  * Sheet formatting: bold headers, currency/percent number formats, alignment.
  */
 
-import type { SheetIds } from "@/types/sheets";
-import { SHEETS_API } from "./api";
+import type { SheetIds } from "./types";
+import type { TransportContext } from "./transport";
+import { SHEETS_API } from "./transport";
+import { apiError } from "./errors";
 
-/** Build a repeatCell request for the Sheets batchUpdate API. */
 function repeatCellRequest(
   sheetId: number,
   startRow: number,
@@ -47,10 +48,47 @@ function repeatCellRequest(
   };
 }
 
-/** Apply formatting (bold headers, currency columns, percent columns) to all sheets. */
-export async function applySheetsFormatting(
-  accessToken: string,
-  spreadsheetId: string,
+export async function getSheetIds(ctx: TransportContext): Promise<SheetIds | null> {
+  const metaUrl = `${SHEETS_API}/${ctx.spreadsheetId}?fields=sheets.properties(sheetId,title)`;
+  const res = await fetch(metaUrl, {
+    headers: { Authorization: `Bearer ${ctx.token}` },
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as {
+    sheets?: { properties: { sheetId: number; title: string } }[];
+  };
+  const byTitle: Record<string, number> = {};
+  for (const s of data.sheets ?? []) {
+    byTitle[s.properties.title] = s.properties.sheetId;
+  }
+
+  const expenses = byTitle["Expenses"];
+  const income = byTitle["Income"];
+  const totals = byTitle["Totals"];
+  const debts = byTitle["Debts"];
+  const debtPayments = byTitle["DebtPayments"];
+  const mortgage = byTitle["Mortgage"];
+  const ownerTransfers = byTitle["OwnerTransfers"];
+  const presetTransactions = byTitle["PresetTransactions"];
+
+  if (
+    expenses == null ||
+    income == null ||
+    totals == null ||
+    debts == null ||
+    debtPayments == null ||
+    mortgage == null ||
+    ownerTransfers == null ||
+    presetTransactions == null
+  ) {
+    return null;
+  }
+
+  return { expenses, income, totals, debts, debtPayments, mortgage, ownerTransfers, presetTransactions };
+}
+
+export async function applyFormatting(
+  ctx: TransportContext,
   sheetIds: SheetIds,
 ): Promise<void> {
   const requests: object[] = [];
@@ -106,16 +144,16 @@ export async function applySheetsFormatting(
   requests.push(repeatCellRequest(sheetIds.presetTransactions, 0, 1, 0, 5, { bold: true, fontSize: 12, horizontalAlignment: "LEFT" }, headerFields));
   requests.push(repeatCellRequest(sheetIds.presetTransactions, 0, 10000, 0, 5, { horizontalAlignment: "LEFT" }, leftAlignFields));
 
-  const batchRes = await fetch(`${SHEETS_API}/${spreadsheetId}:batchUpdate`, {
+  const batchRes = await fetch(`${SHEETS_API}/${ctx.spreadsheetId}:batchUpdate`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${ctx.token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ requests }),
   });
   if (!batchRes.ok) {
     const err = await batchRes.text();
-    throw new Error(`Formatting failed: ${batchRes.status} ${err}`);
+    throw apiError(`Formatting failed: ${batchRes.status} ${err}`);
   }
 }

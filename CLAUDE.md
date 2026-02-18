@@ -81,3 +81,10 @@ Bun's built-in test runner + React Testing Library + happy-dom. Tests in `test/`
 - Path alias `@/` maps to `src/`.
 - TypeScript strict mode is enabled (`noUnusedLocals`, `noUnusedParameters`).
 - Refactors are done incrementally — add/update tests first, then change code, run `bun test` after each change.
+
+## Active Technologies
+- TypeScript 5.x (strict mode) + None (pure `fetch`-based, no external libraries) (002-sheets-db-layer)
+- Google Sheets v4 REST API (client-side, no backend) (002-sheets-db-layer)
+
+## Recent Changes
+- 002-sheets-db-layer: Added TypeScript 5.x (strict mode) + None (pure `fetch`-based, no external libraries)

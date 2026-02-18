@@ -1,25 +1,15 @@
 /**
- * Read/write operations for the Debts and DebtPayments sheets.
+ * Debts and DebtPayments repository for the sheets database layer.
  */
 
-import type { Debt, DebtPayment } from "@/types/core";
-import {
-  generateId,
-  parseAmount,
-  normalizeDate,
-  parseOwner,
-  getSheetValues,
-  clearRange,
-  updateSheet,
-} from "./api";
-import { SHEET_RANGES } from "./constants";
+import type { Debt, DebtPayment } from "./types";
+import type { TransportContext } from "./transport";
+import { getSheetValues, clearRange, updateSheet, generateId } from "./transport";
+import { SHEET_RANGES, SHEET_WRITE_RANGES } from "./schema";
+import { parseAmount, normalizeDate, parseOwner, validateDebt as validateDebtRecord, validateDebtPayment as validateDebtPaymentRecord } from "./normalize";
 
-/** Read all debts from the Debts sheet (A2:E). */
-export async function readDebtsFromSheet(
-  accessToken: string,
-  spreadsheetId: string,
-): Promise<Debt[]> {
-  const rows = await getSheetValues(accessToken, spreadsheetId, SHEET_RANGES.debtsRead, "UNFORMATTED_VALUE");
+export async function readDebts(ctx: TransportContext): Promise<Debt[]> {
+  const rows = await getSheetValues(ctx, SHEET_RANGES.debtsRead, "UNFORMATTED_VALUE");
   const debts: Debt[] = [];
 
   for (const row of rows) {
@@ -42,12 +32,8 @@ export async function readDebtsFromSheet(
   return debts;
 }
 
-/** Read all debt payments from the DebtPayments sheet (A2:E). */
-export async function readDebtPaymentsFromSheet(
-  accessToken: string,
-  spreadsheetId: string,
-): Promise<DebtPayment[]> {
-  const rows = await getSheetValues(accessToken, spreadsheetId, SHEET_RANGES.debtPaymentsRead, "UNFORMATTED_VALUE");
+export async function readDebtPayments(ctx: TransportContext): Promise<DebtPayment[]> {
+  const rows = await getSheetValues(ctx, SHEET_RANGES.debtPaymentsRead, "UNFORMATTED_VALUE");
   const payments: DebtPayment[] = [];
 
   for (const row of rows) {
@@ -70,7 +56,6 @@ export async function readDebtPaymentsFromSheet(
   return payments;
 }
 
-/** Build the header + data rows array for debts (used by batch sync). */
 export function buildDebtsValues(debts: Debt[]): unknown[][] {
   const headers = [["Id", "Name", "Initial Amount", "Start Date", "Owner"]];
   const rows = debts.map((d) => [
@@ -83,7 +68,6 @@ export function buildDebtsValues(debts: Debt[]): unknown[][] {
   return [...headers, ...rows];
 }
 
-/** Build the header + data rows array for debt payments (used by batch sync). */
 export function buildDebtPaymentsValues(debtPayments: DebtPayment[]): unknown[][] {
   const headers = [["Id", "Debt Id", "Date", "Amount", "Note"]];
   const rows = debtPayments.map((p) => [
@@ -96,28 +80,26 @@ export function buildDebtPaymentsValues(debtPayments: DebtPayment[]): unknown[][
   return [...headers, ...rows];
 }
 
-/** Clear and rewrite the Debts sheet. */
-export async function clearAndWriteDebts(
-  accessToken: string,
-  spreadsheetId: string,
+export async function writeDebts(
+  ctx: TransportContext,
   debts: Debt[],
 ): Promise<void> {
+  for (const d of debts) validateDebtRecord(d);
   const values = buildDebtsValues(debts);
-  await clearRange(accessToken, spreadsheetId, "Debts!A1:I10000");
+  await clearRange(ctx, "Debts!A1:I10000");
   if (values.length > 0) {
-    await updateSheet(accessToken, spreadsheetId, "Debts!A1:E", values, false);
+    await updateSheet(ctx, SHEET_WRITE_RANGES.debts, values, false);
   }
 }
 
-/** Clear and rewrite the DebtPayments sheet. */
-export async function clearAndWriteDebtPayments(
-  accessToken: string,
-  spreadsheetId: string,
+export async function writeDebtPayments(
+  ctx: TransportContext,
   debtPayments: DebtPayment[],
 ): Promise<void> {
+  for (const p of debtPayments) validateDebtPaymentRecord(p);
   const values = buildDebtPaymentsValues(debtPayments);
-  await clearRange(accessToken, spreadsheetId, "DebtPayments!A1:E10000");
+  await clearRange(ctx, "DebtPayments!A1:E10000");
   if (values.length > 0) {
-    await updateSheet(accessToken, spreadsheetId, "DebtPayments!A1:E", values, false);
+    await updateSheet(ctx, SHEET_WRITE_RANGES.debtPayments, values, false);
   }
 }

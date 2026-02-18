@@ -1,26 +1,22 @@
 /**
- * Read/write operations for the OwnerTransfers and PresetTransactions sheets.
+ * OwnerTransfers and PresetTransactions repository for the sheets database layer.
  */
 
-import type { OwnerTransfer, PresetTransaction } from "@/types/core";
+import type { OwnerTransfer, PresetTransaction } from "./types";
+import type { TransportContext } from "./transport";
+import { getSheetValues, clearRange, updateSheet, generateId } from "./transport";
+import { SHEET_RANGES, SHEET_WRITE_RANGES } from "./schema";
 import {
-  generateId,
   parseAmount,
   normalizeDate,
   normalizeCategoryFromSheet,
-  getSheetValues,
-  clearRange,
-  updateSheet,
-} from "./api";
-import { SHEET_RANGES } from "./constants";
-import { validateExpenseSource } from "./validate";
+  validateExpenseSource,
+  validateOwnerTransfer as validateOwnerTransferRecord,
+  validatePresetTransaction as validatePresetRecord,
+} from "./normalize";
 
-/** Read all owner transfers from the OwnerTransfers sheet (A2:F). */
-export async function readOwnerTransfersFromSheet(
-  accessToken: string,
-  spreadsheetId: string,
-): Promise<OwnerTransfer[]> {
-  const rows = await getSheetValues(accessToken, spreadsheetId, SHEET_RANGES.ownerTransfersRead, "UNFORMATTED_VALUE");
+export async function readOwnerTransfers(ctx: TransportContext): Promise<OwnerTransfer[]> {
+  const rows = await getSheetValues(ctx, SHEET_RANGES.ownerTransfersRead, "UNFORMATTED_VALUE");
   const transfers: OwnerTransfer[] = [];
 
   for (const row of rows) {
@@ -38,12 +34,8 @@ export async function readOwnerTransfersFromSheet(
   return transfers;
 }
 
-/** Read all preset transactions from the PresetTransactions sheet (A2:E). */
-export async function readPresetsFromSheet(
-  accessToken: string,
-  spreadsheetId: string,
-): Promise<PresetTransaction[]> {
-  const rows = await getSheetValues(accessToken, spreadsheetId, SHEET_RANGES.presetsRead, "UNFORMATTED_VALUE");
+export async function readPresets(ctx: TransportContext): Promise<PresetTransaction[]> {
+  const rows = await getSheetValues(ctx, SHEET_RANGES.presetsRead, "UNFORMATTED_VALUE");
   const presets: PresetTransaction[] = [];
 
   for (const row of rows) {
@@ -66,7 +58,6 @@ export async function readPresetsFromSheet(
   return presets;
 }
 
-/** Build the header + data rows array for owner transfers (used by batch sync). */
 export function buildOwnerTransfersValues(ownerTransfers: OwnerTransfer[]): unknown[][] {
   const headers = [["Id", "Date", "From Owner", "To Owner", "Amount", "Note"]];
   const rows = ownerTransfers.map((t) => [
@@ -80,7 +71,6 @@ export function buildOwnerTransfersValues(ownerTransfers: OwnerTransfer[]): unkn
   return [...headers, ...rows];
 }
 
-/** Build the header + data rows array for preset transactions (used by batch sync). */
 export function buildPresetsValues(presetTransactions: PresetTransaction[]): unknown[][] {
   const headers = [["Id", "Source", "Description", "Category", "Owner"]];
   const rows = presetTransactions.map((p) => [
@@ -93,15 +83,26 @@ export function buildPresetsValues(presetTransactions: PresetTransaction[]): unk
   return [...headers, ...rows];
 }
 
-/** Clear and rewrite the PresetTransactions sheet. */
-export async function clearAndWritePresets(
-  accessToken: string,
-  spreadsheetId: string,
+export async function writeOwnerTransfers(
+  ctx: TransportContext,
+  ownerTransfers: OwnerTransfer[],
+): Promise<void> {
+  for (const t of ownerTransfers) validateOwnerTransferRecord(t);
+  const values = buildOwnerTransfersValues(ownerTransfers);
+  await clearRange(ctx, "OwnerTransfers!A1:F10000");
+  if (values.length > 0) {
+    await updateSheet(ctx, SHEET_WRITE_RANGES.ownerTransfers, values, false);
+  }
+}
+
+export async function writePresets(
+  ctx: TransportContext,
   presetTransactions: PresetTransaction[],
 ): Promise<void> {
+  for (const p of presetTransactions) validatePresetRecord(p);
   const values = buildPresetsValues(presetTransactions);
-  await clearRange(accessToken, spreadsheetId, "PresetTransactions!A1:E10000");
+  await clearRange(ctx, "PresetTransactions!A1:E10000");
   if (values.length > 0) {
-    await updateSheet(accessToken, spreadsheetId, "PresetTransactions!A1:E", values, false);
+    await updateSheet(ctx, SHEET_WRITE_RANGES.presets, values, false);
   }
 }

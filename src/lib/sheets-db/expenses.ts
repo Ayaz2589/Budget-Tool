@@ -1,33 +1,28 @@
 /**
- * Read/write operations for the Expenses and Mortgage sheets.
+ * Expense and Mortgage repository for the sheets database layer.
  */
 
-import type { Expense } from "@/types/core";
+import type { Expense } from "./types";
+import type { TransportContext } from "./transport";
+import { getSheetValues, clearRange, updateSheet, generateId } from "./transport";
+import { SHEET_RANGES, SHEET_WRITE_RANGES } from "./schema";
 import {
-  generateId,
   parseAmount,
   normalizeDate,
   looksLikeIsoDate,
   normalizeCategoryFromSheet,
-  getSheetValues,
-  clearRange,
-  updateSheet,
-} from "./api";
-import { SHEET_RANGES } from "./constants";
-import { validateExpenseSource, hasIdColumn } from "./validate";
+  validateExpenseSource,
+  hasIdColumn,
+  validateExpense,
+} from "./normalize";
 
-/**
- * Read expense rows from a named sheet.
- * Works for both "Expenses" and "Mortgage" sheets since they share the same column layout.
- */
 async function readExpenseSheet(
-  accessToken: string,
-  spreadsheetId: string,
+  ctx: TransportContext,
   range: string,
   defaultCategory: string,
   defaultDescription: string,
 ): Promise<Expense[]> {
-  const rows = await getSheetValues(accessToken, spreadsheetId, range, "UNFORMATTED_VALUE");
+  const rows = await getSheetValues(ctx, range, "UNFORMATTED_VALUE");
   const expenses: Expense[] = [];
 
   for (const row of rows) {
@@ -77,41 +72,14 @@ async function readExpenseSheet(
   return expenses;
 }
 
-/** Read all expenses from the Expenses sheet (A2:G). */
-export async function readExpensesFromSheet(
-  accessToken: string,
-  spreadsheetId: string,
-): Promise<Expense[]> {
-  return readExpenseSheet(accessToken, spreadsheetId, SHEET_RANGES.expensesRead, "", "Expense");
+export async function readExpenses(ctx: TransportContext): Promise<Expense[]> {
+  return readExpenseSheet(ctx, SHEET_RANGES.expensesRead, "", "Expense");
 }
 
-/** Read all mortgage expenses from the Mortgage sheet (A2:G). */
-export async function readMortgageFromSheet(
-  accessToken: string,
-  spreadsheetId: string,
-): Promise<Expense[]> {
-  return readExpenseSheet(accessToken, spreadsheetId, SHEET_RANGES.mortgageRead, "Mortgage", "Mortgage");
+export async function readMortgage(ctx: TransportContext): Promise<Expense[]> {
+  return readExpenseSheet(ctx, SHEET_RANGES.mortgageRead, "Mortgage", "Mortgage");
 }
 
-/** Append expense rows (no clear). */
-export async function appendExpenses(
-  accessToken: string,
-  spreadsheetId: string,
-  expenses: Expense[],
-): Promise<void> {
-  const values = expenses.map((e) => [
-    e.id,
-    e.date,
-    e.amount,
-    e.description,
-    e.category || "Uncategorized",
-    e.source,
-    e.paidByOwner ?? e.owner ?? "",
-  ]);
-  await updateSheet(accessToken, spreadsheetId, "Expenses!A:G", values, false);
-}
-
-/** Build the header + data rows array for expenses (used by batch sync). */
 export function buildExpensesValues(expenses: Expense[]): unknown[][] {
   const headers = [["ID", "Date", "Amount", "Description", "Category", "Source", "Owner"]];
   const rows = expenses.map((e) => [
@@ -126,28 +94,43 @@ export function buildExpensesValues(expenses: Expense[]): unknown[][] {
   return [...headers, ...rows];
 }
 
-/** Clear and rewrite the Expenses sheet. */
-export async function clearAndWriteExpenses(
-  accessToken: string,
-  spreadsheetId: string,
+export async function writeExpenses(
+  ctx: TransportContext,
   expenses: Expense[],
 ): Promise<void> {
+  for (const e of expenses) validateExpense(e);
   const values = buildExpensesValues(expenses);
-  await clearRange(accessToken, spreadsheetId, "Expenses!A1:G10000");
+  await clearRange(ctx, "Expenses!A1:G10000");
   if (values.length > 0) {
-    await updateSheet(accessToken, spreadsheetId, "Expenses!A1:G", values, false);
+    await updateSheet(ctx, SHEET_WRITE_RANGES.expenses, values, false);
   }
 }
 
-/** Clear and rewrite the Mortgage sheet. */
-export async function clearAndWriteMortgage(
-  accessToken: string,
-  spreadsheetId: string,
+export async function writeMortgage(
+  ctx: TransportContext,
   expenses: Expense[],
 ): Promise<void> {
+  for (const e of expenses) validateExpense(e);
   const values = buildExpensesValues(expenses);
-  await clearRange(accessToken, spreadsheetId, "Mortgage!A1:G10000");
+  await clearRange(ctx, "Mortgage!A1:G10000");
   if (values.length > 0) {
-    await updateSheet(accessToken, spreadsheetId, "Mortgage!A1:G", values, false);
+    await updateSheet(ctx, SHEET_WRITE_RANGES.mortgage, values, false);
   }
+}
+
+export async function appendExpenses(
+  ctx: TransportContext,
+  expenses: Expense[],
+): Promise<void> {
+  for (const e of expenses) validateExpense(e);
+  const values = expenses.map((e) => [
+    e.id,
+    e.date,
+    e.amount,
+    e.description,
+    e.category || "Uncategorized",
+    e.source,
+    e.paidByOwner ?? e.owner ?? "",
+  ]);
+  await updateSheet(ctx, "Expenses!A:G", values, false);
 }

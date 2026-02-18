@@ -1,12 +1,9 @@
 import { test, expect, mock, beforeEach, afterEach } from "bun:test";
 import {
+  createSheetsClient,
   extractSpreadsheetId,
-  getSheetValues,
-  readExpensesFromSheet,
-  readIncomeFromSheet,
-  syncAllSheetsBatch,
-} from "@/lib/googleSheets";
-import type { MonthTotals } from "@/types/totals";
+} from "@/lib/sheets-db";
+import type { MonthTotals } from "@/lib/sheets-db";
 
 test("extractSpreadsheetId extracts id from URL", () => {
   const url =
@@ -34,7 +31,7 @@ afterEach(() => {
   mock.restore();
 });
 
-test("syncAllSheetsBatch uses batchClear and batchUpdate endpoints", async () => {
+test("batchSync uses batchClear and batchUpdate endpoints", async () => {
   const fetchMock = mock(() => Promise.resolve(okResponse.clone()));
   globalThis.fetch = fetchMock as unknown as typeof fetch;
   const monthTotals: MonthTotals = {
@@ -54,7 +51,8 @@ test("syncAllSheetsBatch uses batchClear and batchUpdate endpoints", async () =>
     investingTotal: 0,
   };
 
-  await syncAllSheetsBatch("token", "sheet-123", {
+  const db = createSheetsClient({ token: "token", spreadsheetId: "sheet-123" });
+  await db.batchSync({
     expenses: [],
     mortgageExpenses: [],
     income: [],
@@ -75,7 +73,7 @@ test("syncAllSheetsBatch uses batchClear and batchUpdate endpoints", async () =>
   );
 });
 
-test("syncAllSheetsBatch throws when batchClear fails", async () => {
+test("batchSync throws when batchClear fails", async () => {
   const fetchMock = mock(() =>
     Promise.resolve(new Response("rate limit", { status: 429 }))
   );
@@ -97,8 +95,9 @@ test("syncAllSheetsBatch throws when batchClear fails", async () => {
     investingTotal: 0,
   };
 
+  const db = createSheetsClient({ token: "token", spreadsheetId: "sheet-123" });
   await expect(
-    syncAllSheetsBatch("token", "sheet-123", {
+    db.batchSync({
       expenses: [],
       mortgageExpenses: [],
       income: [],
@@ -109,26 +108,26 @@ test("syncAllSheetsBatch throws when batchClear fails", async () => {
       months: [monthTotals],
       grandTotal: { ...monthTotals, monthKey: "grand", monthLabel: "Grand Total" },
     })
-  ).rejects.toThrow(/batch clear failed/i);
+  ).rejects.toThrow(/rate limit/i);
 });
 
-test("getSheetValues throws with status on read failure", async () => {
+test("expenses.readAll throws with status on read failure", async () => {
   const fetchMock = mock(() =>
     Promise.resolve(new Response("forbidden", { status: 403 }))
   );
   globalThis.fetch = fetchMock as unknown as typeof fetch;
 
-  await expect(
-    getSheetValues("token", "sheet-123", "Expenses!A2:G")
-  ).rejects.toThrow(/Sheets read failed: 403/i);
+  const db = createSheetsClient({ token: "token", spreadsheetId: "sheet-123" });
+  await expect(db.expenses.readAll()).rejects.toThrow(/403/);
 });
 
-test("readExpensesFromSheet parses modern rows with id and owner", async () => {
+test("expenses.readAll parses modern rows with id and owner", async () => {
   const fetchMock = mock(() =>
     Promise.resolve(
       new Response(
         JSON.stringify({
           values: [
+            ["id", "date", "amount", "description", "category", "source", "owner"],
             ["e1", "2026-02-06", "10.5", "Coffee", "Food", "manual", "Ayaz"],
           ],
         }),
@@ -138,7 +137,8 @@ test("readExpensesFromSheet parses modern rows with id and owner", async () => {
   );
   globalThis.fetch = fetchMock as unknown as typeof fetch;
 
-  const expenses = await readExpensesFromSheet("token", "sheet-123");
+  const db = createSheetsClient({ token: "token", spreadsheetId: "sheet-123" });
+  const expenses = await db.expenses.readAll();
   expect(expenses).toHaveLength(1);
   expect(expenses[0]).toMatchObject({
     id: "e1",
@@ -151,12 +151,15 @@ test("readExpensesFromSheet parses modern rows with id and owner", async () => {
   });
 });
 
-test("readIncomeFromSheet normalizes Uncategorized to empty category", async () => {
+test("income.readAll normalizes Uncategorized to empty category", async () => {
   const fetchMock = mock(() =>
     Promise.resolve(
       new Response(
         JSON.stringify({
-          values: [["2026-02-06", "1000", "Paycheck", "Uncategorized", "Ayaz"]],
+          values: [
+            ["date", "amount", "description", "category", "owner"],
+            ["2026-02-06", "1000", "Paycheck", "Uncategorized", "Ayaz"],
+          ],
         }),
         { status: 200 }
       )
@@ -164,7 +167,8 @@ test("readIncomeFromSheet normalizes Uncategorized to empty category", async () 
   );
   globalThis.fetch = fetchMock as unknown as typeof fetch;
 
-  const income = await readIncomeFromSheet("token", "sheet-123");
+  const db = createSheetsClient({ token: "token", spreadsheetId: "sheet-123" });
+  const income = await db.income.readAll();
   expect(income).toHaveLength(1);
   expect(income[0]?.category).toBe("");
   expect(income[0]?.owner).toBe("Ayaz");

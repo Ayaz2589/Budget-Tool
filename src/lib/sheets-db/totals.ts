@@ -1,12 +1,12 @@
 /**
- * Write operations for the Totals summary sheet.
+ * Totals repository for the sheets database layer (write-only).
  */
 
-import type { MonthTotals } from "@/types/totals";
-import { clearRange, updateSheet } from "./api";
-import { SHEET_WRITE_RANGES } from "./constants";
+import type { MonthTotals } from "./types";
+import type { TransportContext } from "./transport";
+import { clearRange, updateSheet } from "./transport";
+import { SHEET_WRITE_RANGES } from "./schema";
 
-/** Build the dynamic header row from a MonthTotals (uses owner keys for dynamic columns). */
 function buildTotalsHeaders(m: MonthTotals): string[] {
   const ownerKeys = Object.keys(m.ownerSpending).sort();
   return [
@@ -25,7 +25,6 @@ function buildTotalsHeaders(m: MonthTotals): string[] {
   ];
 }
 
-/** Build one data row from a MonthTotals record. */
 function buildTotalsRow(m: MonthTotals): unknown[] {
   const ownerKeys = Object.keys(m.ownerSpending).sort();
   return [
@@ -44,7 +43,6 @@ function buildTotalsRow(m: MonthTotals): unknown[] {
   ];
 }
 
-/** Build the full header + data rows array for the Totals sheet (used by batch sync). */
 export function buildTotalsValues(months: MonthTotals[], grandTotal: MonthTotals): unknown[][] {
   const headers = buildTotalsHeaders(grandTotal);
   return [
@@ -54,15 +52,13 @@ export function buildTotalsValues(months: MonthTotals[], grandTotal: MonthTotals
   ];
 }
 
-/** Clear and rewrite the Totals sheet with monthly summaries and a grand total row. */
-export async function writeTotalsSheet(
-  accessToken: string,
-  spreadsheetId: string,
+export async function writeTotals(
+  ctx: TransportContext,
   months: MonthTotals[],
   grandTotal: MonthTotals,
 ): Promise<void> {
   const rows = buildTotalsValues(months, grandTotal);
   const range = SHEET_WRITE_RANGES.totals;
-  await clearRange(accessToken, spreadsheetId, range);
-  await updateSheet(accessToken, spreadsheetId, range, rows, false);
+  await clearRange(ctx, range);
+  await updateSheet(ctx, range, rows, false);
 }

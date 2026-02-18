@@ -12,20 +12,7 @@ import i18n from "@/i18n";
 import { useBudget } from "./BudgetContext";
 import { usePresetTransactions } from "./PresetTransactionsContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
-import {
-  ensureSheetsExist,
-  syncAllSheetsBatch,
-  readDataBlob,
-  getSheetIds,
-  applySheetsFormatting,
-  readExpensesFromSheet,
-  readMortgageFromSheet,
-  readIncomeFromSheet,
-  readDebtsFromSheet,
-  readPresetsFromSheet,
-  readDebtPaymentsFromSheet,
-  readOwnerTransfersFromSheet,
-} from "@/lib/googleSheets";
+import { createSheetsClient, isSheetsDbError } from "@/lib/sheets-db";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
@@ -120,6 +107,7 @@ function syncMachineReducer(
 // ---------------------------------------------------------------------------
 
 function isUnauthorizedError(err: unknown): boolean {
+  if (isSheetsDbError(err)) return err.kind === "AUTH_ERROR";
   if (err instanceof Error) {
     return err.message.includes("401") || err.message.includes(" 401 ");
   }
@@ -127,6 +115,7 @@ function isUnauthorizedError(err: unknown): boolean {
 }
 
 function isRateLimitError(err: unknown): boolean {
+  if (isSheetsDbError(err)) return err.kind === "RATE_LIMIT";
   if (!(err instanceof Error)) return false;
   return (
     err.message.includes("429") ||
@@ -347,7 +336,8 @@ export function SyncProvider({
     dispatchSync({ type: "START_SYNC" });
     try {
       const snapshot = getSyncSnapshot();
-      await ensureSheetsExist(accessToken, spreadsheetId);
+      const db = createSheetsClient({ token: accessToken, spreadsheetId });
+      await db.ensureSchema();
       const nonMortgageExpenses = snapshot.expenses.filter(
         (e) => !isMortgageCategory(e.category),
       );
@@ -376,7 +366,7 @@ export function SyncProvider({
         owners: snapshot.owners,
       });
       const grand = computeGrandTotals(months);
-      await syncAllSheetsBatch(accessToken, spreadsheetId, {
+      await db.batchSync({
         expenses: nonMortgageExpenses,
         mortgageExpenses,
         income: snapshot.income,
@@ -388,9 +378,9 @@ export function SyncProvider({
         months,
         grandTotal: grand,
       });
-      const sheetIds = await getSheetIds(accessToken, spreadsheetId);
+      const sheetIds = await db.getSheetIds();
       if (sheetIds) {
-        await applySheetsFormatting(accessToken, spreadsheetId, sheetIds);
+        await db.applyFormatting(sheetIds);
       }
       lastSyncedSignatureRef.current = snapshot.signature;
       const changed =
@@ -577,7 +567,8 @@ export function SyncProvider({
     if (!active) return;
     dispatchSync({ type: "START_SYNC" });
     try {
-      await ensureSheetsExist(accessToken, spreadsheetId);
+      const db = createSheetsClient({ token: accessToken, spreadsheetId });
+      await db.ensureSchema();
 
       const expenseKey = (e: {
         date: string;
@@ -608,7 +599,7 @@ export function SyncProvider({
       let sheetOwnerTransfers: typeof budget.ownerTransfers;
       let sheetPresets: typeof presetTransactions;
 
-      const blob = await readDataBlob(accessToken, spreadsheetId);
+      const blob = await db.dataBlob.read();
       if (blob && blob.startsWith("V2")) {
         try {
           const expanded = parseFromBlob(blob);
@@ -662,13 +653,13 @@ export function SyncProvider({
             ownerTransfers,
             presets,
           ] = await Promise.all([
-            readExpensesFromSheet(accessToken, spreadsheetId),
-            readMortgageFromSheet(accessToken, spreadsheetId),
-            readIncomeFromSheet(accessToken, spreadsheetId),
-            readDebtsFromSheet(accessToken, spreadsheetId),
-            readDebtPaymentsFromSheet(accessToken, spreadsheetId),
-            readOwnerTransfersFromSheet(accessToken, spreadsheetId),
-            readPresetsFromSheet(accessToken, spreadsheetId),
+            db.expenses.readAll(),
+            db.expenses.readMortgage(),
+            db.income.readAll(),
+            db.debts.readAll(),
+            db.debtPayments.readAll(),
+            db.ownerTransfers.readAll(),
+            db.presets.readAll(),
           ]);
           sheetExpenses = expenses;
           sheetMortgage = mortgage;
@@ -702,13 +693,13 @@ export function SyncProvider({
           sheetOwnerTransfers,
           sheetPresets,
         ] = await Promise.all([
-          readExpensesFromSheet(accessToken, spreadsheetId),
-          readMortgageFromSheet(accessToken, spreadsheetId),
-          readIncomeFromSheet(accessToken, spreadsheetId),
-          readDebtsFromSheet(accessToken, spreadsheetId),
-          readDebtPaymentsFromSheet(accessToken, spreadsheetId),
-          readOwnerTransfersFromSheet(accessToken, spreadsheetId),
-          readPresetsFromSheet(accessToken, spreadsheetId),
+          db.expenses.readAll(),
+          db.expenses.readMortgage(),
+          db.income.readAll(),
+          db.debts.readAll(),
+          db.debtPayments.readAll(),
+          db.ownerTransfers.readAll(),
+          db.presets.readAll(),
         ]);
         const derivedOwners = [
           ...new Set(

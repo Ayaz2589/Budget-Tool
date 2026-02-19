@@ -12,7 +12,8 @@ import i18n from "@/i18n";
 import { useBudget } from "./BudgetContext";
 import { usePresetTransactions } from "./PresetTransactionsContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
-import { createSheetsClient, isSheetsDbError } from "@/lib/sheets-db";
+import { isSheetsDbError } from "@/lib/sheets-db";
+import { createOrthoSheetsClient } from "@/lib/ortho-sheets";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
@@ -336,7 +337,7 @@ export function SyncProvider({
     dispatchSync({ type: "START_SYNC" });
     try {
       const snapshot = getSyncSnapshot();
-      const db = createSheetsClient({ token: accessToken, spreadsheetId });
+      const db = createOrthoSheetsClient({ token: accessToken, spreadsheetId });
       await db.ensureSchema();
       const nonMortgageExpenses = snapshot.expenses.filter(
         (e) => !isMortgageCategory(e.category),
@@ -368,20 +369,16 @@ export function SyncProvider({
       const grand = computeGrandTotals(months);
       await db.batchSync({
         expenses: nonMortgageExpenses,
-        mortgageExpenses,
+        mortgage: mortgageExpenses,
         income: snapshot.income,
         debts: snapshot.debts,
         debtPayments: snapshot.debtPayments,
         ownerTransfers: snapshot.ownerTransfers,
-        presetTransactions: snapshot.presetTransactions,
-        dataBlob,
-        months,
-        grandTotal: grand,
+        presets: snapshot.presetTransactions,
+        dataBlob: [dataBlob],
+        totals: [...months, grand],
       });
-      const sheetIds = await db.getSheetIds();
-      if (sheetIds) {
-        await db.applyFormatting(sheetIds);
-      }
+      await db.applyFormatting();
       lastSyncedSignatureRef.current = snapshot.signature;
       const changed =
         latestSyncSignatureRef.current !== lastSyncedSignatureRef.current;
@@ -567,7 +564,7 @@ export function SyncProvider({
     if (!active) return;
     dispatchSync({ type: "START_SYNC" });
     try {
-      const db = createSheetsClient({ token: accessToken, spreadsheetId });
+      const db = createOrthoSheetsClient({ token: accessToken, spreadsheetId });
       await db.ensureSchema();
 
       const expenseKey = (e: {
@@ -599,7 +596,8 @@ export function SyncProvider({
       let sheetOwnerTransfers: typeof budget.ownerTransfers;
       let sheetPresets: typeof presetTransactions;
 
-      const blob = await db.dataBlob.read();
+      const blobs = await db.repo("dataBlob").readAll();
+      const blob = blobs.length > 0 ? blobs[0] : null;
       if (blob && blob.startsWith("V2")) {
         try {
           const expanded = parseFromBlob(blob);
@@ -653,13 +651,13 @@ export function SyncProvider({
             ownerTransfers,
             presets,
           ] = await Promise.all([
-            db.expenses.readAll(),
-            db.expenses.readMortgage(),
-            db.income.readAll(),
-            db.debts.readAll(),
-            db.debtPayments.readAll(),
-            db.ownerTransfers.readAll(),
-            db.presets.readAll(),
+            db.repo("expenses").readAll(),
+            db.repo("mortgage").readAll(),
+            db.repo("income").readAll(),
+            db.repo("debts").readAll(),
+            db.repo("debtPayments").readAll(),
+            db.repo("ownerTransfers").readAll(),
+            db.repo("presets").readAll(),
           ]);
           sheetExpenses = expenses;
           sheetMortgage = mortgage;
@@ -693,13 +691,13 @@ export function SyncProvider({
           sheetOwnerTransfers,
           sheetPresets,
         ] = await Promise.all([
-          db.expenses.readAll(),
-          db.expenses.readMortgage(),
-          db.income.readAll(),
-          db.debts.readAll(),
-          db.debtPayments.readAll(),
-          db.ownerTransfers.readAll(),
-          db.presets.readAll(),
+          db.repo("expenses").readAll(),
+          db.repo("mortgage").readAll(),
+          db.repo("income").readAll(),
+          db.repo("debts").readAll(),
+          db.repo("debtPayments").readAll(),
+          db.repo("ownerTransfers").readAll(),
+          db.repo("presets").readAll(),
         ]);
         const derivedOwners = [
           ...new Set(

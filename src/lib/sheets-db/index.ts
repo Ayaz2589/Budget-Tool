@@ -1,27 +1,35 @@
 /**
- * Public API barrel for the Google Sheets database layer.
+ * Public API barrel for the Generic Sheets Database Library.
+ * Zero domain knowledge — all domain types live in ortho-sheets.
  */
 
+// Client factory
 export { createSheetsClient } from "./client";
-export type { SheetsDbClient, ExpenseRepository, EntityRepository, TotalsRepository, DataBlobRepository } from "./client";
 
+// Generic types
 export type {
-  Expense,
-  Income,
-  Debt,
-  DebtPayment,
-  OwnerTransfer,
-  PresetTransaction,
-  ExpenseSource,
-  ExpenseAllocation,
-  MonthTotals,
-  SheetIds,
-  SheetsDbConfig,
-  SyncPayload,
+  SheetSchema,
+  FormattingRule,
+  InferEntity,
+  Repository,
+  SheetsClientConfig,
+  SheetsClient,
 } from "./types";
-export { ALL_EXPENSE_SOURCES } from "./types";
 
-export { SheetsDbError, isSheetsDbError } from "./errors";
+// Error types
+export { SheetsDbError, isSheetsDbError, validationError, schemaError } from "./errors";
 export type { SheetsDbErrorKind, ValidationIssue } from "./errors";
 
+// Transport
 export { extractSpreadsheetId } from "./transport";
+
+// Utilities
+export {
+  generateId,
+  isValidDate,
+  normalizeDate,
+  looksLikeIsoDate,
+  parseAmount,
+  hasIdColumn,
+  findMissingHeaders,
+} from "./utils";

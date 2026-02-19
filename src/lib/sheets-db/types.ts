@@ -1,138 +1,86 @@
 /**
- * Entity types for the Google Sheets database layer.
- * These are the canonical persistence-layer type definitions.
- * Zero imports from the host app — this module owns its types.
+ * Generic types for the Google Sheets database library.
+ * This module defines the schema-driven API: SheetSchema<T>, Repository<T>,
+ * SheetsClient<S>, and supporting types. Zero domain knowledge.
  */
 
-export type ExpenseSource =
-  | "amex"
-  | "amex-gold"
-  | "apple"
-  | "visa"
-  | "sapphire"
-  | "bank-of-america"
-  | "wells-fargo"
-  | "chase"
-  | "manual"
-  | "td";
+// ---------------------------------------------------------------------------
+// Formatting
+// ---------------------------------------------------------------------------
 
-export const ALL_EXPENSE_SOURCES: ExpenseSource[] = [
-  "amex",
-  "amex-gold",
-  "apple",
-  "visa",
-  "sapphire",
-  "bank-of-america",
-  "wells-fargo",
-  "chase",
-  "manual",
-  "td",
-];
-
-export interface ExpenseAllocation {
-  owner: string;
-  amount?: number;
-  percent?: number;
+/** Formatting rule for a column range within a sheet. */
+export interface FormattingRule {
+  startCol: number;
+  endCol: number;
+  startRow?: number;
+  endRow?: number;
+  bold?: boolean;
+  fontSize?: number;
+  horizontalAlignment?: "LEFT" | "CENTER" | "RIGHT";
+  numberFormat?: { type: string; pattern?: string };
 }
 
-export interface Expense {
-  id: string;
-  date: string;
-  amount: number;
-  description: string;
-  category: string;
-  source: ExpenseSource;
-  owner?: string;
-  paidByOwner?: string;
-  allocationMode?: "single" | "equal" | "custom";
-  allocation?: ExpenseAllocation[];
+// ---------------------------------------------------------------------------
+// Schema Definition
+// ---------------------------------------------------------------------------
+
+/** Schema definition for mapping an entity type to a Google Sheet. */
+export interface SheetSchema<T> {
+  sheetName: string;
+  headers: string[];
+  readRange: string;
+  writeRange: string;
+  clearRange: string;
+  parseRow(row: unknown[], rowIndex: number): T | null;
+  toRow(entity: T): unknown[];
+  validate?: (entity: T) => void;
+  appendSupported?: boolean;
+  formatting?: FormattingRule[];
+  headerFormatting?: {
+    bold?: boolean;
+    fontSize?: number;
+    horizontalAlignment?: "LEFT" | "CENTER" | "RIGHT";
+  };
 }
 
-export interface Income {
-  id: string;
-  date: string;
-  amount: number;
-  description: string;
-  category: string;
-  owner?: string;
+// ---------------------------------------------------------------------------
+// Type Inference
+// ---------------------------------------------------------------------------
+
+/** Extract the entity type T from a SheetSchema<T>. */
+export type InferEntity<S> = S extends SheetSchema<infer T> ? T : never;
+
+// ---------------------------------------------------------------------------
+// Repository
+// ---------------------------------------------------------------------------
+
+/** Bound CRUD operations for a single entity type. */
+export interface Repository<T> {
+  readAll(): Promise<T[]>;
+  writeAll(records: T[]): Promise<void>;
+  append(records: T[]): Promise<void>;
 }
 
-export interface Debt {
-  id: string;
-  name: string;
-  initialAmount: number;
-  startDate?: string;
-  owner?: string;
-}
+// ---------------------------------------------------------------------------
+// Client Configuration
+// ---------------------------------------------------------------------------
 
-export interface DebtPayment {
-  id: string;
-  debtId: string;
-  date: string;
-  amount: number;
-  note?: string;
-}
-
-export interface OwnerTransfer {
-  id: string;
-  date: string;
-  fromOwner: string;
-  toOwner: string;
-  amount: number;
-  note?: string;
-}
-
-export interface PresetTransaction {
-  id: string;
-  source: ExpenseSource;
-  description: string;
-  amount?: number;
-  category: string;
-  owner: string;
-}
-
-export interface MonthTotals {
-  monthKey: string;
-  monthLabel: string;
-  totalEarned: number;
-  totalSpent: number;
-  totalSpentWithoutMortgage: number;
-  sharedSpent: number;
-  sharedSplit: Record<string, number>;
-  ownerSpending: Record<string, number>;
-  ownerBalances: Record<string, number>;
-  totalSaved: number;
-  personalSavingsRate: number;
-  hysa: number;
-  investingSp500: number;
-  investingTotal: number;
-}
-
-export interface SheetIds {
-  expenses: number;
-  income: number;
-  totals: number;
-  debts: number;
-  debtPayments: number;
-  mortgage: number;
-  presetTransactions: number;
-  ownerTransfers: number;
-}
-
-export interface SheetsDbConfig {
+/** Configuration for creating a sheets client. */
+export interface SheetsClientConfig<S extends Record<string, SheetSchema<any>>> {
   token: string;
   spreadsheetId: string;
+  schemas: S;
 }
 
-export interface SyncPayload {
-  expenses: Expense[];
-  mortgageExpenses: Expense[];
-  income: Income[];
-  debts: Debt[];
-  debtPayments: DebtPayment[];
-  ownerTransfers: OwnerTransfer[];
-  presetTransactions: PresetTransaction[];
-  months: MonthTotals[];
-  grandTotal: MonthTotals;
-  dataBlob: string;
+// ---------------------------------------------------------------------------
+// Client
+// ---------------------------------------------------------------------------
+
+/** The main client returned by createSheetsClient. */
+export interface SheetsClient<S extends Record<string, SheetSchema<any>>> {
+  repo<K extends keyof S & string>(key: K): Repository<InferEntity<S[K]>>;
+  batchSync(payload: Partial<{ [K in keyof S]: InferEntity<S[K]>[] }>): Promise<void>;
+  ensureSchema(): Promise<void>;
+  applyFormatting(): Promise<void>;
+  extractSpreadsheetId(urlOrId: string): string | null;
 }

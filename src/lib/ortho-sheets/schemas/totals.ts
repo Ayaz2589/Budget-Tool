@@ -1,11 +1,10 @@
 /**
- * Totals repository for the sheets database layer (write-only).
+ * Totals schema definition (write-only).
  */
 
-import type { MonthTotals } from "./types";
-import type { TransportContext } from "./transport";
-import { clearRange, updateSheet } from "./transport";
-import { SHEET_WRITE_RANGES } from "./schema";
+import type { SheetSchema } from "@/lib/sheets-db";
+import type { MonthTotals } from "../types";
+import { TOTALS_FORMATTING, ORTHO_HEADER_FORMAT } from "../formatting";
 
 function buildTotalsHeaders(m: MonthTotals): string[] {
   const ownerKeys = Object.keys(m.ownerSpending).sort();
@@ -43,22 +42,24 @@ function buildTotalsRow(m: MonthTotals): unknown[] {
   ];
 }
 
-export function buildTotalsValues(months: MonthTotals[], grandTotal: MonthTotals): unknown[][] {
-  const headers = buildTotalsHeaders(grandTotal);
-  return [
-    headers,
-    ...months.map((m) => buildTotalsRow(m)),
-    buildTotalsRow(grandTotal),
-  ];
-}
+export { buildTotalsHeaders, buildTotalsRow };
 
-export async function writeTotals(
-  ctx: TransportContext,
-  months: MonthTotals[],
-  grandTotal: MonthTotals,
-): Promise<void> {
-  const rows = buildTotalsValues(months, grandTotal);
-  const range = SHEET_WRITE_RANGES.totals;
-  await clearRange(ctx, range);
-  await updateSheet(ctx, range, rows, false);
-}
+export const totalsSchema: SheetSchema<MonthTotals> = {
+  sheetName: "Totals",
+  headers: ["Month", "Total Earned", "Total Spent"],
+  readRange: "Totals!A2:Z",
+  writeRange: "Totals!A1:Z100",
+  clearRange: "Totals!A1:O1000",
+  appendSupported: false,
+
+  parseRow(_row) {
+    // Totals is write-only — read is not used
+    return null;
+  },
+
+  toRow(m) {
+    return buildTotalsRow(m);
+  },
+  formatting: TOTALS_FORMATTING,
+  headerFormatting: ORTHO_HEADER_FORMAT,
+};

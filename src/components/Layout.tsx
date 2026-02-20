@@ -258,7 +258,7 @@ export function Layout() {
           </DialogHeader>
           <div className="pt-1">
             <Button
-              className="h-11 w-full"
+              className="w-full"
               onClick={() => setShowHelpHintModal(false)}
             >
               {t("layout.helpHintCta")}

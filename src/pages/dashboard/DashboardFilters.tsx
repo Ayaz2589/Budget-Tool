@@ -185,7 +185,7 @@ export function DashboardFilters({
           <Button
             type="button"
             variant="outline"
-            className="h-11 w-full"
+            className="w-full"
             onClick={() => setSettingsOpen(false)}
           >
             {t("common.done")}

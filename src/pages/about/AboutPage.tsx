@@ -63,7 +63,7 @@ export function AboutPage() {
                 <p className="text-sm text-muted-foreground">
                   {t("about.supportBody")}
                 </p>
-                <Button asChild className="h-11">
+                <Button asChild>
                   <a href="#" className="inline-flex items-center gap-2">
                     <svg
                       aria-hidden="true"

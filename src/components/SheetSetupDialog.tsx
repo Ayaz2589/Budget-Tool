@@ -113,7 +113,7 @@ export function SheetSetupDialog({
           {sheetSetupState === "needs-selection" ? (
             <>
               <Button
-                className="h-11 w-full"
+                className="w-full"
                 disabled={!canUseSelection}
                 onClick={() => linkDriveSheet(selectedSheetId)}
               >
@@ -122,14 +122,14 @@ export function SheetSetupDialog({
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant="outline"
-                  className="h-11 w-full"
+                  className="w-full"
                   onClick={() => void runSheetAutoSetup()}
                 >
                 {t("settings.sheetSetupRefresh")}
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-11 w-full"
+                  className="w-full"
                   onClick={dismissSheetSetupPrompt}
                 >
                   {t("settings.sheetSetupNotNow")}
@@ -139,18 +139,18 @@ export function SheetSetupDialog({
           ) : (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {sheetSetupState === "needs-create" && (
-                <Button className="h-11 w-full" onClick={() => void createOrthoDriveSheet()}>
+                <Button className="w-full" onClick={() => void createOrthoDriveSheet()}>
                   {t("settings.sheetSetupCreate")}
                 </Button>
               )}
               {sheetSetupState === "error" && (
-                <Button className="h-11 w-full" onClick={() => void runSheetAutoSetup()}>
+                <Button className="w-full" onClick={() => void runSheetAutoSetup()}>
                   {t("settings.sheetSetupRetry")}
                 </Button>
               )}
               <Button
                 variant="outline"
-                className="h-11 w-full"
+                className="w-full"
                 onClick={dismissSheetSetupPrompt}
               >
                 {t("settings.sheetSetupNotNow")}

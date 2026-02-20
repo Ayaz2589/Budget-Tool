@@ -72,7 +72,7 @@ export function Dashboard() {
                 <div className="flex items-center gap-2">
                   <Button
                     variant="default"
-                    className="h-11 gap-2"
+                    className="gap-2"
                     onClick={() => setAddTransactionOpen(true)}
                   >
                     <Plus className="size-4" />
@@ -80,7 +80,7 @@ export function Dashboard() {
                   </Button>
                   <Button
                     variant="secondary"
-                    className="h-11 gap-2"
+                    className="gap-2"
                     onClick={() => setAddIncomeOpen(true)}
                   >
                     <Wallet className="size-4" />
@@ -88,7 +88,7 @@ export function Dashboard() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-11 gap-2"
+                    className="gap-2"
                     onClick={() => data.setSettingsOpen(true)}
                   >
                     <SlidersHorizontal className="size-4" />
@@ -160,7 +160,8 @@ export function Dashboard() {
             variant="secondary"
             density="compact"
             onClick={() => data.setSettingsOpen(true)}
-            className="h-11 w-11 rounded-full p-0"
+            className="rounded-full p-0"
+            size="icon"
             aria-label={t("settings.title")}
           >
             <SlidersHorizontal className="size-4" />
@@ -169,7 +170,8 @@ export function Dashboard() {
             variant="secondary"
             density="compact"
             onClick={() => setAddIncomeOpen(true)}
-            className="h-11 w-11 rounded-full p-0"
+            className="rounded-full p-0"
+            size="icon"
             aria-label={t("dashboard.addIncome")}
           >
             <Wallet className="size-4" />
@@ -178,7 +180,8 @@ export function Dashboard() {
             variant="default"
             density="compact"
             onClick={() => setAddTransactionOpen(true)}
-            className="h-11 w-11 rounded-full p-0"
+            className="rounded-full p-0"
+            size="icon"
             aria-label={t("dashboard.addExpense")}
           >
             <Plus className="size-4" />

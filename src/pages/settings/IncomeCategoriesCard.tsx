@@ -85,7 +85,7 @@ export function IncomeCategoriesCard({
           variant="default"
           onClick={handleAdd}
           disabled={!newCategory.trim()}
-          className="h-11 shrink-0 w-full sm:w-auto"
+          className="shrink-0 w-full sm:w-auto"
         >
           {t("settings.addCategory")}
         </Button>

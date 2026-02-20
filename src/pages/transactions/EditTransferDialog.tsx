@@ -122,10 +122,10 @@ export function EditTransferDialog({
         </div>
         <DsSheetActions>
           <div className="grid grid-cols-2 gap-2">
-            <Button type="button" variant="outline" density="compact" className="h-11 w-full" onClick={onClose}>
+            <Button type="button" variant="outline" density="compact" className="w-full" onClick={onClose}>
               {t("common.cancel")}
             </Button>
-            <Button type="button" density="compact" className="h-11 w-full" onClick={handleSave}>
+            <Button type="button" density="compact" className="w-full" onClick={handleSave}>
               {t("common.save")}
             </Button>
           </div>

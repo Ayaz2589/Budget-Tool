@@ -1235,7 +1235,7 @@ export function TourPage() {
                     <Button
                       type="button"
                       onClick={goNext}
-                      className="h-11 min-w-52"
+                      className="min-w-52"
                       data-testid="tour-language-continue"
                     >
                       {copy.languageCardCta}

@@ -142,7 +142,8 @@ export function IncomePage() {
               onClick={() => setAddOpen(true)}
               density="compact"
              
-              className="h-11 w-11 rounded-full p-0"
+              className="rounded-full p-0"
+              size="icon"
               aria-label={t("income.addIncome")}
             >
               <Plus className="size-4" />

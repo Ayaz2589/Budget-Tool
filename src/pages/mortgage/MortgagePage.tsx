@@ -118,7 +118,7 @@ export function MortgagePage() {
             onSubmit={handleAdd}
           />
 
-          <div>
+          <div className="flex flex-1 flex-col">
             {mortgagePayments.length === 0 ? (
               <DsEmptyState
                 icon={<Home className="size-8" />}
@@ -149,7 +149,8 @@ export function MortgagePage() {
               onClick={() => setAddOpen(true)}
               density="compact"
              
-              className="h-11 w-11 rounded-full p-0"
+              className="rounded-full p-0"
+              size="icon"
               aria-label={t("mortgage.addMortgagePayment")}
             >
               <Plus className="size-4" />

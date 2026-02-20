@@ -19,7 +19,7 @@ export function DsEmptyState({
   return (
     <div
       className={cn(
-        "text-center text-muted-foreground py-10 px-4 flex flex-col items-center gap-2.5",
+        "text-center text-muted-foreground py-10 px-4 flex flex-1 flex-col items-center justify-center gap-2.5",
         className,
       )}
     >

@@ -233,15 +233,17 @@ export function TransactionsPage() {
       <div className="flex-1 pb-24 md:pb-0">
         <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0 md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
         <CardContent data-tour="transactions-table" className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
-            <div className="px-4 pb-3 md:px-0">
-              <Input
-                value={searchFilter}
-                onChange={(e) => setSearchFilter(e.target.value)}
-                placeholder={t("transactions.filterByDescription")}
-                className="h-11 w-full"
-                aria-label={t("transactions.searchDescription")}
-              />
-            </div>
+            {expenses.length > 0 || ownerTransfers.length > 0 ? (
+              <div className="px-4 pb-3 md:px-0">
+                <Input
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                  placeholder={t("transactions.filterByDescription")}
+                  className="h-11 w-full"
+                  aria-label={t("transactions.searchDescription")}
+                />
+              </div>
+            ) : null}
             <FiltersAndActionsDialog
               open={filtersPopupOpen}
               onOpenChange={setFiltersPopupOpen}
@@ -343,7 +345,8 @@ export function TransactionsPage() {
               density="compact"
               onClick={() => setFiltersPopupOpen(true)}
              
-              className="h-11 w-11 rounded-full p-0"
+              className="rounded-full p-0"
+              size="icon"
               aria-label={
                 hasActiveFilters
                   ? `${t("common.filtersAndActions")} (${t("common.active")})`
@@ -356,7 +359,8 @@ export function TransactionsPage() {
               onClick={() => setAddTransactionOpen(true)}
               density="compact"
              
-              className="h-11 w-11 rounded-full p-0"
+              className="rounded-full p-0"
+              size="icon"
               aria-label={t("common.add")}
             >
               <Plus className="size-4" />

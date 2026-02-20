@@ -152,7 +152,8 @@ export function DebtPage() {
               onClick={() => setAddDebtOpen(true)}
               density="compact"
              
-              className="h-11 w-11 rounded-full p-0"
+              className="rounded-full p-0"
+              size="icon"
               aria-label={t("debt.addDebt")}
             >
               <Plus className="size-4" />

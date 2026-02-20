@@ -151,7 +151,7 @@ export function ImportPage() {
           {exportStringError}
         </span>
       )}
-      <Button onClick={handleExportStringImport} className="h-11 w-full md:w-auto">
+      <Button onClick={handleExportStringImport} className="w-full md:w-auto">
         {t("import.importExportString")}
       </Button>
     </>
@@ -168,7 +168,7 @@ export function ImportPage() {
       />
       <Button
         onClick={() => jsonInputRef.current?.click()}
-        className="h-11 w-full md:w-auto"
+        className="w-full md:w-auto"
       >
         {t("import.importJson")}
       </Button>
@@ -185,21 +185,21 @@ export function ImportPage() {
       <Button
         variant="outline"
         onClick={handleDownloadPdf}
-        className="h-11 w-full md:w-auto"
+        className="w-full md:w-auto"
       >
         {t("import.downloadPdf")}
       </Button>
       <Button
         variant="outline"
         onClick={handleDownloadJson}
-        className="h-11 w-full md:w-auto"
+        className="w-full md:w-auto"
       >
         {t("import.downloadJson")}
       </Button>
       <Button
         variant="outline"
         onClick={handleDownloadExportString}
-        className="h-11 w-full md:w-auto"
+        className="w-full md:w-auto"
       >
         {t("import.downloadExportString")}
       </Button>

@@ -71,28 +71,28 @@ export function Dashboard() {
               !isMobile ? (
                 <div className="flex items-center gap-2">
                   <Button
-                    variant="default"
-                    className="h-11 gap-2"
-                    onClick={() => setAddTransactionOpen(true)}
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => data.setSettingsOpen(true)}
                   >
-                    <Plus className="size-4" />
-                    <span>{t("dashboard.addExpense")}</span>
+                    <SlidersHorizontal className="size-4" />
+                    <span>{t("settings.title")}</span>
                   </Button>
                   <Button
-                    variant="secondary"
-                    className="h-11 gap-2"
+                    variant="default"
+                    className="gap-2"
                     onClick={() => setAddIncomeOpen(true)}
                   >
                     <Wallet className="size-4" />
                     <span>{t("dashboard.addIncome")}</span>
                   </Button>
                   <Button
-                    variant="outline"
-                    className="h-11 gap-2"
-                    onClick={() => data.setSettingsOpen(true)}
+                    variant="default"
+                    className="gap-2"
+                    onClick={() => setAddTransactionOpen(true)}
                   >
-                    <SlidersHorizontal className="size-4" />
-                    <span>{t("settings.title")}</span>
+                    <Plus className="size-4" />
+                    <span>{t("dashboard.addExpense")}</span>
                   </Button>
                 </div>
               ) : undefined
@@ -160,7 +160,8 @@ export function Dashboard() {
             variant="secondary"
             density="compact"
             onClick={() => data.setSettingsOpen(true)}
-            className="h-11 w-11 rounded-full p-0"
+            className="rounded-full p-0"
+            size="icon"
             aria-label={t("settings.title")}
           >
             <SlidersHorizontal className="size-4" />
@@ -169,7 +170,8 @@ export function Dashboard() {
             variant="secondary"
             density="compact"
             onClick={() => setAddIncomeOpen(true)}
-            className="h-11 w-11 rounded-full p-0"
+            className="rounded-full p-0"
+            size="icon"
             aria-label={t("dashboard.addIncome")}
           >
             <Wallet className="size-4" />
@@ -178,7 +180,8 @@ export function Dashboard() {
             variant="default"
             density="compact"
             onClick={() => setAddTransactionOpen(true)}
-            className="h-11 w-11 rounded-full p-0"
+            className="rounded-full p-0"
+            size="icon"
             aria-label={t("dashboard.addExpense")}
           >
             <Plus className="size-4" />

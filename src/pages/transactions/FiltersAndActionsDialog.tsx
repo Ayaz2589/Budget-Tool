@@ -249,7 +249,7 @@ export function FiltersAndActionsDialog({
             variant="outline"
             density="compact"
             onClick={handleCancel}
-            className="h-11 w-full"
+            className="w-full"
           >
             {t("common.cancel")}
           </Button>

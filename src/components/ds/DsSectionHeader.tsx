@@ -85,7 +85,7 @@ function DsHeaderCurrencyChip() {
       <SelectTrigger
         ref={triggerRef}
         disabled={isCurrencyUpdating}
-        className="h-8 w-auto min-w-0 rounded-full border-border/70 bg-card/70 px-3 text-xs font-medium tracking-wide text-muted-foreground data-[size=default]:h-8"
+        className="h-8 w-auto min-w-0 rounded-full border-border/70 bg-[var(--control-surface)] px-3 text-xs font-medium tracking-wide text-muted-foreground data-[size=default]:h-8"
       >
         <SelectValue>
           {isCurrencyUpdating

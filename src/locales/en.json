@@ -475,6 +475,7 @@
     "mortgagePayments": "Mortgage payments",
     "mortgagePaymentsDesc": "Record mortgage payments here. They are excluded from the Transactions list and included in spending totals (e.g. Dashboard \"Spent w/o Mortgage\" excludes them).",
     "noPaymentsYet": "No mortgage payments yet. Add your first payment.",
+    "emptyStateHint": "Track your mortgage payments separately from regular expenses.",
     "removePaymentDesc": "Remove {{date}} payment of {{amount}}? This cannot be undone.",
     "removePaymentTitle": "Remove mortgage payment?",
     "subtitle": "Record mortgage payments (excluded from Transactions list).",

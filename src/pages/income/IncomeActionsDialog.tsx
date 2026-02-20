@@ -40,7 +40,7 @@ export function IncomeActionsDialog({
   t,
 }: IncomeActionsDialogProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const actionButtonClass = "h-11 w-full";
+  const actionButtonClass = "w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
   if (income === null) return null;

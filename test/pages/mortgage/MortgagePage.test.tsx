@@ -180,8 +180,8 @@ test("MortgagePage opens add sheet via tourSheet query param", () => {
 test("MortgagePage has mobile add button", () => {
   seedBudget();
   render(<TestWrapper />);
-  const mobileAddButton = screen.getByRole("button", {
+  const addButtons = screen.getAllByRole("button", {
     name: i18n.t("mortgage.addMortgagePayment"),
   });
-  expect(mobileAddButton).toBeInTheDocument();
+  expect(addButtons.length).toBeGreaterThan(0);
 });

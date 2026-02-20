@@ -118,7 +118,7 @@
   --accent: oklch(0.88 0.014 80);
   --accent-foreground: oklch(0.27 0.016 75);
   --destructive: oklch(0.58 0.15 24);
-  --border: oklch(0.8 0.012 82);
+  --border: oklch(0.87 0.01 82);
   --input: oklch(0.84 0.012 82);
   --ring: oklch(0.58 0.018 78);
   --chart-1: oklch(0.52 0.19 255);
@@ -132,7 +132,7 @@
   --sidebar-primary-foreground: oklch(0.97 0.01 80);
   --sidebar-accent: oklch(0.88 0.014 80);
   --sidebar-accent-foreground: oklch(0.27 0.016 75);
-  --sidebar-border: oklch(0.8 0.012 82);
+  --sidebar-border: oklch(0.87 0.01 82);
   --sidebar-ring: oklch(0.58 0.018 78);
   --surface-0: var(--background);
   --surface-1: var(--card);
@@ -148,12 +148,12 @@
   --interactive-danger-hover: oklch(0.54 0.14 24);
   --interactive-danger-active: oklch(0.5 0.14 24);
   --focus-ring: var(--ring);
-  --border-subtle: oklch(0.8 0.012 82 / 75%);
-  --border-strong: oklch(0.68 0.014 78 / 85%);
+  --border-subtle: oklch(0.9 0.008 82);
+  --border-strong: oklch(0.8 0.012 80);
   --control-surface: oklch(0.925 0.014 83);
   --control-hover: oklch(0.9 0.014 83);
   --control-active: oklch(0.875 0.014 83);
-  --control-border: oklch(0.69 0.013 79 / 85%);
+  --control-border: oklch(0.87 0.01 82);
   --field-surface: oklch(0.91 0.014 83);
   --field-shadow: 0 0 0 rgba(0, 0, 0, 0);
   --viz-income: #1d4ed8;
@@ -198,7 +198,7 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
+  --border: transparent;
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
@@ -212,7 +212,7 @@
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-border: transparent;
   --sidebar-ring: oklch(0.556 0 0);
   --surface-0: oklch(0.145 0 0);
   --surface-1: oklch(0.205 0 0);
@@ -228,12 +228,12 @@
   --interactive-danger-hover: oklch(0.66 0.188 22.216);
   --interactive-danger-active: oklch(0.62 0.185 22.216);
   --focus-ring: oklch(0.62 0 0);
-  --border-subtle: oklch(1 0 0 / 12%);
-  --border-strong: oklch(1 0 0 / 24%);
+  --border-subtle: transparent;
+  --border-strong: transparent;
   --control-surface: oklch(0.25 0 0);
   --control-hover: oklch(0.29 0 0);
   --control-active: oklch(0.33 0 0);
-  --control-border: oklch(1 0 0 / 24%);
+  --control-border: transparent;
   --field-surface: oklch(0.26 0 0);
   --field-shadow: 0 0 0 rgba(0, 0, 0, 0);
   --viz-income: #3b82f6;

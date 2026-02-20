@@ -50,7 +50,7 @@ export function GoogleSheetsCard({
     <>
       {!isSignedIn ? (
         <div className="flex flex-col gap-3">
-          <Button onClick={signIn} className="h-11 w-full sm:w-auto">
+          <Button onClick={signIn} className="w-full sm:w-auto">
             {t("settings.connectGoogle")}
           </Button>
           <p className="text-xs text-muted-foreground">
@@ -99,7 +99,7 @@ export function GoogleSheetsCard({
                       : t("settings.syncHealthError")}
                 </span>
               </div>
-              <Button variant="outline" onClick={signOut} className="h-11 md:min-w-32">
+              <Button variant="outline" onClick={signOut} className="md:min-w-32">
                 {t("settings.disconnect")}
               </Button>
             </div>
@@ -116,7 +116,7 @@ export function GoogleSheetsCard({
                 <Button
                   variant="outline"
                   onClick={onSetSheetId}
-                  className="h-11 shrink-0 w-full md:w-auto md:min-w-24"
+                  className="shrink-0 w-full md:w-auto md:min-w-24"
                 >
                   {t("settings.set")}
                 </Button>
@@ -145,7 +145,7 @@ export function GoogleSheetsCard({
                 <Button
                   onClick={() => setSyncConfirmOpen(true)}
                   disabled={syncStatus === "syncing" || useDummyData}
-                  className="h-11 w-full"
+                  className="w-full"
                 >
                   {syncStatus === "syncing"
                     ? t("settings.syncing")
@@ -155,7 +155,7 @@ export function GoogleSheetsCard({
                   onClick={() => setRestoreConfirmOpen(true)}
                   disabled={syncStatus === "syncing" || useDummyData}
                   variant="outline"
-                  className="h-11 w-full"
+                  className="w-full"
                 >
                   {syncStatus === "syncing"
                     ? t("settings.syncing")
@@ -165,7 +165,7 @@ export function GoogleSheetsCard({
                   variant="outline"
                   onClick={onRepairDates}
                   title={t("settings.repairCorruptedDatesTitle")}
-                  className="h-11 w-full"
+                  className="w-full"
                 >
                   {t("settings.repairCorruptedDates")}
                 </Button>

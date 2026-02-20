@@ -93,7 +93,7 @@ test("EditTransactionDialog renders when expense is provided", async () => {
   renderDialog();
   const dialog = await screen.findByRole("dialog");
   expect(dialog).toBeInTheDocument();
-  expect(screen.getByText(i18n.t("common.edit"))).toBeInTheDocument();
+  expect(within(dialog).getByText(i18n.t("common.edit"))).toBeInTheDocument();
 });
 
 test("EditTransactionDialog does not render when expense is null", () => {

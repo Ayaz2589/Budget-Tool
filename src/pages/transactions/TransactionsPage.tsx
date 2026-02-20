@@ -7,7 +7,7 @@ import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, SlidersHorizontal, Receipt } from "lucide-react";
+import { Plus, SlidersHorizontal } from "lucide-react";
 import { DsActionBar, DsEmptyState, DsHelpTooltip, DsSectionHeader } from "@/components/ds";
 import { TransactionsToolbar } from "./TransactionsToolbar";
 import { FiltersAndActionsDialog } from "./FiltersAndActionsDialog";
@@ -230,7 +230,7 @@ export function TransactionsPage() {
           }
         />
       </div>
-      <div className="flex-1 pb-24 md:pb-0">
+      <div className="flex flex-1 flex-col pb-24 md:pb-0">
         <Card className="flex-1 min-h-0 flex flex-col overflow-hidden shrink-0 md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
         <CardContent data-tour="transactions-table" className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
             {expenses.length > 0 || ownerTransfers.length > 0 ? (
@@ -269,13 +269,11 @@ export function TransactionsPage() {
               t={t}
             />
 
-            <div className="flex-1">
+            <div className="flex flex-1 flex-col">
               {filtered.length === 0 ? (
                 <DsEmptyState
-                  icon={<Receipt className="size-8" />}
                   title={t("transactions.noTransactions")}
                   description={t("transactions.emptyStateHint")}
-                  className="py-12"
                   actions={
                     <>
                       <Button onClick={() => setAddTransactionOpen(true)}>

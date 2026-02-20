@@ -71,15 +71,15 @@ export function Dashboard() {
               !isMobile ? (
                 <div className="flex items-center gap-2">
                   <Button
-                    variant="default"
+                    variant="outline"
                     className="gap-2"
-                    onClick={() => setAddTransactionOpen(true)}
+                    onClick={() => data.setSettingsOpen(true)}
                   >
-                    <Plus className="size-4" />
-                    <span>{t("dashboard.addExpense")}</span>
+                    <SlidersHorizontal className="size-4" />
+                    <span>{t("settings.title")}</span>
                   </Button>
                   <Button
-                    variant="secondary"
+                    variant="default"
                     className="gap-2"
                     onClick={() => setAddIncomeOpen(true)}
                   >
@@ -87,12 +87,12 @@ export function Dashboard() {
                     <span>{t("dashboard.addIncome")}</span>
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="default"
                     className="gap-2"
-                    onClick={() => data.setSettingsOpen(true)}
+                    onClick={() => setAddTransactionOpen(true)}
                   >
-                    <SlidersHorizontal className="size-4" />
-                    <span>{t("settings.title")}</span>
+                    <Plus className="size-4" />
+                    <span>{t("dashboard.addExpense")}</span>
                   </Button>
                 </div>
               ) : undefined

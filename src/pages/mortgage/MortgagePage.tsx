@@ -5,7 +5,7 @@ import { useBudget } from "@/context";
 import type { Expense } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { DsActionBar, DsEmptyState, DsHelpTooltip, DsSectionHeader } from "@/components/ds";
 import {
   formatCurrencyFromNumber,
@@ -121,8 +121,14 @@ export function MortgagePage() {
           <div className="flex flex-1 flex-col">
             {mortgagePayments.length === 0 ? (
               <DsEmptyState
-                icon={<Home className="size-8" />}
                 title={t("mortgage.noPaymentsYet")}
+                description={t("mortgage.emptyStateHint")}
+                actions={
+                  <Button onClick={() => setAddOpen(true)}>
+                    <Plus className="size-4" />
+                    {t("mortgage.addMortgagePayment")}
+                  </Button>
+                }
               />
             ) : (
               <>

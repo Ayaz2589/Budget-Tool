@@ -89,9 +89,10 @@ afterEach(() => cleanup());
 // Basic rendering
 // ---------------------------------------------------------------------------
 
-test("EditTransactionDialog renders when expense is provided", () => {
+test("EditTransactionDialog renders when expense is provided", async () => {
   renderDialog();
-  expect(screen.getByRole("dialog")).toBeInTheDocument();
+  const dialog = await screen.findByRole("dialog");
+  expect(dialog).toBeInTheDocument();
   expect(screen.getByText(i18n.t("common.edit"))).toBeInTheDocument();
 });
 

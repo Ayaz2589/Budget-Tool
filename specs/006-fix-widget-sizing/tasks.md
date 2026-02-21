@@ -62,13 +62,13 @@
 
 **Independent Test**: Click "Reset Layout", then enter edit mode and verify each widget's highlighted size button matches its actual column span.
 
-- [ ] T013 [US2] Update KPI card entries in `src/lib/defaultLayout.ts` — change from `{ size: "md", w: 3, h: 2 }` to `{ size: "sm", w: 4, h: <minH.sm from registry> }`. Update `x` and `y` positions: 3 KPIs fit per row at w=4 (4+4+4=12), so the 4th KPI wraps to the next row. Recalculate y-positions accordingly.
-- [ ] T014 [US2] Update Quick Add entry in `src/lib/defaultLayout.ts` — change from `{ size: "md", w: 12, h: 2 }` to `{ size: "lg", w: 12, h: <minH.lg from registry> }`. Update y-position to account for KPI row changes.
-- [ ] T015 [US2] Update Smart Insights entry in `src/lib/defaultLayout.ts` — change from `{ size: "md", w: 12, h: 4 }` to `{ size: "lg", w: 12, h: <minH.lg from registry> }`. Update y-position.
-- [ ] T016 [US2] Recalculate all y-positions in `src/lib/defaultLayout.ts` for the remaining widgets (charts, data sections) to account for the new KPI row layout and updated h values. Ensure the `h` value for each widget uses the updated minH from the registry for its assigned size.
-- [ ] T017 [US2] Verify `resizeWidget()` in `src/context/DashboardLayoutContext.tsx` correctly uses updated minH values — the existing code `const newH = registry ? registry.minH[size] : 4` reads from the registry, so updated minH values should automatically propagate. No code changes expected, just verification.
-- [ ] T018 [US2] Run `bun test` and `bun run build` to verify default layout changes don't break existing tests
-- [ ] T019 [US2] Visual verification: run `bun dev`, click "Reset Layout", re-enter edit mode. Verify: (a) each widget's highlighted S/M/L button matches its grid column span, (b) no content is clipped at any widget's default size, (c) the overall layout looks reasonable with the new KPI arrangement.
+- [x] T013 [US2] Update KPI card entries in `src/lib/defaultLayout.ts` — change from `{ size: "md", w: 3, h: 2 }` to `{ size: "sm", w: 4, h: <minH.sm from registry> }`. Update `x` and `y` positions: 3 KPIs fit per row at w=4 (4+4+4=12), so the 4th KPI wraps to the next row. Recalculate y-positions accordingly.
+- [x] T014 [US2] Update Quick Add entry in `src/lib/defaultLayout.ts` — change from `{ size: "md", w: 12, h: 2 }` to `{ size: "lg", w: 12, h: <minH.lg from registry> }`. Update y-position to account for KPI row changes.
+- [x] T015 [US2] Update Smart Insights entry in `src/lib/defaultLayout.ts` — change from `{ size: "md", w: 12, h: 4 }` to `{ size: "lg", w: 12, h: <minH.lg from registry> }`. Update y-position.
+- [x] T016 [US2] Recalculate all y-positions in `src/lib/defaultLayout.ts` for the remaining widgets (charts, data sections) to account for the new KPI row layout and updated h values. Ensure the `h` value for each widget uses the updated minH from the registry for its assigned size.
+- [x] T017 [US2] Verify `resizeWidget()` in `src/context/DashboardLayoutContext.tsx` correctly uses updated minH values — the existing code `const newH = registry ? registry.minH[size] : 4` reads from the registry, so updated minH values should automatically propagate. No code changes expected, just verification.
+- [x] T018 [US2] Run `bun test` and `bun run build` to verify default layout changes don't break existing tests
+- [x] T019 [US2] Visual verification: run `bun dev`, click "Reset Layout", re-enter edit mode. Verify: (a) each widget's highlighted S/M/L button matches its grid column span, (b) no content is clipped at any widget's default size, (c) the overall layout looks reasonable with the new KPI arrangement.
 
 **Checkpoint**: Reset layout is fully SIZE_TO_W-conforming (SC-002, SC-006). All widgets display content at their default sizes.
 
@@ -78,11 +78,11 @@
 
 **Purpose**: Edge cases, mobile, and final validation
 
-- [ ] T020 [P] Verify empty states at all sizes — remove all data (clear localStorage), refresh dashboard, and confirm DsEmptyState messages are fully visible in all 14 widgets at all 3 sizes. No clipping.
-- [ ] T021 [P] Verify mobile rendering — open dashboard in mobile viewport, confirm all widgets render in vertical stack with full content visible at their assigned sizes. Verify in `src/pages/dashboard/DashboardMobileGrid.tsx` that size is passed correctly (FR-010).
-- [ ] T022 [P] Verify first-visit default layout — delete `ortho-dashboard-layout` from localStorage, refresh page, confirm layout matches post-reset layout with conforming sizes (SC-006).
-- [ ] T023 Run full test suite (`bun test`), TypeScript build (`bun run build`), and lint (`bun run lint`) to confirm zero regressions (FR-009, SC-004)
-- [ ] T024 Run quickstart.md validation checklist — verify all 8 items pass
+- [x] T020 [P] Verify empty states at all sizes — remove all data (clear localStorage), refresh dashboard, and confirm DsEmptyState messages are fully visible in all 14 widgets at all 3 sizes. No clipping.
+- [x] T021 [P] Verify mobile rendering — open dashboard in mobile viewport, confirm all widgets render in vertical stack with full content visible at their assigned sizes. Verify in `src/pages/dashboard/DashboardMobileGrid.tsx` that size is passed correctly (FR-010).
+- [x] T022 [P] Verify first-visit default layout — delete `ortho-dashboard-layout` from localStorage, refresh page, confirm layout matches post-reset layout with conforming sizes (SC-006).
+- [x] T023 Run full test suite (`bun test`), TypeScript build (`bun run build`), and lint (`bun run lint`) to confirm zero regressions (FR-009, SC-004)
+- [x] T024 Run quickstart.md validation checklist — verify all 8 items pass
 
 ---
 

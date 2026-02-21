@@ -84,6 +84,31 @@ export function DashboardOwnerSplit({
     );
   }
 
+  // Single-owner: skip pie chart, show direct summary at md/lg
+  if (ownerSlices.length === 1) {
+    const single = ownerSlices[0];
+    return (
+      <>
+        <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+          <div className="flex items-center justify-between py-2">
+            <span className="text-sm font-medium truncate">{single.label}</span>
+            <span className="text-lg font-semibold">{formatCurrency(single.value)}</span>
+          </div>
+        </DsChartCard>
+        {effectiveSize === "lg" && (
+          <OwnerExpenseByOwner
+            visibleOwnerNetRows={visibleOwnerNetRows}
+            ownerExpenseItemsByOwner={ownerExpenseItemsByOwner}
+            totalSpentForSelectedRange={totalSpentForSelectedRange}
+            percentFormatter={percentFormatter}
+            expandedOwnerKey={expandedOwnerKey}
+            setExpandedOwnerKey={setExpandedOwnerKey}
+          />
+        )}
+      </>
+    );
+  }
+
   const tooltipContent = (
     <ChartTooltipContent
       className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"

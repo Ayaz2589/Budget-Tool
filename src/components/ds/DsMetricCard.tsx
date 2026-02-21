@@ -23,7 +23,7 @@ export function DsMetricCard({
       </h3>
       <p
         className={cn(
-          "text-3xl font-semibold leading-tight tracking-tight ds-heading-3",
+          "text-3xl font-semibold leading-tight tracking-tight truncate ds-heading-3",
           tone === "positive" && "text-emerald-500",
           tone === "negative" && "text-destructive",
         )}

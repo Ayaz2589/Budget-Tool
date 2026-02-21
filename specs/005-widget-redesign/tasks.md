@@ -92,10 +92,10 @@
 
 **Independent Test**: Visually inspect all 14 widgets at each size tier and confirm uniform card styling (borders, shadows, radii, padding).
 
-- [ ] T026 [US2] Verify `DsWidgetCard` renders consistent `surface="raised"` Card across all 14 widgets — confirm background, border, shadow, and corner radius match design system tokens in both light and dark themes. Adjust if any widget's internal styling conflicts.
-- [ ] T027 [US2] Verify size-responsive padding: inspect each widget at sm (compact padding), md (standard), lg (comfortable). Ensure small widgets maximize content area and large widgets don't feel cramped. Fine-tune padding values in `src/components/ds/DsWidgetCard.tsx` if needed.
-- [ ] T028 [US2] Verify dark theme card rendering — toggle to dark mode and confirm all 14 widgets render with correct `--card` background, `--card-foreground` text, and `--border` styling from `src/index.css` dark theme tokens.
-- [ ] T029 [US2] Run `bun test` and `bun run build` to verify US2 changes pass
+- [x] T026 [US2] Verify `DsWidgetCard` renders consistent `surface="raised"` Card across all 14 widgets — confirm background, border, shadow, and corner radius match design system tokens in both light and dark themes. Adjust if any widget's internal styling conflicts.
+- [x] T027 [US2] Verify size-responsive padding: inspect each widget at sm (compact padding), md (standard), lg (comfortable). Ensure small widgets maximize content area and large widgets don't feel cramped. Fine-tune padding values in `src/components/ds/DsWidgetCard.tsx` if needed.
+- [x] T028 [US2] Verify dark theme card rendering — toggle to dark mode and confirm all 14 widgets render with correct `--card` background, `--card-foreground` text, and `--border` styling from `src/index.css` dark theme tokens.
+- [x] T029 [US2] Run `bun test` and `bun run build` to verify US2 changes pass
 
 **Checkpoint**: All widgets have uniform visual hierarchy via Card wrapper. Padding adapts cleanly per size tier.
 
@@ -107,11 +107,11 @@
 
 **Independent Test**: Create a minimal test widget following the pattern and verify it automatically receives card wrapping, edit controls, size support, and mobile layout — without modifying DsWidgetShell, DashboardGrid, DashboardMobileGrid, or DsWidgetCard.
 
-- [ ] T030 [US3] Audit all 14 widget render functions in `src/lib/widgetRegistry.tsx` — verify every entry follows the same structure: `{ type, label, icon, defaultSize, minH: Record<WidgetSize, number>, render: (props, size) => ReactNode }`. Fix any inconsistencies (FR-018).
-- [ ] T031 [US3] Verify that DsWidgetShell, DashboardGrid, and DashboardMobileGrid reference ONLY the widget registry for widget metadata — no widget-specific logic (labels, icons, sizing) should be hardcoded in shell or grid code (FR-016, FR-018).
-- [ ] T032 [US3] Ensure all 14 widget render components default to md layout when an unrecognized size value is passed — add a fallback pattern like `const effectiveSize = ["sm","md","lg"].includes(size) ? size : "md"` or use md as the default in switch/if statements (FR-017).
-- [ ] T033 [US3] Verify that `DsWidgetCatalog` in `src/components/ds/DsWidgetCatalog.tsx` dynamically reads from the widget registry (ALL_WIDGET_TYPES) — no hardcoded widget list. New widgets added to the registry should automatically appear in the catalog.
-- [ ] T034 [US3] Run `bun test` and `bun run build` to verify US3 changes pass
+- [x] T030 [US3] Audit all 14 widget render functions in `src/lib/widgetRegistry.tsx` — verify every entry follows the same structure: `{ type, label, icon, defaultSize, minH: Record<WidgetSize, number>, render: (props, size) => ReactNode }`. Fix any inconsistencies (FR-018).
+- [x] T031 [US3] Verify that DsWidgetShell, DashboardGrid, and DashboardMobileGrid reference ONLY the widget registry for widget metadata — no widget-specific logic (labels, icons, sizing) should be hardcoded in shell or grid code (FR-016, FR-018).
+- [x] T032 [US3] Ensure all 14 widget render components default to md layout when an unrecognized size value is passed — add a fallback pattern like `const effectiveSize = ["sm","md","lg"].includes(size) ? size : "md"` or use md as the default in switch/if statements (FR-017).
+- [x] T033 [US3] Verify that `DsWidgetCatalog` in `src/components/ds/DsWidgetCatalog.tsx` dynamically reads from the widget registry (ALL_WIDGET_TYPES) — no hardcoded widget list. New widgets added to the registry should automatically appear in the catalog.
+- [x] T034 [US3] Run `bun test` and `bun run build` to verify US3 changes pass
 
 **Checkpoint**: Widget architecture is standardized. Adding a new widget requires only a registry entry + render component (FR-015, SC-007).
 
@@ -123,9 +123,9 @@
 
 **Independent Test**: Enter edit mode, cycle each widget through S → M → L → S and confirm content adapts instantly.
 
-- [ ] T035 [US4] Verify that resizing a chart widget from lg to sm replaces the chart with the summary metric (not a shrunken chart). Test all 4 chart widgets in `src/pages/dashboard/DashboardCashFlowChart.tsx`, `DashboardNetCashFlowChart.tsx`, `DashboardCategoryChart.tsx`, `DashboardOwnerSplit.tsx`.
-- [ ] T036 [US4] Verify that resizing any widget via S/M/L buttons in DsWidgetShell re-renders within 200ms with no loading state, blank frame, or stale content. Test by cycling all 14 widgets through size tiers in edit mode.
-- [ ] T037 [US4] Verify grid re-flow: when a widget changes from lg (12-col) to sm (4-col), adjacent widgets fill the freed space correctly via react-grid-layout compaction in `src/pages/dashboard/DashboardGrid.tsx`.
+- [x] T035 [US4] Verify that resizing a chart widget from lg to sm replaces the chart with the summary metric (not a shrunken chart). Test all 4 chart widgets in `src/pages/dashboard/DashboardCashFlowChart.tsx`, `DashboardNetCashFlowChart.tsx`, `DashboardCategoryChart.tsx`, `DashboardOwnerSplit.tsx`.
+- [x] T036 [US4] Verify that resizing any widget via S/M/L buttons in DsWidgetShell re-renders within 200ms with no loading state, blank frame, or stale content. Test by cycling all 14 widgets through size tiers in edit mode.
+- [x] T037 [US4] Verify grid re-flow: when a widget changes from lg (12-col) to sm (4-col), adjacent widgets fill the freed space correctly via react-grid-layout compaction in `src/pages/dashboard/DashboardGrid.tsx`.
 
 **Checkpoint**: Size transitions work smoothly. Chart→summary transitions are clean. Grid re-flows without jank.
 
@@ -135,13 +135,13 @@
 
 **Purpose**: Edge cases, mobile, and final validation
 
-- [ ] T038 [P] Handle long currency values in KPI widgets — add text truncation with ellipsis or responsive font scaling in `src/pages/dashboard/widgets/WidgetKpiNetCashFlow.tsx`, `WidgetKpiTotalSpent.tsx`, `WidgetKpiTotalIncome.tsx`, `WidgetKpiTotalDebt.tsx` to prevent overflow at sm size with 10+ digit values.
-- [ ] T039 [P] Handle empty data states at all sizes — verify `DsEmptyState` renders proportionally within `DsWidgetCard` at sm/md/lg for all widgets that support empty states. Ensure widget-level empty states include a context-appropriate action per Constitution Principle I.
-- [ ] T040 [P] Handle single-owner edge case in `src/pages/dashboard/DashboardOwnerSplit.tsx` — ensure visualization adapts when only one owner exists (skip pie chart, show single-owner summary at all sizes).
-- [ ] T041 [P] Handle many-presets edge case in `src/pages/dashboard/DashboardQuickAdd.tsx` at sm size — ensure horizontal scroll or truncation with count indicator when presets exceed available width.
-- [ ] T042 Verify mobile rendering uses medium layout variant by default in `src/pages/dashboard/DashboardMobileGrid.tsx` (FR-013). Confirm widgets display correctly at full viewport width.
-- [ ] T043 Run full test suite (`bun test`), TypeScript build (`bun run build`), and lint (`bun run lint`) to confirm zero regressions
-- [ ] T044 Run quickstart.md validation checklist — verify all 8 items pass
+- [x] T038 [P] Handle long currency values in KPI widgets — add text truncation with ellipsis or responsive font scaling in `src/pages/dashboard/widgets/WidgetKpiNetCashFlow.tsx`, `WidgetKpiTotalSpent.tsx`, `WidgetKpiTotalIncome.tsx`, `WidgetKpiTotalDebt.tsx` to prevent overflow at sm size with 10+ digit values.
+- [x] T039 [P] Handle empty data states at all sizes — verify `DsEmptyState` renders proportionally within `DsWidgetCard` at sm/md/lg for all widgets that support empty states. Ensure widget-level empty states include a context-appropriate action per Constitution Principle I.
+- [x] T040 [P] Handle single-owner edge case in `src/pages/dashboard/DashboardOwnerSplit.tsx` — ensure visualization adapts when only one owner exists (skip pie chart, show single-owner summary at all sizes).
+- [x] T041 [P] Handle many-presets edge case in `src/pages/dashboard/DashboardQuickAdd.tsx` at sm size — ensure horizontal scroll or truncation with count indicator when presets exceed available width.
+- [x] T042 Verify mobile rendering uses medium layout variant by default in `src/pages/dashboard/DashboardMobileGrid.tsx` (FR-013). Confirm widgets display correctly at full viewport width.
+- [x] T043 Run full test suite (`bun test`), TypeScript build (`bun run build`), and lint (`bun run lint`) to confirm zero regressions
+- [x] T044 Run quickstart.md validation checklist — verify all 8 items pass
 
 ---
 

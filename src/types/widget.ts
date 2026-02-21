@@ -39,6 +39,7 @@ export interface WidgetRegistryEntry {
   label: string;
   icon: React.ReactNode;
   defaultSize: WidgetSize;
+  allowedSizes: WidgetSize[];
   minH: Record<WidgetSize, number>;
   render: (props: Record<string, unknown>, size: WidgetSize) => React.ReactNode;
 }

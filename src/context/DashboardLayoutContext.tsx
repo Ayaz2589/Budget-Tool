@@ -23,6 +23,21 @@ const DashboardLayoutCtx = createContext<DashboardLayoutContextValue | null>(nul
 /** Size preset → grid column width mapping. */
 const SIZE_TO_W: Record<WidgetSize, number> = { sm: 4, md: 6, lg: 12 };
 
+const SIZE_ORDER: WidgetSize[] = ["sm", "md", "lg"];
+
+/** Clamp a size to the nearest allowed size, preferring smaller. */
+function clampToAllowed(size: WidgetSize, allowed: WidgetSize[]): WidgetSize {
+  if (allowed.includes(size)) return size;
+  const idx = SIZE_ORDER.indexOf(size);
+  // Search smaller first, then larger
+  for (let d = 1; d < SIZE_ORDER.length; d++) {
+    if (idx - d >= 0 && allowed.includes(SIZE_ORDER[idx - d])) return SIZE_ORDER[idx - d];
+    if (idx + d < SIZE_ORDER.length && allowed.includes(SIZE_ORDER[idx + d]))
+      return SIZE_ORDER[idx + d];
+  }
+  return allowed[0];
+}
+
 function validateLayout(raw: unknown): DashboardLayout | null {
   if (!raw || typeof raw !== "object") return null;
   const obj = raw as Record<string, unknown>;
@@ -36,8 +51,14 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     (item) => knownTypes.has(item.id),
   );
 
-  // Clamp positions
+  // Migrate disallowed sizes and clamp positions
   for (const item of desktopGrid) {
+    const registry = WIDGET_REGISTRY[item.id];
+    if (registry && !registry.allowedSizes.includes(item.size)) {
+      item.size = clampToAllowed(item.size, registry.allowedSizes);
+      item.w = SIZE_TO_W[item.size];
+      item.h = registry.minH[item.size];
+    }
     if (item.x + item.w > 12) {
       item.x = Math.max(0, 12 - item.w);
     }
@@ -103,10 +124,14 @@ export function DashboardLayoutProvider({ children }: { children: React.ReactNod
   const resizeWidget = useCallback((id: WidgetType, size: WidgetSize) => {
     setLayout((prev) => {
       const registry = WIDGET_REGISTRY[id];
-      const newW = SIZE_TO_W[size];
-      const newH = registry ? registry.minH[size] : 4;
+      const effectiveSize =
+        registry && !registry.allowedSizes.includes(size)
+          ? clampToAllowed(size, registry.allowedSizes)
+          : size;
+      const newW = SIZE_TO_W[effectiveSize];
+      const newH = registry ? registry.minH[effectiveSize] : 4;
       const desktopGrid = prev.desktopGrid.map((item) =>
-        item.id === id ? { ...item, size, w: newW, h: newH } : item,
+        item.id === id ? { ...item, size: effectiveSize, w: newW, h: newH } : item,
       );
       return { ...prev, desktopGrid };
     });

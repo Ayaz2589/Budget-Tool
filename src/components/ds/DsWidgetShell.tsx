@@ -8,7 +8,6 @@ import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
 import { DsWidgetCard } from "./DsWidgetCard";
 import type { WidgetType, WidgetSize } from "@/types/widget";
 
-const SIZES: WidgetSize[] = ["sm", "md", "lg"];
 const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", md: "M", lg: "L" };
 
 interface DsWidgetShellProps {
@@ -104,7 +103,7 @@ export function DsWidgetShell({
               {/* Size selector */}
               {onResize && (
                 <div className="flex items-center rounded-md border border-border/60 bg-background">
-                  {SIZES.map((s) => (
+                  {registry.allowedSizes.map((s, i) => (
                     <button
                       key={s}
                       type="button"
@@ -114,7 +113,7 @@ export function DsWidgetShell({
                         s === size
                           ? "bg-primary text-primary-foreground"
                           : "text-muted-foreground hover:text-foreground",
-                        s !== "sm" && "border-l border-border/60",
+                        i !== 0 && "border-l border-border/60",
                       )}
                       aria-label={`${t("widget.resize")} ${SIZE_LABELS[s]}`}
                       aria-pressed={s === size}

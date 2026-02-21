@@ -12,8 +12,10 @@ interface WidgetKpiTotalDebtProps {
 
 export function WidgetKpiTotalDebt({ debtOutstanding, debtPaidThisMonth, size = "md" }: WidgetKpiTotalDebtProps) {
   const { t } = useTranslation();
+  const effectiveSize: WidgetSize = (["sm", "md", "lg"] as const).includes(size) ? size : "md";
 
-  if (size === "sm") {
+  // sm: title text only, value only
+  if (effectiveSize === "sm") {
     return (
       <DsMetricCard
         title={t("dashboard.kpiTotalDebtOutstanding")}
@@ -22,17 +24,29 @@ export function WidgetKpiTotalDebt({ debtOutstanding, debtPaidThisMonth, size = 
     );
   }
 
+  // lg: title + tooltip, value, subtitle
+  if (effectiveSize === "lg") {
+    return (
+      <DsMetricCard
+        title={
+          <span className="inline-flex items-center gap-1.5">
+            {t("dashboard.kpiTotalDebtOutstanding")}
+            <DsHelpTooltip
+              content={t("dashboard.help.kpiDebtOutstanding")}
+              ariaLabel={t("common.help")}
+            />
+          </span>
+        }
+        value={formatCurrency(debtOutstanding)}
+        subtitle={formatDebtPaidSubtitle(debtPaidThisMonth, t)}
+      />
+    );
+  }
+
+  // md: title text only, value, subtitle
   return (
     <DsMetricCard
-      title={
-        <span className="inline-flex items-center gap-1.5">
-          {t("dashboard.kpiTotalDebtOutstanding")}
-          <DsHelpTooltip
-            content={t("dashboard.help.kpiDebtOutstanding")}
-            ariaLabel={t("common.help")}
-          />
-        </span>
-      }
+      title={t("dashboard.kpiTotalDebtOutstanding")}
       value={formatCurrency(debtOutstanding)}
       subtitle={formatDebtPaidSubtitle(debtPaidThisMonth, t)}
     />

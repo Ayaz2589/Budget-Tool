@@ -17,7 +17,10 @@ interface WidgetSpendBySourceProps {
 
 export function WidgetSpendBySource({ spendBySourceRows, size = "md" }: WidgetSpendBySourceProps) {
   const { t } = useTranslation();
-  const displayRows = size === "sm" ? spendBySourceRows.slice(0, 3) : spendBySourceRows;
+  const effectiveSize: WidgetSize = (["sm", "md", "lg"] as const).includes(size) ? size : "md";
+  const displayRows = effectiveSize === "sm" ? spendBySourceRows.slice(0, 3) : spendBySourceRows;
+  const truncatedCount = spendBySourceRows.length - displayRows.length;
+  const total = spendBySourceRows.reduce((sum, r) => sum + r.value, 0);
 
   return (
     <div>
@@ -25,14 +28,24 @@ export function WidgetSpendBySource({ spendBySourceRows, size = "md" }: WidgetSp
       {spendBySourceRows.length === 0 ? (
         <DsEmptyState title={t("dashboard.sectionNoSpendByCardSource")} className="py-4" />
       ) : (
-        displayRows.map((row) => (
-          <DsDataRow
-            key={row.source}
-            title={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[row.source]}`)}
-            trailing={<p className="font-semibold">{formatCurrency(row.value)}</p>}
-            dense
-          />
-        ))
+        <>
+          {displayRows.map((row) => (
+            <DsDataRow
+              key={row.source}
+              title={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[row.source]}`)}
+              subtitle={effectiveSize === "lg" && total > 0
+                ? `${Math.round((row.value / total) * 100)}%`
+                : undefined}
+              trailing={<p className="font-semibold">{formatCurrency(row.value)}</p>}
+              dense
+            />
+          ))}
+          {effectiveSize === "sm" && truncatedCount > 0 && (
+            <p className="px-4 py-2 text-xs text-muted-foreground">
+              {t("dashboard.moreItemsCount", { count: truncatedCount })}
+            </p>
+          )}
+        </>
       )}
     </div>
   );

@@ -49,38 +49,38 @@
 
 ### Add Size Support to Chart Widgets (currently missing)
 
-- [ ] T009 [P] [US1] Add `size?: WidgetSize` prop to `DashboardCashFlowChart` in `src/pages/dashboard/DashboardCashFlowChart.tsx` — sm: show total income vs total expense as two summary numbers with delta. md: render bar chart without legend. lg: full bar chart with legend, axis labels, and tooltips. Default to md layout for unrecognized sizes (FR-017).
-- [ ] T010 [P] [US1] Add `size?: WidgetSize` prop to `DashboardNetCashFlowChart` in `src/pages/dashboard/DashboardNetCashFlowChart.tsx` — sm: show current month net cash flow as single metric value. md: render area chart without legend. lg: full area chart with legend and reference line. Default to md layout for unrecognized sizes.
-- [ ] T011 [P] [US1] Add `size?: WidgetSize` prop to `DashboardCategoryChart` in `src/pages/dashboard/DashboardCategoryChart.tsx` — sm: show top category name and percentage as text. md: render pie chart with truncated legend (top 4). lg: full donut chart with complete legend. Default to md layout for unrecognized sizes.
-- [ ] T012 [P] [US1] Add `size?: WidgetSize` prop to `DashboardOwnerSplit` in `src/pages/dashboard/DashboardOwnerSplit.tsx` — sm: show owner count and largest contributor name/amount as text. md: render pie chart only. lg: full pie chart with expandable per-owner detail rows. Default to md layout for unrecognized sizes.
-- [ ] T013 [P] [US1] Add `size?: WidgetSize` prop to `DashboardQuickAdd` in `src/pages/dashboard/DashboardQuickAdd.tsx` — sm: horizontal scroll with compact pills (h-7, px-2), icon-only add button. md: wrap layout with standard pills (h-9, px-3). lg: wrap layout showing all presets without scrolling. Default to md layout for unrecognized sizes.
+- [x] T009 [P] [US1] Add `size?: WidgetSize` prop to `DashboardCashFlowChart` in `src/pages/dashboard/DashboardCashFlowChart.tsx` — sm: show total income vs total expense as two summary numbers with delta. md: render bar chart without legend. lg: full bar chart with legend, axis labels, and tooltips. Default to md layout for unrecognized sizes (FR-017).
+- [x] T010 [P] [US1] Add `size?: WidgetSize` prop to `DashboardNetCashFlowChart` in `src/pages/dashboard/DashboardNetCashFlowChart.tsx` — sm: show current month net cash flow as single metric value. md: render area chart without legend. lg: full area chart with legend and reference line. Default to md layout for unrecognized sizes.
+- [x] T011 [P] [US1] Add `size?: WidgetSize` prop to `DashboardCategoryChart` in `src/pages/dashboard/DashboardCategoryChart.tsx` — sm: show top category name and percentage as text. md: render pie chart with truncated legend (top 4). lg: full donut chart with complete legend. Default to md layout for unrecognized sizes.
+- [x] T012 [P] [US1] Add `size?: WidgetSize` prop to `DashboardOwnerSplit` in `src/pages/dashboard/DashboardOwnerSplit.tsx` — sm: show owner count and largest contributor name/amount as text. md: render pie chart only. lg: full pie chart with expandable per-owner detail rows. Default to md layout for unrecognized sizes.
+- [x] T013 [P] [US1] Add `size?: WidgetSize` prop to `DashboardQuickAdd` in `src/pages/dashboard/DashboardQuickAdd.tsx` — sm: horizontal scroll with compact pills (h-7, px-2), icon-only add button. md: wrap layout with standard pills (h-9, px-3). lg: wrap layout showing all presets without scrolling. Default to md layout for unrecognized sizes.
 
 ### Update Widget Registry
 
-- [ ] T014 [US1] Update render functions in `src/lib/widgetRegistry.tsx` to pass `size` parameter to all 14 widgets consistently. Currently 5 chart/quick-add widgets don't receive size — fix by passing `size` as prop in their render calls. Ensure all registry entries follow the same structure (type, label, icon, defaultSize, minH, render) per FR-018.
+- [x] T014 [US1] Update render functions in `src/lib/widgetRegistry.tsx` to pass `size` parameter to all 14 widgets consistently. Currently 5 chart/quick-add widgets don't receive size — fix by passing `size` as prop in their render calls. Ensure all registry entries follow the same structure (type, label, icon, defaultSize, minH, render) per FR-018.
 
 ### Enhance lg Variants for KPI Widgets
 
-- [ ] T015 [P] [US1] Enhance `WidgetKpiNetCashFlow` lg variant in `src/pages/dashboard/widgets/WidgetKpiNetCashFlow.tsx` — at lg: show help tooltip, subtitle with comparison text, and tone icon alongside color. Ensure unrecognized sizes fall back to md layout.
-- [ ] T016 [P] [US1] Enhance `WidgetKpiTotalSpent` lg variant in `src/pages/dashboard/widgets/WidgetKpiTotalSpent.tsx` — at lg: show help tooltip, delta label, and expense scope definition text. Ensure unrecognized sizes fall back to md layout.
-- [ ] T017 [P] [US1] Enhance `WidgetKpiTotalIncome` lg variant in `src/pages/dashboard/widgets/WidgetKpiTotalIncome.tsx` — at lg: show help tooltip and subtitle with comparison delta. Ensure unrecognized sizes fall back to md layout.
-- [ ] T018 [P] [US1] Enhance `WidgetKpiTotalDebt` lg variant in `src/pages/dashboard/widgets/WidgetKpiTotalDebt.tsx` — at lg: show help tooltip and formatted subtitle with debt details. Ensure unrecognized sizes fall back to md layout.
+- [x] T015 [P] [US1] Enhance `WidgetKpiNetCashFlow` lg variant in `src/pages/dashboard/widgets/WidgetKpiNetCashFlow.tsx` — at lg: show help tooltip, subtitle with comparison text, and tone icon alongside color. Ensure unrecognized sizes fall back to md layout.
+- [x] T016 [P] [US1] Enhance `WidgetKpiTotalSpent` lg variant in `src/pages/dashboard/widgets/WidgetKpiTotalSpent.tsx` — at lg: show help tooltip, delta label, and expense scope definition text. Ensure unrecognized sizes fall back to md layout.
+- [x] T017 [P] [US1] Enhance `WidgetKpiTotalIncome` lg variant in `src/pages/dashboard/widgets/WidgetKpiTotalIncome.tsx` — at lg: show help tooltip and subtitle with comparison delta. Ensure unrecognized sizes fall back to md layout.
+- [x] T018 [P] [US1] Enhance `WidgetKpiTotalDebt` lg variant in `src/pages/dashboard/widgets/WidgetKpiTotalDebt.tsx` — at lg: show help tooltip and formatted subtitle with debt details. Ensure unrecognized sizes fall back to md layout.
 
 ### Enhance lg Variants for List Widgets
 
-- [ ] T019 [P] [US1] Enhance `WidgetDebtSnapshot` lg variant in `src/pages/dashboard/widgets/WidgetDebtSnapshot.tsx` — at lg: show all debt rows with owner subtitle, progress bars, and full metadata. At sm: add "show more" indicator when items are truncated.
-- [ ] T020 [P] [US1] Enhance `WidgetSpendBySource` lg variant in `src/pages/dashboard/widgets/WidgetSpendBySource.tsx` — at lg: show all sources with percentage breakdown and extended metadata. At sm: add "show more" indicator when items are truncated.
-- [ ] T021 [P] [US1] Enhance `WidgetOwnerTransfers` lg variant in `src/pages/dashboard/widgets/WidgetOwnerTransfers.tsx` — at lg: show all transfers with date, note, and from/to detail. At sm: add "show more" indicator when items are truncated.
-- [ ] T022 [US1] Review `WidgetRecentActivity` in `src/pages/dashboard/widgets/WidgetRecentActivity.tsx` — already has 3-tier support (sm:2/md:3/lg:5 items). Verify lg shows full metadata (date, category, owner, description). Add "show more" indicator at sm when items are truncated.
-- [ ] T023 [P] [US1] Enhance `WidgetSmartInsights` lg variant in `src/pages/dashboard/widgets/WidgetSmartInsights.tsx` — at lg: show all insights with expanded detail text rather than truncated summaries. At sm: add "show more" indicator when items are truncated.
+- [x] T019 [P] [US1] Enhance `WidgetDebtSnapshot` lg variant in `src/pages/dashboard/widgets/WidgetDebtSnapshot.tsx` — at lg: show all debt rows with owner subtitle, progress bars, and full metadata. At sm: add "show more" indicator when items are truncated.
+- [x] T020 [P] [US1] Enhance `WidgetSpendBySource` lg variant in `src/pages/dashboard/widgets/WidgetSpendBySource.tsx` — at lg: show all sources with percentage breakdown and extended metadata. At sm: add "show more" indicator when items are truncated.
+- [x] T021 [P] [US1] Enhance `WidgetOwnerTransfers` lg variant in `src/pages/dashboard/widgets/WidgetOwnerTransfers.tsx` — at lg: show all transfers with date, note, and from/to detail. At sm: add "show more" indicator when items are truncated.
+- [x] T022 [US1] Review `WidgetRecentActivity` in `src/pages/dashboard/widgets/WidgetRecentActivity.tsx` — already has 3-tier support (sm:2/md:3/lg:5 items). Verify lg shows full metadata (date, category, owner, description). Add "show more" indicator at sm when items are truncated.
+- [x] T023 [P] [US1] Enhance `WidgetSmartInsights` lg variant in `src/pages/dashboard/widgets/WidgetSmartInsights.tsx` — at lg: show all insights with expanded detail text rather than truncated summaries. At sm: add "show more" indicator when items are truncated.
 
 ### Adjust Grid Heights
 
-- [ ] T024 [US1] Review and update `minH` values in `src/lib/widgetRegistry.tsx` for each widget at each size tier to ensure content fits without overflow. Adjust based on actual rendered content heights after size variants are built.
+- [x] T024 [US1] Review and update `minH` values in `src/lib/widgetRegistry.tsx` for each widget at each size tier to ensure content fits without overflow. Adjust based on actual rendered content heights after size variants are built.
 
 ### Verify
 
-- [ ] T025 [US1] Run `bun test` and `bun run build` to verify US1 changes don't break existing tests or compilation
+- [x] T025 [US1] Run `bun test` and `bun run build` to verify US1 changes don't break existing tests or compilation
 
 **Checkpoint**: All 14 widgets display purpose-built content at sm/md/lg. No cropping or overflow at any size. 42 widget-size combinations verified.
 

@@ -123,6 +123,8 @@
     "debtRemaining": "Debt remaining",
     "debtSnapshot": "Debt snapshot",
     "earned": "Earned",
+    "emptyHint": "Add an expense or income entry to see your dashboard.",
+    "emptyTitle": "No financial data yet.",
     "earnedVsSpentVsSaved": "Earned vs Spent vs Saved",
     "essentials": "Essentials",
     "fiftyFiftyExpensesInCategory": "Expenses in 50/50 category for the selected month, grouped by description. Top 15 shown.",

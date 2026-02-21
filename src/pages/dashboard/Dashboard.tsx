@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion } from "@/components/ui/accordion";
 import {
   DsActionBar,
+  DsEmptyState,
   DsHelpTooltip,
   DsSectionHeader,
 } from "@/components/ds";
@@ -26,8 +27,9 @@ export function Dashboard() {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const data = useDashboardData();
   const { t } = data;
-  const { incomeCategories, owners, addIncome, uiFormatSettings } = useBudget();
+  const { expenses, income, debts, incomeCategories, owners, addIncome, uiFormatSettings } = useBudget();
   const { presetTransactions } = usePresetTransactions();
+  const isEmpty = expenses.length === 0 && income.length === 0 && debts.length === 0;
 
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
   const [addIncomeOpen, setAddIncomeOpen] = useState(false);
@@ -53,7 +55,7 @@ export function Dashboard() {
 
   return (
     <div data-tour-page="dashboard" className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
-      <div className="min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-4">
+      <div className={`min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-4${isEmpty ? " flex flex-1 flex-col" : ""}`}>
         <div className="space-y-3" data-tour="dashboard-header">
           <DsSectionHeader
             title={
@@ -100,58 +102,79 @@ export function Dashboard() {
           />
         </div>
 
-        <DashboardKpiCards
-          kpis={data.kpis}
-          expenseScope={data.expenseScope}
-          includeDebtPayments={data.includeDebtPayments}
-        />
+        {isEmpty ? (
+          <DsEmptyState
+            title={t("dashboard.emptyTitle")}
+            description={t("dashboard.emptyHint")}
+            actions={
+              <>
+                <Button onClick={() => setAddTransactionOpen(true)}>
+                  <Plus className="size-4" />
+                  {t("dashboard.addExpense")}
+                </Button>
+                <Button variant="outline" onClick={() => setAddIncomeOpen(true)}>
+                  <Wallet className="size-4" />
+                  {t("dashboard.addIncome")}
+                </Button>
+              </>
+            }
+          />
+        ) : (
+          <>
+            <DashboardKpiCards
+              kpis={data.kpis}
+              expenseScope={data.expenseScope}
+              includeDebtPayments={data.includeDebtPayments}
+            />
 
-        <DashboardQuickAdd
-          presets={presetTransactions}
-          onPresetTap={handlePresetTap}
-          onAddBlank={() => setAddTransactionOpen(true)}
-        />
+            <DashboardQuickAdd
+              presets={presetTransactions}
+              onPresetTap={handlePresetTap}
+              onAddBlank={() => setAddTransactionOpen(true)}
+            />
 
-        <div data-tour="dashboard-trends" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <DashboardCashFlowChart
-            cashFlowDisplayRows={data.cashFlowDisplayRows}
-            incomeOwnerKeys={data.incomeOwnerKeys}
-            includeDebtPayments={data.includeDebtPayments}
-          />
-          <DashboardNetCashFlowChart
-            netCashFlowRows={data.netCashFlowRows}
-            range={data.range}
-          />
-        </div>
+            <div data-tour="dashboard-trends" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <DashboardCashFlowChart
+                cashFlowDisplayRows={data.cashFlowDisplayRows}
+                incomeOwnerKeys={data.incomeOwnerKeys}
+                includeDebtPayments={data.includeDebtPayments}
+              />
+              <DashboardNetCashFlowChart
+                netCashFlowRows={data.netCashFlowRows}
+                range={data.range}
+              />
+            </div>
 
-        <section data-tour="dashboard-pies" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <DashboardCategoryChart categorySlices={data.categorySlices} />
-          <DashboardOwnerSplit
-            ownerSlices={data.ownerSlices}
-            visibleOwnerNetRows={data.visibleOwnerNetRows}
-            ownerExpenseItemsByOwner={data.ownerExpenseItemsByOwner}
-            totalSpentForSelectedRange={data.totalSpentForSelectedRange}
-            percentFormatter={data.percentFormatter}
-          />
-        </section>
+            <section data-tour="dashboard-pies" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <DashboardCategoryChart categorySlices={data.categorySlices} />
+              <DashboardOwnerSplit
+                ownerSlices={data.ownerSlices}
+                visibleOwnerNetRows={data.visibleOwnerNetRows}
+                ownerExpenseItemsByOwner={data.ownerExpenseItemsByOwner}
+                totalSpentForSelectedRange={data.totalSpentForSelectedRange}
+                percentFormatter={data.percentFormatter}
+              />
+            </section>
 
-        <Accordion
-          type="multiple"
-          defaultValue={["debt", "spend-source"]}
-          className="space-y-3 pb-4 pt-2"
-        >
-          <DashboardDebtSnapshot
-            debtRows={data.debtRows}
-            spendBySourceRows={data.spendBySourceRows}
-            ownerTransfersMtd={data.ownerTransfersMtd}
-            ownerTransfersMtdTotal={data.ownerTransfersMtdTotal}
-            recentActivity={data.recentActivity}
-          />
-          <DashboardInsights
-            insights={data.insights}
-            onDismiss={data.dismissInsight}
-          />
-        </Accordion>
+            <Accordion
+              type="multiple"
+              defaultValue={["debt", "spend-source"]}
+              className="space-y-3 pb-4 pt-2"
+            >
+              <DashboardDebtSnapshot
+                debtRows={data.debtRows}
+                spendBySourceRows={data.spendBySourceRows}
+                ownerTransfersMtd={data.ownerTransfersMtd}
+                ownerTransfersMtdTotal={data.ownerTransfersMtdTotal}
+                recentActivity={data.recentActivity}
+              />
+              <DashboardInsights
+                insights={data.insights}
+                onDismiss={data.dismissInsight}
+              />
+            </Accordion>
+          </>
+        )}
       </div>
 
       {isMobile ? (

@@ -27,7 +27,7 @@ export function DsWidgetCard({ size, children, className }: DsWidgetCardProps) {
       surface="raised"
       density={SIZE_DENSITY[size]}
       className={cn(
-        "h-full overflow-hidden rounded-2xl",
+        "h-full overflow-y-auto overflow-x-hidden rounded-2xl",
         SIZE_PADDING[size],
         className,
       )}

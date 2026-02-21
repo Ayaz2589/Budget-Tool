@@ -19,8 +19,8 @@
 
 **Purpose**: Verify environment and establish baseline
 
-- [ ] T001 Verify branch `005-widget-redesign` is checked out and run `bun test` to confirm all existing tests pass
-- [ ] T002 Run `bun run build` to confirm TypeScript compilation succeeds as baseline
+- [x] T001 Verify branch `005-widget-redesign` is checked out and run `bun test` to confirm all existing tests pass
+- [x] T002 Run `bun run build` to confirm TypeScript compilation succeeds as baseline
 
 ---
 
@@ -30,12 +30,12 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Create `DsWidgetCard` component in `src/components/ds/DsWidgetCard.tsx` — accepts `size: WidgetSize` and `children`, renders shadcn `Card` with `surface="raised"` and density mapped from size (sm→compact, md→default, lg→comfortable). Provides size-responsive padding: sm=px-3/py-2, md=px-4/py-3, lg=px-5/py-4.
-- [ ] T004 Export `DsWidgetCard` from `src/components/ds/index.ts`
-- [ ] T005 Integrate `DsWidgetCard` into `DsWidgetShell` in `src/components/ds/DsWidgetShell.tsx` — wrap `{children}` with `<DsWidgetCard size={size}>` so all 14 widgets automatically receive card styling
-- [ ] T006 Simplify `DsMetricCard` in `src/components/ds/DsMetricCard.tsx` — remove internal `Card` wrapper (now provided by DsWidgetShell → DsWidgetCard). Keep metric layout (title, value, subtitle, tone) but render as a plain container instead of a Card.
-- [ ] T007 Update `DsChartCard` in `src/components/ds/DsChartCard.tsx` — accept `size?: WidgetSize` prop. Remove any existing container styling that conflicts with the outer DsWidgetCard.
-- [ ] T008 Run `bun test` and `bun run build` to verify foundational changes don't break existing tests
+- [x] T003 Create `DsWidgetCard` component in `src/components/ds/DsWidgetCard.tsx` — accepts `size: WidgetSize` and `children`, renders shadcn `Card` with `surface="raised"` and density mapped from size (sm→compact, md→default, lg→comfortable). Provides size-responsive padding: sm=px-3/py-2, md=px-4/py-3, lg=px-5/py-4.
+- [x] T004 Export `DsWidgetCard` from `src/components/ds/index.ts`
+- [x] T005 Integrate `DsWidgetCard` into `DsWidgetShell` in `src/components/ds/DsWidgetShell.tsx` — wrap `{children}` with `<DsWidgetCard size={size}>` so all 14 widgets automatically receive card styling
+- [x] T006 Simplify `DsMetricCard` in `src/components/ds/DsMetricCard.tsx` — remove internal `Card` wrapper (now provided by DsWidgetShell → DsWidgetCard). Keep metric layout (title, value, subtitle, tone) but render as a plain container instead of a Card.
+- [x] T007 Update `DsChartCard` in `src/components/ds/DsChartCard.tsx` — accept `size?: WidgetSize` prop. Remove any existing container styling that conflicts with the outer DsWidgetCard.
+- [x] T008 Run `bun test` and `bun run build` to verify foundational changes don't break existing tests
 
 **Checkpoint**: DsWidgetCard wrapper is live. All 14 widgets now render inside a consistent Card. Existing functionality preserved.
 

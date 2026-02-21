@@ -1,10 +1,12 @@
 import type * as React from "react";
 import { cn } from "@/lib/utils";
+import type { WidgetSize } from "@/types/widget";
 
 interface DsChartCardProps {
   title: React.ReactNode;
   children: React.ReactNode;
   actions?: React.ReactNode;
+  size?: WidgetSize;
   className?: string;
 }
 
@@ -19,4 +21,3 @@ export function DsChartCard({ title, children, actions, className }: DsChartCard
     </section>
   );
 }
-

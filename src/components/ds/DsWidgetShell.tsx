@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
+import { DsWidgetCard } from "./DsWidgetCard";
 import type { WidgetType, WidgetSize } from "@/types/widget";
 
 const SIZES: WidgetSize[] = ["sm", "md", "lg"];
@@ -140,7 +141,7 @@ export function DsWidgetShell({
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="h-full w-full">{children}</div>
+      <DsWidgetCard size={size}>{children}</DsWidgetCard>
     </div>
   );
 }

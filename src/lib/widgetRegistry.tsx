@@ -41,7 +41,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <DollarSign className="size-4" />,
     defaultSize: "sm",
     allowedSizes: ["sm", "md"],
-    minH: { sm: 3, md: 4, lg: 5 },
+    minH: { sm: 2, md: 3, lg: 5 },
     render: (props: AnyProps, size: WidgetSize) => (
       <WidgetKpiNetCashFlow netCashFlow={props.kpis.netCashFlow} size={size} />
     ),
@@ -52,7 +52,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <TrendingDown className="size-4" />,
     defaultSize: "sm",
     allowedSizes: ["sm", "md"],
-    minH: { sm: 3, md: 4, lg: 5 },
+    minH: { sm: 2, md: 3, lg: 5 },
     render: (props: AnyProps, size: WidgetSize) => (
       <WidgetKpiTotalSpent
         totalSpent={props.kpis.totalSpent}
@@ -69,7 +69,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <TrendingUp className="size-4" />,
     defaultSize: "sm",
     allowedSizes: ["sm", "md"],
-    minH: { sm: 3, md: 4, lg: 5 },
+    minH: { sm: 2, md: 3, lg: 5 },
     render: (props: AnyProps, size: WidgetSize) => (
       <WidgetKpiTotalIncome totalIncome={props.kpis.totalIncome} size={size} />
     ),
@@ -80,7 +80,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Landmark className="size-4" />,
     defaultSize: "sm",
     allowedSizes: ["sm", "md"],
-    minH: { sm: 3, md: 4, lg: 5 },
+    minH: { sm: 2, md: 3, lg: 5 },
     render: (props: AnyProps, size: WidgetSize) => (
       <WidgetKpiTotalDebt
         debtOutstanding={props.kpis.debtOutstanding}
@@ -95,7 +95,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Zap className="size-4" />,
     defaultSize: "lg",
     allowedSizes: ["md", "lg"],
-    minH: { sm: 2, md: 4, lg: 4 },
+    minH: { sm: 2, md: 3, lg: 3 },
     render: (props: AnyProps, size: WidgetSize) => (
       <DashboardQuickAdd
         presets={props.presetTransactions}
@@ -111,7 +111,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <BarChart3 className="size-4" />,
     defaultSize: "md",
     allowedSizes: ["md", "lg"],
-    minH: { sm: 4, md: 8, lg: 11 },
+    minH: { sm: 4, md: 7, lg: 8 },
     render: (props: AnyProps, size: WidgetSize) => (
       <DashboardCashFlowChart
         cashFlowDisplayRows={props.cashFlowDisplayRows}
@@ -127,7 +127,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Activity className="size-4" />,
     defaultSize: "md",
     allowedSizes: ["md", "lg"],
-    minH: { sm: 4, md: 8, lg: 11 },
+    minH: { sm: 4, md: 7, lg: 8 },
     render: (props: AnyProps, size: WidgetSize) => (
       <DashboardNetCashFlowChart
         netCashFlowRows={props.netCashFlowRows}
@@ -142,7 +142,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <PieChart className="size-4" />,
     defaultSize: "md",
     allowedSizes: ["md", "lg"],
-    minH: { sm: 4, md: 8, lg: 11 },
+    minH: { sm: 4, md: 7, lg: 8 },
     render: (props: AnyProps, size: WidgetSize) => (
       <DashboardCategoryChart categorySlices={props.categorySlices} size={size} />
     ),
@@ -153,7 +153,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Users className="size-4" />,
     defaultSize: "md",
     allowedSizes: ["md", "lg"],
-    minH: { sm: 4, md: 8, lg: 13 },
+    minH: { sm: 4, md: 7, lg: 10 },
     render: (props: AnyProps, size: WidgetSize) => (
       <DashboardOwnerSplit
         ownerSlices={props.ownerSlices}
@@ -171,7 +171,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Receipt className="size-4" />,
     defaultSize: "md",
     allowedSizes: ["sm", "md", "lg"],
-    minH: { sm: 5, md: 8, lg: 11 },
+    minH: { sm: 4, md: 6, lg: 8 },
     render: (props: AnyProps, size: WidgetSize) => (
       <WidgetDebtSnapshot debtRows={props.debtRows} size={size} />
     ),
@@ -182,7 +182,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <CreditCard className="size-4" />,
     defaultSize: "md",
     allowedSizes: ["sm", "md", "lg"],
-    minH: { sm: 5, md: 8, lg: 11 },
+    minH: { sm: 4, md: 6, lg: 8 },
     render: (props: AnyProps, size: WidgetSize) => (
       <WidgetSpendBySource spendBySourceRows={props.spendBySourceRows} size={size} />
     ),
@@ -193,7 +193,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <ArrowLeftRight className="size-4" />,
     defaultSize: "md",
     allowedSizes: ["sm", "md", "lg"],
-    minH: { sm: 5, md: 8, lg: 11 },
+    minH: { sm: 4, md: 6, lg: 8 },
     render: (props: AnyProps, size: WidgetSize) => (
       <WidgetOwnerTransfers
         ownerTransfersMtd={props.ownerTransfersMtd}
@@ -208,7 +208,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Clock className="size-4" />,
     defaultSize: "md",
     allowedSizes: ["sm", "md", "lg"],
-    minH: { sm: 5, md: 8, lg: 11 },
+    minH: { sm: 4, md: 6, lg: 8 },
     render: (props: AnyProps, size: WidgetSize) => (
       <WidgetRecentActivity recentActivity={props.recentActivity} size={size} />
     ),
@@ -219,7 +219,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Lightbulb className="size-4" />,
     defaultSize: "sm",
     allowedSizes: ["sm", "md"],
-    minH: { sm: 5, md: 6, lg: 8 },
+    minH: { sm: 4, md: 6, lg: 8 },
     render: (props: AnyProps, size: WidgetSize) => (
       <WidgetSmartInsights
         insights={props.insights}

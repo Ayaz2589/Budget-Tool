@@ -91,11 +91,12 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Zap className="size-4" />,
     defaultSize: "md",
     minH: { sm: 2, md: 2, lg: 2 },
-    render: (props: AnyProps) => (
+    render: (props: AnyProps, size: WidgetSize) => (
       <DashboardQuickAdd
         presets={props.presetTransactions}
         onPresetTap={props.onPresetTap}
         onAddBlank={props.onAddBlank}
+        size={size}
       />
     ),
   },
@@ -105,11 +106,12 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <BarChart3 className="size-4" />,
     defaultSize: "md",
     minH: { sm: 3, md: 5, lg: 7 },
-    render: (props: AnyProps) => (
+    render: (props: AnyProps, size: WidgetSize) => (
       <DashboardCashFlowChart
         cashFlowDisplayRows={props.cashFlowDisplayRows}
         incomeOwnerKeys={props.incomeOwnerKeys}
         includeDebtPayments={props.includeDebtPayments}
+        size={size}
       />
     ),
   },
@@ -119,10 +121,11 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Activity className="size-4" />,
     defaultSize: "md",
     minH: { sm: 3, md: 5, lg: 7 },
-    render: (props: AnyProps) => (
+    render: (props: AnyProps, size: WidgetSize) => (
       <DashboardNetCashFlowChart
         netCashFlowRows={props.netCashFlowRows}
         range={props.range}
+        size={size}
       />
     ),
   },
@@ -132,8 +135,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <PieChart className="size-4" />,
     defaultSize: "md",
     minH: { sm: 3, md: 5, lg: 7 },
-    render: (props: AnyProps) => (
-      <DashboardCategoryChart categorySlices={props.categorySlices} />
+    render: (props: AnyProps, size: WidgetSize) => (
+      <DashboardCategoryChart categorySlices={props.categorySlices} size={size} />
     ),
   },
   "chart-owner-split": {
@@ -142,13 +145,14 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Users className="size-4" />,
     defaultSize: "md",
     minH: { sm: 3, md: 5, lg: 7 },
-    render: (props: AnyProps) => (
+    render: (props: AnyProps, size: WidgetSize) => (
       <DashboardOwnerSplit
         ownerSlices={props.ownerSlices}
         visibleOwnerNetRows={props.visibleOwnerNetRows}
         ownerExpenseItemsByOwner={props.ownerExpenseItemsByOwner}
         totalSpentForSelectedRange={props.totalSpentForSelectedRange}
         percentFormatter={props.percentFormatter}
+        size={size}
       />
     ),
   },

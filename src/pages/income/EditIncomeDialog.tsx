@@ -156,11 +156,11 @@ export function EditIncomeDialog({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="h-11 w-full"
+              className="w-full"
             >
               {t("common.cancel")}
             </Button>
-            <Button type="submit" className="h-11 w-full">
+            <Button type="submit" className="w-full">
               {t("common.save")}
             </Button>
           </DsSheetActions>

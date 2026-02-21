@@ -60,7 +60,7 @@ export function TransferActionsDialog({
             <Button
               variant="outline"
               density="compact"
-              className="h-11 w-full"
+              className="w-full"
               onClick={() => onEdit(transfer)}
             >
               <Pencil className="size-4" />
@@ -69,7 +69,7 @@ export function TransferActionsDialog({
             <Button
               variant="destructive"
               density="compact"
-              className="h-11 w-full"
+              className="w-full"
               onClick={() => onDelete(transfer)}
             >
               <Trash2 className="size-4" />

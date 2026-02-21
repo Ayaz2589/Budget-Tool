@@ -389,7 +389,7 @@ export function AddTransactionDialog({
             <Button
               type="button"
               variant="secondary"
-              className="h-11 w-full"
+              className="w-full"
               onClick={addRow}
             >
               <Plus className="size-4" />
@@ -399,12 +399,12 @@ export function AddTransactionDialog({
               <Button
                 type="button"
                 variant="outline"
-                className="h-11 flex-1"
+                className="flex-1"
                 onClick={() => onOpenChange(false)}
               >
                 {t("common.cancel")}
               </Button>
-              <Button type="submit" className="h-11 flex-1" disabled={validCount === 0}>
+              <Button type="submit" className="flex-1" disabled={validCount === 0}>
                 {validCount === 0
                   ? t("addTransaction.addTransaction")
                   : validCount === 1

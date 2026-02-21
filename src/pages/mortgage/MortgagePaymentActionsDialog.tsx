@@ -28,7 +28,7 @@ export function MortgagePaymentActionsDialog({
   t,
 }: MortgagePaymentActionsDialogProps) {
   if (payment === null) return null;
-  const actionButtonClass = "h-11 w-full";
+  const actionButtonClass = "w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
   const handleRemove = () => {

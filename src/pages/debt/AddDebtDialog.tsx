@@ -134,11 +134,11 @@ export function AddDebtDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="h-11 w-full"
+              className="w-full"
             >
               {t("common.cancel")}
             </Button>
-            <Button type="submit" className="h-11 w-full">
+            <Button type="submit" className="w-full">
               {t("debt.addDebt")}
             </Button>
           </DsSheetActions>

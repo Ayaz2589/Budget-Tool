@@ -20,7 +20,7 @@ export function TransactionsToolbar({
         <Button
           variant="outline"
           onClick={onOpenFilters}
-          className="gap-2 h-11"
+          className="gap-2"
          
           aria-label={filtersLabel}
         >
@@ -34,7 +34,7 @@ export function TransactionsToolbar({
         </Button>
         <Button
           onClick={onAddTransaction}
-          className="gap-1.5 h-11"
+          className="gap-1.5"
           aria-label={t("transactions.addExpense")}
         >
           <Plus className="size-4" />

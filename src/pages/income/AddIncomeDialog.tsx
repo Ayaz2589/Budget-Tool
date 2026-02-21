@@ -230,11 +230,11 @@ function AddIncomeForm({
           type="button"
           variant="outline"
           onClick={onCancel}
-          className="h-11 w-full"
+          className="w-full"
         >
           {t("common.cancel")}
         </Button>
-        <Button type="submit" className="h-11 w-full">
+        <Button type="submit" className="w-full">
           {t("common.add")}
         </Button>
       </DsSheetActions>

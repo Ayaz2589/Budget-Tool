@@ -80,7 +80,7 @@ export function OwnersCard({ owners, onRemove, onAdd, bare = false }: OwnersCard
           variant="default"
           onClick={handleAdd}
           disabled={!newOwner.trim()}
-          className="h-11 shrink-0 w-full sm:w-auto"
+          className="shrink-0 w-full sm:w-auto"
         >
           {t("settings.addOwner")}
         </Button>

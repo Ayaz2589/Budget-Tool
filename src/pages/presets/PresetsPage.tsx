@@ -343,12 +343,12 @@ export function PresetsPage() {
                   <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
-                      className="h-11 flex-1"
+                      className="flex-1"
                       onClick={() => setPresetOpen(false)}
                     >
                       {t("common.cancel")}
                     </Button>
-                    <Button className="h-11 flex-1" onClick={handleSavePreset}>
+                    <Button className="flex-1" onClick={handleSavePreset}>
                       {t("common.save")}
                     </Button>
                   </div>
@@ -541,7 +541,8 @@ export function PresetsPage() {
             <Button
               onClick={openForNew}
               density="compact"
-              className="h-11 w-11 rounded-full p-0"
+              className="rounded-full p-0"
+              size="icon"
               disabled={expenseCategories.length === 0}
               aria-label={t("presetTransactions.addPreset")}
             >
@@ -606,7 +607,7 @@ export function PresetsPage() {
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     variant="outline"
-                    className="h-11 w-full"
+                    className="w-full"
                     onClick={() => {
                       setPresetForActions(null);
                       openForEdit(presetForActions.id);
@@ -617,7 +618,7 @@ export function PresetsPage() {
                   </Button>
                   <Button
                     variant="destructive"
-                    className="h-11 w-full"
+                    className="w-full"
                     onClick={() => {
                       setPresetToDeleteId(presetForActions.id);
                       setPresetForActions(null);

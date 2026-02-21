@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   DsActionBar,
+  DsEmptyState,
   DsHelpTooltip,
   DsSectionHeader,
   DsWidgetCatalog,
@@ -35,7 +36,7 @@ function DashboardContent() {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const data = useDashboardData();
   const { t } = data;
-  const { incomeCategories, owners, addIncome, uiFormatSettings } = useBudget();
+  const { expenses, income, debts, incomeCategories, owners, addIncome, uiFormatSettings } = useBudget();
   const { presetTransactions } = usePresetTransactions();
   const {
     layout,
@@ -46,6 +47,7 @@ function DashboardContent() {
     showWidget,
     resetToDefault,
   } = useDashboardLayout();
+  const isEmpty = expenses.length === 0 && income.length === 0 && debts.length === 0;
 
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
   const [addIncomeOpen, setAddIncomeOpen] = useState(false);
@@ -94,7 +96,7 @@ function DashboardContent() {
 
   return (
     <div data-tour-page="dashboard" className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
-      <div className="min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-4">
+      <div className={`min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-4${isEmpty ? " flex flex-1 flex-col" : ""}`}>
         <div className="space-y-3" data-tour="dashboard-header">
           <DsSectionHeader
             title={
@@ -180,17 +182,39 @@ function DashboardContent() {
           />
         </div>
 
-        {isEditing && (
-          <div className="flex items-center gap-2 rounded-lg bg-muted/60 px-4 py-2 text-sm text-muted-foreground">
-            <LayoutGrid className="size-4 shrink-0" />
-            <span>{tWidget("widget.editingHint")}</span>
-          </div>
-        )}
-
-        {isMobile ? (
-          <DashboardMobileGrid dashboardData={dashboardData} />
+        {isEmpty ? (
+          <DsEmptyState
+            title={t("dashboard.emptyTitle")}
+            description={t("dashboard.emptyHint")}
+            actions={
+              <>
+                <Button onClick={() => setAddTransactionOpen(true)}>
+                  <Plus className="size-4" />
+                  {t("dashboard.addExpense")}
+                </Button>
+                <Button variant="outline" onClick={() => setAddIncomeOpen(true)}>
+                  <Wallet className="size-4" />
+                  {t("dashboard.addIncome")}
+                </Button>
+              </>
+            }
+          />
         ) : (
-          <DashboardGrid dashboardData={dashboardData} />
+          <>
+            {isEditing && (
+              <div className="flex items-center gap-2 rounded-lg bg-muted/60 px-4 py-2 text-sm text-muted-foreground">
+                <LayoutGrid className="size-4 shrink-0" />
+                <span>{tWidget("widget.editingHint")}</span>
+              </div>
+            )}
+
+            {isMobile ? (
+              <DashboardMobileGrid dashboardData={dashboardData} />
+            ) : (
+              <DashboardGrid dashboardData={dashboardData} />
+            )}
+          </>
+
         )}
       </div>
 
@@ -200,7 +224,8 @@ function DashboardContent() {
             variant="secondary"
             density="compact"
             onClick={() => data.setSettingsOpen(true)}
-            className="h-11 w-11 rounded-full p-0"
+            className="rounded-full p-0"
+            size="icon"
             aria-label={t("settings.title")}
           >
             <SlidersHorizontal className="size-4" />
@@ -209,7 +234,8 @@ function DashboardContent() {
             variant="secondary"
             density="compact"
             onClick={() => setAddIncomeOpen(true)}
-            className="h-11 w-11 rounded-full p-0"
+            className="rounded-full p-0"
+            size="icon"
             aria-label={t("dashboard.addIncome")}
           >
             <Wallet className="size-4" />
@@ -218,7 +244,8 @@ function DashboardContent() {
             variant="default"
             density="compact"
             onClick={() => setAddTransactionOpen(true)}
-            className="h-11 w-11 rounded-full p-0"
+            className="rounded-full p-0"
+            size="icon"
             aria-label={t("dashboard.addExpense")}
           >
             <Plus className="size-4" />

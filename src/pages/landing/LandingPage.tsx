@@ -23,7 +23,7 @@ export function LandingPage() {
         <p className="text-muted-foreground text-lg sm:text-xl max-w-xl mb-8">
           {t("landing.heroTagline")}
         </p>
-        <Button asChild size="lg" className="h-12 px-8 text-base">
+        <Button asChild size="lg" className="px-8 text-base">
           <Link to="/auth">{t("landing.heroCta")}</Link>
         </Button>
       </header>

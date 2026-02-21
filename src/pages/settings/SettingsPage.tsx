@@ -350,7 +350,7 @@ export function SettingsPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-11 w-full sm:w-auto"
+                  className="w-full sm:w-auto"
                   onClick={handleReplayTour}
                 >
                   {t("settings.replayTour")}
@@ -433,7 +433,7 @@ export function SettingsPage() {
           <AccordionContent className="pb-3 pt-0">
             <Button
               variant="outline"
-              className="h-11 w-full sm:w-auto text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
+              className="w-full sm:w-auto text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
               onClick={() => setDeleteAllConfirmOpen(true)}
             >
               <Trash2 className="size-4 shrink-0" />

@@ -28,7 +28,7 @@ function Table({
     <div
       data-slot="table-container"
       data-density={density}
-      className="relative w-full overflow-x-auto rounded-[var(--radius-control)] border border-[var(--control-border)] bg-[var(--surface-1)]"
+      className="relative w-full overflow-x-auto rounded-xl border border-[var(--control-border)] bg-[var(--surface-1)]"
     >
       <table
         data-slot="table"

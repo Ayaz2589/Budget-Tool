@@ -16,7 +16,7 @@ export type WidgetType =
   | "recent-activity"
   | "smart-insights";
 
-export type WidgetSize = "sm" | "md" | "lg";
+export type WidgetSize = "sm" | "wide" | "md" | "tall" | "lg" | "xl";
 
 export interface WidgetLayoutItem {
   id: WidgetType;
@@ -40,6 +40,5 @@ export interface WidgetRegistryEntry {
   icon: React.ReactNode;
   defaultSize: WidgetSize;
   allowedSizes: WidgetSize[];
-  minH: Record<WidgetSize, number>;
   render: (props: Record<string, unknown>, size: WidgetSize) => React.ReactNode;
 }

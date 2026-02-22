@@ -47,9 +47,9 @@ export function DashboardNetCashFlowChart({
   size,
 }: DashboardNetCashFlowChartProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = size && (["sm", "md", "lg"] as const).includes(size) ? size : "md";
+  const effectiveSize: WidgetSize = size ?? "md";
 
-  const chartTitle = effectiveSize === "lg" ? (
+  const chartTitle = effectiveSize === "xl" || effectiveSize === "lg" ? (
     <span className="inline-flex items-center gap-1.5">
       {t("dashboard.chartNetCashFlowTrend")}
       <DsHelpTooltip
@@ -128,11 +128,11 @@ export function DashboardNetCashFlowChart({
     netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "var(--viz-series-3)" },
   };
 
-  // lg: full chart with axis labels and reference line
-  if (effectiveSize === "lg") {
+  // xl (~588×664px): full chart with axis labels, reference line, tooltips
+  if (effectiveSize === "xl") {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <ChartContainer config={chartConfig} heightMobile={220} heightDesktop={280}>
+        <ChartContainer config={chartConfig} heightMobile={220} heightDesktop={550}>
           <AreaChart data={netCashFlowRows}>
             <defs>
               <linearGradient id="netCashFlowAreaLg" x1="0" y1="0" x2="0" y2="1">
@@ -163,10 +163,45 @@ export function DashboardNetCashFlowChart({
     );
   }
 
-  // md (default): simplified chart
+  // lg (~588×328px): mid-height chart with axis labels
+  if (effectiveSize === "lg") {
+    return (
+      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+        <ChartContainer config={chartConfig} heightMobile={200} heightDesktop={260}>
+          <AreaChart data={netCashFlowRows}>
+            <defs>
+              <linearGradient id="netCashFlowAreaLgMid" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.35} />
+                <stop offset="75%" stopColor="var(--viz-series-3)" stopOpacity={0.14} />
+                <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.03} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} />
+            <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} />
+            <YAxis />
+            <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
+            <ChartTooltip content={tooltipContent} />
+            <Area
+              type="monotone"
+              dataKey="netCashFlow"
+              name={t("dashboard.chartNetCashFlow")}
+              stroke="var(--viz-series-3)"
+              fill="url(#netCashFlowAreaLgMid)"
+              strokeWidth={2.2}
+              dot={false}
+              activeDot={{ r: 5 }}
+              isAnimationActive={false}
+            />
+          </AreaChart>
+        </ChartContainer>
+      </DsChartCard>
+    );
+  }
+
+  // md (~290×216px): compact chart, no legend
   return (
     <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-      <ChartContainer config={chartConfig} heightMobile={220} heightDesktop={280}>
+      <ChartContainer config={chartConfig} heightMobile={110} heightDesktop={110}>
         <AreaChart
           data={netCashFlowRows}
           margin={{ top: 4, right: 24, left: -6, bottom: 2 }}

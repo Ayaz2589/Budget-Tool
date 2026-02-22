@@ -17,10 +17,23 @@ interface WidgetSpendBySourceProps {
 
 export function WidgetSpendBySource({ spendBySourceRows, size = "md" }: WidgetSpendBySourceProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = (["sm", "md", "lg"] as const).includes(size) ? size : "md";
-  const displayRows = effectiveSize === "sm" ? spendBySourceRows.slice(0, 3) : spendBySourceRows;
-  const truncatedCount = spendBySourceRows.length - displayRows.length;
   const total = spendBySourceRows.reduce((sum, r) => sum + r.value, 0);
+
+  // sm (~141×104px): total spend + source count badge
+  if (size === "sm") {
+    return (
+      <div>
+        <h3 className="text-xs font-medium text-muted-foreground">{t("dashboard.sectionSpendByCardSource")}</h3>
+        <p className="mt-1 text-lg font-semibold">{formatCurrency(total)}</p>
+        <p className="text-xs text-muted-foreground">
+          {t("dashboard.sourceCount", { count: spendBySourceRows.length })}
+        </p>
+      </div>
+    );
+  }
+
+  const limit = size === "xl" || size === "tall" ? spendBySourceRows.length : size === "lg" ? 8 : 4;
+  const displayRows = spendBySourceRows.slice(0, limit);
 
   return (
     <div>
@@ -33,16 +46,21 @@ export function WidgetSpendBySource({ spendBySourceRows, size = "md" }: WidgetSp
             <DsDataRow
               key={row.source}
               title={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[row.source]}`)}
-              subtitle={effectiveSize === "lg" && total > 0
+              subtitle={(size === "tall" || size === "lg" || size === "xl") && total > 0
                 ? `${Math.round((row.value / total) * 100)}%`
                 : undefined}
               trailing={<p className="font-semibold">{formatCurrency(row.value)}</p>}
               dense
             />
           ))}
-          {effectiveSize === "sm" && truncatedCount > 0 && (
+          {size === "md" && spendBySourceRows.length > 4 && (
             <p className="px-4 py-2 text-xs text-muted-foreground">
-              {t("dashboard.moreItemsCount", { count: truncatedCount })}
+              {t("dashboard.moreItemsCount", { count: spendBySourceRows.length - 4 })}
+            </p>
+          )}
+          {size === "lg" && spendBySourceRows.length > 8 && (
+            <p className="px-4 py-2 text-xs text-muted-foreground">
+              {t("dashboard.moreItemsCount", { count: spendBySourceRows.length - 8 })}
             </p>
           )}
         </>

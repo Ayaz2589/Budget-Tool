@@ -8,32 +8,31 @@ interface WidgetKpiTotalIncomeProps {
   size?: WidgetSize;
 }
 
-export function WidgetKpiTotalIncome({ totalIncome, size = "md" }: WidgetKpiTotalIncomeProps) {
+export function WidgetKpiTotalIncome({ totalIncome, size = "sm" }: WidgetKpiTotalIncomeProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = (["sm", "md", "lg"] as const).includes(size) ? size : "md";
 
-  // lg: title + tooltip
-  if (effectiveSize === "lg") {
+  // sm (~141×104px) / wide (~290×104px): total + label
+  if (size === "sm" || size === "wide") {
     return (
       <DsMetricCard
-        title={
-          <span className="inline-flex items-center gap-1.5">
-            {t("dashboard.kpiTotalIncomeMtd")}
-            <DsHelpTooltip
-              content={t("dashboard.help.kpiTotalIncome")}
-              ariaLabel={t("common.help")}
-            />
-          </span>
-        }
+        title={t("dashboard.kpiTotalIncomeMtd")}
         value={formatCurrency(totalIncome)}
       />
     );
   }
 
-  // sm and md: title text only, value
+  // md (~290×216px): total + tooltip for additional context
   return (
     <DsMetricCard
-      title={t("dashboard.kpiTotalIncomeMtd")}
+      title={
+        <span className="inline-flex items-center gap-1.5">
+          {t("dashboard.kpiTotalIncomeMtd")}
+          <DsHelpTooltip
+            content={t("dashboard.help.kpiTotalIncome")}
+            ariaLabel={t("common.help")}
+          />
+        </span>
+      }
       value={formatCurrency(totalIncome)}
     />
   );

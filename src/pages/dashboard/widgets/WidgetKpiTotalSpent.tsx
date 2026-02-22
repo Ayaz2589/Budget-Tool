@@ -1,14 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@/lib/format";
-import { DsHelpTooltip, DsMetricCard } from "@/components/ds";
+import { DsMetricCard } from "@/components/ds";
 import { formatSpentDeltaLabel } from "@/pages/dashboard/insightsBuilder";
-import type { DashboardExpenseScope } from "@/types/dashboard";
 import type { WidgetSize } from "@/types/widget";
 
 interface WidgetKpiTotalSpentProps {
   totalSpent: number;
   spentVsLastMonthPct: number | null;
-  expenseScope: DashboardExpenseScope;
+  expenseScope: import("@/types/dashboard").DashboardExpenseScope;
   includeDebtPayments: boolean;
   size?: WidgetSize;
 }
@@ -16,15 +15,12 @@ interface WidgetKpiTotalSpentProps {
 export function WidgetKpiTotalSpent({
   totalSpent,
   spentVsLastMonthPct,
-  expenseScope,
-  includeDebtPayments,
-  size = "md",
+  size = "sm",
 }: WidgetKpiTotalSpentProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = (["sm", "md", "lg"] as const).includes(size) ? size : "md";
 
-  // sm: title text only, value only
-  if (effectiveSize === "sm") {
+  // sm (~141×104px) / wide (~290×104px): total + label
+  if (size === "sm" || size === "wide") {
     return (
       <DsMetricCard
         title={t("dashboard.kpiTotalSpentMtd")}
@@ -33,41 +29,7 @@ export function WidgetKpiTotalSpent({
     );
   }
 
-  // lg: title + tooltip, value, delta label + scope definition
-  if (effectiveSize === "lg") {
-    return (
-      <DsMetricCard
-        title={
-          <span className="inline-flex items-center gap-1.5">
-            {t("dashboard.kpiTotalSpentMtd")}
-            <DsHelpTooltip
-              content={t("dashboard.help.kpiTotalSpent")}
-              ariaLabel={t("common.help")}
-            />
-          </span>
-        }
-        value={formatCurrency(totalSpent)}
-        subtitle={
-          <span className="space-y-0.5">
-            <span className="block">
-              {t("dashboard.vsLastMonth")}: {formatSpentDeltaLabel(spentVsLastMonthPct)}
-            </span>
-            <span className="block text-xs">
-              {expenseScope === "all" && includeDebtPayments
-                ? t("dashboard.kpiTotalSpentDefAll")
-                : expenseScope === "all" && !includeDebtPayments
-                  ? t("dashboard.kpiTotalSpentDefAllExcludeDebt")
-                  : expenseScope === "exclude-mortgage" && includeDebtPayments
-                    ? t("dashboard.kpiTotalSpentDefExcludeMortgage")
-                    : t("dashboard.kpiTotalSpentDefExcludeMortgageAndDebt")}
-            </span>
-          </span>
-        }
-      />
-    );
-  }
-
-  // md: title text only, value, delta label (no scope)
+  // md (~290×216px): total + month-over-month change
   return (
     <DsMetricCard
       title={t("dashboard.kpiTotalSpentMtd")}

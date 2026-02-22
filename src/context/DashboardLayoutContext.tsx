@@ -20,10 +20,17 @@ interface DashboardLayoutContextValue {
 
 const DashboardLayoutCtx = createContext<DashboardLayoutContextValue | null>(null);
 
-/** Size preset → grid column width mapping. */
-const SIZE_TO_W: Record<WidgetSize, number> = { sm: 4, md: 6, lg: 12 };
+/** Size preset → fixed grid dimensions (width × height). */
+const SIZE_TO_DIMS: Record<WidgetSize, { w: number; h: number }> = {
+  sm: { w: 2, h: 2 },
+  wide: { w: 4, h: 2 },
+  md: { w: 4, h: 3 },
+  tall: { w: 4, h: 12 },
+  lg: { w: 8, h: 6 },
+  xl: { w: 8, h: 12 },
+};
 
-const SIZE_ORDER: WidgetSize[] = ["sm", "md", "lg"];
+const SIZE_ORDER: WidgetSize[] = ["sm", "wide", "md", "tall", "lg", "xl"];
 
 /** Clamp a size to the nearest allowed size, preferring smaller. */
 function clampToAllowed(size: WidgetSize, allowed: WidgetSize[]): WidgetSize {
@@ -41,7 +48,7 @@ function clampToAllowed(size: WidgetSize, allowed: WidgetSize[]): WidgetSize {
 function validateLayout(raw: unknown): DashboardLayout | null {
   if (!raw || typeof raw !== "object") return null;
   const obj = raw as Record<string, unknown>;
-  if (obj.version !== 1) return null;
+  if (obj.version !== 3) return null;
   if (!Array.isArray(obj.desktopGrid)) return null;
   if (!Array.isArray(obj.mobileOrder)) return null;
 
@@ -56,11 +63,12 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     const registry = WIDGET_REGISTRY[item.id];
     if (registry && !registry.allowedSizes.includes(item.size)) {
       item.size = clampToAllowed(item.size, registry.allowedSizes);
-      item.w = SIZE_TO_W[item.size];
-      item.h = registry.minH[item.size];
     }
-    if (item.x + item.w > 12) {
-      item.x = Math.max(0, 12 - item.w);
+    const dims = SIZE_TO_DIMS[item.size];
+    item.w = dims.w;
+    item.h = dims.h;
+    if (item.x + item.w > 16) {
+      item.x = Math.max(0, 16 - item.w);
     }
   }
 
@@ -82,7 +90,7 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     }
   }
 
-  return { version: 1, desktopGrid, mobileOrder };
+  return { version: 3, desktopGrid, mobileOrder };
 }
 
 function loadLayout(): DashboardLayout {
@@ -128,10 +136,9 @@ export function DashboardLayoutProvider({ children }: { children: React.ReactNod
         registry && !registry.allowedSizes.includes(size)
           ? clampToAllowed(size, registry.allowedSizes)
           : size;
-      const newW = SIZE_TO_W[effectiveSize];
-      const newH = registry ? registry.minH[effectiveSize] : 4;
+      const dims = SIZE_TO_DIMS[effectiveSize];
       const desktopGrid = prev.desktopGrid.map((item) =>
-        item.id === id ? { ...item, size: effectiveSize, w: newW, h: newH } : item,
+        item.id === id ? { ...item, size: effectiveSize, w: dims.w, h: dims.h } : item,
       );
       return { ...prev, desktopGrid };
     });

@@ -12,9 +12,23 @@ interface WidgetDebtSnapshotProps {
 
 export function WidgetDebtSnapshot({ debtRows, size = "md" }: WidgetDebtSnapshotProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = (["sm", "md", "lg"] as const).includes(size) ? size : "md";
-  const displayRows = effectiveSize === "sm" ? debtRows.slice(0, 2) : debtRows;
-  const truncatedCount = debtRows.length - displayRows.length;
+
+  // sm (~141×104px): count of active debts + total badge
+  if (size === "sm") {
+    const total = debtRows.reduce((sum, r) => sum + r.remaining, 0);
+    return (
+      <div>
+        <h3 className="text-xs font-medium text-muted-foreground">{t("dashboard.sectionDebtSnapshot")}</h3>
+        <p className="mt-1 text-lg font-semibold">{formatCurrency(total)}</p>
+        <p className="text-xs text-muted-foreground">
+          {t("dashboard.activeDebtsCount", { count: debtRows.length })}
+        </p>
+      </div>
+    );
+  }
+
+  const limit = size === "xl" || size === "tall" ? debtRows.length : size === "lg" ? 8 : 4;
+  const displayRows = debtRows.slice(0, limit);
 
   return (
     <div>
@@ -27,10 +41,10 @@ export function WidgetDebtSnapshot({ debtRows, size = "md" }: WidgetDebtSnapshot
             <DsDataRow
               key={row.id}
               title={row.name}
-              subtitle={effectiveSize !== "sm" ? (row.owner || t("common.noOwner")) : undefined}
+              subtitle={size === "tall" || size === "lg" || size === "xl" ? (row.owner || t("common.noOwner")) : undefined}
               trailing={<p className="font-semibold">{formatCurrency(row.remaining)}</p>}
               meta={
-                effectiveSize !== "sm" ? (
+                size === "xl" || size === "tall" ? (
                   <>
                     <div className="mt-2 h-2 rounded bg-muted">
                       <div
@@ -44,12 +58,17 @@ export function WidgetDebtSnapshot({ debtRows, size = "md" }: WidgetDebtSnapshot
                   </>
                 ) : undefined
               }
-              dense={effectiveSize === "sm"}
+              dense={size === "md"}
             />
           ))}
-          {effectiveSize === "sm" && truncatedCount > 0 && (
+          {size === "md" && debtRows.length > 4 && (
             <p className="px-4 py-2 text-xs text-muted-foreground">
-              {t("dashboard.moreItemsCount", { count: truncatedCount })}
+              {t("dashboard.moreItemsCount", { count: debtRows.length - 4 })}
+            </p>
+          )}
+          {size === "lg" && debtRows.length > 8 && (
+            <p className="px-4 py-2 text-xs text-muted-foreground">
+              {t("dashboard.moreItemsCount", { count: debtRows.length - 8 })}
             </p>
           )}
         </>

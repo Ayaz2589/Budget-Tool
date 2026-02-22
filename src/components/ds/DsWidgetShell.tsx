@@ -8,7 +8,7 @@ import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
 import { DsWidgetCard } from "./DsWidgetCard";
 import type { WidgetType, WidgetSize } from "@/types/widget";
 
-const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", md: "M", lg: "L" };
+const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", wide: "W", md: "M", tall: "T", lg: "L", xl: "XL" };
 
 interface DsWidgetShellProps {
   widgetType: WidgetType;

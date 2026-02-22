@@ -35,7 +35,7 @@ export function DashboardCategoryChart({
   size,
 }: DashboardCategoryChartProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = size && (["sm", "md", "lg"] as const).includes(size) ? size : "md";
+  const effectiveSize: WidgetSize = size ?? "md";
 
   const chartTitle = t("dashboard.chartSpendingBreakdown");
 
@@ -82,11 +82,11 @@ export function DashboardCategoryChart({
 
   const chartConfig = { value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } };
 
-  // lg: full pie chart with complete legend
-  if (effectiveSize === "lg") {
+  // xl (~588×664px): full pie chart with complete legend below
+  if (effectiveSize === "xl") {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <ChartContainer config={chartConfig} heightMobile={210} heightDesktop={260}>
+        <ChartContainer config={chartConfig} heightMobile={210} heightDesktop={550}>
           <PieChart>
             <Pie data={categorySlices} dataKey="value" nameKey="label" outerRadius={90}>
               {categorySlices.map((slice, index) => (
@@ -108,17 +108,43 @@ export function DashboardCategoryChart({
     );
   }
 
-  // md (default): donut chart with truncated legend (top 4)
+  // lg (~588×328px): mid-height pie chart with legend
+  if (effectiveSize === "lg") {
+    return (
+      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+        <ChartContainer config={chartConfig} heightMobile={200} heightDesktop={220}>
+          <PieChart>
+            <Pie data={categorySlices} dataKey="value" nameKey="label" outerRadius={80}>
+              {categorySlices.map((slice, index) => (
+                <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+              ))}
+            </Pie>
+            <ChartTooltip content={tooltipContent} />
+          </PieChart>
+        </ChartContainer>
+        <DsLegendList
+          items={categorySlices.map((slice, index) => ({
+            key: slice.label,
+            label: slice.label,
+            value: formatCurrency(slice.value),
+            color: DONUT_COLORS[index % DONUT_COLORS.length]!,
+          }))}
+        />
+      </DsChartCard>
+    );
+  }
+
+  // md (~290×216px): compact donut chart, no external legend
   return (
     <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-      <ChartContainer config={chartConfig} heightMobile={210} heightDesktop={260}>
+      <ChartContainer config={chartConfig} heightMobile={110} heightDesktop={110}>
         <PieChart>
           <Pie
             data={categorySlices}
             dataKey="value"
             nameKey="label"
-            innerRadius={42}
-            outerRadius={70}
+            innerRadius={30}
+            outerRadius={48}
           >
             {categorySlices.map((slice, index) => (
               <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
@@ -127,14 +153,6 @@ export function DashboardCategoryChart({
           <ChartTooltip content={tooltipContent} />
         </PieChart>
       </ChartContainer>
-      <DsLegendList
-        items={categorySlices.slice(0, 4).map((slice, index) => ({
-          key: slice.label,
-          label: slice.label,
-          value: formatCurrency(slice.value),
-          color: DONUT_COLORS[index % DONUT_COLORS.length]!,
-        }))}
-      />
     </DsChartCard>
   );
 }

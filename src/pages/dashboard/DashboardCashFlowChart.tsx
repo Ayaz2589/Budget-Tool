@@ -60,9 +60,9 @@ export function DashboardCashFlowChart({
   size,
 }: DashboardCashFlowChartProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = size && (["sm", "md", "lg"] as const).includes(size) ? size : "md";
+  const effectiveSize: WidgetSize = size ?? "md";
 
-  const chartTitle = effectiveSize === "lg" ? (
+  const chartTitle = effectiveSize === "xl" || effectiveSize === "lg" ? (
     <span className="inline-flex items-center gap-1.5">
       {t("dashboard.chartIncomeVsExpenses")}
       <DsHelpTooltip
@@ -119,8 +119,8 @@ export function DashboardCashFlowChart({
     />
   );
 
-  // lg: full chart with per-owner stacked bars
-  if (effectiveSize === "lg") {
+  // xl (~588×664px): full chart with per-owner stacked bars, legend, axis labels
+  if (effectiveSize === "xl") {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
         <ChartContainer
@@ -131,7 +131,7 @@ export function DashboardCashFlowChart({
               : {}),
           }}
           heightMobile={220}
-          heightDesktop={280}
+          heightDesktop={550}
         >
           <BarChart data={cashFlowDisplayRows}>
             <CartesianGrid vertical={false} />
@@ -158,7 +158,38 @@ export function DashboardCashFlowChart({
     );
   }
 
-  // md (default): simplified chart with total income bar
+  // lg (~588×328px): mid-height chart, axis labels, no per-owner breakdown
+  if (effectiveSize === "lg") {
+    return (
+      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+        <ChartContainer
+          config={{
+            income: { label: t("dashboard.chartIncome"), color: INCOME_OWNER_COLORS[0] },
+            expenses: { label: t("dashboard.chartExpenses"), color: "var(--viz-expense)" },
+            ...(includeDebtPayments
+              ? { debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" } }
+              : {}),
+          }}
+          heightMobile={200}
+          heightDesktop={260}
+        >
+          <BarChart data={cashFlowDisplayRows}>
+            <CartesianGrid vertical={false} />
+            <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} />
+            <YAxis />
+            <ChartTooltip content={tooltipContent} />
+            <Bar dataKey="incomeTotal" name={t("dashboard.chartIncome")} fill="var(--viz-income)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="expensesTotal" name={t("dashboard.chartExpenses")} fill="var(--viz-expense)" radius={[4, 4, 0, 0]} stackId="outflow" />
+            {includeDebtPayments ? (
+              <Bar dataKey="debtPaymentsTotal" name={t("dashboard.chartDebtPayments")} fill="var(--viz-debt)" radius={[4, 4, 0, 0]} stackId="outflow" />
+            ) : null}
+          </BarChart>
+        </ChartContainer>
+      </DsChartCard>
+    );
+  }
+
+  // md (~290×216px): compact chart, no legend, minimal axis labels
   return (
     <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
       <ChartContainer
@@ -169,8 +200,8 @@ export function DashboardCashFlowChart({
             ? { debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" } }
             : {}),
         }}
-        heightMobile={220}
-        heightDesktop={280}
+        heightMobile={110}
+        heightDesktop={110}
       >
         <BarChart
           data={cashFlowDisplayRows}

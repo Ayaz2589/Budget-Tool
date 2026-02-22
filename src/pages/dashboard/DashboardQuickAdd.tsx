@@ -20,36 +20,62 @@ export function DashboardQuickAdd({
   size,
 }: DashboardQuickAddProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = size && (["sm", "md", "lg"] as const).includes(size) ? size : "md";
-  const isSmall = effectiveSize === "sm";
+  const effectiveSize: WidgetSize = size ?? "md";
 
   if (presets.length === 0) return null;
 
+  // md (~290×216px): compact 2-column preset button grid
+  if (effectiveSize === "md") {
+    const displayPresets = presets.slice(0, 4);
+    return (
+      <section aria-label={t("dashboard.quickAdd")}>
+        <div className="grid grid-cols-2 gap-1.5">
+          {displayPresets.map((preset) => (
+            <Button
+              key={preset.id}
+              variant="outline"
+              className="h-8 gap-1.5 rounded-full text-xs font-medium justify-start px-2.5"
+              onClick={() => onPresetTap(preset.id)}
+            >
+              <span
+                className={cn("size-2 shrink-0 rounded-full", getCategoryColor(preset.category, "expense"))}
+                aria-hidden
+              />
+              <span className="truncate">{preset.description}</span>
+            </Button>
+          ))}
+          <Button
+            variant="outline"
+            className="h-8 rounded-full gap-1.5 text-xs"
+            onClick={onAddBlank}
+            aria-label={t("dashboard.addExpense")}
+          >
+            <Plus className="size-3.5" />
+            <span>{t("dashboard.addExpense")}</span>
+          </Button>
+        </div>
+      </section>
+    );
+  }
+
+  // lg (~588×328px) / xl (~588×664px): expanded preset grid with amounts
   return (
     <section aria-label={t("dashboard.quickAdd")}>
-      <div className={cn(
-        "flex items-center gap-2 pb-1 scrollbar-none",
-        isSmall ? "overflow-x-auto" : "flex-wrap",
-      )}>
+      <div className="grid grid-cols-3 gap-2">
         {presets.map((preset) => (
           <Button
             key={preset.id}
             variant="outline"
-            className={cn(
-              "shrink-0 gap-2 rounded-full text-xs font-medium",
-              isSmall ? "h-7 px-2" : "h-9 px-3",
-            )}
+            className="h-10 gap-2 rounded-full text-xs font-medium justify-start px-3"
             onClick={() => onPresetTap(preset.id)}
           >
             <span
               className={cn("size-2 shrink-0 rounded-full", getCategoryColor(preset.category, "expense"))}
               aria-hidden
             />
-            <span className="truncate max-w-[120px]">
-              {preset.description}
-            </span>
-            {!isSmall && typeof preset.amount === "number" && Number.isFinite(preset.amount) ? (
-              <span className="text-muted-foreground">
+            <span className="truncate">{preset.description}</span>
+            {typeof preset.amount === "number" && Number.isFinite(preset.amount) ? (
+              <span className="ml-auto text-muted-foreground shrink-0">
                 ${preset.amount.toFixed(2)}
               </span>
             ) : null}
@@ -57,14 +83,12 @@ export function DashboardQuickAdd({
         ))}
         <Button
           variant="outline"
-          className={cn(
-            "shrink-0 rounded-full p-0",
-            isSmall ? "size-7" : "size-9",
-          )}
+          className="h-10 rounded-full gap-2 text-xs"
           onClick={onAddBlank}
           aria-label={t("dashboard.addExpense")}
         >
-          <Plus className={isSmall ? "size-3.5" : "size-4"} />
+          <Plus className="size-4" />
+          <span>{t("dashboard.addExpense")}</span>
         </Button>
       </div>
     </section>

@@ -16,9 +16,22 @@ export function WidgetOwnerTransfers({
   size = "md",
 }: WidgetOwnerTransfersProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = (["sm", "md", "lg"] as const).includes(size) ? size : "md";
-  const displayRows = effectiveSize === "sm" ? ownerTransfersMtd.slice(0, 2) : ownerTransfersMtd;
-  const truncatedCount = ownerTransfersMtd.length - displayRows.length;
+
+  // sm (~141×104px): total transfers + badge
+  if (size === "sm") {
+    return (
+      <div>
+        <h3 className="text-xs font-medium text-muted-foreground">{t("dashboard.ownerTransfersMtd")}</h3>
+        <p className="mt-1 text-lg font-semibold">{formatCurrency(ownerTransfersMtdTotal)}</p>
+        <p className="text-xs text-muted-foreground">
+          {t("dashboard.transferCount", { count: ownerTransfersMtd.length })}
+        </p>
+      </div>
+    );
+  }
+
+  const limit = size === "xl" || size === "tall" ? ownerTransfersMtd.length : size === "lg" ? 8 : 4;
+  const displayRows = ownerTransfersMtd.slice(0, limit);
 
   return (
     <div>
@@ -34,14 +47,19 @@ export function WidgetOwnerTransfers({
             <DsDataRow
               key={row.id}
               title={`${row.fromOwner} \u2192 ${row.toOwner}`}
-              subtitle={effectiveSize !== "sm" ? `${formatDate(row.date)}${row.note ? ` \u00B7 ${row.note}` : ""}` : undefined}
+              subtitle={`${formatDate(row.date)}${row.note ? ` \u00B7 ${row.note}` : ""}`}
               trailing={<p className="font-semibold">{formatCurrency(row.amount)}</p>}
               dense
             />
           ))}
-          {effectiveSize === "sm" && truncatedCount > 0 && (
+          {size === "md" && ownerTransfersMtd.length > 4 && (
             <p className="px-4 py-2 text-xs text-muted-foreground">
-              {t("dashboard.moreItemsCount", { count: truncatedCount })}
+              {t("dashboard.moreItemsCount", { count: ownerTransfersMtd.length - 4 })}
+            </p>
+          )}
+          {size === "lg" && ownerTransfersMtd.length > 8 && (
+            <p className="px-4 py-2 text-xs text-muted-foreground">
+              {t("dashboard.moreItemsCount", { count: ownerTransfersMtd.length - 8 })}
             </p>
           )}
         </>

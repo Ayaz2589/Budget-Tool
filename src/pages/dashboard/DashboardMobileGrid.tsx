@@ -4,7 +4,7 @@ import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
 import { DsWidgetShell } from "@/components/ds/DsWidgetShell";
 import { DsEmptyState } from "@/components/ds";
 import { useTranslation } from "react-i18next";
-import type { WidgetType } from "@/types/widget";
+import type { WidgetSize, WidgetType } from "@/types/widget";
 
 interface DashboardMobileGridProps {
   dashboardData: Record<string, unknown>;
@@ -23,7 +23,7 @@ export function DashboardMobileGrid({ dashboardData }: DashboardMobileGridProps)
   }, [layout.desktopGrid, layout.mobileOrder]);
 
   const sizeMap = useMemo(() => {
-    const map = new Map<WidgetType, "sm" | "md" | "lg">();
+    const map = new Map<WidgetType, WidgetSize>();
     for (const item of layout.desktopGrid) {
       map.set(item.id, item.size);
     }

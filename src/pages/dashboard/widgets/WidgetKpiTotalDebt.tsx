@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@/lib/format";
-import { DsHelpTooltip, DsMetricCard } from "@/components/ds";
+import { DsMetricCard } from "@/components/ds";
 import { formatDebtPaidSubtitle } from "@/pages/dashboard/insightsBuilder";
 import type { WidgetSize } from "@/types/widget";
 
@@ -10,12 +10,11 @@ interface WidgetKpiTotalDebtProps {
   size?: WidgetSize;
 }
 
-export function WidgetKpiTotalDebt({ debtOutstanding, debtPaidThisMonth, size = "md" }: WidgetKpiTotalDebtProps) {
+export function WidgetKpiTotalDebt({ debtOutstanding, debtPaidThisMonth, size = "sm" }: WidgetKpiTotalDebtProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = (["sm", "md", "lg"] as const).includes(size) ? size : "md";
 
-  // sm: title text only, value only
-  if (effectiveSize === "sm") {
+  // sm (~141×104px) / wide (~290×104px): debt + label
+  if (size === "sm" || size === "wide") {
     return (
       <DsMetricCard
         title={t("dashboard.kpiTotalDebtOutstanding")}
@@ -24,26 +23,7 @@ export function WidgetKpiTotalDebt({ debtOutstanding, debtPaidThisMonth, size = 
     );
   }
 
-  // lg: title + tooltip, value, subtitle
-  if (effectiveSize === "lg") {
-    return (
-      <DsMetricCard
-        title={
-          <span className="inline-flex items-center gap-1.5">
-            {t("dashboard.kpiTotalDebtOutstanding")}
-            <DsHelpTooltip
-              content={t("dashboard.help.kpiDebtOutstanding")}
-              ariaLabel={t("common.help")}
-            />
-          </span>
-        }
-        value={formatCurrency(debtOutstanding)}
-        subtitle={formatDebtPaidSubtitle(debtPaidThisMonth, t)}
-      />
-    );
-  }
-
-  // md: title text only, value, subtitle
+  // md (~290×216px): outstanding debt + paid-this-month detail
   return (
     <DsMetricCard
       title={t("dashboard.kpiTotalDebtOutstanding")}

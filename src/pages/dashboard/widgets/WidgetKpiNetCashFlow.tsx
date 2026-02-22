@@ -9,40 +9,40 @@ interface WidgetKpiNetCashFlowProps {
   size?: WidgetSize;
 }
 
-export function WidgetKpiNetCashFlow({ netCashFlow, size = "md" }: WidgetKpiNetCashFlowProps) {
+export function WidgetKpiNetCashFlow({ netCashFlow, size = "sm" }: WidgetKpiNetCashFlowProps) {
   const { t } = useTranslation();
-  const effectiveSize: WidgetSize = (["sm", "md", "lg"] as const).includes(size) ? size : "md";
   const tone = netCashFlow >= 0 ? "positive" : "negative";
 
-  if (effectiveSize === "lg") {
-    const Icon = netCashFlow >= 0 ? TrendingUp : TrendingDown;
+  // sm (~141×104px): single metric + label only
+  if (size === "sm" || size === "wide") {
     return (
       <DsMetricCard
-        title={
-          <span className="inline-flex items-center gap-1.5">
-            {t("dashboard.kpiNetCashFlowMtd")}
-            <DsHelpTooltip
-              content={t("dashboard.help.kpiNetCashFlow")}
-              ariaLabel={t("common.help")}
-            />
-          </span>
-        }
-        value={
-          <span className="inline-flex items-center gap-2">
-            {formatCurrency(netCashFlow)}
-            <Icon className="size-5" />
-          </span>
-        }
+        title={t("dashboard.kpiNetCashFlowMtd")}
+        value={formatCurrency(netCashFlow)}
         tone={tone}
       />
     );
   }
 
-  // sm and md: title text only, value
+  // md (~290×216px): metric + trend icon + tooltip
+  const Icon = netCashFlow >= 0 ? TrendingUp : TrendingDown;
   return (
     <DsMetricCard
-      title={t("dashboard.kpiNetCashFlowMtd")}
-      value={formatCurrency(netCashFlow)}
+      title={
+        <span className="inline-flex items-center gap-1.5">
+          {t("dashboard.kpiNetCashFlowMtd")}
+          <DsHelpTooltip
+            content={t("dashboard.help.kpiNetCashFlow")}
+            ariaLabel={t("common.help")}
+          />
+        </span>
+      }
+      value={
+        <span className="inline-flex items-center gap-2">
+          {formatCurrency(netCashFlow)}
+          <Icon className="size-5" />
+        </span>
+      }
       tone={tone}
     />
   );

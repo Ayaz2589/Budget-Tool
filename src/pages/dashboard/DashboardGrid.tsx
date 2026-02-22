@@ -31,10 +31,10 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
       x: item.x,
       y: item.y,
       w: item.w,
-      h: item.h,
+      h: isEditing && item.size === "sm" ? item.h + 1 : item.h,
     }));
     return { lg };
-  }, [visibleItems]);
+  }, [visibleItems, isEditing]);
 
   const handleLayoutChange = useCallback(
     (currentLayout: Layout) => {
@@ -63,19 +63,20 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
   }
 
   return (
+    <div className={`transition-[padding] duration-200 ease-in-out${isEditing ? " p-4" : ""}`}>
     <ResponsiveGridLayout
       className="widget-grid"
       layouts={rglLayouts}
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-      cols={{ lg: 12, md: 12, sm: 6, xs: 1, xxs: 1 }}
-      rowHeight={40}
+      cols={{ lg: 16, md: 16, sm: 8, xs: 1, xxs: 1 }}
+      rowHeight={48}
       compactType="vertical"
       isDraggable={isEditing}
       isResizable={false}
       draggableHandle=".react-grid-dragHandleExample"
       onLayoutChange={handleLayoutChange}
       onDragStart={handleDragStart}
-      margin={[12, 12]}
+      margin={[8, 8]}
     >
       {visibleItems.map((item) => {
         const registry = WIDGET_REGISTRY[item.id];
@@ -96,5 +97,6 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
         );
       })}
     </ResponsiveGridLayout>
+    </div>
   );
 }

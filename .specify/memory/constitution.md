@@ -1,14 +1,12 @@
 <!--
   Sync Impact Report
   ==================
-  Version change: 0.0.0 (template) → 1.0.0 (initial ratification)
-  Modified principles: N/A (all new)
+  Version change: 1.0.0 → 1.1.0 (MINOR — new section added)
+  Modified principles: None
   Added sections:
-    - 7 Core Principles (I–VII)
-    - Technology Constraints
-    - Development Workflow
-    - Governance
-  Removed sections: None (first fill)
+    - Dashboard Widget System (between Technology Constraints and
+      Development Workflow)
+  Removed sections: None
   Templates requiring updates:
     - .specify/templates/plan-template.md       ✅ No updates needed (generic)
     - .specify/templates/spec-template.md        ✅ No updates needed (generic)
@@ -149,6 +147,95 @@ minimum needed for the current task:
 - Skipping pre-commit hooks (`--no-verify`)
 - Committing secrets (`.env`, credentials, API keys)
 
+## Dashboard Widget System
+
+The dashboard uses a widget-based architecture with 14 widgets rendered
+via `react-grid-layout` on a 24-column responsive grid. All widget
+behavior is governed by four key files:
+
+**Architecture:**
+
+- `src/lib/widgetRegistry.tsx` — single registry mapping each
+  `WidgetType` to its label, icon, `sizeDims`, and `render()` function.
+  The registry is the **source of truth** for widget dimensions.
+- `src/lib/defaultLayout.ts` — default 24-column layout (version 6)
+  used for new users and as the reset target. Exports
+  `ALL_WIDGET_TYPES` for validation.
+- `src/context/DashboardLayoutContext.tsx` — layout state management,
+  localStorage persistence, and version migration chain.
+- `src/pages/dashboard/DashboardGrid.tsx` — desktop grid rendering via
+  `ResponsiveGridLayout` (24 cols at lg/md, 12 at sm, 1 at xs/xxs).
+
+**Widget types (14):**
+
+- KPI (5): `net-cash-flow`, `total-spent`, `total-income`,
+  `total-debt`, `smart-insights`
+- Chart (4): `cash-flow-chart`, `net-trend-chart`, `category-chart`,
+  `owner-split-chart`
+- List (4): `debt-snapshot`, `spend-by-source`, `owner-transfers`,
+  `recent-activity`
+- Form (1): `quick-add`
+
+**Sizing rules:**
+
+- Every widget supports exactly 3 sizes: `sm`, `md`, `lg`.
+- Each widget defines its own `sizeDims: Record<WidgetSize, {w, h}>`
+  in the registry. Shared constants (`KPI_DIMS`, `CHART_WIDE_DIMS`,
+  `LIST_DIMS`) cover common patterns; per-widget overrides exist for
+  `quick-add`, `net-trend-chart`, `category-chart`, `owner-split-chart`.
+- On resize, `resizeWidget()` fetches dimensions from the registry
+  and applies them — the registry is always authoritative.
+- Widget components MUST respond to the `size` prop to adapt their
+  content density, chart heights, and layout (e.g., side-by-side at
+  md, full-width at lg).
+
+**Grid configuration:**
+
+- 24 columns at lg/md breakpoints, 12 at sm, 1 at xs/xxs
+- `rowHeight: 48`, `margin: [8, 8]`, `compactType: "vertical"`
+- Draggable via `.react-grid-dragHandleExample` handle, not resizable
+- `onLayoutChange` persists only `x` and `y` — dimensions come from
+  the registry via `resizeWidget()`.
+
+**Layout persistence and migration:**
+
+- Layouts are stored as JSON in localStorage at a versioned schema.
+- `validateLayout()` runs on load and applies the full migration
+  chain: v3→v4 (ID renames) → v4→v5 (size normalization) → v5→v6
+  (16-col to 24-col scaling via 1.5x factor on x and w).
+- After migration, dimensions are re-synchronized from the registry
+  and boundary-clamped (`x + w <= 24`).
+- New widgets added to the registry are automatically merged into
+  existing layouts from `DEFAULT_LAYOUT`.
+- Version 6 MUST be returned from `validateLayout()`.
+
+**Adding a new widget:**
+
+1. Add the `WidgetType` string to the union in `src/types/widget.ts`.
+2. Create the widget component in `src/pages/dashboard/widgets/`.
+3. Register it in `WIDGET_REGISTRY` with label, icon, `sizeDims`,
+   and `render()`.
+4. Add it to `DEFAULT_LAYOUT.desktopGrid` and `mobileOrder`.
+5. Bump the layout version and add a migration if existing layouts
+   need updating.
+
+**Mobile rendering:**
+
+- Mobile uses a vertical flex column (`DashboardMobileGrid`), not
+  a grid layout. Order is controlled by `mobileOrder` array.
+- Long-press (500ms) opens a popover with Move Up/Down, size
+  selector, and hide button.
+- Mobile and desktop share the same layout state in context.
+
+**UI components:**
+
+- `DsWidgetShell` — wraps every widget with drag handle (desktop)
+  and overflow menu (size picker S/M/L + hide button).
+- `DsWidgetCard` — card wrapper applying size-based padding
+  (`px-4 py-3` at sm/md, `px-5 py-4` at lg) and density.
+- `DsMetricCard` — KPI display with title, value, optional subtitle,
+  optional sparkline, and tone coloring (positive/negative/neutral).
+
 ## Development Workflow
 
 **Branch strategy:** Feature branches off `main`. PRs required for merge.
@@ -193,4 +280,4 @@ It supersedes ad-hoc decisions and informal conventions:
 - **Runtime guidance**: see `CLAUDE.md` for AI-assisted development
   conventions that complement this constitution.
 
-**Version**: 1.0.0 | **Ratified**: 2026-02-16 | **Last Amended**: 2026-02-16
+**Version**: 1.1.0 | **Ratified**: 2026-02-16 | **Last Amended**: 2026-02-21

@@ -7,9 +7,6 @@ import type { DashboardLayout, WidgetLayoutItem, WidgetSize, WidgetType } from "
 
 interface DashboardLayoutContextValue {
   layout: DashboardLayout;
-  isEditing: boolean;
-  startEditing: () => void;
-  stopEditing: () => void;
   updateDesktopGrid: (items: WidgetLayoutItem[]) => void;
   updateMobileOrder: (order: WidgetType[]) => void;
   resizeWidget: (id: WidgetType, size: WidgetSize) => void;
@@ -136,14 +133,10 @@ function persistLayout(layout: DashboardLayout) {
 
 export function DashboardLayoutProvider({ children }: { children: React.ReactNode }) {
   const [layout, setLayout] = useState<DashboardLayout>(loadLayout);
-  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     persistLayout(layout);
   }, [layout]);
-
-  const startEditing = useCallback(() => setIsEditing(true), []);
-  const stopEditing = useCallback(() => setIsEditing(false), []);
 
   const updateDesktopGrid = useCallback((items: WidgetLayoutItem[]) => {
     setLayout((prev) => ({ ...prev, desktopGrid: items }));
@@ -205,9 +198,6 @@ export function DashboardLayoutProvider({ children }: { children: React.ReactNod
     <DashboardLayoutCtx.Provider
       value={{
         layout,
-        isEditing,
-        startEditing,
-        stopEditing,
         updateDesktopGrid,
         updateMobileOrder,
         resizeWidget,

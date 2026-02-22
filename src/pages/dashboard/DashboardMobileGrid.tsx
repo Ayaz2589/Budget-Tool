@@ -11,7 +11,8 @@ import { ChevronUp, ChevronDown, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { WidgetSize, WidgetType } from "@/types/widget";
 
-const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", wide: "W", md: "M", tall: "T", "wide-lg": "WL", lg: "L", xl: "XL" };
+const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", md: "M", lg: "L" };
+const ALL_SIZES: WidgetSize[] = ["sm", "md", "lg"];
 
 interface DashboardMobileGridProps {
   dashboardData: Record<string, unknown>;
@@ -106,7 +107,7 @@ function MobileWidgetItem({
 
           {/* Size selector */}
           <div className="mb-2 flex items-center rounded-md border border-border/60 bg-background">
-            {registry.allowedSizes.map((s, i) => (
+            {ALL_SIZES.map((s, i) => (
               <button
                 key={s}
                 type="button"

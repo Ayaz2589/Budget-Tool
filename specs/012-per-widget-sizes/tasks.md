@@ -21,7 +21,7 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T001 Simplify `WidgetSize` from 7 values to `"sm" | "md" | "lg"`, add `SizeDims` type as `Record<WidgetSize, { w: number; h: number }>`, and replace `allowedSizes: WidgetSize[]` with `sizeDims: SizeDims` in `WidgetRegistryEntry` interface in src/types/widget.ts
+- [x] T001 Simplify `WidgetSize` from 7 values to `"sm" | "md" | "lg"`, add `SizeDims` type as `Record<WidgetSize, { w: number; h: number }>`, and replace `allowedSizes: WidgetSize[]` with `sizeDims: SizeDims` in `WidgetRegistryEntry` interface in src/types/widget.ts
 
 **Checkpoint**: Types compile (with expected errors in downstream files that still reference old sizes/properties)
 
@@ -35,9 +35,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T002 [US2] Add `sizeDims` to all 14 widget entries per the dimension table in data-model.md, remove `allowedSizes` from all entries, and update `defaultSize` values (`wide`→`md`, `wide-lg`→`md`, `xl`→`lg`) in src/lib/widgetRegistry.tsx
-- [ ] T003 [US2] Remove `SIZE_TO_DIMS` constant, `SIZE_ORDER` constant, and `clampToAllowed()` function; update `resizeWidget()` and `validateLayout()` to look up dimensions via `WIDGET_REGISTRY[id].sizeDims[size]` instead of `SIZE_TO_DIMS[size]` in src/context/DashboardLayoutContext.tsx
-- [ ] T004 [US2] Bump layout version from 4 to 5, update all size names (`wide`→`md`, `wide-lg`→`md`, `xl`→`lg`), and update w/h values to match per-widget sizeDims for the assigned size in src/lib/defaultLayout.ts
+- [x] T002 [US2] Add `sizeDims` to all 14 widget entries per the dimension table in data-model.md, remove `allowedSizes` from all entries, and update `defaultSize` values (`wide`→`md`, `wide-lg`→`md`, `xl`→`lg`) in src/lib/widgetRegistry.tsx
+- [x] T003 [US2] Remove `SIZE_TO_DIMS` constant, `SIZE_ORDER` constant, and `clampToAllowed()` function; update `resizeWidget()` and `validateLayout()` to look up dimensions via `WIDGET_REGISTRY[id].sizeDims[size]` instead of `SIZE_TO_DIMS[size]` in src/context/DashboardLayoutContext.tsx
+- [x] T004 [US2] Bump layout version from 4 to 5, update all size names (`wide`→`md`, `wide-lg`→`md`, `xl`→`lg`), and update w/h values to match per-widget sizeDims for the assigned size in src/lib/defaultLayout.ts
 
 **Checkpoint**: `bun run build` passes. Dimension lookup is per-widget. Default layout uses new sizes.
 
@@ -51,14 +51,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T005 [P] [US1] Simplify `SIZE_LABELS` to 3 entries (`{ sm: "S", md: "M", lg: "L" }`), remove `allowedSizes` filtering from the size picker — iterate all 3 sizes directly in src/components/ds/DsWidgetShell.tsx
-- [ ] T006 [P] [US1] Simplify `SIZE_PADDING` to 3 entries (`sm`→`"px-4 py-3"`, `md`→`"px-4 py-3"`, `lg`→`"px-5 py-4"`) and `SIZE_DENSITY` to 3 entries (`sm`→`"compact"`, `md`→`"default"`, `lg`→`"comfortable"`) in src/components/ds/DsWidgetCard.tsx
-- [ ] T007 [P] [US1] Simplify `SIZE_LABELS` to 3 entries and remove `allowedSizes` filtering in src/pages/dashboard/DashboardMobileGrid.tsx
-- [ ] T008 [P] [US1] Simplify size branches in KPI widgets: change `size === "sm" || size === "wide"` to `size === "sm"` in src/pages/dashboard/widgets/NetCashFlow.tsx, TotalSpent.tsx, TotalIncome.tsx, TotalDebt.tsx, and SmartInsights.tsx
-- [ ] T009 [P] [US1] Simplify size branches in src/pages/dashboard/widgets/CashFlowChart.tsx: merge `xl` branch into `lg` (replace `effectiveSize === "xl"` with `effectiveSize === "lg"`), update chart height for lg
-- [ ] T010 [P] [US1] Simplify size branches in src/pages/dashboard/widgets/NetTrendChart.tsx: replace `wide-lg` references with `md`, keep `lg` title logic
-- [ ] T011 [P] [US1] Simplify size branches in src/pages/dashboard/widgets/CategoryChart.tsx (`xl`→`lg`) and OwnerSplitChart.tsx (merge `xl | lg` into `lg`)
-- [ ] T012 [P] [US1] Simplify size branches in list widgets: change `size === "xl" || size === "tall"` to `size === "lg"` in src/pages/dashboard/widgets/DebtSnapshot.tsx, SpendBySource.tsx, RecentActivity.tsx, and OwnerTransfers.tsx
+- [x] T005 [P] [US1] Simplify `SIZE_LABELS` to 3 entries (`{ sm: "S", md: "M", lg: "L" }`), remove `allowedSizes` filtering from the size picker — iterate all 3 sizes directly in src/components/ds/DsWidgetShell.tsx
+- [x] T006 [P] [US1] Simplify `SIZE_PADDING` to 3 entries (`sm`→`"px-4 py-3"`, `md`→`"px-4 py-3"`, `lg`→`"px-5 py-4"`) and `SIZE_DENSITY` to 3 entries (`sm`→`"compact"`, `md`→`"default"`, `lg`→`"comfortable"`) in src/components/ds/DsWidgetCard.tsx
+- [x] T007 [P] [US1] Simplify `SIZE_LABELS` to 3 entries and remove `allowedSizes` filtering in src/pages/dashboard/DashboardMobileGrid.tsx
+- [x] T008 [P] [US1] Simplify size branches in KPI widgets: change `size === "sm" || size === "wide"` to `size === "sm"` in src/pages/dashboard/widgets/NetCashFlow.tsx, TotalSpent.tsx, TotalIncome.tsx, TotalDebt.tsx, and SmartInsights.tsx
+- [x] T009 [P] [US1] Simplify size branches in src/pages/dashboard/widgets/CashFlowChart.tsx: merge `xl` branch into `lg` (replace `effectiveSize === "xl"` with `effectiveSize === "lg"`), update chart height for lg
+- [x] T010 [P] [US1] Simplify size branches in src/pages/dashboard/widgets/NetTrendChart.tsx: replace `wide-lg` references with `md`, keep `lg` title logic
+- [x] T011 [P] [US1] Simplify size branches in src/pages/dashboard/widgets/CategoryChart.tsx (`xl`→`lg`) and OwnerSplitChart.tsx (merge `xl | lg` into `lg`)
+- [x] T012 [P] [US1] Simplify size branches in list widgets: change `size === "xl" || size === "tall"` to `size === "lg"` in src/pages/dashboard/widgets/DebtSnapshot.tsx, SpendBySource.tsx, RecentActivity.tsx, and OwnerTransfers.tsx
 
 **Checkpoint**: `bun run build` passes. Size picker shows S/M/L. No old size names in widget components.
 
@@ -72,7 +72,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T013 [US3] Add `SIZE_MIGRATION` constant mapping old→new size names and add v4→v5 migration block in `validateLayout()` (after existing v3→v4 migration): iterate items, map sizes via `SIZE_MIGRATION`, update w/h from `WIDGET_REGISTRY[id].sizeDims[newSize]`, preserve x/y, set version to 5 in src/context/DashboardLayoutContext.tsx
+- [x] T013 [US3] Add `SIZE_MIGRATION` constant mapping old→new size names and add v4→v5 migration block in `validateLayout()` (after existing v3→v4 migration): iterate items, map sizes via `SIZE_MIGRATION`, update w/h from `WIDGET_REGISTRY[id].sizeDims[newSize]`, preserve x/y, set version to 5 in src/context/DashboardLayoutContext.tsx
 
 **Checkpoint**: Version-4 layouts migrate correctly. Version-5+ layouts are untouched.
 
@@ -82,9 +82,9 @@
 
 **Purpose**: Verify no old size references remain, update i18n, confirm all tests pass
 
-- [ ] T014 Check for and update any i18n keys referencing old size names in src/locales/*.json files
-- [ ] T015 Grep src/ for old size names (`"wide"`, `"tall"`, `"wide-lg"`, `"xl"`) and remove any remaining references
-- [ ] T016 Run `bun test`, `bun run build`, and `bun run lint` to verify everything passes
+- [x] T014 Check for and update any i18n keys referencing old size names in src/locales/*.json files
+- [x] T015 Grep src/ for old size names (`"wide"`, `"tall"`, `"wide-lg"`, `"xl"`) and remove any remaining references
+- [x] T016 Run `bun test`, `bun run build`, and `bun run lint` to verify everything passes
 
 ---
 

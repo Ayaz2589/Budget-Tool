@@ -14,7 +14,7 @@ export function TotalDebt({ debtOutstanding, debtPaidThisMonth, size = "sm" }: T
   const { t } = useTranslation();
 
   // sm (~141×104px) / wide (~290×104px): debt + label
-  if (size === "sm" || size === "wide") {
+  if (size === "sm") {
     return (
       <DsMetricCard
         title={t("dashboard.kpiTotalDebtOutstanding")}

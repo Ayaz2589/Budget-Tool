@@ -17,32 +17,6 @@ interface DashboardLayoutContextValue {
 
 const DashboardLayoutCtx = createContext<DashboardLayoutContextValue | null>(null);
 
-/** Size preset → fixed grid dimensions (width × height). */
-const SIZE_TO_DIMS: Record<WidgetSize, { w: number; h: number }> = {
-  sm: { w: 2, h: 2 },
-  wide: { w: 4, h: 2 },
-  md: { w: 4, h: 3 },
-  tall: { w: 4, h: 12 },
-  "wide-lg": { w: 8, h: 4 },
-  lg: { w: 8, h: 6 },
-  xl: { w: 8, h: 12 },
-};
-
-const SIZE_ORDER: WidgetSize[] = ["sm", "wide", "md", "tall", "wide-lg", "lg", "xl"];
-
-/** Clamp a size to the nearest allowed size, preferring smaller. */
-function clampToAllowed(size: WidgetSize, allowed: WidgetSize[]): WidgetSize {
-  if (allowed.includes(size)) return size;
-  const idx = SIZE_ORDER.indexOf(size);
-  // Search smaller first, then larger
-  for (let d = 1; d < SIZE_ORDER.length; d++) {
-    if (idx - d >= 0 && allowed.includes(SIZE_ORDER[idx - d])) return SIZE_ORDER[idx - d];
-    if (idx + d < SIZE_ORDER.length && allowed.includes(SIZE_ORDER[idx + d]))
-      return SIZE_ORDER[idx + d];
-  }
-  return allowed[0];
-}
-
 /** Maps v3 widget IDs to their v4 equivalents. */
 const ID_MIGRATION: Record<string, string> = {
   "kpi-net-cash-flow": "net-cash-flow",
@@ -55,6 +29,17 @@ const ID_MIGRATION: Record<string, string> = {
   "chart-owner-split": "owner-split-chart",
 };
 
+/** Maps v4 size names to v5 equivalents. */
+const SIZE_MIGRATION: Record<string, WidgetSize> = {
+  sm: "sm",
+  wide: "md",
+  md: "md",
+  tall: "md",
+  "wide-lg": "lg",
+  lg: "lg",
+  xl: "lg",
+};
+
 function migrateId(id: string): WidgetType {
   return (ID_MIGRATION[id] ?? id) as WidgetType;
 }
@@ -62,7 +47,7 @@ function migrateId(id: string): WidgetType {
 function validateLayout(raw: unknown): DashboardLayout | null {
   if (!raw || typeof raw !== "object") return null;
   const obj = raw as Record<string, unknown>;
-  if (obj.version !== 3 && obj.version !== 4) return null;
+  if (obj.version !== 3 && obj.version !== 4 && obj.version !== 5) return null;
   if (!Array.isArray(obj.desktopGrid)) return null;
   if (!Array.isArray(obj.mobileOrder)) return null;
 
@@ -80,15 +65,28 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     (item) => knownTypes.has(item.id),
   );
 
-  // Migrate disallowed sizes and clamp positions
+  // Migrate v3/v4 sizes → v5
+  if (obj.version === 3 || obj.version === 4) {
+    for (const item of desktopGrid) {
+      const newSize = SIZE_MIGRATION[item.size] ?? "md";
+      item.size = newSize;
+      const registry = WIDGET_REGISTRY[item.id];
+      if (registry) {
+        const dims = registry.sizeDims[newSize];
+        item.w = dims.w;
+        item.h = dims.h;
+      }
+    }
+  }
+
+  // Ensure dimensions match registry for all versions
   for (const item of desktopGrid) {
     const registry = WIDGET_REGISTRY[item.id];
-    if (registry && !registry.allowedSizes.includes(item.size)) {
-      item.size = clampToAllowed(item.size, registry.allowedSizes);
+    if (registry) {
+      const dims = registry.sizeDims[item.size];
+      item.w = dims.w;
+      item.h = dims.h;
     }
-    const dims = SIZE_TO_DIMS[item.size];
-    item.w = dims.w;
-    item.h = dims.h;
     if (item.x + item.w > 16) {
       item.x = Math.max(0, 16 - item.w);
     }
@@ -112,7 +110,7 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     }
   }
 
-  return { version: 4, desktopGrid, mobileOrder };
+  return { version: 5, desktopGrid, mobileOrder };
 }
 
 function loadLayout(): DashboardLayout {
@@ -150,13 +148,9 @@ export function DashboardLayoutProvider({ children }: { children: React.ReactNod
   const resizeWidget = useCallback((id: WidgetType, size: WidgetSize) => {
     setLayout((prev) => {
       const registry = WIDGET_REGISTRY[id];
-      const effectiveSize =
-        registry && !registry.allowedSizes.includes(size)
-          ? clampToAllowed(size, registry.allowedSizes)
-          : size;
-      const dims = SIZE_TO_DIMS[effectiveSize];
+      const dims = registry.sizeDims[size];
       const desktopGrid = prev.desktopGrid.map((item) =>
-        item.id === id ? { ...item, size: effectiveSize, w: dims.w, h: dims.h } : item,
+        item.id === id ? { ...item, size, w: dims.w, h: dims.h } : item,
       );
       return { ...prev, desktopGrid };
     });

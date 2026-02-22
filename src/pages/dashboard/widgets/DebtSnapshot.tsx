@@ -27,7 +27,7 @@ export function DebtSnapshot({ debtRows, size = "md" }: DebtSnapshotProps) {
     );
   }
 
-  const limit = size === "xl" || size === "tall" ? debtRows.length : size === "lg" ? 8 : 4;
+  const limit = size === "lg" ? debtRows.length : 4;
   const displayRows = debtRows.slice(0, limit);
 
   return (
@@ -41,10 +41,10 @@ export function DebtSnapshot({ debtRows, size = "md" }: DebtSnapshotProps) {
             <DsDataRow
               key={row.id}
               title={row.name}
-              subtitle={size === "tall" || size === "lg" || size === "xl" ? (row.owner || t("common.noOwner")) : undefined}
+              subtitle={size === "lg" ? (row.owner || t("common.noOwner")) : undefined}
               trailing={<p className="font-semibold">{formatCurrency(row.remaining)}</p>}
               meta={
-                size === "xl" || size === "tall" ? (
+                size === "lg" ? (
                   <>
                     <div className="mt-2 h-2 rounded bg-muted">
                       <div
@@ -64,11 +64,6 @@ export function DebtSnapshot({ debtRows, size = "md" }: DebtSnapshotProps) {
           {size === "md" && debtRows.length > 4 && (
             <p className="px-4 py-2 text-xs text-muted-foreground">
               {t("dashboard.moreItemsCount", { count: debtRows.length - 4 })}
-            </p>
-          )}
-          {size === "lg" && debtRows.length > 8 && (
-            <p className="px-4 py-2 text-xs text-muted-foreground">
-              {t("dashboard.moreItemsCount", { count: debtRows.length - 8 })}
             </p>
           )}
         </>

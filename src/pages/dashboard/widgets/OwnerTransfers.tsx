@@ -30,7 +30,7 @@ export function OwnerTransfers({
     );
   }
 
-  const limit = size === "xl" || size === "tall" ? ownerTransfersMtd.length : size === "lg" ? 8 : 4;
+  const limit = size === "lg" ? ownerTransfersMtd.length : 4;
   const displayRows = ownerTransfersMtd.slice(0, limit);
 
   return (
@@ -55,11 +55,6 @@ export function OwnerTransfers({
           {size === "md" && ownerTransfersMtd.length > 4 && (
             <p className="px-4 py-2 text-xs text-muted-foreground">
               {t("dashboard.moreItemsCount", { count: ownerTransfersMtd.length - 4 })}
-            </p>
-          )}
-          {size === "lg" && ownerTransfersMtd.length > 8 && (
-            <p className="px-4 py-2 text-xs text-muted-foreground">
-              {t("dashboard.moreItemsCount", { count: ownerTransfersMtd.length - 8 })}
             </p>
           )}
         </>

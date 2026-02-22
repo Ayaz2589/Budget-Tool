@@ -12,7 +12,7 @@ export function TotalIncome({ totalIncome, size = "sm" }: TotalIncomeProps) {
   const { t } = useTranslation();
 
   // sm (~141×104px) / wide (~290×104px): total + label
-  if (size === "sm" || size === "wide") {
+  if (size === "sm") {
     return (
       <DsMetricCard
         title={t("dashboard.kpiTotalIncomeMtd")}

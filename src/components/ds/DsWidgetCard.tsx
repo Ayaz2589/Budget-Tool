@@ -5,22 +5,14 @@ import type { WidgetSize } from "@/types/widget";
 
 const SIZE_PADDING: Record<WidgetSize, string> = {
   sm: "px-4 py-3",
-  wide: "px-4 py-3",
   md: "px-4 py-3",
-  tall: "px-4 py-3",
-  "wide-lg": "px-5 py-4",
   lg: "px-5 py-4",
-  xl: "px-5 py-4",
 };
 
 const SIZE_DENSITY: Record<WidgetSize, "compact" | "default" | "comfortable"> = {
   sm: "compact",
-  wide: "compact",
   md: "default",
-  tall: "default",
-  "wide-lg": "comfortable",
   lg: "comfortable",
-  xl: "comfortable",
 };
 
 interface DsWidgetCardProps {

@@ -26,7 +26,7 @@ export function RecentActivity({ recentActivity, size = "md" }: RecentActivityPr
     );
   }
 
-  const limit = size === "xl" || size === "tall" ? recentActivity.length : size === "lg" ? 8 : 4;
+  const limit = size === "lg" ? recentActivity.length : 4;
   const displayItems = recentActivity.slice(0, limit);
 
   return (
@@ -41,7 +41,7 @@ export function RecentActivity({ recentActivity, size = "md" }: RecentActivityPr
               key={item.id}
               title={item.description || "\u2014"}
               subtitle={
-                size === "tall" || size === "lg" || size === "xl"
+                size === "lg"
                   ? `${formatDate(item.date)} \u00B7 ${item.category || t("common.uncategorized")} \u00B7 ${item.owner || t("common.noOwner")}`
                   : `${item.category || t("common.uncategorized")} \u00B7 ${item.owner || t("common.noOwner")}`
               }
@@ -52,11 +52,6 @@ export function RecentActivity({ recentActivity, size = "md" }: RecentActivityPr
           {size === "md" && recentActivity.length > 4 && (
             <p className="px-4 py-2 text-xs text-muted-foreground">
               {t("dashboard.moreItemsCount", { count: recentActivity.length - 4 })}
-            </p>
-          )}
-          {size === "lg" && recentActivity.length > 8 && (
-            <p className="px-4 py-2 text-xs text-muted-foreground">
-              {t("dashboard.moreItemsCount", { count: recentActivity.length - 8 })}
             </p>
           )}
         </>

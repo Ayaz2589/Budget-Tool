@@ -34,13 +34,17 @@ import type { WidgetType, WidgetSize, WidgetRegistryEntry } from "@/types/widget
 type AnyProps = any;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
+const KPI_DIMS = { sm: { w: 2, h: 2 }, md: { w: 4, h: 2 }, lg: { w: 4, h: 3 } } as const;
+const CHART_WIDE_DIMS = { sm: { w: 4, h: 3 }, md: { w: 8, h: 6 }, lg: { w: 8, h: 8 } } as const;
+const LIST_DIMS = { sm: { w: 4, h: 3 }, md: { w: 4, h: 6 }, lg: { w: 8, h: 6 } } as const;
+
 export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
   "net-cash-flow": {
     type: "net-cash-flow",
     label: "widget.netCashFlow",
     icon: <DollarSign className="size-4" />,
-    defaultSize: "wide",
-    allowedSizes: ["sm", "wide", "md"],
+    defaultSize: "md",
+    sizeDims: KPI_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
       <NetCashFlow netCashFlow={props.kpis.netCashFlow} size={size} />
@@ -50,8 +54,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     type: "total-spent",
     label: "widget.totalSpent",
     icon: <TrendingDown className="size-4" />,
-    defaultSize: "wide",
-    allowedSizes: ["sm", "wide", "md"],
+    defaultSize: "md",
+    sizeDims: KPI_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
       <TotalSpent
@@ -67,8 +71,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     type: "total-income",
     label: "widget.totalIncome",
     icon: <TrendingUp className="size-4" />,
-    defaultSize: "wide",
-    allowedSizes: ["sm", "wide", "md"],
+    defaultSize: "md",
+    sizeDims: KPI_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
       <TotalIncome totalIncome={props.kpis.totalIncome} size={size} />
@@ -78,8 +82,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     type: "total-debt",
     label: "widget.totalDebt",
     icon: <Landmark className="size-4" />,
-    defaultSize: "wide",
-    allowedSizes: ["sm", "wide", "md"],
+    defaultSize: "md",
+    sizeDims: KPI_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
       <TotalDebt
@@ -94,7 +98,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     label: "widget.quickAdd",
     icon: <Zap className="size-4" />,
     defaultSize: "md",
-    allowedSizes: ["md", "lg", "xl"],
+    sizeDims: { sm: { w: 4, h: 3 }, md: { w: 8, h: 4 }, lg: { w: 8, h: 6 } },
     render: (props: AnyProps, size: WidgetSize) => (
       <QuickAdd
         presets={props.presetTransactions}
@@ -108,8 +112,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     type: "cash-flow-chart",
     label: "widget.cashFlowChart",
     icon: <BarChart3 className="size-4" />,
-    defaultSize: "xl",
-    allowedSizes: ["md", "lg", "xl"],
+    defaultSize: "lg",
+    sizeDims: CHART_WIDE_DIMS,
     render: (props: AnyProps, size: WidgetSize) => (
       <CashFlowChart
         cashFlowDisplayRows={props.cashFlowDisplayRows}
@@ -123,8 +127,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     type: "net-trend-chart",
     label: "widget.netTrendChart",
     icon: <Activity className="size-4" />,
-    defaultSize: "wide-lg",
-    allowedSizes: ["md", "wide-lg"],
+    defaultSize: "md",
+    sizeDims: { sm: { w: 4, h: 3 }, md: { w: 6, h: 3 }, lg: { w: 8, h: 6 } },
     render: (props: AnyProps, size: WidgetSize) => (
       <NetTrendChart
         netCashFlowRows={props.netCashFlowRows}
@@ -137,8 +141,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     type: "category-chart",
     label: "widget.categoryChart",
     icon: <PieChart className="size-4" />,
-    defaultSize: "xl",
-    allowedSizes: ["md", "lg", "xl"],
+    defaultSize: "lg",
+    sizeDims: { sm: { w: 4, h: 3 }, md: { w: 6, h: 4 }, lg: { w: 8, h: 8 } },
     render: (props: AnyProps, size: WidgetSize) => (
       <CategoryChart categorySlices={props.categorySlices} size={size} />
     ),
@@ -147,8 +151,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     type: "owner-split-chart",
     label: "widget.ownerSplitChart",
     icon: <Users className="size-4" />,
-    defaultSize: "xl",
-    allowedSizes: ["md", "lg", "xl"],
+    defaultSize: "lg",
+    sizeDims: { sm: { w: 4, h: 3 }, md: { w: 6, h: 4 }, lg: { w: 8, h: 8 } },
     render: (props: AnyProps, size: WidgetSize) => (
       <OwnerSplitChart
         ownerSlices={props.ownerSlices}
@@ -165,7 +169,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     label: "widget.debtSnapshot",
     icon: <Receipt className="size-4" />,
     defaultSize: "md",
-    allowedSizes: ["sm", "md", "tall", "lg", "xl"],
+    sizeDims: LIST_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
       <DebtSnapshot debtRows={props.debtRows} size={size} />
@@ -176,7 +180,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     label: "widget.spendBySource",
     icon: <CreditCard className="size-4" />,
     defaultSize: "md",
-    allowedSizes: ["sm", "md", "tall", "lg", "xl"],
+    sizeDims: LIST_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
       <SpendBySource spendBySourceRows={props.spendBySourceRows} size={size} />
@@ -187,7 +191,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     label: "widget.ownerTransfers",
     icon: <ArrowLeftRight className="size-4" />,
     defaultSize: "md",
-    allowedSizes: ["sm", "md", "tall", "lg", "xl"],
+    sizeDims: LIST_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
       <OwnerTransfers
@@ -202,7 +206,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     label: "widget.recentActivity",
     icon: <Clock className="size-4" />,
     defaultSize: "md",
-    allowedSizes: ["sm", "md", "tall", "lg", "xl"],
+    sizeDims: LIST_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
       <RecentActivity recentActivity={props.recentActivity} size={size} />
@@ -213,7 +217,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     label: "widget.smartInsights",
     icon: <Lightbulb className="size-4" />,
     defaultSize: "sm",
-    allowedSizes: ["sm", "wide", "md"],
+    sizeDims: KPI_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
       <SmartInsights

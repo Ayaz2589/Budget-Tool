@@ -9,7 +9,8 @@ import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
 import { DsWidgetCard } from "./DsWidgetCard";
 import type { WidgetType, WidgetSize } from "@/types/widget";
 
-const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", wide: "W", md: "M", tall: "T", "wide-lg": "WL", lg: "L", xl: "XL" };
+const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", md: "M", lg: "L" };
+const ALL_SIZES: WidgetSize[] = ["sm", "md", "lg"];
 
 interface DsWidgetShellProps {
   widgetType: WidgetType;
@@ -78,7 +79,7 @@ export function DsWidgetShell({
             {/* Size selector */}
             {onResize && (
               <div className="mb-2 flex items-center rounded-md border border-border/60 bg-background">
-                {registry.allowedSizes.map((s, i) => (
+                {ALL_SIZES.map((s, i) => (
                   <button
                     key={s}
                     type="button"

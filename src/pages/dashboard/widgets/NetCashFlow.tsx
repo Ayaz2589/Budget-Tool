@@ -14,7 +14,7 @@ export function NetCashFlow({ netCashFlow, size = "sm" }: NetCashFlowProps) {
   const tone = netCashFlow >= 0 ? "positive" : "negative";
 
   // sm (~141×104px): single metric + label only
-  if (size === "sm" || size === "wide") {
+  if (size === "sm") {
     return (
       <DsMetricCard
         title={t("dashboard.kpiNetCashFlowMtd")}

@@ -43,7 +43,7 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
       const updated: WidgetLayoutItem[] = layout.desktopGrid.map((item) => {
         const match = currentLayout.find((l) => l.i === item.id);
         if (match && item.visible) {
-          return { ...item, x: match.x, y: match.y, w: match.w, h: match.h };
+          return { ...item, x: match.x, y: match.y };
         }
         return item;
       });

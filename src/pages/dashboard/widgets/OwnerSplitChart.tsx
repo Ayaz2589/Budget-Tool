@@ -8,6 +8,7 @@ import { DsChartCard, DsDataRow, DsEmptyState, DsLegendList } from "@/components
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import type { DashboardOwnerSlice, DashboardOwnerNetRow } from "@/types/dashboard";
 import type { buildOwnerExpenseItems } from "@/pages/dashboard/dashboardSelectors";
+import type { WidgetSize } from "@/types/widget";
 
 const DONUT_COLORS = [
   "var(--viz-series-1)",
@@ -28,92 +29,154 @@ function asNumber(value: unknown): number {
   return 0;
 }
 
-interface DashboardOwnerSplitProps {
+interface OwnerSplitChartProps {
   ownerSlices: DashboardOwnerSlice[];
   visibleOwnerNetRows: DashboardOwnerNetRow[];
   ownerExpenseItemsByOwner: Map<string, ReturnType<typeof buildOwnerExpenseItems>>;
   totalSpentForSelectedRange: number;
   percentFormatter: Intl.NumberFormat;
+  size?: WidgetSize;
 }
 
-export function DashboardOwnerSplit({
+export function OwnerSplitChart({
   ownerSlices,
   visibleOwnerNetRows,
   ownerExpenseItemsByOwner,
   totalSpentForSelectedRange,
   percentFormatter,
-}: DashboardOwnerSplitProps) {
+  size,
+}: OwnerSplitChartProps) {
   const { t } = useTranslation();
   const [expandedOwnerKey, setExpandedOwnerKey] = useState<string | null>(null);
+  const effectiveSize: WidgetSize = size ?? "md";
 
+  const chartTitle = t("dashboard.chartSharedVsIndividualSpending");
+
+  if (ownerSlices.length === 0) {
+    return (
+      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+        <DsEmptyState title={t("dashboard.chartNoOwnerSplitData")} className="py-4" />
+      </DsChartCard>
+    );
+  }
+
+  // sm: summary text (owner count + largest contributor)
+  if (effectiveSize === "sm") {
+    const sorted = [...ownerSlices].sort((a, b) => b.value - a.value);
+    const largest = sorted[0];
+    return (
+      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">
+              {t("dashboard.splitOwners")}
+            </span>
+            <span className="text-sm font-semibold">{ownerSlices.length}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground truncate mr-2">
+              {largest.label}
+            </span>
+            <span className="text-sm font-semibold shrink-0">{formatCurrency(largest.value)}</span>
+          </div>
+        </div>
+      </DsChartCard>
+    );
+  }
+
+  // Single-owner: skip pie chart, show direct summary at md/lg
+  if (ownerSlices.length === 1) {
+    const single = ownerSlices[0];
+    return (
+      <>
+        <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+          <div className="flex items-center justify-between py-2">
+            <span className="text-sm font-medium truncate">{single.label}</span>
+            <span className="text-lg font-semibold">{formatCurrency(single.value)}</span>
+          </div>
+        </DsChartCard>
+        {(effectiveSize === "xl" || effectiveSize === "lg") && (
+          <OwnerExpenseByOwner
+            visibleOwnerNetRows={visibleOwnerNetRows}
+            ownerExpenseItemsByOwner={ownerExpenseItemsByOwner}
+            totalSpentForSelectedRange={totalSpentForSelectedRange}
+            percentFormatter={percentFormatter}
+            expandedOwnerKey={expandedOwnerKey}
+            setExpandedOwnerKey={setExpandedOwnerKey}
+          />
+        )}
+      </>
+    );
+  }
+
+  const tooltipContent = (
+    <ChartTooltipContent
+      className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
+      labelClassName="text-sm font-semibold"
+      valueFormatter={(value) => formatCurrency(asNumber(value))}
+    />
+  );
+
+  const chartConfig = { value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } };
+
+  const pieChart = (
+    <ChartContainer config={chartConfig} heightMobile={110} heightDesktop={effectiveSize === "xl" ? 400 : effectiveSize === "lg" ? 220 : 110}>
+      <PieChart>
+        <Pie
+          data={ownerSlices}
+          dataKey="value"
+          nameKey="label"
+          innerRadius={effectiveSize === "md" ? 30 : undefined}
+          outerRadius={effectiveSize === "md" ? 48 : effectiveSize === "lg" ? 80 : 90}
+        >
+          {ownerSlices.map((slice, index) => (
+            <Cell key={slice.key} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+          ))}
+        </Pie>
+        <ChartTooltip content={tooltipContent} />
+      </PieChart>
+    </ChartContainer>
+  );
+
+  const legend = (
+    <DsLegendList
+      items={ownerSlices.map((slice, index) => ({
+        key: slice.key,
+        label: slice.label,
+        value: formatCurrency(slice.value),
+        color: DONUT_COLORS[index % DONUT_COLORS.length]!,
+      }))}
+    />
+  );
+
+  // md: pie chart + legend only (no detail rows)
+  if (effectiveSize === "md") {
+    return (
+      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+        <div className="space-y-2">
+          {pieChart}
+          {legend}
+        </div>
+      </DsChartCard>
+    );
+  }
+
+  // lg (~588×328px): pie chart + legend (no detail rows)
+  if (effectiveSize === "lg") {
+    return (
+      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+        {pieChart}
+        {legend}
+      </DsChartCard>
+    );
+  }
+
+  // xl (~588×664px): full pie chart + legend + OwnerExpenseByOwner detail rows
   return (
     <>
-      <DsChartCard title={t("dashboard.chartSharedVsIndividualSpending")} className="min-w-0">
-        {ownerSlices.length === 0 ? (
-          <DsEmptyState title={t("dashboard.chartNoOwnerSplitData")} className="py-4" />
-        ) : (
-          <>
-            <div className="hidden md:block">
-              <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} heightMobile={210} heightDesktop={260}>
-                <PieChart>
-                  <Pie
-                    data={ownerSlices}
-                    dataKey="value"
-                    nameKey="label"
-                    outerRadius={90}
-                  >
-                    {ownerSlices.map((slice, index) => (
-                      <Cell key={slice.key} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
-                        labelClassName="text-sm font-semibold"
-                        valueFormatter={(value) => formatCurrency(asNumber(value))}
-                      />
-                    }
-                  />
-                </PieChart>
-              </ChartContainer>
-            </div>
-            <div className="md:hidden space-y-2">
-              <ChartContainer config={{ value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } }} heightMobile={210} heightDesktop={260}>
-                <PieChart>
-                  <Pie
-                    data={ownerSlices}
-                    dataKey="value"
-                    nameKey="label"
-                    innerRadius={42}
-                    outerRadius={70}
-                  >
-                    {ownerSlices.map((slice, index) => (
-                      <Cell key={slice.key} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        className="min-w-[16rem] bg-card border-border px-4 py-3 text-sm shadow-md"
-                        labelClassName="text-sm font-semibold"
-                        valueFormatter={(value) => formatCurrency(asNumber(value))}
-                      />
-                    }
-                  />
-                </PieChart>
-              </ChartContainer>
-              <DsLegendList
-                items={ownerSlices.map((slice, index) => ({
-                  key: slice.key,
-                  label: slice.label,
-                  value: formatCurrency(slice.value),
-                  color: DONUT_COLORS[index % DONUT_COLORS.length]!,
-                }))}
-              />
-            </div>
-          </>
-        )}
+      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+        {pieChart}
+        {legend}
       </DsChartCard>
 
       <OwnerExpenseByOwner

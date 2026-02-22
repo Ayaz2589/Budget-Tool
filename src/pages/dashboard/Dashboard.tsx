@@ -1,39 +1,59 @@
-import { useState, useCallback } from "react";
-import { Plus, SlidersHorizontal, Wallet } from "lucide-react";
+import { useState, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { Plus, SlidersHorizontal, Wallet, LayoutGrid, Check, RotateCcw, Grid2X2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Accordion } from "@/components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   DsActionBar,
   DsEmptyState,
   DsHelpTooltip,
   DsSectionHeader,
+  DsWidgetCatalog,
 } from "@/components/ds";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useBudget, usePresetTransactions } from "@/context";
+import {
+  DashboardLayoutProvider,
+  useDashboardLayout,
+} from "@/context/DashboardLayoutContext";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { AddIncomeDialog } from "@/pages/income/AddIncomeDialog";
 import { useDashboardData } from "./useDashboardData";
-import { DashboardKpiCards } from "./DashboardKpiCards";
-import { DashboardCashFlowChart } from "./DashboardCashFlowChart";
-import { DashboardNetCashFlowChart } from "./DashboardNetCashFlowChart";
-import { DashboardCategoryChart } from "./DashboardCategoryChart";
-import { DashboardOwnerSplit } from "./DashboardOwnerSplit";
-import { DashboardDebtSnapshot } from "./DashboardDebtSnapshot";
-import { DashboardInsights } from "./DashboardInsights";
+import { DashboardGrid } from "./DashboardGrid";
+import { DashboardMobileGrid } from "./DashboardMobileGrid";
 import { DashboardFilters } from "./DashboardFilters";
-import { DashboardQuickAdd } from "./DashboardQuickAdd";
 
-export function Dashboard() {
+function DashboardContent() {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const data = useDashboardData();
   const { t } = data;
   const { expenses, income, debts, incomeCategories, owners, addIncome, uiFormatSettings } = useBudget();
   const { presetTransactions } = usePresetTransactions();
+  const {
+    layout,
+    isEditing,
+    startEditing,
+    stopEditing,
+    hideWidget,
+    showWidget,
+    resetToDefault,
+  } = useDashboardLayout();
   const isEmpty = expenses.length === 0 && income.length === 0 && debts.length === 0;
 
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
   const [addIncomeOpen, setAddIncomeOpen] = useState(false);
   const [selectedPresetId, setSelectedPresetId] = useState<string | undefined>();
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   const handlePresetTap = useCallback((presetId: string) => {
     setSelectedPresetId(presetId);
@@ -52,6 +72,27 @@ export function Dashboard() {
     },
     [addIncome],
   );
+
+  const handleReset = useCallback(() => {
+    resetToDefault();
+    stopEditing();
+    setResetDialogOpen(false);
+  }, [resetToDefault, stopEditing]);
+
+  const visibleWidgetIds = useMemo(
+    () => new Set(layout.desktopGrid.filter((item) => item.visible).map((item) => item.id)),
+    [layout.desktopGrid],
+  );
+
+  const { t: tWidget } = useTranslation();
+
+  // Build the props object passed to widget render functions
+  const dashboardData: Record<string, unknown> = {
+    ...data,
+    presetTransactions,
+    onPresetTap: handlePresetTap,
+    onAddBlank: () => setAddTransactionOpen(true),
+  };
 
   return (
     <div data-tour-page="dashboard" className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
@@ -72,30 +113,69 @@ export function Dashboard() {
             actions={
               !isMobile ? (
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    className="gap-2"
-                    onClick={() => data.setSettingsOpen(true)}
-                  >
-                    <SlidersHorizontal className="size-4" />
-                    <span>{t("settings.title")}</span>
-                  </Button>
-                  <Button
-                    variant="default"
-                    className="gap-2"
-                    onClick={() => setAddIncomeOpen(true)}
-                  >
-                    <Wallet className="size-4" />
-                    <span>{t("dashboard.addIncome")}</span>
-                  </Button>
-                  <Button
-                    variant="default"
-                    className="gap-2"
-                    onClick={() => setAddTransactionOpen(true)}
-                  >
-                    <Plus className="size-4" />
-                    <span>{t("dashboard.addExpense")}</span>
-                  </Button>
+                  {isEditing ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        className="h-11 gap-2"
+                        onClick={() => setCatalogOpen(true)}
+                      >
+                        <Grid2X2 className="size-4" />
+                        <span>{tWidget("widget.manageWidgets")}</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-11 gap-2"
+                        onClick={() => setResetDialogOpen(true)}
+                      >
+                        <RotateCcw className="size-4" />
+                        <span>{tWidget("widget.resetLayout")}</span>
+                      </Button>
+                      <Button
+                        variant="default"
+                        className="h-11 gap-2"
+                        onClick={stopEditing}
+                      >
+                        <Check className="size-4" />
+                        <span>{tWidget("widget.doneEditing")}</span>
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="outline"
+                        className="h-11 gap-2"
+                        onClick={startEditing}
+                      >
+                        <LayoutGrid className="size-4" />
+                        <span>{tWidget("widget.editLayout")}</span>
+                      </Button>
+                      <Button
+                        variant="default"
+                        className="h-11 gap-2"
+                        onClick={() => setAddTransactionOpen(true)}
+                      >
+                        <Plus className="size-4" />
+                        <span>{t("dashboard.addExpense")}</span>
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        className="h-11 gap-2"
+                        onClick={() => setAddIncomeOpen(true)}
+                      >
+                        <Wallet className="size-4" />
+                        <span>{t("dashboard.addIncome")}</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-11 gap-2"
+                        onClick={() => data.setSettingsOpen(true)}
+                      >
+                        <SlidersHorizontal className="size-4" />
+                        <span>{t("settings.title")}</span>
+                      </Button>
+                    </>
+                  )}
                 </div>
               ) : undefined
             }
@@ -121,59 +201,20 @@ export function Dashboard() {
           />
         ) : (
           <>
-            <DashboardKpiCards
-              kpis={data.kpis}
-              expenseScope={data.expenseScope}
-              includeDebtPayments={data.includeDebtPayments}
-            />
+            {isEditing && (
+              <div className="flex items-center gap-2 rounded-lg bg-muted/60 px-4 py-2 text-sm text-muted-foreground">
+                <LayoutGrid className="size-4 shrink-0" />
+                <span>{tWidget("widget.editingHint")}</span>
+              </div>
+            )}
 
-            <DashboardQuickAdd
-              presets={presetTransactions}
-              onPresetTap={handlePresetTap}
-              onAddBlank={() => setAddTransactionOpen(true)}
-            />
-
-            <div data-tour="dashboard-trends" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <DashboardCashFlowChart
-                cashFlowDisplayRows={data.cashFlowDisplayRows}
-                incomeOwnerKeys={data.incomeOwnerKeys}
-                includeDebtPayments={data.includeDebtPayments}
-              />
-              <DashboardNetCashFlowChart
-                netCashFlowRows={data.netCashFlowRows}
-                range={data.range}
-              />
-            </div>
-
-            <section data-tour="dashboard-pies" className="min-w-0 grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <DashboardCategoryChart categorySlices={data.categorySlices} />
-              <DashboardOwnerSplit
-                ownerSlices={data.ownerSlices}
-                visibleOwnerNetRows={data.visibleOwnerNetRows}
-                ownerExpenseItemsByOwner={data.ownerExpenseItemsByOwner}
-                totalSpentForSelectedRange={data.totalSpentForSelectedRange}
-                percentFormatter={data.percentFormatter}
-              />
-            </section>
-
-            <Accordion
-              type="multiple"
-              defaultValue={["debt", "spend-source"]}
-              className="space-y-3 pb-4 pt-2"
-            >
-              <DashboardDebtSnapshot
-                debtRows={data.debtRows}
-                spendBySourceRows={data.spendBySourceRows}
-                ownerTransfersMtd={data.ownerTransfersMtd}
-                ownerTransfersMtdTotal={data.ownerTransfersMtdTotal}
-                recentActivity={data.recentActivity}
-              />
-              <DashboardInsights
-                insights={data.insights}
-                onDismiss={data.dismissInsight}
-              />
-            </Accordion>
+            {isMobile ? (
+              <DashboardMobileGrid dashboardData={dashboardData} />
+            ) : (
+              <DashboardGrid dashboardData={dashboardData} />
+            )}
           </>
+
         )}
       </div>
 
@@ -245,6 +286,39 @@ export function Dashboard() {
         includeDebtPayments={data.includeDebtPayments}
         setIncludeDebtPayments={data.setIncludeDebtPayments}
       />
+
+      <DsWidgetCatalog
+        open={catalogOpen}
+        onOpenChange={setCatalogOpen}
+        visibleWidgetIds={visibleWidgetIds}
+        onShow={showWidget}
+        onHide={hideWidget}
+      />
+
+      <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tWidget("widget.resetConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {tWidget("widget.resetConfirmDescription")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReset}>
+              {tWidget("widget.resetConfirmAction")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
+  );
+}
+
+export function Dashboard() {
+  return (
+    <DashboardLayoutProvider>
+      <DashboardContent />
+    </DashboardLayoutProvider>
   );
 }

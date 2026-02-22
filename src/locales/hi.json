@@ -792,5 +792,38 @@
         "description": "Smart Insights and Alerts मौजूदा data और scope के आधार पर spending shift, missing income या unpaid obligations जैसी महत्वपूर्ण चीज़ें दिखाता है।"
       }
     }
+  },
+  "widget": {
+    "netCashFlow": "Net Cash Flow",
+    "totalSpent": "Total Spent",
+    "totalIncome": "Total Income",
+    "totalDebt": "Total Debt",
+    "quickAdd": "Quick Add",
+    "cashFlowChart": "Income vs Expenses",
+    "netTrendChart": "Net Cash Flow Trend",
+    "categoryChart": "Category Breakdown",
+    "ownerSplitChart": "Owner Split",
+    "debtSnapshot": "Debt Snapshot",
+    "spendBySource": "Spend by Source",
+    "ownerTransfers": "Owner Transfers",
+    "recentActivity": "Recent Activity",
+    "smartInsights": "Smart Insights",
+    "editLayout": "Edit layout",
+    "doneEditing": "Done",
+    "editingHint": "Drag widgets to rearrange",
+    "manageWidgets": "Manage widgets",
+    "resetLayout": "Reset layout",
+    "resetConfirmTitle": "Reset to default layout?",
+    "resetConfirmDescription": "This will restore all widgets to their original positions, sizes, and visibility. Your current layout will be lost.",
+    "resetConfirmAction": "Reset",
+    "noWidgetsVisible": "No widgets visible",
+    "addWidgets": "Manage widgets",
+    "resize": "Resize",
+    "hide": "Hide widget",
+    "visible": "Visible",
+    "addWidget": "Add",
+    "catalogDescription": "Toggle widgets on or off",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   }
 }

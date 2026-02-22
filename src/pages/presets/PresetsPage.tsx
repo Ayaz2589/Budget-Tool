@@ -227,16 +227,7 @@ export function PresetsPage() {
           title={t("nav.presets")}
           subtitle={t("presetTransactions.description")}
           showCurrencyChip
-          actions={
-            <Button
-              className="hidden md:inline-flex"
-              onClick={openForNew}
-              disabled={expenseCategories.length === 0}
-            >
-              <Plus className="size-4" />
-              {t("presetTransactions.addPreset")}
-            </Button>
-          }
+          actions={undefined}
         />
       </div>
 
@@ -537,7 +528,7 @@ export function PresetsPage() {
         </CardContent>
       </Card>
 
-      <DsActionBar>
+      <DsActionBar mobileOnly={false}>
             <Button
               onClick={openForNew}
               density="compact"

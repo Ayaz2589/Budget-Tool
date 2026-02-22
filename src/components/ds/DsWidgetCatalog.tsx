@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -18,6 +19,7 @@ interface DsWidgetCatalogProps {
   visibleWidgetIds: Set<WidgetType>;
   onShow: (id: WidgetType) => void;
   onHide: (id: WidgetType) => void;
+  onReset?: () => void;
 }
 
 export function DsWidgetCatalog({
@@ -26,17 +28,18 @@ export function DsWidgetCatalog({
   visibleWidgetIds,
   onShow,
   onHide,
+  onReset,
 }: DsWidgetCatalogProps) {
   const { t } = useTranslation();
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-80 sm:w-96">
+      <SheetContent side="right" className="flex flex-col w-80 sm:w-96 px-5">
         <SheetHeader>
           <SheetTitle>{t("widget.manageWidgets")}</SheetTitle>
           <SheetDescription>{t("widget.catalogDescription")}</SheetDescription>
         </SheetHeader>
-        <div className="mt-4 space-y-1 overflow-y-auto">
+        <div className="flex-1 mt-4 space-y-1 overflow-y-auto">
           {ALL_WIDGET_TYPES.map((wType) => {
             const entry = WIDGET_REGISTRY[wType];
             if (!entry) return null;
@@ -76,6 +79,18 @@ export function DsWidgetCatalog({
             );
           })}
         </div>
+        {onReset && (
+          <SheetFooter className="border-t pt-4">
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+              onClick={onReset}
+            >
+              <RotateCcw className="size-4" />
+              {t("widget.resetLayout")}
+            </Button>
+          </SheetFooter>
+        )}
       </SheetContent>
     </Sheet>
   );

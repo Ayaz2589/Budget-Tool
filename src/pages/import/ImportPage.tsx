@@ -215,13 +215,7 @@ export function ImportPage() {
         <DsSectionHeader
           title={t("import.title")}
           subtitle={t("import.subtitle")}
-          actions={
-            hasPreview ? (
-              <Button className="hidden md:inline-flex" onClick={addToTransactions}>
-                {primaryAddLabel}
-              </Button>
-            ) : undefined
-          }
+          actions={undefined}
         />
       </div>
 
@@ -384,7 +378,7 @@ export function ImportPage() {
       </Dialog>
 
       {hasPreview ? (
-        <DsActionBar>
+        <DsActionBar mobileOnly={false}>
           <Button onClick={addToTransactions}>{primaryAddLabel}</Button>
         </DsActionBar>
       ) : null}

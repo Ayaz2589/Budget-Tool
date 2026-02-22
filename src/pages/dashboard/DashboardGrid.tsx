@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Responsive, WidthProvider, type Layout } from "react-grid-layout/legacy";
+import { Responsive, WidthProvider, type Layout, type LayoutItem } from "react-grid-layout/legacy";
 import { useDashboardLayout } from "@/context/DashboardLayoutContext";
 import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
 import { DsWidgetShell } from "@/components/ds/DsWidgetShell";
@@ -8,6 +8,17 @@ import { DsEmptyState } from "@/components/ds";
 import type { WidgetLayoutItem } from "@/types/widget";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
+
+const SM_COLS = 12;
+
+/** Scale a 24-column RGL layout to a 12-column layout. */
+export function deriveSmLayout(lgLayout: readonly LayoutItem[]): LayoutItem[] {
+  return lgLayout.map((item) => {
+    const w = Math.max(1, Math.round(item.w * 0.5));
+    const x = Math.min(Math.round(item.x * 0.5), SM_COLS - w);
+    return { ...item, x, w };
+  });
+}
 
 interface DashboardGridProps {
   dashboardData: Record<string, unknown>;
@@ -17,8 +28,7 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
   const { layout, updateDesktopGrid, resizeWidget, hideWidget } =
     useDashboardLayout();
 
-  // Prevent onLayoutChange from firing on initial mount with stale positions
-  const hasInteracted = useRef(false);
+  const currentBreakpoint = useRef("lg");
 
   const visibleItems = useMemo(
     () => layout.desktopGrid.filter((item) => item.visible),
@@ -33,30 +43,53 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
       w: item.w,
       h: item.h,
     }));
-    return { lg };
+    const sm = visibleItems.map((item) => ({
+      i: item.id,
+      x: item.smX,
+      y: item.y,
+      w: item.smW,
+      h: item.h,
+    }));
+    return { lg, md: lg, sm };
   }, [visibleItems]);
 
-  const handleLayoutChange = useCallback(
-    (currentLayout: Layout) => {
-      if (!hasInteracted.current) return;
+  const handleBreakpointChange = useCallback((newBreakpoint: string) => {
+    currentBreakpoint.current = newBreakpoint;
+  }, []);
 
+  const handleDragStop = useCallback(
+    (currentLayout: Layout) => {
+      const bp = currentBreakpoint.current;
+      if (bp !== "lg" && bp !== "sm") return;
+
+      let changed = false;
       const updated: WidgetLayoutItem[] = layout.desktopGrid.map((item) => {
         const match = currentLayout.find((l) => l.i === item.id);
-        if (match && item.visible) {
-          return { ...item, x: match.x, y: match.y };
+        if (!match || !item.visible) return item;
+
+        if (bp === "lg") {
+          if (item.x !== match.x || item.y !== match.y) {
+            changed = true;
+            const smW = Math.max(1, Math.round(match.w * 0.5));
+            const smX = Math.min(Math.round(match.x * 0.5), 12 - smW);
+            return { ...item, x: match.x, y: match.y, smX, smW };
+          }
+        } else {
+          if (item.smX !== match.x || item.smW !== match.w) {
+            changed = true;
+            return { ...item, smX: match.x, smW: match.w };
+          }
         }
         return item;
       });
-      updateDesktopGrid(updated);
+      if (changed) {
+        updateDesktopGrid(updated);
+      }
     },
     [layout.desktopGrid, updateDesktopGrid],
   );
 
   const { t } = useTranslation();
-
-  const handleDragStart = useCallback(() => {
-    hasInteracted.current = true;
-  }, []);
 
   if (visibleItems.length === 0) {
     return <DsEmptyState title={t("widget.noWidgetsVisible")} className="py-12" />;
@@ -73,8 +106,8 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
       isDraggable
       isResizable={false}
       draggableHandle=".react-grid-dragHandleExample"
-      onLayoutChange={handleLayoutChange}
-      onDragStart={handleDragStart}
+      onBreakpointChange={handleBreakpointChange}
+      onDragStop={handleDragStop}
       margin={[8, 8]}
     >
       {visibleItems.map((item) => {

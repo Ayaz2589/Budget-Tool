@@ -47,7 +47,7 @@ function migrateId(id: string): WidgetType {
 function validateLayout(raw: unknown): DashboardLayout | null {
   if (!raw || typeof raw !== "object") return null;
   const obj = raw as Record<string, unknown>;
-  if (obj.version !== 3 && obj.version !== 4 && obj.version !== 5 && obj.version !== 6) return null;
+  if (obj.version !== 3 && obj.version !== 4 && obj.version !== 5 && obj.version !== 6 && obj.version !== 7) return null;
   if (!Array.isArray(obj.desktopGrid)) return null;
   if (!Array.isArray(obj.mobileOrder)) return null;
 
@@ -98,6 +98,9 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     if (item.x + item.w > 24) {
       item.x = Math.max(0, 24 - item.w);
     }
+    // Compute or recompute sm values after w may have changed
+    item.smW = Math.max(1, Math.round(item.w * 0.5));
+    item.smX = Math.min(item.smX ?? Math.round(item.x * 0.5), 12 - item.smW);
   }
 
   const mobileOrder = (obj.mobileOrder as WidgetType[]).filter((id) =>
@@ -118,7 +121,7 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     }
   }
 
-  return { version: 6, desktopGrid, mobileOrder };
+  return { version: 7, desktopGrid, mobileOrder };
 }
 
 function loadLayout(): DashboardLayout {
@@ -157,9 +160,12 @@ export function DashboardLayoutProvider({ children }: { children: React.ReactNod
     setLayout((prev) => {
       const registry = WIDGET_REGISTRY[id];
       const dims = registry.sizeDims[size];
-      const desktopGrid = prev.desktopGrid.map((item) =>
-        item.id === id ? { ...item, size, w: dims.w, h: dims.h } : item,
-      );
+      const desktopGrid = prev.desktopGrid.map((item) => {
+        if (item.id !== id) return item;
+        const smW = Math.max(1, Math.round(dims.w * 0.5));
+        const smX = Math.min(item.smX, 12 - smW);
+        return { ...item, size, w: dims.w, h: dims.h, smW, smX };
+      });
       return { ...prev, desktopGrid };
     });
   }, []);

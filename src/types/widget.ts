@@ -26,6 +26,8 @@ export interface WidgetLayoutItem {
   y: number;
   w: number;
   h: number;
+  smX: number;
+  smW: number;
   size: WidgetSize;
   visible: boolean;
 }

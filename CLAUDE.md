@@ -83,10 +83,10 @@ Bun's built-in test runner + React Testing Library + happy-dom. Tests in `test/`
 - Refactors are done incrementally — add/update tests first, then change code, run `bun test` after each change.
 
 ## Recent Changes
+- 012-per-widget-sizes: Added TypeScript 5.x (strict), React 19 + react-grid-layout v2.2.2, @radix-ui/react-popover, framer-motion, lucide-react, i18nex
 - 011-always-on-widget-controls: Added TypeScript 5.x (strict), React 19 + react-grid-layout v2.2.2, @radix-ui/react-popover (already installed via shadcn/ui), framer-motion, lucide-react, i18nex
 - 005-widget-redesign: Added TypeScript 5.x (strict), React 19 + react-grid-layout, recharts, shadcn/ui Card, Tailwind CSS v4, lucide-reac
-- 001-widget-dashboard: Widget-based dashboard with `react-grid-layout` v2, `DashboardLayoutContext` for layout persistence in localStorage
 
 ## Active Technologies
-- TypeScript 5.x (strict), React 19 + react-grid-layout v2.2.2, @radix-ui/react-popover (already installed via shadcn/ui), framer-motion, lucide-react, i18nex (011-always-on-widget-controls)
-- localStorage (dashboard layout persisted as JSON, version 4) (011-always-on-widget-controls)
+- TypeScript 5.x (strict), React 19 + react-grid-layout v2.2.2, @radix-ui/react-popover, framer-motion, lucide-react, i18nex (012-per-widget-sizes)
+- localStorage (JSON, layout version 4 → 5) (012-per-widget-sizes)

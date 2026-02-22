@@ -109,4 +109,7 @@ export const STORAGE_KEYS = {
 
   // Dashboard widget layout
   DASHBOARD_LAYOUT: "budget-tool-dashboard-layout",
+
+  // Saved layout collection
+  SAVED_LAYOUTS: "budget-tool-saved-layouts",
 } as const;

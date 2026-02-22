@@ -822,6 +822,22 @@
     "addWidget": "Add",
     "catalogDescription": "Toggle widgets on or off",
     "moveUp": "Move up",
-    "moveDown": "Move down"
+    "moveDown": "Move down",
+    "saveLayout": "Guardar diseño",
+    "layouts": "Diseños",
+    "defaultLayout": "Predeterminado",
+    "deleteLayoutConfirmTitle": "¿Eliminar diseño?",
+    "deleteLayoutConfirmDescription": "\"{{name}}\" se eliminará permanentemente. Esta acción no se puede deshacer.",
+    "deleteLayoutConfirmAction": "Eliminar",
+    "renameLayout": "Renombrar diseño",
+    "layoutName": "Nombre del diseño",
+    "layoutLimitReached": "Se alcanzó el máximo de 10 diseños. Elimina uno para guardar uno nuevo.",
+    "layoutSaved": "Diseño guardado",
+    "layoutNameRequired": "El nombre del diseño es obligatorio",
+    "layoutNameTooLong": "El nombre del diseño debe tener 30 caracteres o menos",
+    "layoutNameDuplicate": "Ya existe un diseño con este nombre",
+    "overwriteLayout": "Sobrescribir",
+    "saveAsNew": "Guardar como nuevo",
+    "myLayout": "Mi diseño"
   }
 }

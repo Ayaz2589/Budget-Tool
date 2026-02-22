@@ -821,6 +821,22 @@
     "addWidget": "Add",
     "catalogDescription": "Toggle widgets on or off",
     "moveUp": "Move up",
-    "moveDown": "Move down"
+    "moveDown": "Move down",
+    "saveLayout": "レイアウトを保存",
+    "layouts": "レイアウト",
+    "defaultLayout": "デフォルト",
+    "deleteLayoutConfirmTitle": "レイアウトを削除しますか？",
+    "deleteLayoutConfirmDescription": "「{{name}}」は完全に削除されます。この操作は元に戻せません。",
+    "deleteLayoutConfirmAction": "削除",
+    "renameLayout": "レイアウト名を変更",
+    "layoutName": "レイアウト名",
+    "layoutLimitReached": "レイアウトは最大10個です。新しく保存するには既存のレイアウトを削除してください。",
+    "layoutSaved": "レイアウトを保存しました",
+    "layoutNameRequired": "レイアウト名は必須です",
+    "layoutNameTooLong": "レイアウト名は30文字以内にしてください",
+    "layoutNameDuplicate": "同じ名前のレイアウトが既に存在します",
+    "overwriteLayout": "上書き",
+    "saveAsNew": "新規保存",
+    "myLayout": "マイレイアウト"
   }
 }

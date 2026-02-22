@@ -843,6 +843,22 @@
     "addWidget": "Add",
     "catalogDescription": "Toggle widgets on or off",
     "moveUp": "Move up",
-    "moveDown": "Move down"
+    "moveDown": "Move down",
+    "saveLayout": "Save layout",
+    "layouts": "Layouts",
+    "defaultLayout": "Default",
+    "deleteLayoutConfirmTitle": "Delete layout?",
+    "deleteLayoutConfirmDescription": "\"{{name}}\" will be permanently deleted. This action cannot be undone.",
+    "deleteLayoutConfirmAction": "Delete",
+    "renameLayout": "Rename layout",
+    "layoutName": "Layout name",
+    "layoutLimitReached": "Maximum of 10 layouts reached. Delete a layout to save a new one.",
+    "layoutSaved": "Layout saved",
+    "layoutNameRequired": "Layout name is required",
+    "layoutNameTooLong": "Layout name must be 30 characters or less",
+    "layoutNameDuplicate": "A layout with this name already exists",
+    "overwriteLayout": "Overwrite",
+    "saveAsNew": "Save as new",
+    "myLayout": "My Layout"
   }
 }

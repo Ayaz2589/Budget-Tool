@@ -1,9 +1,18 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import type React from "react";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
 import { DEFAULT_LAYOUT, ALL_WIDGET_TYPES } from "@/lib/defaultLayout";
 import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
-import type { DashboardLayout, WidgetLayoutItem, WidgetSize, WidgetType } from "@/types/widget";
+import type {
+  DashboardLayout,
+  WidgetLayoutItem,
+  WidgetSize,
+  WidgetType,
+  SavedLayoutEntry,
+  SavedLayoutCollection,
+  SaveLayoutResult,
+  RenameResult,
+} from "@/types/widget";
 
 interface DashboardLayoutContextValue {
   layout: DashboardLayout;
@@ -13,6 +22,14 @@ interface DashboardLayoutContextValue {
   hideWidget: (id: WidgetType) => void;
   showWidget: (id: WidgetType) => void;
   resetToDefault: () => void;
+  // Layout collection
+  savedLayouts: SavedLayoutEntry[];
+  activeLayoutId: string;
+  activeLayoutName: string;
+  saveLayout: (name: string) => SaveLayoutResult;
+  switchLayout: (id: string) => void;
+  deleteLayout: (id: string) => void;
+  renameLayout: (id: string, newName: string) => RenameResult;
 }
 
 const DashboardLayoutCtx = createContext<DashboardLayoutContextValue | null>(null);
@@ -141,12 +158,128 @@ function persistLayout(layout: DashboardLayout) {
   storage.setItem(STORAGE_KEYS.DASHBOARD_LAYOUT, JSON.stringify(layout));
 }
 
-export function DashboardLayoutProvider({ children }: { children: React.ReactNode }) {
-  const [layout, setLayout] = useState<DashboardLayout>(loadLayout);
+// ---------------------------------------------------------------------------
+// Layout collection — load / persist
+// ---------------------------------------------------------------------------
 
+function loadLayoutCollection(): SavedLayoutCollection {
+  const stored = storage.getItem(STORAGE_KEYS.SAVED_LAYOUTS);
+
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored) as SavedLayoutCollection;
+      if (parsed && Array.isArray(parsed.layouts) && parsed.layouts.length > 0) {
+        const validLayouts: SavedLayoutEntry[] = [];
+        for (const entry of parsed.layouts) {
+          if (entry.id === "default") {
+            // Default entry always uses factory layout
+            validLayouts.push({
+              ...entry,
+              layout: structuredClone(DEFAULT_LAYOUT),
+            });
+          } else {
+            const validated = validateLayout(entry.layout);
+            if (validated) {
+              validLayouts.push({ ...entry, layout: validated });
+            }
+          }
+        }
+
+        // Ensure default always exists
+        if (!validLayouts.find((e) => e.id === "default")) {
+          validLayouts.unshift({
+            id: "default",
+            name: "Default",
+            layout: structuredClone(DEFAULT_LAYOUT),
+            createdAt: 0,
+          });
+        }
+
+        const activeId = validLayouts.find((e) => e.id === parsed.activeId)
+          ? parsed.activeId
+          : "default";
+
+        return { activeId, layouts: validLayouts };
+      }
+    } catch {
+      // Fall through to migration / fresh install
+    }
+  }
+
+  // No valid collection — check for existing single layout (migration)
+  const hasExistingLayout = storage.getItem(STORAGE_KEYS.DASHBOARD_LAYOUT) !== null;
+
+  const defaultEntry: SavedLayoutEntry = {
+    id: "default",
+    name: "Default",
+    layout: structuredClone(DEFAULT_LAYOUT),
+    createdAt: 0,
+  };
+
+  if (hasExistingLayout) {
+    const existingLayout = loadLayout();
+    const migratedEntry: SavedLayoutEntry = {
+      id: crypto.randomUUID(),
+      name: "My Layout",
+      layout: existingLayout,
+      createdAt: Date.now(),
+    };
+    return { activeId: migratedEntry.id, layouts: [defaultEntry, migratedEntry] };
+  }
+
+  return { activeId: "default", layouts: [defaultEntry] };
+}
+
+function persistLayoutCollection(collection: SavedLayoutCollection) {
+  storage.setItem(STORAGE_KEYS.SAVED_LAYOUTS, JSON.stringify(collection));
+}
+
+// ---------------------------------------------------------------------------
+// Provider
+// ---------------------------------------------------------------------------
+
+export function DashboardLayoutProvider({ children }: { children: React.ReactNode }) {
+  // Initialize collection and working layout together (single localStorage read)
+  const [init] = useState(() => {
+    const collection = loadLayoutCollection();
+    persistLayoutCollection(collection);
+    const activeEntry = collection.layouts.find((e) => e.id === collection.activeId);
+    const layout = activeEntry
+      ? structuredClone(activeEntry.layout)
+      : structuredClone(DEFAULT_LAYOUT);
+    return { layout, collection };
+  });
+
+  const [layout, setLayout] = useState<DashboardLayout>(init.layout);
+  const [savedLayouts, setSavedLayouts] = useState<SavedLayoutEntry[]>(init.collection.layouts);
+  const [activeLayoutId, setActiveLayoutId] = useState<string>(init.collection.activeId);
+
+  // Refs hold the latest collection data for the sync effect and CRUD methods
+  // so we avoid calling setState inside useEffect (react-hooks/set-state-in-effect).
+  const collectionRef = useRef({ layouts: init.collection.layouts, activeId: init.collection.activeId });
+
+  // Persist active layout and sync edits to collection ref + localStorage
   useEffect(() => {
     persistLayout(layout);
-  }, [layout]);
+    const { activeId, layouts } = collectionRef.current;
+    // Default entry always keeps factory layout — skip collection sync
+    if (activeId === "default") return;
+    const updated = layouts.map((entry) =>
+      entry.id === activeId
+        ? { ...entry, layout: structuredClone(layout) }
+        : entry,
+    );
+    collectionRef.current = { activeId, layouts: updated };
+    persistLayoutCollection({ activeId, layouts: updated });
+  }, [layout, activeLayoutId]);
+
+  // Helper: update both state and ref for collection mutations
+  const updateCollection = useCallback((layouts: SavedLayoutEntry[], activeId: string) => {
+    collectionRef.current = { layouts, activeId };
+    setSavedLayouts(layouts);
+    setActiveLayoutId(activeId);
+    persistLayoutCollection({ activeId, layouts });
+  }, []);
 
   const updateDesktopGrid = useCallback((items: WidgetLayoutItem[]) => {
     setLayout((prev) => ({ ...prev, desktopGrid: items }));
@@ -185,7 +318,6 @@ export function DashboardLayoutProvider({ children }: { children: React.ReactNod
       const desktopGrid = prev.desktopGrid.map((item) =>
         item.id === id ? { ...item, visible: true } : item,
       );
-      // If the widget was removed from the grid entirely, add it back
       if (!desktopGrid.find((item) => item.id === id)) {
         const defaultItem = DEFAULT_LAYOUT.desktopGrid.find((d) => d.id === id);
         if (defaultItem) {
@@ -203,6 +335,86 @@ export function DashboardLayoutProvider({ children }: { children: React.ReactNod
     setLayout(structuredClone(DEFAULT_LAYOUT));
   }, []);
 
+  // --- Layout collection methods (read from ref for latest data) ---
+
+  const saveLayout = useCallback(
+    (name: string): SaveLayoutResult => {
+      const trimmed = name.trim();
+      if (!trimmed) return { ok: false, reason: "empty_name" };
+      if (trimmed.length > 30) return { ok: false, reason: "name_too_long" };
+      if (collectionRef.current.layouts.length >= 10) return { ok: false, reason: "limit_reached" };
+
+      const newId = crypto.randomUUID();
+      const newEntry: SavedLayoutEntry = {
+        id: newId,
+        name: trimmed,
+        layout: structuredClone(layout),
+        createdAt: Date.now(),
+      };
+
+      updateCollection([...collectionRef.current.layouts, newEntry], newId);
+      return { ok: true };
+    },
+    [layout, updateCollection],
+  );
+
+  const switchLayout = useCallback(
+    (id: string) => {
+      const entry = collectionRef.current.layouts.find((e) => e.id === id);
+      if (!entry) return;
+
+      collectionRef.current = { ...collectionRef.current, activeId: id };
+      setActiveLayoutId(id);
+      setLayout(structuredClone(entry.layout));
+      persistLayoutCollection(collectionRef.current);
+    },
+    [],
+  );
+
+  const deleteLayout = useCallback(
+    (id: string) => {
+      if (id === "default") return;
+
+      const { layouts, activeId } = collectionRef.current;
+      const updated = layouts.filter((e) => e.id !== id);
+      const newActiveId = activeId === id ? "default" : activeId;
+
+      if (activeId === id) {
+        const defaultEntry = updated.find((e) => e.id === "default");
+        if (defaultEntry) {
+          setLayout(structuredClone(defaultEntry.layout));
+        }
+      }
+
+      updateCollection(updated, newActiveId);
+    },
+    [updateCollection],
+  );
+
+  const renameLayout = useCallback(
+    (id: string, newName: string): RenameResult => {
+      const trimmed = newName.trim();
+      if (!trimmed) return { ok: false, reason: "empty_name" };
+      if (trimmed.length > 30) return { ok: false, reason: "name_too_long" };
+
+      const { layouts, activeId } = collectionRef.current;
+      const isDuplicate = layouts.some(
+        (e) => e.id !== id && e.name.toLowerCase() === trimmed.toLowerCase(),
+      );
+      if (isDuplicate) return { ok: false, reason: "duplicate_name" };
+
+      const updated = layouts.map((e) =>
+        e.id === id ? { ...e, name: trimmed } : e,
+      );
+      updateCollection(updated, activeId);
+      return { ok: true };
+    },
+    [updateCollection],
+  );
+
+  const activeLayoutName =
+    savedLayouts.find((e) => e.id === activeLayoutId)?.name ?? "Default";
+
   return (
     <DashboardLayoutCtx.Provider
       value={{
@@ -213,6 +425,13 @@ export function DashboardLayoutProvider({ children }: { children: React.ReactNod
         hideWidget,
         showWidget,
         resetToDefault,
+        savedLayouts,
+        activeLayoutId,
+        activeLayoutName,
+        saveLayout,
+        switchLayout,
+        deleteLayout,
+        renameLayout,
       }}
     >
       {children}

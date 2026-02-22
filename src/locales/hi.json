@@ -821,6 +821,22 @@
     "addWidget": "Add",
     "catalogDescription": "Toggle widgets on or off",
     "moveUp": "Move up",
-    "moveDown": "Move down"
+    "moveDown": "Move down",
+    "saveLayout": "लेआउट सहेजें",
+    "layouts": "लेआउट",
+    "defaultLayout": "डिफ़ॉल्ट",
+    "deleteLayoutConfirmTitle": "लेआउट हटाएं?",
+    "deleteLayoutConfirmDescription": "\"{{name}}\" स्थायी रूप से हटा दिया जाएगा। यह क्रिया पूर्ववत नहीं की जा सकती।",
+    "deleteLayoutConfirmAction": "हटाएं",
+    "renameLayout": "लेआउट का नाम बदलें",
+    "layoutName": "लेआउट का नाम",
+    "layoutLimitReached": "अधिकतम 10 लेआउट तक पहुंच गया। नया सहेजने के लिए एक लेआउट हटाएं।",
+    "layoutSaved": "लेआउट सहेजा गया",
+    "layoutNameRequired": "लेआउट का नाम आवश्यक है",
+    "layoutNameTooLong": "लेआउट का नाम 30 अक्षर या उससे कम होना चाहिए",
+    "layoutNameDuplicate": "इस नाम का एक लेआउट पहले से मौजूद है",
+    "overwriteLayout": "ओवरराइट करें",
+    "saveAsNew": "नए के रूप में सहेजें",
+    "myLayout": "मेरा लेआउट"
   }
 }

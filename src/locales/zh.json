@@ -822,6 +822,22 @@
     "addWidget": "Add",
     "catalogDescription": "Toggle widgets on or off",
     "moveUp": "Move up",
-    "moveDown": "Move down"
+    "moveDown": "Move down",
+    "saveLayout": "保存布局",
+    "layouts": "布局",
+    "defaultLayout": "默认",
+    "deleteLayoutConfirmTitle": "删除布局？",
+    "deleteLayoutConfirmDescription": "\"{{name}}\" 将被永久删除。此操作无法撤销。",
+    "deleteLayoutConfirmAction": "删除",
+    "renameLayout": "重命名布局",
+    "layoutName": "布局名称",
+    "layoutLimitReached": "最多可保存 10 个布局。请删除一个布局后再保存新布局。",
+    "layoutSaved": "布局已保存",
+    "layoutNameRequired": "布局名称为必填项",
+    "layoutNameTooLong": "布局名称不得超过 30 个字符",
+    "layoutNameDuplicate": "已存在同名布局",
+    "overwriteLayout": "覆盖",
+    "saveAsNew": "另存为新布局",
+    "myLayout": "我的布局"
   }
 }

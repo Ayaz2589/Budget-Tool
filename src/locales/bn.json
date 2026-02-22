@@ -821,6 +821,22 @@
     "addWidget": "Add",
     "catalogDescription": "Toggle widgets on or off",
     "moveUp": "Move up",
-    "moveDown": "Move down"
+    "moveDown": "Move down",
+    "saveLayout": "লেআউট সংরক্ষণ করুন",
+    "layouts": "লেআউটসমূহ",
+    "defaultLayout": "ডিফল্ট",
+    "deleteLayoutConfirmTitle": "লেআউট মুছবেন?",
+    "deleteLayoutConfirmDescription": "\"{{name}}\" স্থায়ীভাবে মুছে ফেলা হবে। এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।",
+    "deleteLayoutConfirmAction": "মুছুন",
+    "renameLayout": "লেআউটের নাম পরিবর্তন করুন",
+    "layoutName": "লেআউটের নাম",
+    "layoutLimitReached": "সর্বোচ্চ ১০টি লেআউটে পৌঁছেছে। নতুন সংরক্ষণ করতে একটি লেআউট মুছুন।",
+    "layoutSaved": "লেআউট সংরক্ষিত",
+    "layoutNameRequired": "লেআউটের নাম প্রয়োজন",
+    "layoutNameTooLong": "লেআউটের নাম ৩০ অক্ষর বা তার কম হতে হবে",
+    "layoutNameDuplicate": "এই নামে একটি লেআউট ইতিমধ্যে বিদ্যমান",
+    "overwriteLayout": "ওভাররাইট করুন",
+    "saveAsNew": "নতুন হিসেবে সংরক্ষণ",
+    "myLayout": "আমার লেআউট"
   }
 }

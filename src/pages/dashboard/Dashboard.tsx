@@ -16,6 +16,7 @@ import {
   DsActionBar,
   DsEmptyState,
   DsHelpTooltip,
+  DsLayoutSwitcher,
   DsSectionHeader,
   DsWidgetCatalog,
 } from "@/components/ds";
@@ -43,6 +44,12 @@ function DashboardContent() {
     hideWidget,
     showWidget,
     resetToDefault,
+    savedLayouts,
+    activeLayoutId,
+    saveLayout,
+    switchLayout,
+    deleteLayout,
+    renameLayout,
   } = useDashboardLayout();
   const isEmpty = expenses.length === 0 && income.length === 0 && debts.length === 0;
 
@@ -108,15 +115,25 @@ function DashboardContent() {
             showCurrencyChip
             actions={
               !isMobile ? (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-10 w-10"
-                  onClick={() => setCatalogOpen(true)}
-                  aria-label={tWidget("widget.manageWidgets")}
-                >
-                  <Grid2X2 className="size-5" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <DsLayoutSwitcher
+                    savedLayouts={savedLayouts}
+                    activeLayoutId={activeLayoutId}
+                    onSwitch={switchLayout}
+                    onSave={saveLayout}
+                    onDelete={deleteLayout}
+                    onRename={renameLayout}
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-10 w-10"
+                    onClick={() => setCatalogOpen(true)}
+                    aria-label={tWidget("widget.manageWidgets")}
+                  >
+                    <Grid2X2 className="size-5" />
+                  </Button>
+                </div>
               ) : undefined
             }
           />

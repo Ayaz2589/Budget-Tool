@@ -38,6 +38,26 @@ export interface DashboardLayout {
   mobileOrder: WidgetType[];
 }
 
+export interface SavedLayoutEntry {
+  id: string;
+  name: string;
+  layout: DashboardLayout;
+  createdAt: number;
+}
+
+export interface SavedLayoutCollection {
+  activeId: string;
+  layouts: SavedLayoutEntry[];
+}
+
+export type SaveLayoutResult =
+  | { ok: true }
+  | { ok: false; reason: "empty_name" | "name_too_long" | "limit_reached" | "storage_error" };
+
+export type RenameResult =
+  | { ok: true }
+  | { ok: false; reason: "empty_name" | "name_too_long" | "duplicate_name" };
+
 export interface WidgetRegistryEntry {
   type: WidgetType;
   label: string;

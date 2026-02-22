@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, SlidersHorizontal } from "lucide-react";
 import { DsActionBar, DsEmptyState, DsHelpTooltip, DsSectionHeader } from "@/components/ds";
-import { TransactionsToolbar } from "./TransactionsToolbar";
+
 import { FiltersAndActionsDialog } from "./FiltersAndActionsDialog";
 import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
 import { ExpensesByMonthTable, type SortColumn } from "./ExpensesByMonthTable";
@@ -218,16 +218,7 @@ export function TransactionsPage() {
           }
           subtitle={t("transactions.subtitle")}
           showCurrencyChip
-          actions={
-            <div className="hidden md:block">
-              <TransactionsToolbar
-                onOpenFilters={() => setFiltersPopupOpen(true)}
-                onAddTransaction={() => setAddTransactionOpen(true)}
-                hasActiveFilters={hasActiveFilters}
-                t={t}
-              />
-            </div>
-          }
+          actions={undefined}
         />
       </div>
       <div className="flex flex-1 flex-col pb-24 md:pb-0">
@@ -337,7 +328,7 @@ export function TransactionsPage() {
         </Card>
       </div>
 
-      <DsActionBar>
+      <DsActionBar mobileOnly={false}>
             <Button
               variant="secondary"
               density="compact"

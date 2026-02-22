@@ -77,15 +77,7 @@ export function IncomePage() {
           }
           subtitle={t("income.subtitle")}
           showCurrencyChip
-          actions={
-            <Button
-              className="hidden md:inline-flex"
-              onClick={() => setAddOpen(true)}
-            >
-              <Plus className="size-4" />
-              {t("income.addIncome")}
-            </Button>
-          }
+          actions={undefined}
         />
       </div>
 
@@ -136,7 +128,7 @@ export function IncomePage() {
         </CardContent>
       </Card>
 
-      <DsActionBar>
+      <DsActionBar mobileOnly={false}>
             <Button
               onClick={() => setAddOpen(true)}
               density="compact"

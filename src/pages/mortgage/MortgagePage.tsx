@@ -93,12 +93,7 @@ export function MortgagePage() {
           }
           subtitle={t("mortgage.subtitle")}
           showCurrencyChip
-          actions={
-            <Button className="hidden md:inline-flex" onClick={() => setAddOpen(true)}>
-              <Plus className="size-4" />
-              {t("mortgage.addPayment")}
-            </Button>
-          }
+          actions={undefined}
         />
       </div>
 
@@ -150,7 +145,7 @@ export function MortgagePage() {
         </CardContent>
       </Card>
 
-      <DsActionBar>
+      <DsActionBar mobileOnly={false}>
             <Button
               onClick={() => setAddOpen(true)}
               density="compact"

@@ -86,15 +86,7 @@ export function DebtPage() {
           }
           subtitle={t("debt.subtitle")}
           showCurrencyChip
-          actions={
-            <Button
-              className="hidden md:inline-flex"
-              onClick={() => setAddDebtOpen(true)}
-            >
-              <Plus className="size-4" />
-              {t("debt.addDebt")}
-            </Button>
-          }
+          actions={undefined}
         />
       </div>
 
@@ -146,7 +138,7 @@ export function DebtPage() {
         </div>
       </div>
 
-      <DsActionBar>
+      <DsActionBar mobileOnly={false}>
             <Button
               onClick={() => setAddDebtOpen(true)}
               density="compact"

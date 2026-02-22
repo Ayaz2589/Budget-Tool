@@ -166,7 +166,7 @@ test("TransactionsPage renders without throwing", () => {
 
 test("TransactionsPage opens add transaction sheet", () => {
   render(<TestWrapper />);
-  const addButtons = screen.getAllByRole("button", { name: /add expense/i });
+  const addButtons = screen.getAllByRole("button", { name: /^add$/i });
   fireEvent.click(addButtons[0]!);
   expect(screen.getAllByText("New transaction").length).toBeGreaterThan(0);
 });

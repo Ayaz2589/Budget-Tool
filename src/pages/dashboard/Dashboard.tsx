@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, SlidersHorizontal, Wallet, RotateCcw, Grid2X2 } from "lucide-react";
+import { Plus, SlidersHorizontal, Wallet, Grid2X2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -108,48 +108,15 @@ function DashboardContent() {
             showCurrencyChip
             actions={
               !isMobile ? (
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    className="h-11 gap-2"
-                    onClick={() => setCatalogOpen(true)}
-                  >
-                    <Grid2X2 className="size-4" />
-                    <span>{tWidget("widget.manageWidgets")}</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-11 gap-2"
-                    onClick={() => setResetDialogOpen(true)}
-                  >
-                    <RotateCcw className="size-4" />
-                    <span>{tWidget("widget.resetLayout")}</span>
-                  </Button>
-                  <Button
-                    variant="default"
-                    className="h-11 gap-2"
-                    onClick={() => setAddTransactionOpen(true)}
-                  >
-                    <Plus className="size-4" />
-                    <span>{t("dashboard.addExpense")}</span>
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    className="h-11 gap-2"
-                    onClick={() => setAddIncomeOpen(true)}
-                  >
-                    <Wallet className="size-4" />
-                    <span>{t("dashboard.addIncome")}</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-11 gap-2"
-                    onClick={() => data.setSettingsOpen(true)}
-                  >
-                    <SlidersHorizontal className="size-4" />
-                    <span>{t("settings.title")}</span>
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10"
+                  onClick={() => setCatalogOpen(true)}
+                  aria-label={tWidget("widget.manageWidgets")}
+                >
+                  <Grid2X2 className="size-5" />
+                </Button>
               ) : undefined
             }
           />
@@ -181,40 +148,38 @@ function DashboardContent() {
         )}
       </div>
 
-      {isMobile ? (
-        <DsActionBar>
-          <Button
-            variant="secondary"
-            density="compact"
-            onClick={() => data.setSettingsOpen(true)}
-            className="rounded-full p-0"
-            size="icon"
-            aria-label={t("settings.title")}
-          >
-            <SlidersHorizontal className="size-4" />
-          </Button>
-          <Button
-            variant="secondary"
-            density="compact"
-            onClick={() => setAddIncomeOpen(true)}
-            className="rounded-full p-0"
-            size="icon"
-            aria-label={t("dashboard.addIncome")}
-          >
-            <Wallet className="size-4" />
-          </Button>
-          <Button
-            variant="default"
-            density="compact"
-            onClick={() => setAddTransactionOpen(true)}
-            className="rounded-full p-0"
-            size="icon"
-            aria-label={t("dashboard.addExpense")}
-          >
-            <Plus className="size-4" />
-          </Button>
-        </DsActionBar>
-      ) : null}
+      <DsActionBar mobileOnly={false}>
+        <Button
+          variant="secondary"
+          density="compact"
+          onClick={() => data.setSettingsOpen(true)}
+          className="rounded-full p-0"
+          size="icon"
+          aria-label={t("settings.title")}
+        >
+          <SlidersHorizontal className="size-4" />
+        </Button>
+        <Button
+          variant="secondary"
+          density="compact"
+          onClick={() => setAddIncomeOpen(true)}
+          className="rounded-full p-0"
+          size="icon"
+          aria-label={t("dashboard.addIncome")}
+        >
+          <Wallet className="size-4" />
+        </Button>
+        <Button
+          variant="default"
+          density="compact"
+          onClick={() => setAddTransactionOpen(true)}
+          className="rounded-full p-0"
+          size="icon"
+          aria-label={t("dashboard.addExpense")}
+        >
+          <Plus className="size-4" />
+        </Button>
+      </DsActionBar>
 
       <AddTransactionDialog
         open={addTransactionOpen}
@@ -256,6 +221,7 @@ function DashboardContent() {
         visibleWidgetIds={visibleWidgetIds}
         onShow={showWidget}
         onHide={hideWidget}
+        onReset={() => setResetDialogOpen(true)}
       />
 
       <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>

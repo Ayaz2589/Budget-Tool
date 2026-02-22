@@ -159,7 +159,7 @@ test("MortgagePage opens add payment sheet", () => {
   seedBudget();
   render(<TestWrapper />);
   const addButtons = screen.getAllByRole("button", {
-    name: new RegExp(i18n.t("mortgage.addPayment"), "i"),
+    name: new RegExp(i18n.t("mortgage.addMortgagePayment"), "i"),
   });
   fireEvent.click(addButtons[0]!);
   expect(

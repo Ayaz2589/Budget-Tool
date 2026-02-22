@@ -42,9 +42,10 @@ export function TotalIncome({ totalIncome, sparklineRows, size = "sm" }: TotalIn
         </span>
       }
       value={formatCurrency(totalIncome)}
+      sparklineBottom={size === "lg"}
       sparkline={
         sparklineRows && sparklineRows.length > 1 ? (
-          <ResponsiveContainer width="100%" height={28}>
+          <ResponsiveContainer width={size === "lg" ? "100%" : "75%"} height={20}>
             <AreaChart data={sparklineRows}>
               <defs>
                 <linearGradient id="incomeSpark" x1="0" y1="0" x2="0" y2="1">

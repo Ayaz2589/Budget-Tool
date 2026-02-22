@@ -51,9 +51,10 @@ export function TotalSpent({
           </span>
         ) : undefined
       }
+      sparklineBottom={size === "lg"}
       sparkline={
         sparklineRows && sparklineRows.length > 1 ? (
-          <ResponsiveContainer width="100%" height={28}>
+          <ResponsiveContainer width={size === "lg" ? "100%" : "75%"} height={20}>
             <AreaChart data={sparklineRows}>
               <defs>
                 <linearGradient id="spentSpark" x1="0" y1="0" x2="0" y2="1">

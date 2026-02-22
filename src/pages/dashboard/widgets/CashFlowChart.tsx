@@ -141,7 +141,7 @@ export function CashFlowChart({
             {incomeOwnerKeys.map((owner, index) => (
               <Bar
                 key={owner}
-                dataKey={(row) => row.incomeByOwner[owner] ?? 0}
+                dataKey={`incomeByOwner.${owner}`}
                 name={t("dashboard.chartIncomeOwner", { owner })}
                 fill={INCOME_OWNER_COLORS[index % INCOME_OWNER_COLORS.length]}
                 stackId="income"

@@ -20,6 +20,29 @@ export function deriveSmLayout(lgLayout: readonly LayoutItem[]): LayoutItem[] {
   });
 }
 
+/** Push items left to eliminate horizontal gaps within a grid. */
+function compactHorizontal(layout: readonly LayoutItem[], cols: number): LayoutItem[] {
+  const sorted = [...layout].sort((a, b) => a.y - b.y || a.x - b.x);
+  const placed: LayoutItem[] = [];
+
+  for (const item of sorted) {
+    let x = 0;
+    for (;;) {
+      if (x + item.w > cols) { x = Math.max(0, cols - item.w); break; }
+      const blocker = placed.find(
+        (p) =>
+          x < p.x + p.w && x + item.w > p.x &&
+          item.y < p.y + p.h && item.y + item.h > p.y,
+      );
+      if (!blocker) break;
+      x = blocker.x + blocker.w;
+    }
+    placed.push({ ...item, x });
+  }
+
+  return placed;
+}
+
 interface DashboardGridProps {
   dashboardData: Record<string, unknown>;
 }
@@ -36,20 +59,18 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
   );
 
   const rglLayouts = useMemo(() => {
-    const lg = visibleItems.map((item) => ({
-      i: item.id,
-      x: item.x,
-      y: item.y,
-      w: item.w,
-      h: item.h,
-    }));
-    const sm = visibleItems.map((item) => ({
-      i: item.id,
-      x: item.smX,
-      y: item.y,
-      w: item.smW,
-      h: item.h,
-    }));
+    const lg = compactHorizontal(
+      visibleItems.map((item) => ({
+        i: item.id, x: item.x, y: item.y, w: item.w, h: item.h,
+      })),
+      24,
+    );
+    const sm = compactHorizontal(
+      visibleItems.map((item) => ({
+        i: item.id, x: item.smX, y: item.y, w: item.smW, h: item.h,
+      })),
+      SM_COLS,
+    );
     return { lg, md: lg, sm };
   }, [visibleItems]);
 
@@ -60,24 +81,28 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
   const handleDragStop = useCallback(
     (currentLayout: Layout) => {
       const bp = currentBreakpoint.current;
-      if (bp !== "lg" && bp !== "sm") return;
+      const isLg = bp === "lg" || bp === "md";
+      if (!isLg && bp !== "sm") return;
+
+      const cols = isLg ? 24 : SM_COLS;
+      const compacted = compactHorizontal(currentLayout, cols);
 
       let changed = false;
       const updated: WidgetLayoutItem[] = layout.desktopGrid.map((item) => {
-        const match = currentLayout.find((l) => l.i === item.id);
+        const match = compacted.find((l) => l.i === item.id);
         if (!match || !item.visible) return item;
 
-        if (bp === "lg") {
+        if (isLg) {
           if (item.x !== match.x || item.y !== match.y) {
             changed = true;
             const smW = Math.max(1, Math.round(match.w * 0.5));
-            const smX = Math.min(Math.round(match.x * 0.5), 12 - smW);
+            const smX = Math.min(Math.round(match.x * 0.5), SM_COLS - smW);
             return { ...item, x: match.x, y: match.y, smX, smW };
           }
         } else {
-          if (item.smX !== match.x || item.smW !== match.w) {
+          if (item.smX !== match.x) {
             changed = true;
-            return { ...item, smX: match.x, smW: match.w };
+            return { ...item, smX: match.x };
           }
         }
         return item;

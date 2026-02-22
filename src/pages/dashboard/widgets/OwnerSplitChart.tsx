@@ -95,7 +95,7 @@ export function OwnerSplitChart({
             <span className="text-lg font-semibold">{formatCurrency(single.value)}</span>
           </div>
         </DsChartCard>
-        {(effectiveSize === "xl" || effectiveSize === "lg") && (
+        {effectiveSize === "lg" && (
           <OwnerExpenseByOwner
             visibleOwnerNetRows={visibleOwnerNetRows}
             ownerExpenseItemsByOwner={ownerExpenseItemsByOwner}
@@ -120,14 +120,13 @@ export function OwnerSplitChart({
   const chartConfig = { value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } };
 
   const pieChart = (
-    <ChartContainer config={chartConfig} heightMobile={110} heightDesktop={effectiveSize === "xl" ? 400 : effectiveSize === "lg" ? 220 : 110}>
+    <ChartContainer config={chartConfig} heightMobile={140} heightDesktop={effectiveSize === "lg" ? 220 : 140}>
       <PieChart>
         <Pie
           data={ownerSlices}
           dataKey="value"
           nameKey="label"
-          innerRadius={effectiveSize === "md" ? 30 : undefined}
-          outerRadius={effectiveSize === "md" ? 48 : effectiveSize === "lg" ? 80 : 90}
+          outerRadius={effectiveSize === "md" ? 60 : 80}
         >
           {ownerSlices.map((slice, index) => (
             <Cell key={slice.key} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
@@ -149,29 +148,23 @@ export function OwnerSplitChart({
     />
   );
 
-  // md: pie chart + legend only (no detail rows)
+  // md: side-by-side pie + legend
   if (effectiveSize === "md") {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <div className="space-y-2">
-          {pieChart}
-          {legend}
+        <div className="flex items-center gap-6">
+          <div className="w-[160px] shrink-0">
+            {pieChart}
+          </div>
+          <div className="min-w-0 flex-1">
+            {legend}
+          </div>
         </div>
       </DsChartCard>
     );
   }
 
-  // lg (~588×328px): pie chart + legend (no detail rows)
-  if (effectiveSize === "lg") {
-    return (
-      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        {pieChart}
-        {legend}
-      </DsChartCard>
-    );
-  }
-
-  // xl (~588×664px): full pie chart + legend + OwnerExpenseByOwner detail rows
+  // lg: full pie chart + legend + OwnerExpenseByOwner detail rows
   return (
     <>
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>

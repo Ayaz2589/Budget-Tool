@@ -49,7 +49,7 @@ export function NetTrendChart({
   const { t } = useTranslation();
   const effectiveSize: WidgetSize = size ?? "md";
 
-  const chartTitle = effectiveSize === "xl" || effectiveSize === "lg" ? (
+  const chartTitle = effectiveSize === "lg" || effectiveSize === "md" ? (
     <span className="inline-flex items-center gap-1.5">
       {t("dashboard.chartNetCashFlowTrend")}
       <DsHelpTooltip
@@ -90,24 +90,81 @@ export function NetTrendChart({
     );
   }
 
-  // md/lg: range="current" shows single metric
+  // md/lg: range="current" shows single metric (lg adds mini chart)
   if (range === "current") {
+    const currentNet = netCashFlowRows[0]?.netCashFlow ?? 0;
+    const miniChartConfig = {
+      netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "var(--viz-series-3)" },
+    };
+    // Build a small dataset: zero baseline + current value for a simple visual
+    const miniData = [
+      { monthAxisLabel: "", netCashFlow: 0 },
+      { monthAxisLabel: t("dashboard.chartCurrentMonthNetCashFlow"), netCashFlow: currentNet },
+    ];
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <div className="rounded-2xl border border-border bg-card px-4 py-4 md:px-5 md:py-5">
+        <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground/90">
             {t("dashboard.chartCurrentMonthNetCashFlow")}
           </p>
           <p
             className={
-              (netCashFlowRows[0]?.netCashFlow ?? 0) >= 0
-                ? "mt-2 text-3xl font-semibold leading-tight text-emerald-500"
-                : "mt-2 text-3xl font-semibold leading-tight text-destructive"
+              currentNet >= 0
+                ? "mt-1 text-2xl font-semibold leading-tight text-emerald-500"
+                : "mt-1 text-2xl font-semibold leading-tight text-destructive"
             }
           >
-            {formatCurrency(netCashFlowRows[0]?.netCashFlow ?? 0)}
+            {formatCurrency(currentNet)}
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t("dashboard.chartTrendSwitchHint")}
+          </p>
+        </div>
+        {effectiveSize === "lg" && (
+          <ChartContainer config={miniChartConfig} heightMobile={120} heightDesktop={160}>
+            <AreaChart data={miniData}>
+              <defs>
+                <linearGradient id="netCashFlowMini" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.03} />
+                </linearGradient>
+              </defs>
+              <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
+              <Area
+                type="monotone"
+                dataKey="netCashFlow"
+                stroke="var(--viz-series-3)"
+                fill="url(#netCashFlowMini)"
+                strokeWidth={2}
+                dot={false}
+                isAnimationActive={false}
+              />
+            </AreaChart>
+          </ChartContainer>
+        )}
+      </DsChartCard>
+    );
+  }
+
+  // md at 6m/12m: show metric value (card too small for chart)
+  if (effectiveSize === "md") {
+    const latestNetMd = netCashFlowRows[netCashFlowRows.length - 1]?.netCashFlow ?? 0;
+    return (
+      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground/90">
+            {t("dashboard.chartCurrentMonthNetCashFlow")}
+          </p>
+          <p
+            className={
+              latestNetMd >= 0
+                ? "mt-1 text-2xl font-semibold leading-tight text-emerald-500"
+                : "mt-1 text-2xl font-semibold leading-tight text-destructive"
+            }
+          >
+            {formatCurrency(latestNetMd)}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
             {t("dashboard.chartTrendSwitchHint")}
           </p>
         </div>
@@ -128,109 +185,42 @@ export function NetTrendChart({
     netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "var(--viz-series-3)" },
   };
 
-  // xl (~588×664px): full chart with axis labels, reference line, tooltips
-  if (effectiveSize === "xl") {
-    return (
-      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <ChartContainer config={chartConfig} heightMobile={220} heightDesktop={550}>
-          <AreaChart data={netCashFlowRows}>
-            <defs>
-              <linearGradient id="netCashFlowAreaLg" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.35} />
-                <stop offset="75%" stopColor="var(--viz-series-3)" stopOpacity={0.14} />
-                <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.03} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} />
-            <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} />
-            <YAxis />
-            <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
-            <ChartTooltip content={tooltipContent} />
-            <Area
-              type="monotone"
-              dataKey="netCashFlow"
-              name={t("dashboard.chartNetCashFlow")}
-              stroke="var(--viz-series-3)"
-              fill="url(#netCashFlowAreaLg)"
-              strokeWidth={2.2}
-              dot={false}
-              activeDot={{ r: 5 }}
-              isAnimationActive={false}
-            />
-          </AreaChart>
-        </ChartContainer>
-      </DsChartCard>
-    );
-  }
-
-  // lg (~588×328px): mid-height chart with axis labels
-  if (effectiveSize === "lg") {
-    return (
-      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <ChartContainer config={chartConfig} heightMobile={200} heightDesktop={260}>
-          <AreaChart data={netCashFlowRows}>
-            <defs>
-              <linearGradient id="netCashFlowAreaLgMid" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.35} />
-                <stop offset="75%" stopColor="var(--viz-series-3)" stopOpacity={0.14} />
-                <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.03} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} />
-            <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} />
-            <YAxis />
-            <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
-            <ChartTooltip content={tooltipContent} />
-            <Area
-              type="monotone"
-              dataKey="netCashFlow"
-              name={t("dashboard.chartNetCashFlow")}
-              stroke="var(--viz-series-3)"
-              fill="url(#netCashFlowAreaLgMid)"
-              strokeWidth={2.2}
-              dot={false}
-              activeDot={{ r: 5 }}
-              isAnimationActive={false}
-            />
-          </AreaChart>
-        </ChartContainer>
-      </DsChartCard>
-    );
-  }
-
-  // md (~290×216px): compact chart, no legend
+  // md/lg: chart with axis labels (lg adds metric summary above)
+  const latestNet = netCashFlowRows[netCashFlowRows.length - 1]?.netCashFlow ?? 0;
   return (
     <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-      <ChartContainer config={chartConfig} heightMobile={110} heightDesktop={110}>
-        <AreaChart
-          data={netCashFlowRows}
-          margin={{ top: 4, right: 24, left: -6, bottom: 2 }}
-        >
+      {effectiveSize === "lg" && (
+        <div className="mb-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground/90">
+            {t("dashboard.chartCurrentMonthNetCashFlow")}
+          </p>
+          <p
+            className={
+              latestNet >= 0
+                ? "mt-1 text-2xl font-semibold leading-tight text-emerald-500"
+                : "mt-1 text-2xl font-semibold leading-tight text-destructive"
+            }
+          >
+            {formatCurrency(latestNet)}
+          </p>
+        </div>
+      )}
+      <ChartContainer config={chartConfig} heightMobile={140} heightDesktop={effectiveSize === "lg" ? 220 : 160}>
+        <AreaChart data={netCashFlowRows}>
           <defs>
             <linearGradient id="netCashFlowAreaMd" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.3} />
-              <stop offset="75%" stopColor="var(--viz-series-3)" stopOpacity={0.12} />
-              <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.35} />
+              <stop offset="75%" stopColor="var(--viz-series-3)" stopOpacity={0.14} />
+              <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.03} />
             </linearGradient>
           </defs>
           <CartesianGrid vertical={false} />
-          <XAxis
-            dataKey="monthAxisLabel"
-            tick={{ fontSize: 11 }}
-            tickMargin={8}
-            minTickGap={18}
-            interval="preserveStartEnd"
-            padding={{ left: 0, right: 10 }}
-          />
-          <YAxis
-            tick={{ fontSize: 11 }}
-            width={34}
-            tickFormatter={(value) => {
-              const abs = Math.abs(Number(value));
-              if (abs >= 1000) return `${Math.round(Number(value) / 1000)}k`;
-              return String(Math.round(Number(value)));
-            }}
-          />
+          <XAxis dataKey="monthAxisLabel" tick={{ fontSize: 11 }} tickMargin={8} minTickGap={18} interval="preserveStartEnd" />
+          <YAxis tick={{ fontSize: 11 }} width={34} tickFormatter={(value) => {
+            const abs = Math.abs(Number(value));
+            if (abs >= 1000) return `${Math.round(Number(value) / 1000)}k`;
+            return String(Math.round(Number(value)));
+          }} />
           <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
           <ChartTooltip content={tooltipContent} />
           <Area

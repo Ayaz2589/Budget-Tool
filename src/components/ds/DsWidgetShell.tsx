@@ -1,145 +1,127 @@
+import { useState } from "react";
 import type React from "react";
 import { useTranslation } from "react-i18next";
-import { GripVertical, EyeOff, ChevronUp, ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { GripVertical, EyeOff, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
 import { DsWidgetCard } from "./DsWidgetCard";
 import type { WidgetType, WidgetSize } from "@/types/widget";
 
-const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", wide: "W", md: "M", tall: "T", lg: "L", xl: "XL" };
+const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", md: "M", lg: "L" };
+const ALL_SIZES: WidgetSize[] = ["sm", "md", "lg"];
 
 interface DsWidgetShellProps {
   widgetType: WidgetType;
   size: WidgetSize;
-  isEditing: boolean;
   onResize?: (size: WidgetSize) => void;
   onHide?: () => void;
-  onMoveUp?: () => void;
-  onMoveDown?: () => void;
   isMobile?: boolean;
-  isFirst?: boolean;
-  isLast?: boolean;
   children: React.ReactNode;
 }
 
 export function DsWidgetShell({
   widgetType,
   size,
-  isEditing,
   onResize,
   onHide,
-  onMoveUp,
-  onMoveDown,
   isMobile,
-  isFirst,
-  isLast,
   children,
 }: DsWidgetShellProps) {
   const { t } = useTranslation();
   const registry = WIDGET_REGISTRY[widgetType];
   const label = t(registry.label);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   return (
     <div
       role="region"
       aria-label={label}
       tabIndex={0}
-      className={cn(
-        "h-full w-full overflow-hidden rounded-2xl",
-        isEditing && "ring-2 ring-primary/20 bg-card shadow-sm",
-      )}
+      className="group relative h-full w-full overflow-hidden rounded-2xl"
     >
-      <AnimatePresence>
-        {isEditing && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="flex items-center gap-2 border-b border-border/60 bg-muted/50 px-3 py-1.5"
-          >
-            {/* Drag handle (desktop) */}
-            {!isMobile && (
-              <GripVertical
-                className="react-grid-dragHandleExample size-4 shrink-0 cursor-grab text-muted-foreground"
-                aria-hidden
-              />
-            )}
+      {/* Drag handle — top-left, hover-visible on desktop, always visible on mobile */}
+      {!isMobile && (
+        <div
+          className="react-grid-dragHandleExample absolute left-1.5 top-1.5 z-10 flex size-6 cursor-grab items-center justify-center rounded-md bg-background/80 opacity-0 shadow-sm backdrop-blur-sm transition-opacity group-hover:opacity-100"
+          aria-hidden
+        >
+          <GripVertical className="size-3.5 text-muted-foreground" />
+        </div>
+      )}
 
-            {/* Mobile move buttons */}
-            {isMobile && (
-              <div className="flex items-center gap-0.5">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  disabled={isFirst}
-                  onClick={onMoveUp}
-                  aria-label={t("widget.moveUp")}
-                >
-                  <ChevronUp className="size-3.5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  disabled={isLast}
-                  onClick={onMoveDown}
-                  aria-label={t("widget.moveDown")}
-                >
-                  <ChevronDown className="size-3.5" />
-                </Button>
+      {/* Overflow popover trigger — top-right, hover-visible on desktop, always visible on mobile */}
+      <div
+        className={cn(
+          "absolute right-1.5 top-1.5 z-10 transition-opacity",
+          isMobile ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+        )}
+      >
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="size-6 rounded-md bg-background/80 p-0 shadow-sm backdrop-blur-sm"
+              aria-label={t("widget.resize")}
+            >
+              <MoreHorizontal className="size-3.5 text-muted-foreground" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-48 p-3">
+            {/* Widget label */}
+            <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              {registry.icon}
+              <span className="truncate">{label}</span>
+            </div>
+
+            {/* Size selector */}
+            {onResize && (
+              <div className="mb-2 flex items-center rounded-md border border-border/60 bg-background">
+                {ALL_SIZES.map((s, i) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => {
+                      onResize(s);
+                      setPopoverOpen(false);
+                    }}
+                    className={cn(
+                      "flex-1 px-1.5 py-1 text-[10px] font-semibold leading-none transition-colors",
+                      s === size
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground",
+                      i !== 0 && "border-l border-border/60",
+                    )}
+                    aria-label={`${t("widget.resize")} ${SIZE_LABELS[s]}`}
+                    aria-pressed={s === size}
+                  >
+                    {SIZE_LABELS[s]}
+                  </button>
+                ))}
               </div>
             )}
 
-            {/* Widget label */}
-            <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground truncate">
-              {registry.icon}
-              {label}
-            </span>
+            {/* Hide button */}
+            {onHide && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-full justify-start gap-2 text-xs text-muted-foreground hover:text-destructive"
+                onClick={() => {
+                  onHide();
+                  setPopoverOpen(false);
+                }}
+              >
+                <EyeOff className="size-3.5" />
+                {t("widget.hide")}
+              </Button>
+            )}
+          </PopoverContent>
+        </Popover>
+      </div>
 
-            <div className="ml-auto flex items-center gap-1">
-              {/* Size selector */}
-              {onResize && (
-                <div className="flex items-center rounded-md border border-border/60 bg-background">
-                  {registry.allowedSizes.map((s, i) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => onResize(s)}
-                      className={cn(
-                        "px-1.5 py-0.5 text-[10px] font-semibold leading-none transition-colors",
-                        s === size
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground",
-                        i !== 0 && "border-l border-border/60",
-                      )}
-                      aria-label={`${t("widget.resize")} ${SIZE_LABELS[s]}`}
-                      aria-pressed={s === size}
-                    >
-                      {SIZE_LABELS[s]}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Hide button */}
-              {onHide && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-                  onClick={onHide}
-                  aria-label={t("widget.hide")}
-                >
-                  <EyeOff className="size-3.5" />
-                </Button>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       <DsWidgetCard size={size}>{children}</DsWidgetCard>
     </div>
   );

@@ -32,7 +32,7 @@ export function SpendBySource({ spendBySourceRows, size = "md" }: SpendBySourceP
     );
   }
 
-  const limit = size === "xl" || size === "tall" ? spendBySourceRows.length : size === "lg" ? 8 : 4;
+  const limit = size === "lg" ? spendBySourceRows.length : 4;
   const displayRows = spendBySourceRows.slice(0, limit);
 
   return (
@@ -46,7 +46,7 @@ export function SpendBySource({ spendBySourceRows, size = "md" }: SpendBySourceP
             <DsDataRow
               key={row.source}
               title={t(`addTransaction.${EXPENSE_SOURCE_LOCALE_KEYS[row.source]}`)}
-              subtitle={(size === "tall" || size === "lg" || size === "xl") && total > 0
+              subtitle={size === "lg" && total > 0
                 ? `${Math.round((row.value / total) * 100)}%`
                 : undefined}
               trailing={<p className="font-semibold">{formatCurrency(row.value)}</p>}
@@ -56,11 +56,6 @@ export function SpendBySource({ spendBySourceRows, size = "md" }: SpendBySourceP
           {size === "md" && spendBySourceRows.length > 4 && (
             <p className="px-4 py-2 text-xs text-muted-foreground">
               {t("dashboard.moreItemsCount", { count: spendBySourceRows.length - 4 })}
-            </p>
-          )}
-          {size === "lg" && spendBySourceRows.length > 8 && (
-            <p className="px-4 py-2 text-xs text-muted-foreground">
-              {t("dashboard.moreItemsCount", { count: spendBySourceRows.length - 8 })}
             </p>
           )}
         </>

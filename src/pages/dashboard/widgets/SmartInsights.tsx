@@ -27,7 +27,7 @@ export function SmartInsights({
   }
 
   // sm (~141×104px) / wide (~290×104px): single top insight as a one-liner
-  if (size === "sm" || size === "wide") {
+  if (size === "sm") {
     const top = insights[0];
     return (
       <div>

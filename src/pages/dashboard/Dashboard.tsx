@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, SlidersHorizontal, Wallet, LayoutGrid, Check, RotateCcw, Grid2X2 } from "lucide-react";
+import { Plus, SlidersHorizontal, Wallet, RotateCcw, Grid2X2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -40,9 +40,6 @@ function DashboardContent() {
   const { presetTransactions } = usePresetTransactions();
   const {
     layout,
-    isEditing,
-    startEditing,
-    stopEditing,
     hideWidget,
     showWidget,
     resetToDefault,
@@ -75,9 +72,8 @@ function DashboardContent() {
 
   const handleReset = useCallback(() => {
     resetToDefault();
-    stopEditing();
     setResetDialogOpen(false);
-  }, [resetToDefault, stopEditing]);
+  }, [resetToDefault]);
 
   const visibleWidgetIds = useMemo(
     () => new Set(layout.desktopGrid.filter((item) => item.visible).map((item) => item.id)),
@@ -113,69 +109,46 @@ function DashboardContent() {
             actions={
               !isMobile ? (
                 <div className="flex items-center gap-2">
-                  {isEditing ? (
-                    <>
-                      <Button
-                        variant="outline"
-                        className="h-11 gap-2"
-                        onClick={() => setCatalogOpen(true)}
-                      >
-                        <Grid2X2 className="size-4" />
-                        <span>{tWidget("widget.manageWidgets")}</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="h-11 gap-2"
-                        onClick={() => setResetDialogOpen(true)}
-                      >
-                        <RotateCcw className="size-4" />
-                        <span>{tWidget("widget.resetLayout")}</span>
-                      </Button>
-                      <Button
-                        variant="default"
-                        className="h-11 gap-2"
-                        onClick={stopEditing}
-                      >
-                        <Check className="size-4" />
-                        <span>{tWidget("widget.doneEditing")}</span>
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        className="h-11 gap-2"
-                        onClick={startEditing}
-                      >
-                        <LayoutGrid className="size-4" />
-                        <span>{tWidget("widget.editLayout")}</span>
-                      </Button>
-                      <Button
-                        variant="default"
-                        className="h-11 gap-2"
-                        onClick={() => setAddTransactionOpen(true)}
-                      >
-                        <Plus className="size-4" />
-                        <span>{t("dashboard.addExpense")}</span>
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        className="h-11 gap-2"
-                        onClick={() => setAddIncomeOpen(true)}
-                      >
-                        <Wallet className="size-4" />
-                        <span>{t("dashboard.addIncome")}</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="h-11 gap-2"
-                        onClick={() => data.setSettingsOpen(true)}
-                      >
-                        <SlidersHorizontal className="size-4" />
-                        <span>{t("settings.title")}</span>
-                      </Button>
-                    </>
-                  )}
+                  <Button
+                    variant="outline"
+                    className="h-11 gap-2"
+                    onClick={() => setCatalogOpen(true)}
+                  >
+                    <Grid2X2 className="size-4" />
+                    <span>{tWidget("widget.manageWidgets")}</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-11 gap-2"
+                    onClick={() => setResetDialogOpen(true)}
+                  >
+                    <RotateCcw className="size-4" />
+                    <span>{tWidget("widget.resetLayout")}</span>
+                  </Button>
+                  <Button
+                    variant="default"
+                    className="h-11 gap-2"
+                    onClick={() => setAddTransactionOpen(true)}
+                  >
+                    <Plus className="size-4" />
+                    <span>{t("dashboard.addExpense")}</span>
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="h-11 gap-2"
+                    onClick={() => setAddIncomeOpen(true)}
+                  >
+                    <Wallet className="size-4" />
+                    <span>{t("dashboard.addIncome")}</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-11 gap-2"
+                    onClick={() => data.setSettingsOpen(true)}
+                  >
+                    <SlidersHorizontal className="size-4" />
+                    <span>{t("settings.title")}</span>
+                  </Button>
                 </div>
               ) : undefined
             }
@@ -200,21 +173,11 @@ function DashboardContent() {
             }
           />
         ) : (
-          <>
-            {isEditing && (
-              <div className="flex items-center gap-2 rounded-lg bg-muted/60 px-4 py-2 text-sm text-muted-foreground">
-                <LayoutGrid className="size-4 shrink-0" />
-                <span>{tWidget("widget.editingHint")}</span>
-              </div>
-            )}
-
-            {isMobile ? (
-              <DashboardMobileGrid dashboardData={dashboardData} />
-            ) : (
-              <DashboardGrid dashboardData={dashboardData} />
-            )}
-          </>
-
+          isMobile ? (
+            <DashboardMobileGrid dashboardData={dashboardData} />
+          ) : (
+            <DashboardGrid dashboardData={dashboardData} />
+          )
         )}
       </div>
 

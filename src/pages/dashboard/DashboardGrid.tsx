@@ -14,7 +14,7 @@ interface DashboardGridProps {
 }
 
 export function DashboardGrid({ dashboardData }: DashboardGridProps) {
-  const { layout, isEditing, updateDesktopGrid, resizeWidget, hideWidget } =
+  const { layout, updateDesktopGrid, resizeWidget, hideWidget } =
     useDashboardLayout();
 
   // Prevent onLayoutChange from firing on initial mount with stale positions
@@ -31,10 +31,10 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
       x: item.x,
       y: item.y,
       w: item.w,
-      h: isEditing && item.size === "sm" ? item.h + 1 : item.h,
+      h: item.h,
     }));
     return { lg };
-  }, [visibleItems, isEditing]);
+  }, [visibleItems]);
 
   const handleLayoutChange = useCallback(
     (currentLayout: Layout) => {
@@ -63,15 +63,14 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
   }
 
   return (
-    <div className={`transition-[padding] duration-200 ease-in-out${isEditing ? " p-4" : ""}`}>
     <ResponsiveGridLayout
       className="widget-grid"
       layouts={rglLayouts}
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-      cols={{ lg: 16, md: 16, sm: 8, xs: 1, xxs: 1 }}
+      cols={{ lg: 24, md: 24, sm: 12, xs: 1, xxs: 1 }}
       rowHeight={48}
       compactType="vertical"
-      isDraggable={isEditing}
+      isDraggable
       isResizable={false}
       draggableHandle=".react-grid-dragHandleExample"
       onLayoutChange={handleLayoutChange}
@@ -87,7 +86,6 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
             <DsWidgetShell
               widgetType={item.id}
               size={item.size}
-              isEditing={isEditing}
               onResize={(size) => resizeWidget(item.id, size)}
               onHide={() => hideWidget(item.id)}
             >
@@ -97,6 +95,5 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
         );
       })}
     </ResponsiveGridLayout>
-    </div>
   );
 }

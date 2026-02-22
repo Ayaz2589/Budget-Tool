@@ -82,33 +82,7 @@ export function CategoryChart({
 
   const chartConfig = { value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } };
 
-  // xl (~588×664px): full pie chart with complete legend below
-  if (effectiveSize === "xl") {
-    return (
-      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <ChartContainer config={chartConfig} heightMobile={210} heightDesktop={550}>
-          <PieChart>
-            <Pie data={categorySlices} dataKey="value" nameKey="label" outerRadius={90}>
-              {categorySlices.map((slice, index) => (
-                <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
-              ))}
-            </Pie>
-            <ChartTooltip content={tooltipContent} />
-          </PieChart>
-        </ChartContainer>
-        <DsLegendList
-          items={categorySlices.map((slice, index) => ({
-            key: slice.label,
-            label: slice.label,
-            value: formatCurrency(slice.value),
-            color: DONUT_COLORS[index % DONUT_COLORS.length]!,
-          }))}
-        />
-      </DsChartCard>
-    );
-  }
-
-  // lg (~588×328px): mid-height pie chart with legend
+  // lg: full pie chart with legend
   if (effectiveSize === "lg") {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
@@ -134,25 +108,33 @@ export function CategoryChart({
     );
   }
 
-  // md (~290×216px): compact donut chart, no external legend
+  // md: side-by-side pie + legend
   return (
     <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-      <ChartContainer config={chartConfig} heightMobile={110} heightDesktop={110}>
-        <PieChart>
-          <Pie
-            data={categorySlices}
-            dataKey="value"
-            nameKey="label"
-            innerRadius={30}
-            outerRadius={48}
-          >
-            {categorySlices.map((slice, index) => (
-              <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
-            ))}
-          </Pie>
-          <ChartTooltip content={tooltipContent} />
-        </PieChart>
-      </ChartContainer>
+      <div className="flex items-center gap-6">
+        <div className="w-[160px] shrink-0">
+          <ChartContainer config={chartConfig} heightMobile={140} heightDesktop={140}>
+            <PieChart>
+              <Pie data={categorySlices} dataKey="value" nameKey="label" outerRadius={60}>
+                {categorySlices.map((slice, index) => (
+                  <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                ))}
+              </Pie>
+              <ChartTooltip content={tooltipContent} />
+            </PieChart>
+          </ChartContainer>
+        </div>
+        <div className="min-w-0 flex-1">
+          <DsLegendList
+            items={categorySlices.map((slice, index) => ({
+              key: slice.label,
+              label: slice.label,
+              value: formatCurrency(slice.value),
+              color: DONUT_COLORS[index % DONUT_COLORS.length]!,
+            }))}
+          />
+        </div>
+      </div>
     </DsChartCard>
   );
 }

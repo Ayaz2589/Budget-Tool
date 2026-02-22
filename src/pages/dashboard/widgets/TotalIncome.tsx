@@ -1,18 +1,26 @@
 import { useTranslation } from "react-i18next";
+import { AreaChart, Area } from "recharts";
+import { ResponsiveContainer } from "recharts";
 import { formatCurrency } from "@/lib/format";
 import { DsHelpTooltip, DsMetricCard } from "@/components/ds";
 import type { WidgetSize } from "@/types/widget";
 
+interface SparklineRow {
+  monthKey: string;
+  incomeTotal: number;
+}
+
 interface TotalIncomeProps {
   totalIncome: number;
+  sparklineRows?: SparklineRow[];
   size?: WidgetSize;
 }
 
-export function TotalIncome({ totalIncome, size = "sm" }: TotalIncomeProps) {
+export function TotalIncome({ totalIncome, sparklineRows, size = "sm" }: TotalIncomeProps) {
   const { t } = useTranslation();
 
-  // sm (~141×104px) / wide (~290×104px): total + label
-  if (size === "sm" || size === "wide") {
+  // sm: total + label
+  if (size === "sm") {
     return (
       <DsMetricCard
         title={t("dashboard.kpiTotalIncomeMtd")}
@@ -21,7 +29,7 @@ export function TotalIncome({ totalIncome, size = "sm" }: TotalIncomeProps) {
     );
   }
 
-  // md (~290×216px): total + tooltip for additional context
+  // md: total + tooltip + sparkline
   return (
     <DsMetricCard
       title={
@@ -34,6 +42,22 @@ export function TotalIncome({ totalIncome, size = "sm" }: TotalIncomeProps) {
         </span>
       }
       value={formatCurrency(totalIncome)}
+      sparklineBottom={size === "lg"}
+      sparkline={
+        sparklineRows && sparklineRows.length > 1 ? (
+          <ResponsiveContainer width={size === "lg" ? "100%" : "75%"} height={20}>
+            <AreaChart data={sparklineRows}>
+              <defs>
+                <linearGradient id="incomeSpark" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.03} />
+                </linearGradient>
+              </defs>
+              <Area type="monotone" dataKey="incomeTotal" stroke="var(--viz-series-3)" fill="url(#incomeSpark)" strokeWidth={1.5} dot={false} isAnimationActive={false} />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : undefined
+      }
     />
   );
 }

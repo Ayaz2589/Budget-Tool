@@ -132,7 +132,7 @@ test("Dashboard debt row is read-only", () => {
     }),
   );
   render(<TestWrapper />);
-  expect(screen.getByText("Car loan")).toBeInTheDocument();
+  expect(screen.getByText("1 active debts")).toBeInTheDocument();
   expect(screen.queryByText("/dashboard/debt?debtId=d1")).toBeNull();
 });
 

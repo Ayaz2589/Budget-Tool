@@ -1,17 +1,156 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useDashboardLayout } from "@/context/DashboardLayoutContext";
 import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
 import { DsWidgetShell } from "@/components/ds/DsWidgetShell";
 import { DsEmptyState } from "@/components/ds";
 import { useTranslation } from "react-i18next";
+import { useLongPress } from "@/hooks/useLongPress";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { ChevronUp, ChevronDown, EyeOff } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { WidgetSize, WidgetType } from "@/types/widget";
+
+const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", md: "M", lg: "L" };
+const ALL_SIZES: WidgetSize[] = ["sm", "md", "lg"];
 
 interface DashboardMobileGridProps {
   dashboardData: Record<string, unknown>;
 }
 
+function MobileWidgetItem({
+  id,
+  index,
+  isFirst,
+  isLast,
+  size,
+  dashboardData,
+  onMoveUp,
+  onMoveDown,
+  onResize,
+  onHide,
+}: {
+  id: WidgetType;
+  index: number;
+  isFirst: boolean;
+  isLast: boolean;
+  size: WidgetSize;
+  dashboardData: Record<string, unknown>;
+  onMoveUp: (index: number) => void;
+  onMoveDown: (index: number) => void;
+  onResize: (id: WidgetType, size: WidgetSize) => void;
+  onHide: (id: WidgetType) => void;
+}) {
+  const { t } = useTranslation();
+  const registry = WIDGET_REGISTRY[id];
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const anchorRef = useRef<HTMLDivElement>(null);
+
+  const longPress = useLongPress(
+    () => setPopoverOpen(true),
+    { threshold: 500, moveThreshold: 10, haptic: true },
+  );
+
+  if (!registry) return null;
+
+  return (
+    <div key={id} ref={anchorRef} {...longPress}>
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <PopoverTrigger asChild>
+          <div aria-hidden className="hidden" />
+        </PopoverTrigger>
+        <DsWidgetShell
+          widgetType={id}
+          size={size}
+          isMobile
+          onResize={(s) => onResize(id, s)}
+          onHide={() => onHide(id)}
+        >
+          {registry.render(dashboardData, size)}
+        </DsWidgetShell>
+        <PopoverContent align="center" side="top" className="w-52 p-3">
+          {/* Widget label */}
+          <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            {registry.icon}
+            <span className="truncate">{t(registry.label)}</span>
+          </div>
+
+          {/* Move buttons */}
+          <div className="mb-2 flex gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 flex-1 gap-1.5 text-xs"
+              disabled={isFirst}
+              onClick={() => {
+                onMoveUp(index);
+                setPopoverOpen(false);
+              }}
+            >
+              <ChevronUp className="size-3.5" />
+              {t("widget.moveUp")}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 flex-1 gap-1.5 text-xs"
+              disabled={isLast}
+              onClick={() => {
+                onMoveDown(index);
+                setPopoverOpen(false);
+              }}
+            >
+              <ChevronDown className="size-3.5" />
+              {t("widget.moveDown")}
+            </Button>
+          </div>
+
+          {/* Size selector */}
+          <div className="mb-2 flex items-center rounded-md border border-border/60 bg-background">
+            {ALL_SIZES.map((s, i) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => {
+                  onResize(id, s);
+                  setPopoverOpen(false);
+                }}
+                className={cn(
+                  "flex-1 px-1.5 py-1 text-[10px] font-semibold leading-none transition-colors",
+                  s === size
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                  i !== 0 && "border-l border-border/60",
+                )}
+                aria-label={`${t("widget.resize")} ${SIZE_LABELS[s]}`}
+                aria-pressed={s === size}
+              >
+                {SIZE_LABELS[s]}
+              </button>
+            ))}
+          </div>
+
+          {/* Hide button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-full justify-start gap-2 text-xs text-muted-foreground hover:text-destructive"
+            onClick={() => {
+              onHide(id);
+              setPopoverOpen(false);
+            }}
+          >
+            <EyeOff className="size-3.5" />
+            {t("widget.hide")}
+          </Button>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
 export function DashboardMobileGrid({ dashboardData }: DashboardMobileGridProps) {
-  const { layout, isEditing, updateMobileOrder, resizeWidget, hideWidget } =
+  const { layout, updateMobileOrder, resizeWidget, hideWidget } =
     useDashboardLayout();
   const { t } = useTranslation();
 
@@ -56,30 +195,21 @@ export function DashboardMobileGrid({ dashboardData }: DashboardMobileGridProps)
 
   return (
     <div className="flex flex-col gap-3">
-      {visibleIds.map((id, index) => {
-        const registry = WIDGET_REGISTRY[id];
-        if (!registry) return null;
-        const size = sizeMap.get(id) ?? "md";
-
-        return (
-          <div key={id}>
-            <DsWidgetShell
-              widgetType={id}
-              size={size}
-              isEditing={isEditing}
-              isMobile
-              isFirst={index === 0}
-              isLast={index === visibleIds.length - 1}
-              onResize={(s) => resizeWidget(id, s)}
-              onHide={() => hideWidget(id)}
-              onMoveUp={() => handleMoveUp(index)}
-              onMoveDown={() => handleMoveDown(index)}
-            >
-              {registry.render(dashboardData, size)}
-            </DsWidgetShell>
-          </div>
-        );
-      })}
+      {visibleIds.map((id, index) => (
+        <MobileWidgetItem
+          key={id}
+          id={id}
+          index={index}
+          isFirst={index === 0}
+          isLast={index === visibleIds.length - 1}
+          size={sizeMap.get(id) ?? "md"}
+          dashboardData={dashboardData}
+          onMoveUp={handleMoveUp}
+          onMoveDown={handleMoveDown}
+          onResize={resizeWidget}
+          onHide={hideWidget}
+        />
+      ))}
     </div>
   );
 }

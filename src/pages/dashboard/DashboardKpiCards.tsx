@@ -1,7 +1,7 @@
-import { WidgetKpiNetCashFlow } from "./widgets/WidgetKpiNetCashFlow";
-import { WidgetKpiTotalSpent } from "./widgets/WidgetKpiTotalSpent";
-import { WidgetKpiTotalIncome } from "./widgets/WidgetKpiTotalIncome";
-import { WidgetKpiTotalDebt } from "./widgets/WidgetKpiTotalDebt";
+import { NetCashFlow } from "./widgets/NetCashFlow";
+import { TotalSpent } from "./widgets/TotalSpent";
+import { TotalIncome } from "./widgets/TotalIncome";
+import { TotalDebt } from "./widgets/TotalDebt";
 import type { DashboardExpenseScope } from "@/types/dashboard";
 import type { DashboardKpis } from "@/types/dashboard";
 
@@ -18,15 +18,15 @@ export function DashboardKpiCards({
 }: DashboardKpiCardsProps) {
   return (
     <div data-tour="dashboard-kpis" className="grid grid-cols-2 gap-1.5 md:grid-cols-2 md:gap-3 xl:grid-cols-4">
-      <WidgetKpiNetCashFlow netCashFlow={kpis.netCashFlow} />
-      <WidgetKpiTotalSpent
+      <NetCashFlow netCashFlow={kpis.netCashFlow} />
+      <TotalSpent
         totalSpent={kpis.totalSpent}
         spentVsLastMonthPct={kpis.spentVsLastMonthPct}
         expenseScope={expenseScope}
         includeDebtPayments={includeDebtPayments}
       />
-      <WidgetKpiTotalIncome totalIncome={kpis.totalIncome} />
-      <WidgetKpiTotalDebt
+      <TotalIncome totalIncome={kpis.totalIncome} />
+      <TotalDebt
         debtOutstanding={kpis.debtOutstanding}
         debtPaidThisMonth={kpis.debtPaidThisMonth}
       />

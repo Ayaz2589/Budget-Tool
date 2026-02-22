@@ -5,12 +5,12 @@ import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { DashboardDebtRow } from "@/types/dashboard";
 import type { WidgetSize } from "@/types/widget";
 
-interface WidgetDebtSnapshotProps {
+interface DebtSnapshotProps {
   debtRows: DashboardDebtRow[];
   size?: WidgetSize;
 }
 
-export function WidgetDebtSnapshot({ debtRows, size = "md" }: WidgetDebtSnapshotProps) {
+export function DebtSnapshot({ debtRows, size = "md" }: DebtSnapshotProps) {
   const { t } = useTranslation();
 
   // sm (~141×104px): count of active debts + total badge

@@ -6,19 +6,19 @@ import { cn } from "@/lib/utils";
 import type { PresetTransaction } from "@/types/core";
 import type { WidgetSize } from "@/types/widget";
 
-interface DashboardQuickAddProps {
+interface QuickAddProps {
   presets: PresetTransaction[];
   onPresetTap: (presetId: string) => void;
   onAddBlank: () => void;
   size?: WidgetSize;
 }
 
-export function DashboardQuickAdd({
+export function QuickAdd({
   presets,
   onPresetTap,
   onAddBlank,
   size,
-}: DashboardQuickAddProps) {
+}: QuickAddProps) {
   const { t } = useTranslation();
   const effectiveSize: WidgetSize = size ?? "md";
 

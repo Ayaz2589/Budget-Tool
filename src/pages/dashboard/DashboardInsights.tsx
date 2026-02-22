@@ -4,7 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { WidgetSmartInsights } from "./widgets/WidgetSmartInsights";
+import { SmartInsights } from "./widgets/SmartInsights";
 import type { DashboardInsight } from "@/types/dashboard";
 
 interface DashboardInsightsProps {
@@ -29,7 +29,7 @@ export function DashboardInsights({
       </AccordionTrigger>
       <AccordionContent className="pb-3 pt-0">
         <div className="border-t border-[var(--border-subtle)] pt-3">
-          <WidgetSmartInsights insights={insights} onDismiss={onDismiss} />
+          <SmartInsights insights={insights} onDismiss={onDismiss} />
         </div>
       </AccordionContent>
     </AccordionItem>

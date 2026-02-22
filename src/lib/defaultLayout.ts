@@ -7,13 +7,13 @@ import type { DashboardLayout, WidgetType } from "@/types/widget";
  * Sizes: sm=2×2, md=4×3, lg=8×6, xl=8×12
  */
 export const DEFAULT_LAYOUT: DashboardLayout = {
-  version: 3,
+  version: 4,
   desktopGrid: [
     // Row 0-1: 4 KPIs (wide, w=4, h=2)
-    { id: "kpi-net-cash-flow", x: 0, y: 0, w: 4, h: 2, size: "wide", visible: true },
-    { id: "kpi-total-spent", x: 4, y: 0, w: 4, h: 2, size: "wide", visible: true },
-    { id: "kpi-total-income", x: 8, y: 0, w: 4, h: 2, size: "wide", visible: true },
-    { id: "kpi-total-debt", x: 12, y: 0, w: 4, h: 2, size: "wide", visible: true },
+    { id: "net-cash-flow", x: 0, y: 0, w: 4, h: 2, size: "wide", visible: true },
+    { id: "total-spent", x: 4, y: 0, w: 4, h: 2, size: "wide", visible: true },
+    { id: "total-income", x: 8, y: 0, w: 4, h: 2, size: "wide", visible: true },
+    { id: "total-debt", x: 12, y: 0, w: 4, h: 2, size: "wide", visible: true },
 
     // Row 2-4: 4 medium tiles (md, w=4, h=3)
     { id: "quick-add", x: 0, y: 2, w: 4, h: 3, size: "md", visible: true },
@@ -22,27 +22,27 @@ export const DEFAULT_LAYOUT: DashboardLayout = {
     { id: "recent-activity", x: 12, y: 2, w: 4, h: 3, size: "md", visible: true },
 
     // Row 5-16: 2 xl chart tiles (xl, w=8, h=12)
-    { id: "chart-cash-flow", x: 0, y: 5, w: 8, h: 12, size: "xl", visible: true },
-    { id: "chart-net-trend", x: 8, y: 5, w: 8, h: 12, size: "xl", visible: true },
+    { id: "cash-flow-chart", x: 0, y: 5, w: 8, h: 12, size: "xl", visible: true },
+    { id: "net-trend-chart", x: 8, y: 5, w: 8, h: 12, size: "xl", visible: true },
 
     // Row 17-28: 2 xl chart tiles (xl, w=8, h=12)
-    { id: "chart-category", x: 0, y: 17, w: 8, h: 12, size: "xl", visible: true },
-    { id: "chart-owner-split", x: 8, y: 17, w: 8, h: 12, size: "xl", visible: true },
+    { id: "category-chart", x: 0, y: 17, w: 8, h: 12, size: "xl", visible: true },
+    { id: "owner-split-chart", x: 8, y: 17, w: 8, h: 12, size: "xl", visible: true },
 
     // Row 29-31: owner-transfers (md) + smart-insights (wide)
     { id: "owner-transfers", x: 0, y: 29, w: 4, h: 3, size: "md", visible: true },
     { id: "smart-insights", x: 4, y: 29, w: 4, h: 2, size: "wide", visible: true },
   ],
   mobileOrder: [
-    "kpi-net-cash-flow",
-    "kpi-total-spent",
-    "kpi-total-income",
-    "kpi-total-debt",
+    "net-cash-flow",
+    "total-spent",
+    "total-income",
+    "total-debt",
     "quick-add",
-    "chart-cash-flow",
-    "chart-net-trend",
-    "chart-category",
-    "chart-owner-split",
+    "cash-flow-chart",
+    "net-trend-chart",
+    "category-chart",
+    "owner-split-chart",
     "debt-snapshot",
     "spend-by-source",
     "owner-transfers",

@@ -14,20 +14,20 @@ import {
   Lightbulb,
   Receipt,
 } from "lucide-react";
-import { WidgetKpiNetCashFlow } from "@/pages/dashboard/widgets/WidgetKpiNetCashFlow";
-import { WidgetKpiTotalSpent } from "@/pages/dashboard/widgets/WidgetKpiTotalSpent";
-import { WidgetKpiTotalIncome } from "@/pages/dashboard/widgets/WidgetKpiTotalIncome";
-import { WidgetKpiTotalDebt } from "@/pages/dashboard/widgets/WidgetKpiTotalDebt";
-import { WidgetDebtSnapshot } from "@/pages/dashboard/widgets/WidgetDebtSnapshot";
-import { WidgetSpendBySource } from "@/pages/dashboard/widgets/WidgetSpendBySource";
-import { WidgetOwnerTransfers } from "@/pages/dashboard/widgets/WidgetOwnerTransfers";
-import { WidgetRecentActivity } from "@/pages/dashboard/widgets/WidgetRecentActivity";
-import { DashboardCashFlowChart } from "@/pages/dashboard/DashboardCashFlowChart";
-import { DashboardNetCashFlowChart } from "@/pages/dashboard/DashboardNetCashFlowChart";
-import { DashboardCategoryChart } from "@/pages/dashboard/DashboardCategoryChart";
-import { DashboardOwnerSplit } from "@/pages/dashboard/DashboardOwnerSplit";
-import { DashboardQuickAdd } from "@/pages/dashboard/DashboardQuickAdd";
-import { WidgetSmartInsights } from "@/pages/dashboard/widgets/WidgetSmartInsights";
+import { NetCashFlow } from "@/pages/dashboard/widgets/NetCashFlow";
+import { TotalSpent } from "@/pages/dashboard/widgets/TotalSpent";
+import { TotalIncome } from "@/pages/dashboard/widgets/TotalIncome";
+import { TotalDebt } from "@/pages/dashboard/widgets/TotalDebt";
+import { DebtSnapshot } from "@/pages/dashboard/widgets/DebtSnapshot";
+import { SpendBySource } from "@/pages/dashboard/widgets/SpendBySource";
+import { OwnerTransfers } from "@/pages/dashboard/widgets/OwnerTransfers";
+import { RecentActivity } from "@/pages/dashboard/widgets/RecentActivity";
+import { CashFlowChart } from "@/pages/dashboard/widgets/CashFlowChart";
+import { NetTrendChart } from "@/pages/dashboard/widgets/NetTrendChart";
+import { CategoryChart } from "@/pages/dashboard/widgets/CategoryChart";
+import { OwnerSplitChart } from "@/pages/dashboard/widgets/OwnerSplitChart";
+import { QuickAdd } from "@/pages/dashboard/widgets/QuickAdd";
+import { SmartInsights } from "@/pages/dashboard/widgets/SmartInsights";
 import type { WidgetType, WidgetSize, WidgetRegistryEntry } from "@/types/widget";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -35,26 +35,26 @@ type AnyProps = any;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
-  "kpi-net-cash-flow": {
-    type: "kpi-net-cash-flow",
-    label: "widget.kpiNetCashFlow",
+  "net-cash-flow": {
+    type: "net-cash-flow",
+    label: "widget.netCashFlow",
     icon: <DollarSign className="size-4" />,
     defaultSize: "wide",
     allowedSizes: ["sm", "wide", "md"],
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <WidgetKpiNetCashFlow netCashFlow={props.kpis.netCashFlow} size={size} />
+      <NetCashFlow netCashFlow={props.kpis.netCashFlow} size={size} />
     ),
   },
-  "kpi-total-spent": {
-    type: "kpi-total-spent",
-    label: "widget.kpiTotalSpent",
+  "total-spent": {
+    type: "total-spent",
+    label: "widget.totalSpent",
     icon: <TrendingDown className="size-4" />,
     defaultSize: "wide",
     allowedSizes: ["sm", "wide", "md"],
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <WidgetKpiTotalSpent
+      <TotalSpent
         totalSpent={props.kpis.totalSpent}
         spentVsLastMonthPct={props.kpis.spentVsLastMonthPct}
         expenseScope={props.expenseScope}
@@ -63,26 +63,26 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
       />
     ),
   },
-  "kpi-total-income": {
-    type: "kpi-total-income",
-    label: "widget.kpiTotalIncome",
+  "total-income": {
+    type: "total-income",
+    label: "widget.totalIncome",
     icon: <TrendingUp className="size-4" />,
     defaultSize: "wide",
     allowedSizes: ["sm", "wide", "md"],
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <WidgetKpiTotalIncome totalIncome={props.kpis.totalIncome} size={size} />
+      <TotalIncome totalIncome={props.kpis.totalIncome} size={size} />
     ),
   },
-  "kpi-total-debt": {
-    type: "kpi-total-debt",
-    label: "widget.kpiTotalDebt",
+  "total-debt": {
+    type: "total-debt",
+    label: "widget.totalDebt",
     icon: <Landmark className="size-4" />,
     defaultSize: "wide",
     allowedSizes: ["sm", "wide", "md"],
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <WidgetKpiTotalDebt
+      <TotalDebt
         debtOutstanding={props.kpis.debtOutstanding}
         debtPaidThisMonth={props.kpis.debtPaidThisMonth}
         size={size}
@@ -96,7 +96,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     defaultSize: "md",
     allowedSizes: ["md", "lg", "xl"],
     render: (props: AnyProps, size: WidgetSize) => (
-      <DashboardQuickAdd
+      <QuickAdd
         presets={props.presetTransactions}
         onPresetTap={props.onPresetTap}
         onAddBlank={props.onAddBlank}
@@ -104,14 +104,14 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
       />
     ),
   },
-  "chart-cash-flow": {
-    type: "chart-cash-flow",
-    label: "widget.chartCashFlow",
+  "cash-flow-chart": {
+    type: "cash-flow-chart",
+    label: "widget.cashFlowChart",
     icon: <BarChart3 className="size-4" />,
     defaultSize: "xl",
     allowedSizes: ["md", "lg", "xl"],
     render: (props: AnyProps, size: WidgetSize) => (
-      <DashboardCashFlowChart
+      <CashFlowChart
         cashFlowDisplayRows={props.cashFlowDisplayRows}
         incomeOwnerKeys={props.incomeOwnerKeys}
         includeDebtPayments={props.includeDebtPayments}
@@ -119,38 +119,38 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
       />
     ),
   },
-  "chart-net-trend": {
-    type: "chart-net-trend",
-    label: "widget.chartNetTrend",
+  "net-trend-chart": {
+    type: "net-trend-chart",
+    label: "widget.netTrendChart",
     icon: <Activity className="size-4" />,
     defaultSize: "xl",
     allowedSizes: ["md", "lg", "xl"],
     render: (props: AnyProps, size: WidgetSize) => (
-      <DashboardNetCashFlowChart
+      <NetTrendChart
         netCashFlowRows={props.netCashFlowRows}
         range={props.range}
         size={size}
       />
     ),
   },
-  "chart-category": {
-    type: "chart-category",
-    label: "widget.chartCategory",
+  "category-chart": {
+    type: "category-chart",
+    label: "widget.categoryChart",
     icon: <PieChart className="size-4" />,
     defaultSize: "xl",
     allowedSizes: ["md", "lg", "xl"],
     render: (props: AnyProps, size: WidgetSize) => (
-      <DashboardCategoryChart categorySlices={props.categorySlices} size={size} />
+      <CategoryChart categorySlices={props.categorySlices} size={size} />
     ),
   },
-  "chart-owner-split": {
-    type: "chart-owner-split",
-    label: "widget.chartOwnerSplit",
+  "owner-split-chart": {
+    type: "owner-split-chart",
+    label: "widget.ownerSplitChart",
     icon: <Users className="size-4" />,
     defaultSize: "xl",
     allowedSizes: ["md", "lg", "xl"],
     render: (props: AnyProps, size: WidgetSize) => (
-      <DashboardOwnerSplit
+      <OwnerSplitChart
         ownerSlices={props.ownerSlices}
         visibleOwnerNetRows={props.visibleOwnerNetRows}
         ownerExpenseItemsByOwner={props.ownerExpenseItemsByOwner}
@@ -168,7 +168,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     allowedSizes: ["sm", "md", "tall", "lg", "xl"],
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <WidgetDebtSnapshot debtRows={props.debtRows} size={size} />
+      <DebtSnapshot debtRows={props.debtRows} size={size} />
     ),
   },
   "spend-by-source": {
@@ -179,7 +179,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     allowedSizes: ["sm", "md", "tall", "lg", "xl"],
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <WidgetSpendBySource spendBySourceRows={props.spendBySourceRows} size={size} />
+      <SpendBySource spendBySourceRows={props.spendBySourceRows} size={size} />
     ),
   },
   "owner-transfers": {
@@ -190,7 +190,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     allowedSizes: ["sm", "md", "tall", "lg", "xl"],
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <WidgetOwnerTransfers
+      <OwnerTransfers
         ownerTransfersMtd={props.ownerTransfersMtd}
         ownerTransfersMtdTotal={props.ownerTransfersMtdTotal}
         size={size}
@@ -205,7 +205,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     allowedSizes: ["sm", "md", "tall", "lg", "xl"],
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <WidgetRecentActivity recentActivity={props.recentActivity} size={size} />
+      <RecentActivity recentActivity={props.recentActivity} size={size} />
     ),
   },
   "smart-insights": {
@@ -216,7 +216,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     allowedSizes: ["sm", "wide", "md"],
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <WidgetSmartInsights
+      <SmartInsights
         insights={props.insights}
         onDismiss={props.dismissInsight}
         size={size}

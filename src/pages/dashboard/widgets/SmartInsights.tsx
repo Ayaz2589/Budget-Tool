@@ -4,17 +4,17 @@ import { DsEmptyState } from "@/components/ds";
 import type { DashboardInsight } from "@/types/dashboard";
 import type { WidgetSize } from "@/types/widget";
 
-interface WidgetSmartInsightsProps {
+interface SmartInsightsProps {
   insights: DashboardInsight[];
   onDismiss: (id: string) => void;
   size?: WidgetSize;
 }
 
-export function WidgetSmartInsights({
+export function SmartInsights({
   insights,
   onDismiss,
   size = "sm",
-}: WidgetSmartInsightsProps) {
+}: SmartInsightsProps) {
   const { t } = useTranslation();
 
   if (insights.length === 0) {

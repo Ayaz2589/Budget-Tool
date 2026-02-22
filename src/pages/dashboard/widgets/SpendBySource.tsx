@@ -10,12 +10,12 @@ interface SpendBySourceRow {
   value: number;
 }
 
-interface WidgetSpendBySourceProps {
+interface SpendBySourceProps {
   spendBySourceRows: SpendBySourceRow[];
   size?: WidgetSize;
 }
 
-export function WidgetSpendBySource({ spendBySourceRows, size = "md" }: WidgetSpendBySourceProps) {
+export function SpendBySource({ spendBySourceRows, size = "md" }: SpendBySourceProps) {
   const { t } = useTranslation();
   const total = spendBySourceRows.reduce((sum, r) => sum + r.value, 0);
 

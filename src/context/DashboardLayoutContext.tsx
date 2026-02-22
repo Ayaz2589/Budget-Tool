@@ -45,12 +45,36 @@ function clampToAllowed(size: WidgetSize, allowed: WidgetSize[]): WidgetSize {
   return allowed[0];
 }
 
+/** Maps v3 widget IDs to their v4 equivalents. */
+const ID_MIGRATION: Record<string, string> = {
+  "kpi-net-cash-flow": "net-cash-flow",
+  "kpi-total-spent": "total-spent",
+  "kpi-total-income": "total-income",
+  "kpi-total-debt": "total-debt",
+  "chart-cash-flow": "cash-flow-chart",
+  "chart-net-trend": "net-trend-chart",
+  "chart-category": "category-chart",
+  "chart-owner-split": "owner-split-chart",
+};
+
+function migrateId(id: string): WidgetType {
+  return (ID_MIGRATION[id] ?? id) as WidgetType;
+}
+
 function validateLayout(raw: unknown): DashboardLayout | null {
   if (!raw || typeof raw !== "object") return null;
   const obj = raw as Record<string, unknown>;
-  if (obj.version !== 3) return null;
+  if (obj.version !== 3 && obj.version !== 4) return null;
   if (!Array.isArray(obj.desktopGrid)) return null;
   if (!Array.isArray(obj.mobileOrder)) return null;
+
+  // Migrate v3 IDs → v4
+  if (obj.version === 3) {
+    for (const item of obj.desktopGrid as WidgetLayoutItem[]) {
+      item.id = migrateId(item.id);
+    }
+    obj.mobileOrder = (obj.mobileOrder as string[]).map(migrateId);
+  }
 
   // Filter out unknown widget types
   const knownTypes = new Set<string>(ALL_WIDGET_TYPES);
@@ -90,7 +114,7 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     }
   }
 
-  return { version: 3, desktopGrid, mobileOrder };
+  return { version: 4, desktopGrid, mobileOrder };
 }
 
 function loadLayout(): DashboardLayout {

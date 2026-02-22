@@ -3,12 +3,12 @@ import { formatCurrency } from "@/lib/format";
 import { DsHelpTooltip, DsMetricCard } from "@/components/ds";
 import type { WidgetSize } from "@/types/widget";
 
-interface WidgetKpiTotalIncomeProps {
+interface TotalIncomeProps {
   totalIncome: number;
   size?: WidgetSize;
 }
 
-export function WidgetKpiTotalIncome({ totalIncome, size = "sm" }: WidgetKpiTotalIncomeProps) {
+export function TotalIncome({ totalIncome, size = "sm" }: TotalIncomeProps) {
   const { t } = useTranslation();
 
   // sm (~141×104px) / wide (~290×104px): total + label

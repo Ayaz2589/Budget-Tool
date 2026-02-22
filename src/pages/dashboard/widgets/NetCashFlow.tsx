@@ -4,12 +4,12 @@ import { formatCurrency } from "@/lib/format";
 import { DsHelpTooltip, DsMetricCard } from "@/components/ds";
 import type { WidgetSize } from "@/types/widget";
 
-interface WidgetKpiNetCashFlowProps {
+interface NetCashFlowProps {
   netCashFlow: number;
   size?: WidgetSize;
 }
 
-export function WidgetKpiNetCashFlow({ netCashFlow, size = "sm" }: WidgetKpiNetCashFlowProps) {
+export function NetCashFlow({ netCashFlow, size = "sm" }: NetCashFlowProps) {
   const { t } = useTranslation();
   const tone = netCashFlow >= 0 ? "positive" : "negative";
 

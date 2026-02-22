@@ -25,15 +25,15 @@ function asNumber(value: unknown): number {
   return 0;
 }
 
-interface DashboardCategoryChartProps {
+interface CategoryChartProps {
   categorySlices: DashboardCategorySlice[];
   size?: WidgetSize;
 }
 
-export function DashboardCategoryChart({
+export function CategoryChart({
   categorySlices,
   size,
-}: DashboardCategoryChartProps) {
+}: CategoryChartProps) {
   const { t } = useTranslation();
   const effectiveSize: WidgetSize = size ?? "md";
 

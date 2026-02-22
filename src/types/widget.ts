@@ -1,15 +1,15 @@
 import type React from "react";
 
 export type WidgetType =
-  | "kpi-net-cash-flow"
-  | "kpi-total-spent"
-  | "kpi-total-income"
-  | "kpi-total-debt"
+  | "net-cash-flow"
+  | "total-spent"
+  | "total-income"
+  | "total-debt"
   | "quick-add"
-  | "chart-cash-flow"
-  | "chart-net-trend"
-  | "chart-category"
-  | "chart-owner-split"
+  | "cash-flow-chart"
+  | "net-trend-chart"
+  | "category-chart"
+  | "owner-split-chart"
   | "debt-snapshot"
   | "spend-by-source"
   | "owner-transfers"

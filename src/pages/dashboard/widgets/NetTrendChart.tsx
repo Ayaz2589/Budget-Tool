@@ -35,17 +35,17 @@ interface NetCashFlowRow {
   netCashFlow: number;
 }
 
-interface DashboardNetCashFlowChartProps {
+interface NetTrendChartProps {
   netCashFlowRows: NetCashFlowRow[];
   range: DashboardRange;
   size?: WidgetSize;
 }
 
-export function DashboardNetCashFlowChart({
+export function NetTrendChart({
   netCashFlowRows,
   range,
   size,
-}: DashboardNetCashFlowChartProps) {
+}: NetTrendChartProps) {
   const { t } = useTranslation();
   const effectiveSize: WidgetSize = size ?? "md";
 

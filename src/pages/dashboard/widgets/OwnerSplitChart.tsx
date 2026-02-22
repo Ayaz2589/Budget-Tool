@@ -29,7 +29,7 @@ function asNumber(value: unknown): number {
   return 0;
 }
 
-interface DashboardOwnerSplitProps {
+interface OwnerSplitChartProps {
   ownerSlices: DashboardOwnerSlice[];
   visibleOwnerNetRows: DashboardOwnerNetRow[];
   ownerExpenseItemsByOwner: Map<string, ReturnType<typeof buildOwnerExpenseItems>>;
@@ -38,14 +38,14 @@ interface DashboardOwnerSplitProps {
   size?: WidgetSize;
 }
 
-export function DashboardOwnerSplit({
+export function OwnerSplitChart({
   ownerSlices,
   visibleOwnerNetRows,
   ownerExpenseItemsByOwner,
   totalSpentForSelectedRange,
   percentFormatter,
   size,
-}: DashboardOwnerSplitProps) {
+}: OwnerSplitChartProps) {
   const { t } = useTranslation();
   const [expandedOwnerKey, setExpandedOwnerKey] = useState<string | null>(null);
   const effectiveSize: WidgetSize = size ?? "md";

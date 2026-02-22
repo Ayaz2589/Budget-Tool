@@ -4,17 +4,17 @@ import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { DashboardOwnerTransferItem } from "@/types/dashboard";
 import type { WidgetSize } from "@/types/widget";
 
-interface WidgetOwnerTransfersProps {
+interface OwnerTransfersProps {
   ownerTransfersMtd: DashboardOwnerTransferItem[];
   ownerTransfersMtdTotal: number;
   size?: WidgetSize;
 }
 
-export function WidgetOwnerTransfers({
+export function OwnerTransfers({
   ownerTransfersMtd,
   ownerTransfersMtdTotal,
   size = "md",
-}: WidgetOwnerTransfersProps) {
+}: OwnerTransfersProps) {
   const { t } = useTranslation();
 
   // sm (~141×104px): total transfers + badge

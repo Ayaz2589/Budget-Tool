@@ -4,7 +4,7 @@ import { DsMetricCard } from "@/components/ds";
 import { formatSpentDeltaLabel } from "@/pages/dashboard/insightsBuilder";
 import type { WidgetSize } from "@/types/widget";
 
-interface WidgetKpiTotalSpentProps {
+interface TotalSpentProps {
   totalSpent: number;
   spentVsLastMonthPct: number | null;
   expenseScope: import("@/types/dashboard").DashboardExpenseScope;
@@ -12,11 +12,11 @@ interface WidgetKpiTotalSpentProps {
   size?: WidgetSize;
 }
 
-export function WidgetKpiTotalSpent({
+export function TotalSpent({
   totalSpent,
   spentVsLastMonthPct,
   size = "sm",
-}: WidgetKpiTotalSpentProps) {
+}: TotalSpentProps) {
   const { t } = useTranslation();
 
   // sm (~141×104px) / wide (~290×104px): total + label

@@ -4,13 +4,13 @@ import { DsMetricCard } from "@/components/ds";
 import { formatDebtPaidSubtitle } from "@/pages/dashboard/insightsBuilder";
 import type { WidgetSize } from "@/types/widget";
 
-interface WidgetKpiTotalDebtProps {
+interface TotalDebtProps {
   debtOutstanding: number;
   debtPaidThisMonth: number;
   size?: WidgetSize;
 }
 
-export function WidgetKpiTotalDebt({ debtOutstanding, debtPaidThisMonth, size = "sm" }: WidgetKpiTotalDebtProps) {
+export function TotalDebt({ debtOutstanding, debtPaidThisMonth, size = "sm" }: TotalDebtProps) {
   const { t } = useTranslation();
 
   // sm (~141×104px) / wide (~290×104px): debt + label

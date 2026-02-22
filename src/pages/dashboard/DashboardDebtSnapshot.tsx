@@ -4,10 +4,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { WidgetDebtSnapshot } from "./widgets/WidgetDebtSnapshot";
-import { WidgetSpendBySource } from "./widgets/WidgetSpendBySource";
-import { WidgetOwnerTransfers } from "./widgets/WidgetOwnerTransfers";
-import { WidgetRecentActivity } from "./widgets/WidgetRecentActivity";
+import { DebtSnapshot } from "./widgets/DebtSnapshot";
+import { SpendBySource } from "./widgets/SpendBySource";
+import { OwnerTransfers } from "./widgets/OwnerTransfers";
+import { RecentActivity } from "./widgets/RecentActivity";
 import type { DashboardDebtRow, DashboardOwnerTransferItem } from "@/types/dashboard";
 import type { Expense } from "@/types/core";
 
@@ -49,7 +49,7 @@ export function DashboardDebtSnapshot({
         </AccordionTrigger>
         <AccordionContent className="pb-3 pt-0">
           <div className="border-t border-[var(--border-subtle)] pt-3">
-            <WidgetDebtSnapshot debtRows={debtRows} />
+            <DebtSnapshot debtRows={debtRows} />
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -64,7 +64,7 @@ export function DashboardDebtSnapshot({
         </AccordionTrigger>
         <AccordionContent className="pb-3 pt-0">
           <div className="border-t border-[var(--border-subtle)] pt-3">
-            <WidgetSpendBySource spendBySourceRows={spendBySourceRows} />
+            <SpendBySource spendBySourceRows={spendBySourceRows} />
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -79,7 +79,7 @@ export function DashboardDebtSnapshot({
         </AccordionTrigger>
         <AccordionContent className="pb-3 pt-0">
           <div className="border-t border-[var(--border-subtle)] pt-3">
-            <WidgetOwnerTransfers
+            <OwnerTransfers
               ownerTransfersMtd={ownerTransfersMtd}
               ownerTransfersMtdTotal={ownerTransfersMtdTotal}
             />
@@ -97,7 +97,7 @@ export function DashboardDebtSnapshot({
         </AccordionTrigger>
         <AccordionContent className="pb-3 pt-0">
           <div className="border-t border-[var(--border-subtle)] pt-3">
-            <WidgetRecentActivity recentActivity={recentActivity} />
+            <RecentActivity recentActivity={recentActivity} />
           </div>
         </AccordionContent>
       </AccordionItem>

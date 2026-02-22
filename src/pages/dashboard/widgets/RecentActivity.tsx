@@ -4,12 +4,12 @@ import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { Expense } from "@/types/core";
 import type { WidgetSize } from "@/types/widget";
 
-interface WidgetRecentActivityProps {
+interface RecentActivityProps {
   recentActivity: Expense[];
   size?: WidgetSize;
 }
 
-export function WidgetRecentActivity({ recentActivity, size = "md" }: WidgetRecentActivityProps) {
+export function RecentActivity({ recentActivity, size = "md" }: RecentActivityProps) {
   const { t } = useTranslation();
 
   // sm (~141×104px): count of recent items + badge

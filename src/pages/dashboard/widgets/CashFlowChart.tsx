@@ -46,19 +46,19 @@ interface CashFlowDisplayRow {
   incomeByOwner: Record<string, number>;
 }
 
-interface DashboardCashFlowChartProps {
+interface CashFlowChartProps {
   cashFlowDisplayRows: CashFlowDisplayRow[];
   incomeOwnerKeys: string[];
   includeDebtPayments: boolean;
   size?: WidgetSize;
 }
 
-export function DashboardCashFlowChart({
+export function CashFlowChart({
   cashFlowDisplayRows,
   incomeOwnerKeys,
   includeDebtPayments,
   size,
-}: DashboardCashFlowChartProps) {
+}: CashFlowChartProps) {
   const { t } = useTranslation();
   const effectiveSize: WidgetSize = size ?? "md";
 

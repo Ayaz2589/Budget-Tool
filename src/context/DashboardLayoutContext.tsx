@@ -47,7 +47,7 @@ function migrateId(id: string): WidgetType {
 function validateLayout(raw: unknown): DashboardLayout | null {
   if (!raw || typeof raw !== "object") return null;
   const obj = raw as Record<string, unknown>;
-  if (obj.version !== 3 && obj.version !== 4 && obj.version !== 5) return null;
+  if (obj.version !== 3 && obj.version !== 4 && obj.version !== 5 && obj.version !== 6) return null;
   if (!Array.isArray(obj.desktopGrid)) return null;
   if (!Array.isArray(obj.mobileOrder)) return null;
 
@@ -79,6 +79,14 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     }
   }
 
+  // Migrate v3/v4/v5 columns → v6 (16-col → 24-col)
+  if (obj.version === 3 || obj.version === 4 || obj.version === 5) {
+    for (const item of desktopGrid) {
+      item.x = Math.round(item.x * 1.5);
+      item.w = Math.round(item.w * 1.5);
+    }
+  }
+
   // Ensure dimensions match registry for all versions
   for (const item of desktopGrid) {
     const registry = WIDGET_REGISTRY[item.id];
@@ -87,8 +95,8 @@ function validateLayout(raw: unknown): DashboardLayout | null {
       item.w = dims.w;
       item.h = dims.h;
     }
-    if (item.x + item.w > 16) {
-      item.x = Math.max(0, 16 - item.w);
+    if (item.x + item.w > 24) {
+      item.x = Math.max(0, 24 - item.w);
     }
   }
 
@@ -110,7 +118,7 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     }
   }
 
-  return { version: 5, desktopGrid, mobileOrder };
+  return { version: 6, desktopGrid, mobileOrder };
 }
 
 function loadLayout(): DashboardLayout {

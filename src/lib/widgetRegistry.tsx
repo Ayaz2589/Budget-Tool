@@ -34,9 +34,9 @@ import type { WidgetType, WidgetSize, WidgetRegistryEntry } from "@/types/widget
 type AnyProps = any;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-const KPI_DIMS = { sm: { w: 2, h: 2 }, md: { w: 4, h: 2 }, lg: { w: 4, h: 3 } } as const;
-const CHART_WIDE_DIMS = { sm: { w: 4, h: 3 }, md: { w: 8, h: 6 }, lg: { w: 8, h: 8 } } as const;
-const LIST_DIMS = { sm: { w: 4, h: 3 }, md: { w: 4, h: 6 }, lg: { w: 8, h: 6 } } as const;
+const KPI_DIMS = { sm: { w: 3, h: 2 }, md: { w: 6, h: 2 }, lg: { w: 6, h: 3 } } as const;
+const CHART_WIDE_DIMS = { sm: { w: 6, h: 3 }, md: { w: 12, h: 6 }, lg: { w: 12, h: 8 } } as const;
+const LIST_DIMS = { sm: { w: 6, h: 3 }, md: { w: 6, h: 6 }, lg: { w: 12, h: 6 } } as const;
 
 export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
   "net-cash-flow": {
@@ -47,7 +47,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     sizeDims: KPI_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <NetCashFlow netCashFlow={props.kpis.netCashFlow} size={size} />
+      <NetCashFlow netCashFlow={props.kpis.netCashFlow} sparklineRows={props.kpiSparklineRows} size={size} />
     ),
   },
   "total-spent": {
@@ -61,6 +61,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
       <TotalSpent
         totalSpent={props.kpis.totalSpent}
         spentVsLastMonthPct={props.kpis.spentVsLastMonthPct}
+        sparklineRows={props.kpiSparklineRows}
         expenseScope={props.expenseScope}
         includeDebtPayments={props.includeDebtPayments}
         size={size}
@@ -75,7 +76,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     sizeDims: KPI_DIMS,
 
     render: (props: AnyProps, size: WidgetSize) => (
-      <TotalIncome totalIncome={props.kpis.totalIncome} size={size} />
+      <TotalIncome totalIncome={props.kpis.totalIncome} sparklineRows={props.kpiSparklineRows} size={size} />
     ),
   },
   "total-debt": {
@@ -89,6 +90,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
       <TotalDebt
         debtOutstanding={props.kpis.debtOutstanding}
         debtPaidThisMonth={props.kpis.debtPaidThisMonth}
+        sparklineRows={props.kpiSparklineRows}
         size={size}
       />
     ),
@@ -98,7 +100,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     label: "widget.quickAdd",
     icon: <Zap className="size-4" />,
     defaultSize: "md",
-    sizeDims: { sm: { w: 4, h: 3 }, md: { w: 8, h: 4 }, lg: { w: 8, h: 6 } },
+    sizeDims: { sm: { w: 6, h: 3 }, md: { w: 12, h: 4 }, lg: { w: 12, h: 6 } },
     render: (props: AnyProps, size: WidgetSize) => (
       <QuickAdd
         presets={props.presetTransactions}
@@ -128,7 +130,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     label: "widget.netTrendChart",
     icon: <Activity className="size-4" />,
     defaultSize: "md",
-    sizeDims: { sm: { w: 4, h: 3 }, md: { w: 6, h: 3 }, lg: { w: 8, h: 6 } },
+    sizeDims: { sm: { w: 6, h: 3 }, md: { w: 9, h: 3 }, lg: { w: 12, h: 6 } },
     render: (props: AnyProps, size: WidgetSize) => (
       <NetTrendChart
         netCashFlowRows={props.netCashFlowRows}
@@ -142,7 +144,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     label: "widget.categoryChart",
     icon: <PieChart className="size-4" />,
     defaultSize: "lg",
-    sizeDims: { sm: { w: 4, h: 3 }, md: { w: 6, h: 4 }, lg: { w: 8, h: 8 } },
+    sizeDims: { sm: { w: 6, h: 3 }, md: { w: 9, h: 4 }, lg: { w: 12, h: 8 } },
     render: (props: AnyProps, size: WidgetSize) => (
       <CategoryChart categorySlices={props.categorySlices} size={size} />
     ),
@@ -152,7 +154,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     label: "widget.ownerSplitChart",
     icon: <Users className="size-4" />,
     defaultSize: "lg",
-    sizeDims: { sm: { w: 4, h: 3 }, md: { w: 6, h: 4 }, lg: { w: 8, h: 8 } },
+    sizeDims: { sm: { w: 6, h: 3 }, md: { w: 9, h: 4 }, lg: { w: 12, h: 8 } },
     render: (props: AnyProps, size: WidgetSize) => (
       <OwnerSplitChart
         ownerSlices={props.ownerSlices}

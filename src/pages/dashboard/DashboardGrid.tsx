@@ -67,7 +67,7 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
       className="widget-grid"
       layouts={rglLayouts}
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-      cols={{ lg: 16, md: 16, sm: 8, xs: 1, xxs: 1 }}
+      cols={{ lg: 24, md: 24, sm: 12, xs: 1, xxs: 1 }}
       rowHeight={48}
       compactType="vertical"
       isDraggable

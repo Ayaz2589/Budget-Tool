@@ -314,6 +314,32 @@ export function useDashboardData() {
     [cashFlowDisplayRows],
   );
 
+  // Always 6-month series for KPI sparklines, independent of dashboard range
+  const sparklineMonthKeys = useMemo(
+    () => getRangeMonthKeys("6", currentMonthKey),
+    [currentMonthKey],
+  );
+  const kpiSparklineRows = useMemo(
+    () =>
+      buildCashFlowRows({
+        monthKeys: sparklineMonthKeys,
+        expenses: scopedExpenses,
+        income: scopedIncome,
+        debtPayments: scopedDebtPayments,
+        scope: expenseScope,
+        includeDebtPayments,
+        unassignedOwnerLabel: t("dashboard.unassigned"),
+        locale: i18n.resolvedLanguage || i18n.language,
+      }).map((row) => ({
+        monthKey: row.monthKey,
+        incomeTotal: row.incomeTotal,
+        expensesTotal: row.expensesTotal,
+        debtPaymentsTotal: row.debtPaymentsTotal,
+        netCashFlow: computeNetCashFlow(row.incomeTotal, row.expensesTotal, row.debtPaymentsTotal),
+      })),
+    [sparklineMonthKeys, scopedExpenses, scopedIncome, scopedDebtPayments, expenseScope, includeDebtPayments, t, i18n.language, i18n.resolvedLanguage],
+  );
+
   const dismissInsight = (id: string) => {
     const next = [...dismissedInsightIds, id];
     setDismissedInsightIds(next);
@@ -339,6 +365,7 @@ export function useDashboardData() {
     ownerOptions,
     availableMonthKeys,
     kpis,
+    kpiSparklineRows,
     cashFlowDisplayRows,
     incomeOwnerKeys,
     netCashFlowRows,

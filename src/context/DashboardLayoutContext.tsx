@@ -23,11 +23,12 @@ const SIZE_TO_DIMS: Record<WidgetSize, { w: number; h: number }> = {
   wide: { w: 4, h: 2 },
   md: { w: 4, h: 3 },
   tall: { w: 4, h: 12 },
+  "wide-lg": { w: 8, h: 4 },
   lg: { w: 8, h: 6 },
   xl: { w: 8, h: 12 },
 };
 
-const SIZE_ORDER: WidgetSize[] = ["sm", "wide", "md", "tall", "lg", "xl"];
+const SIZE_ORDER: WidgetSize[] = ["sm", "wide", "md", "tall", "wide-lg", "lg", "xl"];
 
 /** Clamp a size to the nearest allowed size, preferring smaller. */
 function clampToAllowed(size: WidgetSize, allowed: WidgetSize[]): WidgetSize {

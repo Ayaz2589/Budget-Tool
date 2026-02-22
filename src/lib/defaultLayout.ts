@@ -23,7 +23,7 @@ export const DEFAULT_LAYOUT: DashboardLayout = {
 
     // Row 5-16: 2 xl chart tiles (xl, w=8, h=12)
     { id: "cash-flow-chart", x: 0, y: 5, w: 8, h: 12, size: "xl", visible: true },
-    { id: "net-trend-chart", x: 8, y: 5, w: 8, h: 12, size: "xl", visible: true },
+    { id: "net-trend-chart", x: 8, y: 5, w: 8, h: 4, size: "wide-lg", visible: true },
 
     // Row 17-28: 2 xl chart tiles (xl, w=8, h=12)
     { id: "category-chart", x: 0, y: 17, w: 8, h: 12, size: "xl", visible: true },

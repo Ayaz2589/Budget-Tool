@@ -123,8 +123,8 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     type: "net-trend-chart",
     label: "widget.netTrendChart",
     icon: <Activity className="size-4" />,
-    defaultSize: "xl",
-    allowedSizes: ["md", "lg", "xl"],
+    defaultSize: "wide-lg",
+    allowedSizes: ["md", "wide-lg"],
     render: (props: AnyProps, size: WidgetSize) => (
       <NetTrendChart
         netCashFlowRows={props.netCashFlowRows}

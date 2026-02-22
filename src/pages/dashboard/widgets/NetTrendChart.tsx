@@ -49,7 +49,7 @@ export function NetTrendChart({
   const { t } = useTranslation();
   const effectiveSize: WidgetSize = size ?? "md";
 
-  const chartTitle = effectiveSize === "xl" || effectiveSize === "lg" ? (
+  const chartTitle = effectiveSize === "lg" || effectiveSize === "wide-lg" ? (
     <span className="inline-flex items-center gap-1.5">
       {t("dashboard.chartNetCashFlowTrend")}
       <DsHelpTooltip
@@ -128,22 +128,26 @@ export function NetTrendChart({
     netCashFlow: { label: t("dashboard.chartNetCashFlow"), color: "var(--viz-series-3)" },
   };
 
-  // xl (~588×664px): full chart with axis labels, reference line, tooltips
-  if (effectiveSize === "xl") {
+  // wide-lg (~588×220px): compact chart with axis labels
+  if (effectiveSize === "wide-lg") {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <ChartContainer config={chartConfig} heightMobile={220} heightDesktop={550}>
+        <ChartContainer config={chartConfig} heightMobile={140} heightDesktop={160}>
           <AreaChart data={netCashFlowRows}>
             <defs>
-              <linearGradient id="netCashFlowAreaLg" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="netCashFlowAreaWlg" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.35} />
                 <stop offset="75%" stopColor="var(--viz-series-3)" stopOpacity={0.14} />
                 <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.03} />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
-            <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} />
-            <YAxis />
+            <XAxis dataKey="monthAxisLabel" tick={{ fontSize: 11 }} tickMargin={8} minTickGap={18} interval="preserveStartEnd" />
+            <YAxis tick={{ fontSize: 11 }} width={34} tickFormatter={(value) => {
+              const abs = Math.abs(Number(value));
+              if (abs >= 1000) return `${Math.round(Number(value) / 1000)}k`;
+              return String(Math.round(Number(value)));
+            }} />
             <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
             <ChartTooltip content={tooltipContent} />
             <Area
@@ -151,45 +155,10 @@ export function NetTrendChart({
               dataKey="netCashFlow"
               name={t("dashboard.chartNetCashFlow")}
               stroke="var(--viz-series-3)"
-              fill="url(#netCashFlowAreaLg)"
-              strokeWidth={2.2}
+              fill="url(#netCashFlowAreaWlg)"
+              strokeWidth={2}
               dot={false}
-              activeDot={{ r: 5 }}
-              isAnimationActive={false}
-            />
-          </AreaChart>
-        </ChartContainer>
-      </DsChartCard>
-    );
-  }
-
-  // lg (~588×328px): mid-height chart with axis labels
-  if (effectiveSize === "lg") {
-    return (
-      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <ChartContainer config={chartConfig} heightMobile={200} heightDesktop={260}>
-          <AreaChart data={netCashFlowRows}>
-            <defs>
-              <linearGradient id="netCashFlowAreaLgMid" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--viz-series-3)" stopOpacity={0.35} />
-                <stop offset="75%" stopColor="var(--viz-series-3)" stopOpacity={0.14} />
-                <stop offset="100%" stopColor="var(--viz-series-3)" stopOpacity={0.03} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} />
-            <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} />
-            <YAxis />
-            <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
-            <ChartTooltip content={tooltipContent} />
-            <Area
-              type="monotone"
-              dataKey="netCashFlow"
-              name={t("dashboard.chartNetCashFlow")}
-              stroke="var(--viz-series-3)"
-              fill="url(#netCashFlowAreaLgMid)"
-              strokeWidth={2.2}
-              dot={false}
-              activeDot={{ r: 5 }}
+              activeDot={{ r: 4 }}
               isAnimationActive={false}
             />
           </AreaChart>

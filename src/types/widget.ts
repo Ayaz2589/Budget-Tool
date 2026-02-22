@@ -16,7 +16,7 @@ export type WidgetType =
   | "recent-activity"
   | "smart-insights";
 
-export type WidgetSize = "sm" | "wide" | "md" | "tall" | "lg" | "xl";
+export type WidgetSize = "sm" | "wide" | "md" | "tall" | "wide-lg" | "lg" | "xl";
 
 export interface WidgetLayoutItem {
   id: WidgetType;

@@ -3,6 +3,16 @@
 @import "react-grid-layout/css/styles.css";
 @import "react-resizable/css/styles.css";
 
+.react-grid-item.react-grid-placeholder {
+  background: oklch(0.7 0 0);
+  opacity: 0.15;
+  border-radius: var(--radius-2xl);
+}
+.dark .react-grid-item.react-grid-placeholder {
+  background: oklch(0.4 0 0);
+  opacity: 0.3;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @layer base {

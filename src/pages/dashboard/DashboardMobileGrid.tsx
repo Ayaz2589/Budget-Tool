@@ -11,7 +11,7 @@ import { ChevronUp, ChevronDown, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { WidgetSize, WidgetType } from "@/types/widget";
 
-const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", wide: "W", md: "M", tall: "T", lg: "L", xl: "XL" };
+const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", wide: "W", md: "M", tall: "T", "wide-lg": "WL", lg: "L", xl: "XL" };
 
 interface DashboardMobileGridProps {
   dashboardData: Record<string, unknown>;

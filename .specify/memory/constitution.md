@@ -132,7 +132,7 @@ minimum needed for the current task:
 - OKLCH color space for theming (light/dark via `.dark` class)
 
 **File organization:**
-- `src/lib/` — pure helpers by domain (`math/`, `parsers/`, `sheets/`)
+- `src/lib/` — pure helpers organized into subdirectories: `domain/` (business logic), `export/`, `format/` (UI display), `google/`, `import/`, `math/`, `parsers/`, `platform/` (runtime/browser), `sheets/`, `widgets/`
 - `src/components/ui/` — shadcn/ui (do not modify manually)
 - `src/components/ds/` — custom design system (16 components)
 - `src/context/` — one file per domain context

@@ -152,6 +152,16 @@ function DashboardContent() {
         <Button
           variant="secondary"
           density="compact"
+          onClick={() => setCatalogOpen(true)}
+          className="rounded-full p-0"
+          size="icon"
+          aria-label={tWidget("widget.manageWidgets")}
+        >
+          <Grid2X2 className="size-4" />
+        </Button>
+        <Button
+          variant="secondary"
+          density="compact"
           onClick={() => data.setSettingsOpen(true)}
           className="rounded-full p-0"
           size="icon"

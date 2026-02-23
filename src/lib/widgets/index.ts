@@ -13,3 +13,6 @@ export type { CreateWidgetOptions } from "./createWidget";
 export { DEFAULT_LAYOUT, ALL_WIDGET_TYPES } from "./defaultLayout";
 
 export { WIDGET_REGISTRY } from "./widgetRegistry";
+
+export { WIDGET_GROUPS } from "./widgetGroups";
+export type { WidgetGroup } from "./widgetGroups";

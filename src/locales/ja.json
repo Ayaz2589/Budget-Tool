@@ -821,6 +821,10 @@
     "addWidget": "Add",
     "catalogDescription": "Toggle widgets on or off",
     "moveUp": "Move up",
+    "groupKpiMetrics": "KPI Metrics",
+    "groupCharts": "Charts",
+    "groupListsActivity": "Lists & Activity",
+    "groupInsights": "Insights",
     "moveDown": "Move down"
   }
 }

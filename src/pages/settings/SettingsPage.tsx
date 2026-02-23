@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useBudget } from "@/context";
 import { useGoogleAuth } from "@/context";
 import { usePresetTransactions } from "@/context";
-import { extractSpreadsheetId } from "@/lib/googleSheets";
+import { extractSpreadsheetId } from "genjutsu-db";
 import { formatDate } from "@/lib/format";
 import { useTheme } from "@/hooks/useTheme";
 import {

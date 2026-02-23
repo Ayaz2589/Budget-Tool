@@ -3,8 +3,7 @@
  */
 
 import type { MonthTotals } from "@/types/totals";
-import { clearRange, updateSheet } from "./api";
-import { SHEET_WRITE_RANGES } from "./constants";
+import { clearRange, updateSheet, DATA_RANGES } from "./transport";
 
 /** Build the dynamic header row from a MonthTotals (uses owner keys for dynamic columns). */
 function buildTotalsHeaders(m: MonthTotals): string[] {
@@ -62,7 +61,7 @@ export async function writeTotalsSheet(
   grandTotal: MonthTotals,
 ): Promise<void> {
   const rows = buildTotalsValues(months, grandTotal);
-  const range = SHEET_WRITE_RANGES.totals;
+  const range = DATA_RANGES.totalsWrite;
   await clearRange(accessToken, spreadsheetId, range);
-  await updateSheet(accessToken, spreadsheetId, range, rows, false);
+  await updateSheet(accessToken, spreadsheetId, range, rows);
 }

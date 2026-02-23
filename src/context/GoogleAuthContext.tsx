@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import i18n from "@/i18n";
-import { extractSpreadsheetId } from "@/lib/googleSheets";
+import { extractSpreadsheetId } from "genjutsu-db";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
 import type { SyncStatus, SyncHealth } from "@/types/auth";
 import type { GoogleUserProfile, GoogleAuthContextValue } from "@/types/auth";

@@ -1,9 +1,6 @@
 import { test, expect, describe } from "bun:test";
-import {
-  validateExpenseSource,
-  hasIdColumn,
-  findMissingHeaders,
-} from "@/lib/sheets/validate";
+import { validateExpenseSource } from "@/lib/sheets/models";
+import { hasIdColumn, findMissingHeaders } from "genjutsu-db";
 
 describe("validateExpenseSource", () => {
   test("returns valid source for all known sources", () => {

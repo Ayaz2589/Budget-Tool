@@ -1,50 +1,17 @@
 /**
  * Backward-compatible barrel re-export.
  *
- * The Google Sheets integration has been split into focused modules under
- * `@/lib/sheets/`. This file re-exports everything so existing consumers
- * (`@/lib/googleSheets`) continue to work without import changes.
+ * Domain sheets are now handled by genjutsu-db. This file re-exports the
+ * remaining special-case modules (Data blob, Totals) for consumers that
+ * still import from `@/lib/googleSheets`.
  */
 export {
-  // API utilities
-  extractSpreadsheetId,
-  getSheetValues,
-
-  // Expense read/write
-  readExpensesFromSheet,
-  readMortgageFromSheet,
-  appendExpenses,
-  clearAndWriteExpenses,
-  clearAndWriteMortgage,
-
-  // Income read/write
-  readIncomeFromSheet,
-  appendIncome,
-  clearAndWriteIncome,
-
-  // Debt read/write
-  readDebtsFromSheet,
-  readDebtPaymentsFromSheet,
-  clearAndWriteDebts,
-  clearAndWriteDebtPayments,
-
-  // Transfer & preset read/write
-  readOwnerTransfersFromSheet,
-  readPresetsFromSheet,
-  clearAndWritePresets,
-
-  // Data blob
   writeDataBlob,
   readDataBlob,
-
-  // Totals
   writeTotalsSheet,
-
-  // Sync & structure
-  syncAllSheetsBatch,
-  getSheetIds,
-  ensureSheetsExist,
-  applySheetsFormatting,
+  buildTotalsValues,
+  validateExpenseSource,
+  createSheetsClient,
 } from "./sheets";
 
-export type { SheetIds, SyncPayload } from "./sheets";
+export type { SheetsClient } from "./sheets";

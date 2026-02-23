@@ -12,20 +12,11 @@ import i18n from "@/i18n";
 import { useBudget } from "./BudgetContext";
 import { usePresetTransactions } from "./PresetTransactionsContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
-import {
-  ensureSheetsExist,
-  syncAllSheetsBatch,
-  readDataBlob,
-  getSheetIds,
-  applySheetsFormatting,
-  readExpensesFromSheet,
-  readMortgageFromSheet,
-  readIncomeFromSheet,
-  readDebtsFromSheet,
-  readPresetsFromSheet,
-  readDebtPaymentsFromSheet,
-  readOwnerTransfersFromSheet,
-} from "@/lib/googleSheets";
+import { readDataBlob, writeDataBlob } from "@/lib/sheets/data";
+import { writeTotalsSheet } from "@/lib/sheets/totals";
+import { createSheetsClient } from "@/lib/sheets/client";
+import { isGenjutsuError, generateId } from "genjutsu-db";
+import { validateExpenseSource } from "@/lib/sheets/models";
 import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { isMortgageCategory } from "@/lib/mortgageCategory";
@@ -347,7 +338,8 @@ export function SyncProvider({
     dispatchSync({ type: "START_SYNC" });
     try {
       const snapshot = getSyncSnapshot();
-      await ensureSheetsExist(accessToken, spreadsheetId);
+      const db = createSheetsClient(spreadsheetId, async () => accessToken);
+      await db.ensureSchema();
       const nonMortgageExpenses = snapshot.expenses.filter(
         (e) => !isMortgageCategory(e.category),
       );
@@ -376,22 +368,66 @@ export function SyncProvider({
         owners: snapshot.owners,
       });
       const grand = computeGrandTotals(months);
-      await syncAllSheetsBatch(accessToken, spreadsheetId, {
-        expenses: nonMortgageExpenses,
-        mortgageExpenses,
-        income: snapshot.income,
-        debts: snapshot.debts,
-        debtPayments: snapshot.debtPayments,
-        ownerTransfers: snapshot.ownerTransfers,
-        presetTransactions: snapshot.presetTransactions,
-        dataBlob,
-        months,
-        grandTotal: grand,
+      await db.batchSync({
+        expenses: nonMortgageExpenses.map((e) => ({
+          id: e.id,
+          date: e.date,
+          amount: e.amount,
+          description: e.description,
+          category: e.category || "Uncategorized",
+          source: e.source,
+          owner: e.paidByOwner ?? e.owner ?? "",
+        })),
+        mortgage: mortgageExpenses.map((e) => ({
+          id: e.id,
+          date: e.date,
+          amount: e.amount,
+          description: e.description,
+          category: e.category || "Uncategorized",
+          source: e.source,
+          owner: e.paidByOwner ?? e.owner ?? "",
+        })),
+        income: snapshot.income.map((i) => ({
+          date: i.date,
+          amount: i.amount,
+          description: i.description,
+          category: i.category || "Uncategorized",
+          owner: i.owner ?? "",
+        })),
+        debts: snapshot.debts.map((d) => ({
+          id: d.id,
+          name: d.name,
+          initialAmount: d.initialAmount,
+          startDate: d.startDate ?? "",
+          owner: d.owner ?? "",
+        })),
+        debtPayments: snapshot.debtPayments.map((p) => ({
+          id: p.id,
+          debtId: p.debtId,
+          date: p.date,
+          amount: p.amount,
+          note: p.note ?? "",
+        })),
+        ownerTransfers: (snapshot.ownerTransfers ?? []).map((t) => ({
+          id: t.id,
+          date: t.date,
+          fromOwner: t.fromOwner,
+          toOwner: t.toOwner,
+          amount: t.amount,
+          note: t.note ?? "",
+        })),
+        presetTransactions: snapshot.presetTransactions.map((p) => ({
+          id: p.id,
+          source: p.source,
+          description: p.description,
+          category: p.category || "Uncategorized",
+          owner: p.owner,
+        })),
       });
-      const sheetIds = await getSheetIds(accessToken, spreadsheetId);
-      if (sheetIds) {
-        await applySheetsFormatting(accessToken, spreadsheetId, sheetIds);
-      }
+      // Data blob and Totals are special cases — written separately
+      await writeDataBlob(accessToken, spreadsheetId, dataBlob);
+      await writeTotalsSheet(accessToken, spreadsheetId, months, grand);
+      await db.applyFormatting();
       lastSyncedSignatureRef.current = snapshot.signature;
       const changed =
         latestSyncSignatureRef.current !== lastSyncedSignatureRef.current;
@@ -403,32 +439,70 @@ export function SyncProvider({
       retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
       nextSyncAllowedAtRef.current = 0;
     } catch (err) {
-      if (isUnauthorizedError(err)) {
-        clearSession();
-      }
-      const message = err instanceof Error ? err.message : String(err);
       console.error("Sync failed:", err);
-      if (isRateLimitError(err)) {
-        syncQueuedRef.current = true;
-        nextSyncAllowedAtRef.current =
-          Date.now() + retryBackoffMsRef.current;
-        retryBackoffMsRef.current = Math.min(
-          retryBackoffMsRef.current * 2,
-          SYNC_RATE_LIMIT_MAX_DELAY_MS,
-        );
-        dispatchSync({
-          type: "SYNC_ERROR",
-          message:
-            "Rate limited by Google Sheets, retrying automatically.",
-          health: "warning",
-          status: "idle",
-        });
+      if (isGenjutsuError(err)) {
+        switch (err.kind) {
+          case "AUTH_ERROR":
+            clearSession();
+            dispatchSync({
+              type: "SYNC_ERROR",
+              message: err.message,
+              health: "error",
+            });
+            break;
+          case "RATE_LIMIT": {
+            syncQueuedRef.current = true;
+            const delay =
+              err.retryAfterMs ?? retryBackoffMsRef.current;
+            nextSyncAllowedAtRef.current = Date.now() + delay;
+            retryBackoffMsRef.current = Math.min(
+              retryBackoffMsRef.current * 2,
+              SYNC_RATE_LIMIT_MAX_DELAY_MS,
+            );
+            dispatchSync({
+              type: "SYNC_ERROR",
+              message:
+                "Rate limited by Google Sheets, retrying automatically.",
+              health: "warning",
+              status: "idle",
+            });
+            break;
+          }
+          default:
+            dispatchSync({
+              type: "SYNC_ERROR",
+              message: err.message,
+              health: "error",
+            });
+        }
       } else {
-        dispatchSync({
-          type: "SYNC_ERROR",
-          message,
-          health: "error",
-        });
+        // Fallback for non-genjutsu errors (writeDataBlob/writeTotalsSheet)
+        if (isUnauthorizedError(err)) {
+          clearSession();
+        }
+        const message = err instanceof Error ? err.message : String(err);
+        if (isRateLimitError(err)) {
+          syncQueuedRef.current = true;
+          nextSyncAllowedAtRef.current =
+            Date.now() + retryBackoffMsRef.current;
+          retryBackoffMsRef.current = Math.min(
+            retryBackoffMsRef.current * 2,
+            SYNC_RATE_LIMIT_MAX_DELAY_MS,
+          );
+          dispatchSync({
+            type: "SYNC_ERROR",
+            message:
+              "Rate limited by Google Sheets, retrying automatically.",
+            health: "warning",
+            status: "idle",
+          });
+        } else {
+          dispatchSync({
+            type: "SYNC_ERROR",
+            message,
+            health: "error",
+          });
+        }
       }
     } finally {
       inFlightRef.current = false;
@@ -577,7 +651,137 @@ export function SyncProvider({
     if (!active) return;
     dispatchSync({ type: "START_SYNC" });
     try {
-      await ensureSheetsExist(accessToken, spreadsheetId);
+      const db = createSheetsClient(spreadsheetId, async () => accessToken);
+      await db.ensureSchema();
+
+      // Helper: read all 7 domain sheets via genjutsu-db and convert to app types
+      const readFromSheetTabs = async () => {
+        const [rawExp, rawMort, rawInc, rawDbt, rawPay, rawTrf, rawPre] =
+          await Promise.all([
+            db.repo("expenses").readAll(),
+            db.repo("mortgage").readAll(),
+            db.repo("income").readAll(),
+            db.repo("debts").readAll(),
+            db.repo("debtPayments").readAll(),
+            db.repo("ownerTransfers").readAll(),
+            db.repo("presetTransactions").readAll(),
+          ]);
+        const expenses = rawExp
+          .filter((e) => e.date && e.amount > 0)
+          .map((e) => ({
+            id: (e.id as string) || generateId(),
+            date: e.date as string,
+            amount: e.amount as number,
+            description: (e.description as string) || "Expense",
+            category:
+              e.category === "Uncategorized"
+                ? ""
+                : ((e.category as string) || ""),
+            source: validateExpenseSource(String(e.source || "")),
+            owner: ((e.owner as string) || undefined) as string | undefined,
+            paidByOwner: ((e.owner as string) || undefined) as
+              | string
+              | undefined,
+          }));
+        const mortgage = rawMort
+          .filter((e) => e.date && (e.amount as number) > 0)
+          .map((e) => ({
+            id: (e.id as string) || generateId(),
+            date: e.date as string,
+            amount: e.amount as number,
+            description: (e.description as string) || "Mortgage",
+            category: "Mortgage" as string,
+            source: validateExpenseSource(String(e.source || "")),
+            owner: ((e.owner as string) || undefined) as string | undefined,
+            paidByOwner: ((e.owner as string) || undefined) as
+              | string
+              | undefined,
+          }));
+        const income = rawInc
+          .filter((i) => i.date && (i.amount as number) > 0)
+          .map((i) => ({
+            id: generateId(),
+            date: i.date as string,
+            amount: i.amount as number,
+            description: (i.description as string) || "Income",
+            category:
+              i.category === "Uncategorized"
+                ? ""
+                : ((i.category as string) || ""),
+            owner: ((i.owner as string) || undefined) as string | undefined,
+          }));
+        const debts = rawDbt
+          .filter((d) => d.name && (d.initialAmount as number) >= 0)
+          .map((d) => ({
+            id: (d.id as string) || generateId(),
+            name: d.name as string,
+            initialAmount: d.initialAmount as number,
+            startDate: ((d.startDate as string) || undefined) as
+              | string
+              | undefined,
+            owner: ((d.owner as string) || undefined) as string | undefined,
+          }));
+        const payments = rawPay
+          .filter((p) => p.debtId && p.date && (p.amount as number) > 0)
+          .map((p) => ({
+            id: (p.id as string) || generateId(),
+            debtId: p.debtId as string,
+            date: p.date as string,
+            amount: p.amount as number,
+            note: ((p.note as string) || undefined) as string | undefined,
+          }));
+        const transfers = rawTrf
+          .filter(
+            (t) =>
+              t.date && t.fromOwner && t.toOwner && (t.amount as number) > 0,
+          )
+          .map((t) => ({
+            id: (t.id as string) || generateId(),
+            date: t.date as string,
+            fromOwner: t.fromOwner as string,
+            toOwner: t.toOwner as string,
+            amount: t.amount as number,
+            note: ((t.note as string) || undefined) as string | undefined,
+          }));
+        const presets = rawPre
+          .filter((p) => p.id)
+          .map((p) => ({
+            id: p.id as string,
+            source: validateExpenseSource(String(p.source || "")),
+            description: p.description as string,
+            category:
+              p.category === "Uncategorized"
+                ? ""
+                : ((p.category as string) || ""),
+            owner: (p.owner as string) || "",
+          }));
+
+        // Derive owners from read data
+        const derivedOwners = [
+          ...new Set(
+            [...expenses, ...mortgage]
+              .map((e) => e.owner)
+              .concat(income.map((i) => i.owner))
+              .concat(debts.map((d) => d.owner))
+              .concat(transfers.map((row) => row.fromOwner))
+              .concat(transfers.map((row) => row.toOwner))
+              .filter((o): o is string => !!o),
+          ),
+        ];
+        if (derivedOwners.length > 0) {
+          budget.setOwners(derivedOwners);
+        }
+
+        return {
+          expenses,
+          mortgage,
+          income,
+          debts,
+          payments,
+          transfers,
+          presets,
+        };
+      };
 
       const expenseKey = (e: {
         date: string;
@@ -653,77 +857,24 @@ export function SyncProvider({
             });
           }
         } catch {
-          const [
-            expenses,
-            mortgage,
-            income,
-            debts,
-            payments,
-            ownerTransfers,
-            presets,
-          ] = await Promise.all([
-            readExpensesFromSheet(accessToken, spreadsheetId),
-            readMortgageFromSheet(accessToken, spreadsheetId),
-            readIncomeFromSheet(accessToken, spreadsheetId),
-            readDebtsFromSheet(accessToken, spreadsheetId),
-            readDebtPaymentsFromSheet(accessToken, spreadsheetId),
-            readOwnerTransfersFromSheet(accessToken, spreadsheetId),
-            readPresetsFromSheet(accessToken, spreadsheetId),
-          ]);
-          sheetExpenses = expenses;
-          sheetMortgage = mortgage;
-          sheetIncome = income;
-          sheetDebts = debts;
-          sheetPayments = payments;
-          sheetOwnerTransfers = ownerTransfers;
-          sheetPresets = presets;
-          const derivedOwners = [
-            ...new Set(
-              [...expenses, ...mortgage]
-                .map((e) => e.owner)
-                .concat(income.map((i) => i.owner))
-                .concat(debts.map((d) => d.owner))
-                .concat(ownerTransfers.map((row) => row.fromOwner))
-                .concat(ownerTransfers.map((row) => row.toOwner))
-                .filter((o): o is string => !!o),
-            ),
-          ];
-          if (derivedOwners.length > 0) {
-            budget.setOwners(derivedOwners);
-          }
+          const result = await readFromSheetTabs();
+          sheetExpenses = result.expenses;
+          sheetMortgage = result.mortgage;
+          sheetIncome = result.income;
+          sheetDebts = result.debts;
+          sheetPayments = result.payments;
+          sheetOwnerTransfers = result.transfers;
+          sheetPresets = result.presets;
         }
       } else {
-        [
-          sheetExpenses,
-          sheetMortgage,
-          sheetIncome,
-          sheetDebts,
-          sheetPayments,
-          sheetOwnerTransfers,
-          sheetPresets,
-        ] = await Promise.all([
-          readExpensesFromSheet(accessToken, spreadsheetId),
-          readMortgageFromSheet(accessToken, spreadsheetId),
-          readIncomeFromSheet(accessToken, spreadsheetId),
-          readDebtsFromSheet(accessToken, spreadsheetId),
-          readDebtPaymentsFromSheet(accessToken, spreadsheetId),
-          readOwnerTransfersFromSheet(accessToken, spreadsheetId),
-          readPresetsFromSheet(accessToken, spreadsheetId),
-        ]);
-        const derivedOwners = [
-          ...new Set(
-            [...sheetExpenses, ...sheetMortgage]
-              .map((e) => e.owner)
-              .concat(sheetIncome.map((i) => i.owner))
-              .concat(sheetDebts.map((d) => d.owner))
-              .concat(sheetOwnerTransfers.map((row) => row.fromOwner))
-              .concat(sheetOwnerTransfers.map((row) => row.toOwner))
-              .filter((o): o is string => !!o),
-          ),
-        ];
-        if (derivedOwners.length > 0) {
-          budget.setOwners(derivedOwners);
-        }
+        const result = await readFromSheetTabs();
+        sheetExpenses = result.expenses;
+        sheetMortgage = result.mortgage;
+        sheetIncome = result.income;
+        sheetDebts = result.debts;
+        sheetPayments = result.payments;
+        sheetOwnerTransfers = result.transfers;
+        sheetPresets = result.presets;
       }
 
       const newExpenses = sheetExpenses.filter(
@@ -849,16 +1000,43 @@ export function SyncProvider({
       });
       lastSyncedSignatureRef.current = latestSyncSignatureRef.current;
     } catch (err) {
-      if (isUnauthorizedError(err)) {
-        clearSession();
-      }
-      const message = err instanceof Error ? err.message : String(err);
       console.error("Restore from sheet failed:", err);
-      dispatchSync({
-        type: "SYNC_ERROR",
-        message,
-        health: "error",
-      });
+      if (isGenjutsuError(err)) {
+        switch (err.kind) {
+          case "AUTH_ERROR":
+            clearSession();
+            dispatchSync({
+              type: "SYNC_ERROR",
+              message: err.message,
+              health: "error",
+            });
+            break;
+          case "RATE_LIMIT":
+            dispatchSync({
+              type: "SYNC_ERROR",
+              message:
+                "Rate limited by Google Sheets. Please try again later.",
+              health: "warning",
+            });
+            break;
+          default:
+            dispatchSync({
+              type: "SYNC_ERROR",
+              message: err.message,
+              health: "error",
+            });
+        }
+      } else {
+        if (isUnauthorizedError(err)) {
+          clearSession();
+        }
+        const message = err instanceof Error ? err.message : String(err);
+        dispatchSync({
+          type: "SYNC_ERROR",
+          message,
+          health: "error",
+        });
+      }
     }
   }, [
     isDummyDataActive,

@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import type { MonthlySummaryRow } from "@/lib/mortgageMath";
+import type { MonthlySummaryRow } from "@/lib/domain/mortgageMath";
 
 interface MortgageAmortizationChartProps {
   rows: MonthlySummaryRow[];

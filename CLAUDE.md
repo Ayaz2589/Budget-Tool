@@ -56,7 +56,7 @@ React Router v7 with an auth gate pattern. Public routes: `/`, `/tour`, `/auth`.
 - `ExpenseSource` — union type for card sources (amex, apple, chase, manual, etc.)
 
 ### Data Flows
-- **Import**: CSV/PDF → bank-specific parser (`src/lib/parsers/`) → dedup (`importDedup.ts`) → preview → merge into context
+- **Import**: CSV/PDF → bank-specific parser (`src/lib/parsers/`) → dedup (`src/lib/import/importDedup.ts`) → preview → merge into context
 - **Sync**: Context data → minified payload → Google Sheets API (push) or Sheets → context (pull)
 - **Export**: Context data → PDF with V2 machine-readable block (gzip + Base64) or JSON
 - **Calculations**: Raw transactions → selector functions (`dashboardSelectors.ts`) → derived totals/charts
@@ -74,19 +74,27 @@ Bun's built-in test runner + React Testing Library + happy-dom. Tests in `test/`
 ## Key Conventions
 
 - `src/lib/` contains pure helper functions and I/O modules, organized into subdirectories:
+  - `src/lib/domain/` — business logic & financial calculations (totals, debt, mortgage, owner accounting, validation)
+  - `src/lib/export/` — export pipeline (PDF, JSON, minified payload, export strings)
+  - `src/lib/format/` — UI formatting & display (currency/date input, category colors, source labels)
+  - `src/lib/google/` — Google Drive API integration
+  - `src/lib/import/` — import pipeline (dedup, normalization, dummy data)
   - `src/lib/math/` — core financial math (`core.ts`)
-  - `src/lib/sheets/` — Google Sheets sync (12 modules: api, sync, data, formatting, per-domain files)
   - `src/lib/parsers/` — bank-specific CSV parsers (amex, apple, csv-utils)
+  - `src/lib/platform/` — runtime/browser utilities (storage, theme, FX rates, haptics)
+  - `src/lib/sheets/` — Google Sheets sync (12 modules: api, sync, data, formatting, per-domain files)
+  - `src/lib/widgets/` — widget registry, factory, and utilities
+  - Root files: `index.ts` (barrel), `utils.ts`, `types.ts`
 - `src/components/ui/` is shadcn/ui components; `src/components/ds/` is the custom design system.
 - Path alias `@/` maps to `src/`.
 - TypeScript strict mode is enabled (`noUnusedLocals`, `noUnusedParameters`).
 - Refactors are done incrementally — add/update tests first, then change code, run `bun test` after each change.
 
 ## Recent Changes
+- 020-sync-genjutsu-db: Added TypeScript 5.x (strict), React 19 + genjutsu-db (new), React, Vite 7, Tailwind CSS v4, shadcn/ui
+- 018-widget-creator: Added TypeScript 5.x (strict), React 19 + None new — uses existing `WidgetRegistryEntry` type
 - 016-responsive-widget-layout: Added TypeScript 5.x (strict), React 19 + react-grid-layout v2.2.2 (`Responsive` + `WidthProvider`), Tailwind CSS v4, shadcn/ui
-- 014-unified-action-bar: Added TypeScript 5.x (strict), React 19 + React, Tailwind CSS v4, shadcn/ui, lucide-reac
-- 012-per-widget-sizes: Added TypeScript 5.x (strict), React 19 + react-grid-layout v2.2.2, @radix-ui/react-popover, framer-motion, lucide-react, i18nex
 
 ## Active Technologies
-- TypeScript 5.x (strict), React 19 + react-grid-layout v2.2.2 (`Responsive` + `WidthProvider`), Tailwind CSS v4, shadcn/ui (016-responsive-widget-layout)
-- localStorage (no changes — existing `DashboardLayout` schema v6) (016-responsive-widget-layout)
+- TypeScript 5.x (strict), React 19 + genjutsu-db (new), React, Vite 7, Tailwind CSS v4, shadcn/ui (020-sync-genjutsu-db)
+- localStorage (primary), Google Sheets via genjutsu-db (sync) (020-sync-genjutsu-db)

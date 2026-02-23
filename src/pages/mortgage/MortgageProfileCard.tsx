@@ -13,7 +13,7 @@ import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
   parseCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import type { MortgageProfile } from "@/types/mortgage";
 
 interface MortgageProfileCardProps {

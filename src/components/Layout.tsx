@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { persistLocale } from "@/i18n";
 import i18n from "@/i18n";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { SheetSetupDialog } from "@/components/SheetSetupDialog";
 import { SidebarContent } from "@/components/layout/Sidebar";

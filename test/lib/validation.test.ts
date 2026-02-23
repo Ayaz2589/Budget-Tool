@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import { validateExpense, validateIncome } from "@/lib/validation";
+import { validateExpense, validateIncome } from "@/lib/domain/validation";
 
 describe("validateExpense", () => {
   test("valid expense passes", () => {

@@ -19,8 +19,8 @@ import {
   type UiFormatSettings,
 } from "@/lib/format";
 import { toDisplayCurrency } from "@/types/currency";
-import { getCachedUsdFxRate, getUsdFxRate } from "@/lib/fx";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { getCachedUsdFxRate, getUsdFxRate } from "@/lib/platform/fx";
+import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 
 // ---------------------------------------------------------------------------
 // Stored-settings loaders (pure functions, no side effects)

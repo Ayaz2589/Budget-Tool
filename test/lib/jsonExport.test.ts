@@ -3,7 +3,7 @@ import {
   buildExpandedPayload,
   downloadBudgetJson,
   parseBudgetJson,
-} from "@/lib/jsonExport";
+} from "@/lib/export/jsonExport";
 import type { ExpandedPayload } from "@/types/payload";
 
 test("buildExpandedPayload returns expected shape and parseBudgetJson roundtrips", () => {

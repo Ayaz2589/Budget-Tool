@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { buildDummyBudget } from "@/lib/dummyData";
+import { buildDummyBudget } from "@/lib/import/dummyData";
 
 test("buildDummyBudget returns a compact deterministic dataset", () => {
   const data = buildDummyBudget("2026-02");

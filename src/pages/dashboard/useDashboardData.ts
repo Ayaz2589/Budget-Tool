@@ -4,12 +4,12 @@ import { useLocation } from "react-router-dom";
 import { useBudget } from "@/context";
 import { usePresetTransactions } from "@/context";
 import { computeNetCashFlow, sumAmountsBy } from "@/lib/math";
-import { isValidDate } from "@/lib/totals";
+import { isValidDate } from "@/lib/domain/totals";
 import {
   collectFinancialOwners,
   scopeFinancialData,
   type FinancialViewMode,
-} from "@/lib/financialModel";
+} from "@/lib/domain/financialModel";
 import {
   buildCashFlowRows,
   buildCategoryBreakdown,

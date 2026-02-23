@@ -5,7 +5,7 @@ import {
   computeAllTotals,
   computeGrandTotals,
   type TotalsInput,
-} from "@/lib/totals";
+} from "@/lib/domain/totals";
 import type { Expense, Income } from "@/lib/types";
 
 function expense(overrides: Partial<Expense>): Expense {

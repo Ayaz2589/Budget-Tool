@@ -2,7 +2,7 @@
 
 ## Budget Tool — What Was Done So Far
 
-**Last updated:** 2026-02-22
+**Last updated:** 2026-02-23
 
 ---
 
@@ -140,7 +140,7 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 - **Warnings:** Dashboard shows rules-based warnings when a category total threshold is met for the current month.
 - **Spending by month (table):** Table with one row per month: Month, Total Earned, Total Spent, Spent w/o Mortgage, Total Saved, Savings Rate. Current month row is highlighted.
 - **Monthly breakdown (bar chart):** Bar chart (recharts) showing **Total Earned** vs **Total Spent** per month (chronological order). Two bars per month; tooltip formats as currency; legend. Empty state if no data.
-- **Totals:** Sourced from `lib/totals.ts` (see below).
+- **Totals:** Sourced from `lib/domain/totals.ts` (see below).
 
 ### 4.7 Totals Logic
 
@@ -195,13 +195,13 @@ Categories are used in dropdowns and for totals logic. Custom categories can be 
 | Area            | Path / files                                                                                              |
 | --------------- | --------------------------------------------------------------------------------------------------------- |
 | Types           | `src/lib/types.ts` (Expense, Income, Debt, DebtPayment, ExpenseSource, categories)                       |
-| Source labels   | `src/lib/sourceLabels.ts` (EXPENSE_SOURCE_LOCALE_KEYS, EXPENSE_SOURCE_DISPLAY_LABELS, SOURCE_LABEL_KEYS, SOURCE_OPTIONS) |
+| Domain logic    | `src/lib/domain/` — totals, debt utils, mortgage math, owner accounting, financial model, validation       |
+| Format/display  | `src/lib/format/` — category colors, currency/date input, source labels, formatting                        |
+| Import pipeline | `src/lib/import/` — dedup, normalization, dummy data                                                       |
+| Export pipeline | `src/lib/export/` — PDF export (V2: gzip + Base64), JSON export, minified payload, export strings          |
 | Parsers         | `src/lib/parsers/amex.ts`, `apple.ts`, `chase.ts`, `index.ts`                                              |
-| Rules engine    | `src/lib/rules.ts` (conditions + actions, priority order)                                                 |
-| Totals          | `src/lib/totals.ts` (getMonthLabel exported for Dashboard/Transactions)                                   |
-| Google Sheets   | `src/lib/googleSheets.ts` (read/write Expenses, Income, Mortgage, Debts, DebtPayments, Rules, PresetTransactions, Totals, cardSources) |
-| PDF export      | `src/lib/pdfExport.ts` (V2: JSON gzip + Base64 between markers; import V2-only; table fallback; payload includes cardSources) |
-| Category colors | `src/lib/categoryColors.tsx` (colors + CategoryOption component)                                          |
+| Google          | `src/lib/google/` — Google Drive API; `src/lib/sheets/` — Google Sheets sync                                |
+| Platform        | `src/lib/platform/` — storage, theme, FX rates, haptics, storage cleanup                                    |
 | Context         | `src/context/BudgetContext.tsx`, `RulesContext.tsx`, `PresetTransactionsContext.tsx`, `GoogleAuthContext.tsx` |
 | Layout          | `src/components/Layout.tsx` (sidebar, mobile header + bottom nav + "More" sheet, globe language switcher)  |
 | Auth            | `src/pages/auth/AuthGate.tsx` (redirect to /auth when not signed in), `src/pages/auth/LoginPage.tsx` (two-column login, Sign in with Google) |

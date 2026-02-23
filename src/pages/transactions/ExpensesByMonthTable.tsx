@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { sumAmountsBy } from "@/lib/math";
-import { getMonthLabel } from "@/lib/totals";
-import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
+import { getMonthLabel } from "@/lib/domain/totals";
+import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/format/sourceLabels";
 import {
   Select,
   SelectContent,
@@ -28,7 +28,7 @@ import {
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DsHelpTooltip } from "@/components/ds";
-import { CategoryOption } from "@/lib/categoryColors";
+import { CategoryOption } from "@/lib/format/categoryColors";
 import type {
   SortColumn,
   ExpensesByMonthTableProps,

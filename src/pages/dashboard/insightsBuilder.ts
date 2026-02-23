@@ -1,7 +1,7 @@
 import { formatCurrency, formatDate } from "@/lib/format";
-import { isValidDate } from "@/lib/totals";
+import { isValidDate } from "@/lib/domain/totals";
 import { computeMonthOverMonthPct, sumAmountsBy } from "@/lib/math";
-import { isMortgageCategory } from "@/lib/mortgageCategory";
+import { isMortgageCategory } from "@/lib/domain/mortgageCategory";
 import type { DashboardInsight, DashboardInsightInput } from "@/types/dashboard";
 
 function monthFromDate(date: string): string {

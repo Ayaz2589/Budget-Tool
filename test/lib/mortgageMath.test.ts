@@ -7,7 +7,7 @@ import {
   summarizeByMonth,
   summarizeByYear,
   type AmortizationRow,
-} from "@/lib/mortgageMath";
+} from "@/lib/domain/mortgageMath";
 import type { Expense } from "@/types/core";
 import type { MortgageProfile } from "@/types/mortgage";
 

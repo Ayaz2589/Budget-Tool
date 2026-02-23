@@ -1,6 +1,6 @@
 import type { Debt, Expense, Income, PresetTransaction } from "@/types/core";
 import type { ParsedExportedPdf } from "@/types/pdf";
-import { isMortgageCategory } from "@/lib/mortgageCategory";
+import { isMortgageCategory } from "@/lib/domain/mortgageCategory";
 
 export function normalizeImportedData(
   input: {

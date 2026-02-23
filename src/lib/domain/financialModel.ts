@@ -5,7 +5,7 @@ import type {
   Income,
   OwnerTransfer,
 } from "@/types/core";
-import { normalizeExpenseAllocation } from "@/lib/ownerAccounting";
+import { normalizeExpenseAllocation } from "./ownerAccounting";
 
 export type FinancialViewMode = "household" | "individual";
 

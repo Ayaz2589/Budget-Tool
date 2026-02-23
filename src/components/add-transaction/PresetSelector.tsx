@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import {
   EXPENSE_SOURCE_LOCALE_KEYS,
-} from "@/lib/sourceLabels";
-import { getCategoryColor } from "@/lib/categoryColors";
+} from "@/lib/format/sourceLabels";
+import { getCategoryColor } from "@/lib/format/categoryColors";
 import {
   Select,
   SelectContent,

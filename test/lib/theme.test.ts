@@ -6,9 +6,9 @@ import {
   getSystemTheme,
   initializeTheme,
   persistTheme,
-} from "@/lib/theme";
-import type { AppTheme } from "@/lib/theme";
-import { STORAGE_KEYS } from "@/lib/storage";
+} from "@/lib/platform/theme";
+import type { AppTheme } from "@/lib/platform/theme";
+import { STORAGE_KEYS } from "@/lib/platform/storage";
 
 beforeEach(() => {
   localStorage.clear();

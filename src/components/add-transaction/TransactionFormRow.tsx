@@ -2,16 +2,16 @@ import { useTranslation } from "react-i18next";
 import type { ExpenseSource, TransactionRow } from "@/types";
 import {
   formatCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import {
   dateInputToIso,
   isoToDateInput,
-} from "@/lib/dateInput";
+} from "@/lib/format/dateInput";
 import {
   EXPENSE_SOURCE_BADGE_LABELS,
   EXPENSE_SOURCE_LOCALE_KEYS,
-} from "@/lib/sourceLabels";
-import { CategoryOption } from "@/lib/categoryColors";
+} from "@/lib/format/sourceLabels";
+import { CategoryOption } from "@/lib/format/categoryColors";
 import {
   Select,
   SelectContent,

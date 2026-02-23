@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { useGoogleAuth } from "@/context";
 import { RETURNING_USER_KEY } from "@/context";
 import { TOUR_COMPLETED_KEY } from "@/context";
-import { storage } from "@/lib/storage";
+import { storage } from "@/lib/platform/storage";
 import { LandingPage } from "./LandingPage";
 
 function isReturningUser(): boolean {

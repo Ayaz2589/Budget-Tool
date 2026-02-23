@@ -10,14 +10,14 @@ import { DsActionBar, DsEmptyState, DsHelpTooltip, DsSectionHeader } from "@/com
 import {
   formatCurrencyFromNumber,
   parseCurrencyInput,
-} from "@/lib/currencyInput";
-import { dateInputToIso, isoToDateInput } from "@/lib/dateInput";
+} from "@/lib/format/currencyInput";
+import { dateInputToIso, isoToDateInput } from "@/lib/format/dateInput";
 import { AddMortgagePaymentDialog } from "./AddMortgagePaymentDialog";
 import { MortgagePaymentsTable } from "./MortgagePaymentsTable";
 import { MortgagePaymentsList } from "./MortgagePaymentsList";
 import { MortgagePaymentActionsDialog } from "./MortgagePaymentActionsDialog";
 import { DeleteMortgagePaymentDialog } from "./DeleteMortgagePaymentDialog";
-import { isMortgageCategory, MORTGAGE_CATEGORY_LABEL } from "@/lib/mortgageCategory";
+import { isMortgageCategory, MORTGAGE_CATEGORY_LABEL } from "@/lib/domain/mortgageCategory";
 
 const MORTGAGE_CATEGORY = MORTGAGE_CATEGORY_LABEL;
 const DEFAULT_MORTGAGE_AMOUNT = 5400;

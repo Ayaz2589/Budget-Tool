@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useBudget } from "@/context";
 import { useGoogleAuth } from "@/context";
 import { usePresetTransactions } from "@/context";
-import { extractSpreadsheetId } from "@/lib/googleSheets";
+import { extractSpreadsheetId } from "genjutsu-db";
 import { formatDate } from "@/lib/format";
 import { useTheme } from "@/hooks/useTheme";
 import {
@@ -43,7 +43,7 @@ import { CardSourcesCard } from "./CardSourcesCard";
 import { ExpenseCategoriesCard } from "./ExpenseCategoriesCard";
 import { IncomeCategoriesCard } from "./IncomeCategoriesCard";
 import { OwnersCard } from "./OwnersCard";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 
 const DATE_FORMAT_OPTIONS = [
   { value: "YYYY/MM/DD", label: "YYYY/MM/DD" },

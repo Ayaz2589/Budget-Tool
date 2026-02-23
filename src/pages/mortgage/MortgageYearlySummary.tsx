@@ -1,5 +1,5 @@
 import { formatCurrency } from "@/lib/format";
-import type { YearlySummaryRow } from "@/lib/mortgageMath";
+import type { YearlySummaryRow } from "@/lib/domain/mortgageMath";
 
 interface MortgageYearlySummaryProps {
   rows: YearlySummaryRow[];

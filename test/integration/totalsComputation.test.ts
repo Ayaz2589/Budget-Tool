@@ -4,7 +4,7 @@ import {
   computeGrandTotals,
   computeMonthTotals,
   type TotalsInput,
-} from "@/lib/totals";
+} from "@/lib/domain/totals";
 import type { Expense, Income } from "@/types/core";
 
 /**

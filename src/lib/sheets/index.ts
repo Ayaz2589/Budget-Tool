@@ -1,88 +1,19 @@
 /**
  * Google Sheets integration — barrel re-exports.
  *
- * All public API is re-exported here so consumers can import from
- * `@/lib/sheets` (or from `@/lib/googleSheets` for backward compatibility).
+ * Domain sheets are handled by genjutsu-db models (see models.ts and client.ts).
+ * This barrel re-exports the remaining modules: Data blob, Totals, and the
+ * genjutsu-db client factory.
  */
 
-// Shared API utilities
-export {
-  extractSpreadsheetId,
-  getSheetValues,
-  generateId,
-  parseAmount,
-  normalizeDate,
-  looksLikeIsoDate,
-  normalizeCategoryFromSheet,
-  parseOwner,
-  clearRange,
-  updateSheet,
-  SHEETS_API,
-} from "./api";
+// genjutsu-db client
+export { createSheetsClient, type SheetsClient } from "./client";
 
-// Constants
-export {
-  SHEET_NAMES,
-  ALL_SHEET_TITLES,
-  SHEET_RANGES,
-  SHEET_WRITE_RANGES,
-  SHEET_CLEAR_RANGES,
-} from "./constants";
+// Models (app-specific validation + genjutsu-db model definitions)
+export { validateExpenseSource } from "./models";
 
-// Validation
-export { validateExpenseSource, hasIdColumn, findMissingHeaders } from "./validate";
-
-// Expenses
-export {
-  readExpensesFromSheet,
-  readMortgageFromSheet,
-  appendExpenses,
-  clearAndWriteExpenses,
-  clearAndWriteMortgage,
-  buildExpensesValues,
-} from "./expenses";
-
-// Income
-export {
-  readIncomeFromSheet,
-  appendIncome,
-  clearAndWriteIncome,
-  buildIncomeValues,
-} from "./income";
-
-// Debts
-export {
-  readDebtsFromSheet,
-  readDebtPaymentsFromSheet,
-  clearAndWriteDebts,
-  clearAndWriteDebtPayments,
-  buildDebtsValues,
-  buildDebtPaymentsValues,
-} from "./debts";
-
-// Transfers & Presets
-export {
-  readOwnerTransfersFromSheet,
-  readPresetsFromSheet,
-  clearAndWritePresets,
-  buildOwnerTransfersValues,
-  buildPresetsValues,
-} from "./transfers";
-
-// Totals
-export { writeTotalsSheet, buildTotalsValues } from "./totals";
-
-// Data blob
+// Data blob (special-case sheet not covered by models)
 export { writeDataBlob, readDataBlob } from "./data";
 
-// Sync & structure
-export type { SyncPayload } from "./sync";
-export {
-  syncAllSheetsBatch,
-  getSheetIds,
-  ensureSheetsExist,
-} from "./sync";
-export type { SheetIds } from "./sync";
-
-// Formatting
-export { applySheetsFormatting } from "./formatting";
+// Totals (dynamic columns not covered by models)
+export { writeTotalsSheet, buildTotalsValues } from "./totals";

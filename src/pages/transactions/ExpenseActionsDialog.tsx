@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Pencil, Trash2 } from "lucide-react";
-import { CategoryOption } from "@/lib/categoryColors";
+import { CategoryOption } from "@/lib/format/categoryColors";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { ExpenseActionsDialogProps } from "@/types/transactions";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";

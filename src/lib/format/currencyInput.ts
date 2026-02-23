@@ -2,7 +2,7 @@ import {
   displayToUsdAmount,
   getUiFormatSettings,
   usdToDisplayAmount,
-} from "@/lib/format";
+} from "./format";
 import { CURRENCY_META, type DisplayCurrency } from "@/types/currency";
 
 function escapeRegex(value: string): string {

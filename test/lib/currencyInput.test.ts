@@ -4,7 +4,7 @@ import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
   parseCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import { getDefaultUiFormatSettings, setUiFormatSettings } from "@/lib/format";
 
 beforeEach(() => {

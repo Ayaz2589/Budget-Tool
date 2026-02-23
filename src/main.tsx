@@ -3,8 +3,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { initializeTheme } from "@/lib/theme";
-import { runStorageCleanupMigration } from "@/lib/storageCleanup";
+import { initializeTheme } from "@/lib/platform/theme";
+import { runStorageCleanupMigration } from "@/lib/platform/storageCleanup";
 
 runStorageCleanupMigration();
 initializeTheme();

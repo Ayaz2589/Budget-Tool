@@ -1,7 +1,7 @@
 import { test, expect } from "bun:test";
 import pako from "pako";
-import { serializeToBlob } from "@/lib/minifiedPayload";
-import { parseExportedPdfData } from "@/lib/pdfExport";
+import { serializeToBlob } from "@/lib/export/minifiedPayload";
+import { parseExportedPdfData } from "@/lib/export/pdfExport";
 
 const DATA_START = "BUDGET_TOOL_DATA_START";
 const DATA_END = "BUDGET_TOOL_DATA_END";

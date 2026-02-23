@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { sumAmountsBy } from "@/lib/math";
-import { getMonthLabel } from "@/lib/totals";
+import { getMonthLabel } from "@/lib/domain/totals";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import type { ExpensesByMonthListProps } from "@/types/transactions";

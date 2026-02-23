@@ -16,10 +16,10 @@ import type {
   OwnerTransfer,
 } from "@/types/core";
 import { ALL_EXPENSE_SOURCES } from "@/lib/types";
-import { isMortgageCategory } from "@/lib/mortgageCategory";
-import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
-import { buildDummyBudget, type DummyBudgetData } from "@/lib/dummyData";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { isMortgageCategory } from "@/lib/domain/mortgageCategory";
+import { isValidDate, tryRepairDate } from "@/lib/domain/dateRepair";
+import { buildDummyBudget, type DummyBudgetData } from "@/lib/import/dummyData";
+import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 import type { BudgetState } from "@/types/budget";
 import type { BudgetContextValue } from "@/types/context";
 

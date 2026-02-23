@@ -5,7 +5,7 @@ import {
   findOrthoFolder,
   isSpreadsheetActive,
   listSheetsInFolder,
-} from "@/lib/googleDrive";
+} from "@/lib/google/googleDrive";
 
 const originalFetch = globalThis.fetch;
 

@@ -8,12 +8,12 @@ import type { ExpenseSource, PresetTransaction } from "@/types/core";
 import {
   EXPENSE_SOURCE_BADGE_LABELS,
   EXPENSE_SOURCE_LOCALE_KEYS,
-} from "@/lib/sourceLabels";
+} from "@/lib/format/sourceLabels";
 import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
   parseCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {

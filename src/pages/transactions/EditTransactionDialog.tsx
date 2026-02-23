@@ -4,17 +4,17 @@ import type { EditTransactionDialogProps } from "@/types/transactions";
 import {
   EXPENSE_SOURCE_BADGE_LABELS,
   EXPENSE_SOURCE_LOCALE_KEYS,
-} from "@/lib/sourceLabels";
+} from "@/lib/format/sourceLabels";
 import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
   parseCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import {
   dateInputToIso,
   isoToDateInput,
-} from "@/lib/dateInput";
-import { CategoryOption } from "@/lib/categoryColors";
+} from "@/lib/format/dateInput";
+import { CategoryOption } from "@/lib/format/categoryColors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";

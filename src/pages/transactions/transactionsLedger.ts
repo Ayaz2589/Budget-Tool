@@ -1,16 +1,16 @@
 import type { Expense, OwnerTransfer } from "@/types";
 import type { SortColumn, TransactionLedgerRow } from "@/types";
-import { isValidDate } from "@/lib/totals";
-import { isMortgageCategory } from "@/lib/mortgageCategory";
+import { isValidDate } from "@/lib/domain/totals";
+import { isMortgageCategory } from "@/lib/domain/mortgageCategory";
 import {
   isSharedExpenseByAllocation,
   normalizeExpenseAllocation,
-} from "@/lib/ownerAccounting";
+} from "@/lib/domain/ownerAccounting";
 import {
   collectFinancialOwners,
   getOwnerAllocatedExpenseAmount,
   getSignedOwnerTransferAmount,
-} from "@/lib/financialModel";
+} from "@/lib/domain/financialModel";
 
 export type TransactionTypeFilter = "all" | "expense" | "transfer";
 

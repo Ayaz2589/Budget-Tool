@@ -1,8 +1,8 @@
 import { test, expect, describe } from "bun:test";
 import { parseAmexCsv } from "@/lib/parsers/amex";
 import { parseAppleCsv } from "@/lib/parsers/apple";
-import { filterOutExistingExpenses } from "@/lib/importDedup";
-import { validateExpense } from "@/lib/validation";
+import { filterOutExistingExpenses } from "@/lib/import/importDedup";
+import { validateExpense } from "@/lib/domain/validation";
 import type { Expense } from "@/types/core";
 
 /**

@@ -8,7 +8,7 @@ import type {
 } from "@/types/core";
 import type { CategoryWithColorPayload } from "@/types/payload";
 import type { DisplayCurrency } from "@/types/currency";
-import { serializeToBlob } from "@/lib/minifiedPayload";
+import { serializeToBlob } from "./minifiedPayload";
 
 const DATA_START_MARKER = "BUDGET_TOOL_DATA_START";
 const DATA_END_MARKER = "BUDGET_TOOL_DATA_END";

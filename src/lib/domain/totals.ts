@@ -1,15 +1,15 @@
 import type { Expense, Income } from "@/types/core";
 import type { MonthTotals, TotalsInput } from "@/types/totals";
-import { isMortgageCategory } from "@/lib/mortgageCategory";
+import { isMortgageCategory } from "./mortgageCategory";
 import { safeDivide, sumAmountsBy } from "@/lib/math";
 import {
   normalizeExpenseAllocation,
   isSharedExpenseByAllocation,
-} from "@/lib/ownerAccounting";
+} from "./ownerAccounting";
 
 export type { MonthTotals, TotalsInput };
 
-import { isValidDate } from "@/lib/dateRepair";
+import { isValidDate } from "./dateRepair";
 
 export { isValidDate };
 

@@ -8,16 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
-import { CategoryOption } from "@/lib/categoryColors";
+import { CategoryOption } from "@/lib/format/categoryColors";
 import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
   parseCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import {
   dateInputToIso,
   isoToDateInput,
-} from "@/lib/dateInput";
+} from "@/lib/format/dateInput";
 import { useBudget } from "@/context";
 import type { Owner } from "@/types/core";
 import type {

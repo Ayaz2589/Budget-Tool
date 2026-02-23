@@ -15,7 +15,7 @@ import {
   useGoogleAuth,
 } from "@/context";
 import i18n, { persistLocale } from "@/i18n";
-import { storage } from "@/lib/storage";
+import { storage } from "@/lib/platform/storage";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 

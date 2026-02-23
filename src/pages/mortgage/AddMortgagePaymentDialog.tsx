@@ -13,8 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatCurrencyInput } from "@/lib/currencyInput";
-import { dateInputToIso, isoToDateInput } from "@/lib/dateInput";
+import { formatCurrencyInput } from "@/lib/format/currencyInput";
+import { dateInputToIso, isoToDateInput } from "@/lib/format/dateInput";
 import type { AddMortgagePaymentDialogProps } from "@/types/mortgage";
 import { useTranslation } from "react-i18next";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";

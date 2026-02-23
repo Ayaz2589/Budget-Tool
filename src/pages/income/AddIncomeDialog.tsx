@@ -15,15 +15,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CategoryOption } from "@/lib/categoryColors";
+import { CategoryOption } from "@/lib/format/categoryColors";
 import {
   formatCurrencyInput,
   parseCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import {
   dateInputToIso,
   isoToDateInput,
-} from "@/lib/dateInput";
+} from "@/lib/format/dateInput";
 import type { Owner } from "@/types/core";
 import type {
   AddIncomeFormPayload,

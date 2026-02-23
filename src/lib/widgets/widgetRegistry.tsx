@@ -28,7 +28,8 @@ import { CategoryChart } from "@/pages/dashboard/widgets/CategoryChart";
 import { OwnerSplitChart } from "@/pages/dashboard/widgets/OwnerSplitChart";
 import { QuickAdd } from "@/pages/dashboard/widgets/QuickAdd";
 import { SmartInsights } from "@/pages/dashboard/widgets/SmartInsights";
-import type { WidgetType, WidgetSize, WidgetRegistryEntry } from "@/types/widget";
+import type { WidgetType, WidgetSize, WidgetRegistryEntry } from "@/lib/widgets/widget";
+import { createWidget } from "@/lib/widgets/createWidget";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyProps = any;
@@ -39,24 +40,20 @@ const CHART_WIDE_DIMS = { sm: { w: 6, h: 3 }, md: { w: 12, h: 6 }, lg: { w: 12, 
 const LIST_DIMS = { sm: { w: 6, h: 3 }, md: { w: 6, h: 6 }, lg: { w: 12, h: 6 } } as const;
 
 export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
-  "net-cash-flow": {
+  "net-cash-flow": createWidget({
+    ...KPI_DIMS,
     type: "net-cash-flow",
     label: "widget.netCashFlow",
     icon: <DollarSign className="size-4" />,
-    defaultSize: "md",
-    sizeDims: KPI_DIMS,
-
     render: (props: AnyProps, size: WidgetSize) => (
       <NetCashFlow netCashFlow={props.kpis.netCashFlow} sparklineRows={props.kpiSparklineRows} size={size} />
     ),
-  },
-  "total-spent": {
+  }),
+  "total-spent": createWidget({
+    ...KPI_DIMS,
     type: "total-spent",
     label: "widget.totalSpent",
     icon: <TrendingDown className="size-4" />,
-    defaultSize: "md",
-    sizeDims: KPI_DIMS,
-
     render: (props: AnyProps, size: WidgetSize) => (
       <TotalSpent
         totalSpent={props.kpis.totalSpent}
@@ -67,25 +64,21 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
         size={size}
       />
     ),
-  },
-  "total-income": {
+  }),
+  "total-income": createWidget({
+    ...KPI_DIMS,
     type: "total-income",
     label: "widget.totalIncome",
     icon: <TrendingUp className="size-4" />,
-    defaultSize: "md",
-    sizeDims: KPI_DIMS,
-
     render: (props: AnyProps, size: WidgetSize) => (
       <TotalIncome totalIncome={props.kpis.totalIncome} sparklineRows={props.kpiSparklineRows} size={size} />
     ),
-  },
-  "total-debt": {
+  }),
+  "total-debt": createWidget({
+    ...KPI_DIMS,
     type: "total-debt",
     label: "widget.totalDebt",
     icon: <Landmark className="size-4" />,
-    defaultSize: "md",
-    sizeDims: KPI_DIMS,
-
     render: (props: AnyProps, size: WidgetSize) => (
       <TotalDebt
         debtOutstanding={props.kpis.debtOutstanding}
@@ -94,13 +87,14 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
         size={size}
       />
     ),
-  },
-  "quick-add": {
+  }),
+  "quick-add": createWidget({
     type: "quick-add",
     label: "widget.quickAdd",
     icon: <Zap className="size-4" />,
-    defaultSize: "md",
-    sizeDims: { sm: { w: 6, h: 3 }, md: { w: 12, h: 4 }, lg: { w: 12, h: 6 } },
+    sm: { w: 6, h: 3 },
+    md: { w: 12, h: 4 },
+    lg: { w: 12, h: 6 },
     render: (props: AnyProps, size: WidgetSize) => (
       <QuickAdd
         presets={props.presetTransactions}
@@ -109,13 +103,13 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
         size={size}
       />
     ),
-  },
-  "cash-flow-chart": {
+  }),
+  "cash-flow-chart": createWidget({
+    ...CHART_WIDE_DIMS,
     type: "cash-flow-chart",
     label: "widget.cashFlowChart",
     icon: <BarChart3 className="size-4" />,
     defaultSize: "lg",
-    sizeDims: CHART_WIDE_DIMS,
     render: (props: AnyProps, size: WidgetSize) => (
       <CashFlowChart
         cashFlowDisplayRows={props.cashFlowDisplayRows}
@@ -124,13 +118,14 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
         size={size}
       />
     ),
-  },
-  "net-trend-chart": {
+  }),
+  "net-trend-chart": createWidget({
     type: "net-trend-chart",
     label: "widget.netTrendChart",
     icon: <Activity className="size-4" />,
-    defaultSize: "md",
-    sizeDims: { sm: { w: 6, h: 3 }, md: { w: 9, h: 3 }, lg: { w: 12, h: 6 } },
+    sm: { w: 6, h: 3 },
+    md: { w: 9, h: 3 },
+    lg: { w: 12, h: 6 },
     render: (props: AnyProps, size: WidgetSize) => (
       <NetTrendChart
         netCashFlowRows={props.netCashFlowRows}
@@ -138,23 +133,27 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
         size={size}
       />
     ),
-  },
-  "category-chart": {
+  }),
+  "category-chart": createWidget({
     type: "category-chart",
     label: "widget.categoryChart",
     icon: <PieChart className="size-4" />,
     defaultSize: "lg",
-    sizeDims: { sm: { w: 6, h: 3 }, md: { w: 9, h: 4 }, lg: { w: 12, h: 8 } },
+    sm: { w: 6, h: 3 },
+    md: { w: 9, h: 4 },
+    lg: { w: 12, h: 8 },
     render: (props: AnyProps, size: WidgetSize) => (
       <CategoryChart categorySlices={props.categorySlices} size={size} />
     ),
-  },
-  "owner-split-chart": {
+  }),
+  "owner-split-chart": createWidget({
     type: "owner-split-chart",
     label: "widget.ownerSplitChart",
     icon: <Users className="size-4" />,
     defaultSize: "lg",
-    sizeDims: { sm: { w: 6, h: 3 }, md: { w: 9, h: 4 }, lg: { w: 12, h: 8 } },
+    sm: { w: 6, h: 3 },
+    md: { w: 9, h: 4 },
+    lg: { w: 12, h: 8 },
     render: (props: AnyProps, size: WidgetSize) => (
       <OwnerSplitChart
         ownerSlices={props.ownerSlices}
@@ -165,36 +164,30 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
         size={size}
       />
     ),
-  },
-  "debt-snapshot": {
+  }),
+  "debt-snapshot": createWidget({
+    ...LIST_DIMS,
     type: "debt-snapshot",
     label: "widget.debtSnapshot",
     icon: <Receipt className="size-4" />,
-    defaultSize: "md",
-    sizeDims: LIST_DIMS,
-
     render: (props: AnyProps, size: WidgetSize) => (
       <DebtSnapshot debtRows={props.debtRows} size={size} />
     ),
-  },
-  "spend-by-source": {
+  }),
+  "spend-by-source": createWidget({
+    ...LIST_DIMS,
     type: "spend-by-source",
     label: "widget.spendBySource",
     icon: <CreditCard className="size-4" />,
-    defaultSize: "md",
-    sizeDims: LIST_DIMS,
-
     render: (props: AnyProps, size: WidgetSize) => (
       <SpendBySource spendBySourceRows={props.spendBySourceRows} size={size} />
     ),
-  },
-  "owner-transfers": {
+  }),
+  "owner-transfers": createWidget({
+    ...LIST_DIMS,
     type: "owner-transfers",
     label: "widget.ownerTransfers",
     icon: <ArrowLeftRight className="size-4" />,
-    defaultSize: "md",
-    sizeDims: LIST_DIMS,
-
     render: (props: AnyProps, size: WidgetSize) => (
       <OwnerTransfers
         ownerTransfersMtd={props.ownerTransfersMtd}
@@ -202,25 +195,22 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
         size={size}
       />
     ),
-  },
-  "recent-activity": {
+  }),
+  "recent-activity": createWidget({
+    ...LIST_DIMS,
     type: "recent-activity",
     label: "widget.recentActivity",
     icon: <Clock className="size-4" />,
-    defaultSize: "md",
-    sizeDims: LIST_DIMS,
-
     render: (props: AnyProps, size: WidgetSize) => (
       <RecentActivity recentActivity={props.recentActivity} size={size} />
     ),
-  },
-  "smart-insights": {
+  }),
+  "smart-insights": createWidget({
+    ...KPI_DIMS,
     type: "smart-insights",
     label: "widget.smartInsights",
     icon: <Lightbulb className="size-4" />,
     defaultSize: "sm",
-    sizeDims: KPI_DIMS,
-
     render: (props: AnyProps, size: WidgetSize) => (
       <SmartInsights
         insights={props.insights}
@@ -228,5 +218,5 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
         size={size}
       />
     ),
-  },
+  }),
 };

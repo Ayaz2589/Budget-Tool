@@ -2,10 +2,10 @@ import { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Responsive, WidthProvider, type Layout, type LayoutItem } from "react-grid-layout/legacy";
 import { useDashboardLayout } from "@/context/DashboardLayoutContext";
-import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
+import { WIDGET_REGISTRY } from "@/lib/widgets/widgetRegistry";
 import { DsWidgetShell } from "@/components/ds/DsWidgetShell";
 import { DsEmptyState } from "@/components/ds";
-import type { WidgetLayoutItem } from "@/types/widget";
+import type { WidgetLayoutItem } from "@/lib/widgets/widget";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 

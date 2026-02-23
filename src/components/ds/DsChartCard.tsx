@@ -1,6 +1,6 @@
 import type * as React from "react";
 import { cn } from "@/lib/utils";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 interface DsChartCardProps {
   title: React.ReactNode;

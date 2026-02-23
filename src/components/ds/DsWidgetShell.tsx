@@ -5,9 +5,9 @@ import { GripVertical, EyeOff, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
+import { WIDGET_REGISTRY } from "@/lib/widgets/widgetRegistry";
 import { DsWidgetCard } from "./DsWidgetCard";
-import type { WidgetType, WidgetSize } from "@/types/widget";
+import type { WidgetType, WidgetSize } from "@/lib/widgets/widget";
 
 const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", md: "M", lg: "L" };
 const ALL_SIZES: WidgetSize[] = ["sm", "md", "lg"];

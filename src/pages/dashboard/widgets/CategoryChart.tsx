@@ -4,7 +4,7 @@ import { formatCurrency } from "@/lib/format";
 import { DsChartCard, DsEmptyState, DsLegendList } from "@/components/ds";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import type { DashboardCategorySlice } from "@/types/dashboard";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 const DONUT_COLORS = [
   "var(--viz-series-1)",

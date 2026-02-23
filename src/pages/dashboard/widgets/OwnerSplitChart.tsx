@@ -8,7 +8,7 @@ import { DsChartCard, DsDataRow, DsEmptyState, DsLegendList } from "@/components
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import type { DashboardOwnerSlice, DashboardOwnerNetRow } from "@/types/dashboard";
 import type { buildOwnerExpenseItems } from "@/pages/dashboard/dashboardSelectors";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 const DONUT_COLORS = [
   "var(--viz-series-1)",

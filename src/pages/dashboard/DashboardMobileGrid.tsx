@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useDashboardLayout } from "@/context/DashboardLayoutContext";
-import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
+import { WIDGET_REGISTRY } from "@/lib/widgets/widgetRegistry";
 import { DsWidgetShell } from "@/components/ds/DsWidgetShell";
 import { DsEmptyState } from "@/components/ds";
 import { useTranslation } from "react-i18next";
@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { ChevronUp, ChevronDown, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { WidgetSize, WidgetType } from "@/types/widget";
+import type { WidgetSize, WidgetType } from "@/lib/widgets/widget";
 
 const SIZE_LABELS: Record<WidgetSize, string> = { sm: "S", md: "M", lg: "L" };
 const ALL_SIZES: WidgetSize[] = ["sm", "md", "lg"];

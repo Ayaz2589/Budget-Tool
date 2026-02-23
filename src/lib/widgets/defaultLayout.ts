@@ -1,4 +1,4 @@
-import type { DashboardLayout, WidgetType } from "@/types/widget";
+import type { DashboardLayout, WidgetType } from "@/lib/widgets/widget";
 
 /**
  * Default dashboard layout for 24-column grid with per-widget size presets.

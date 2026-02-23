@@ -9,9 +9,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
-import { ALL_WIDGET_TYPES } from "@/lib/defaultLayout";
-import type { WidgetType } from "@/types/widget";
+import { WIDGET_REGISTRY } from "@/lib/widgets/widgetRegistry";
+import { ALL_WIDGET_TYPES } from "@/lib/widgets/defaultLayout";
+import type { WidgetType } from "@/lib/widgets/widget";
 
 interface DsWidgetCatalogProps {
   open: boolean;

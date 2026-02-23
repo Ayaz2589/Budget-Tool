@@ -10,7 +10,7 @@ import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { DsChartCard, DsEmptyState, DsHelpTooltip } from "@/components/ds";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 const INCOME_OWNER_COLORS = [
   "var(--viz-series-1)",

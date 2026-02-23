@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { DsEmptyState } from "@/components/ds";
 import type { DashboardInsight } from "@/types/dashboard";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 interface SmartInsightsProps {
   insights: DashboardInsight[];

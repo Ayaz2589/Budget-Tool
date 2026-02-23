@@ -4,7 +4,7 @@ import { ResponsiveContainer } from "recharts";
 import { formatCurrency } from "@/lib/format";
 import { DsMetricCard } from "@/components/ds";
 import { formatDebtPaidSubtitle } from "@/pages/dashboard/insightsBuilder";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 interface SparklineRow {
   monthKey: string;

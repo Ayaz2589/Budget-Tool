@@ -28,8 +28,8 @@ import { CategoryChart } from "@/pages/dashboard/widgets/CategoryChart";
 import { OwnerSplitChart } from "@/pages/dashboard/widgets/OwnerSplitChart";
 import { QuickAdd } from "@/pages/dashboard/widgets/QuickAdd";
 import { SmartInsights } from "@/pages/dashboard/widgets/SmartInsights";
-import type { WidgetType, WidgetSize, WidgetRegistryEntry } from "@/types/widget";
-import { createWidget } from "@/lib/createWidget";
+import type { WidgetType, WidgetSize, WidgetRegistryEntry } from "@/lib/widgets/widget";
+import { createWidget } from "@/lib/widgets/createWidget";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyProps = any;

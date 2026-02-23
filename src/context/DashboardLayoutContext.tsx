@@ -1,9 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type React from "react";
 import { storage, STORAGE_KEYS } from "@/lib/storage";
-import { DEFAULT_LAYOUT, ALL_WIDGET_TYPES } from "@/lib/defaultLayout";
-import { WIDGET_REGISTRY } from "@/lib/widgetRegistry";
-import type { DashboardLayout, WidgetLayoutItem, WidgetSize, WidgetType } from "@/types/widget";
+import { DEFAULT_LAYOUT, ALL_WIDGET_TYPES } from "@/lib/widgets/defaultLayout";
+import { WIDGET_REGISTRY } from "@/lib/widgets/widgetRegistry";
+import type { DashboardLayout, WidgetLayoutItem, WidgetSize, WidgetType } from "@/lib/widgets/widget";
 
 interface DashboardLayoutContextValue {
   layout: DashboardLayout;

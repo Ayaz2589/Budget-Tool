@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { Expense } from "@/types/core";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 interface RecentActivityProps {
   recentActivity: Expense[];

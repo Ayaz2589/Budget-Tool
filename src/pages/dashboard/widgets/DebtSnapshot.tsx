@@ -3,7 +3,7 @@ import { formatCurrency } from "@/lib/format";
 import { clamp } from "@/lib/math";
 import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { DashboardDebtRow } from "@/types/dashboard";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 interface DebtSnapshotProps {
   debtRows: DashboardDebtRow[];

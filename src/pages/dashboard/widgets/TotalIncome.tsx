@@ -3,7 +3,7 @@ import { AreaChart, Area } from "recharts";
 import { ResponsiveContainer } from "recharts";
 import { formatCurrency } from "@/lib/format";
 import { DsHelpTooltip, DsMetricCard } from "@/components/ds";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 interface SparklineRow {
   monthKey: string;

@@ -1,4 +1,4 @@
-import type { WidgetType, WidgetSize, SizeDims, WidgetRegistryEntry } from "@/types/widget";
+import type { WidgetType, WidgetSize, SizeDims, WidgetRegistryEntry } from "@/lib/widgets/widget";
 import type React from "react";
 
 export interface CreateWidgetOptions {

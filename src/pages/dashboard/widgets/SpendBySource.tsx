@@ -3,7 +3,7 @@ import { formatCurrency } from "@/lib/format";
 import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
 import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { Expense } from "@/types/core";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 interface SpendBySourceRow {
   source: Expense["source"];

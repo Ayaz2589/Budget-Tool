@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { cn } from "@/lib/utils";
 import type { PresetTransaction } from "@/types/core";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 interface QuickAddProps {
   presets: PresetTransaction[];

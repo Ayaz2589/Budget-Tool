@@ -11,7 +11,7 @@ import { formatCurrency } from "@/lib/format";
 import { DsChartCard, DsEmptyState, DsHelpTooltip } from "@/components/ds";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import type { DashboardRange } from "@/types/dashboard";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 function asNumber(value: unknown): number {
   if (typeof value === "number") return value;

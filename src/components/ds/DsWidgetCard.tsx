@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import type { WidgetSize } from "@/types/widget";
+import type { WidgetSize } from "@/lib/widgets/widget";
 
 const SIZE_PADDING: Record<WidgetSize, string> = {
   sm: "px-4 py-3",

@@ -1,7 +1,7 @@
 import { describe, test, expect } from "bun:test";
 import { createElement, isValidElement } from "react";
-import type { WidgetSize } from "@/types/widget";
-import { createWidget } from "@/lib/createWidget";
+import type { WidgetSize } from "@/lib/widgets/widget";
+import { createWidget } from "@/lib/widgets/createWidget";
 
 const TEST_DIMS = {
   sm: { w: 3, h: 2 },

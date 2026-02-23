@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DsHelpTooltip, DsSplitToggle } from "@/components/ds";
-import type { FinancialViewMode } from "@/lib/financialModel";
+import type { FinancialViewMode } from "@/lib/domain/financialModel";
 import type { DashboardExpenseScope, DashboardRange } from "@/types/dashboard";
 
 function formatMonthKeyNumeric(monthKey: string): string {

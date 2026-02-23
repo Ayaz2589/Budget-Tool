@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getDebtBalance } from "@/lib/debtUtils";
+import { getDebtBalance } from "@/lib/domain/debtUtils";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { DebtPayment } from "@/types/core";
 import { cn } from "@/lib/utils";

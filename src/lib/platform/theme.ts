@@ -1,4 +1,4 @@
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { storage, STORAGE_KEYS } from "./storage";
 
 export type AppTheme = "light" | "dark" | "system";
 

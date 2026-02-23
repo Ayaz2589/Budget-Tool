@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { sumAmountsBy } from "@/lib/math";
-import { getMonthLabel } from "@/lib/totals";
+import { getMonthLabel } from "@/lib/domain/totals";
 import {
   Select,
   SelectContent,
@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DsHelpTooltip } from "@/components/ds";
-import { CategoryOption } from "@/lib/categoryColors";
+import { CategoryOption } from "@/lib/format/categoryColors";
 import type { IncomeTableProps } from "@/types/income";
 
 export type { IncomeTableProps };

@@ -2,7 +2,7 @@ import { describe, test, expect } from "bun:test";
 import {
   isMortgageCategory,
   MORTGAGE_CATEGORY_LABEL,
-} from "@/lib/mortgageCategory";
+} from "@/lib/domain/mortgageCategory";
 
 // ---------------------------------------------------------------------------
 // MORTGAGE_CATEGORY_LABEL

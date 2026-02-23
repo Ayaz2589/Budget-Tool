@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "react-i18next";
-import { getDebtBalance } from "@/lib/debtUtils";
+import { getDebtBalance } from "@/lib/domain/debtUtils";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { DsHelpTooltip } from "@/components/ds";

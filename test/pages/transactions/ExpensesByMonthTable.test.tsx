@@ -1,7 +1,7 @@
 import { test, expect, mock } from "bun:test";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { ExpensesByMonthTable } from "@/pages/transactions/ExpensesByMonthTable";
-import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
+import { SOURCE_LABEL_KEYS } from "@/lib/format/sourceLabels";
 import type { TransactionLedgerRow } from "@/types/transactions";
 
 const mockT = (key: string, opts?: { count?: number }) =>

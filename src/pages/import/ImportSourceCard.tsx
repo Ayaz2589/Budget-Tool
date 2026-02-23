@@ -4,7 +4,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DsSectionHeader } from "@/components/ds";
-import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
+import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/format/sourceLabels";
 import { cn } from "@/lib/utils";
 import type { SourceChoice, ImportSourceCardProps } from "@/types/import";
 

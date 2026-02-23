@@ -11,7 +11,7 @@ import { Plus, SlidersHorizontal } from "lucide-react";
 import { DsActionBar, DsEmptyState, DsHelpTooltip, DsSectionHeader } from "@/components/ds";
 
 import { FiltersAndActionsDialog } from "./FiltersAndActionsDialog";
-import { SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
+import { SOURCE_LABEL_KEYS } from "@/lib/format/sourceLabels";
 import { ExpensesByMonthTable, type SortColumn } from "./ExpensesByMonthTable";
 import { ExpensesByMonthList } from "./ExpensesByMonthList";
 import { ExpenseActionsDialog } from "./ExpenseActionsDialog";

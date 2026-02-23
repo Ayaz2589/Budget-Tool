@@ -2,7 +2,7 @@ import { test, expect, describe } from "bun:test";
 import {
   isSameExpense,
   filterOutExistingExpenses,
-} from "@/lib/importDedup";
+} from "@/lib/import/importDedup";
 import type { Expense } from "@/lib/types";
 
 function expense(overrides: Partial<Expense>): Expense {

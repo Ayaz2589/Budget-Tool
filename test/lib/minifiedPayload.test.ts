@@ -1,6 +1,6 @@
 import { test, expect } from "bun:test";
 import pako from "pako";
-import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
+import { serializeToBlob, parseFromBlob } from "@/lib/export/minifiedPayload";
 
 test("serializeToBlob and parseFromBlob round-trip", () => {
   const input = {

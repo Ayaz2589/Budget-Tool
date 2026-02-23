@@ -1,5 +1,5 @@
 import { type DisplayCurrency } from "@/types/currency";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { storage, STORAGE_KEYS } from "./storage";
 
 const FX_TTL_MS = 12 * 60 * 60 * 1000;
 const FALLBACK_RATE = 1;

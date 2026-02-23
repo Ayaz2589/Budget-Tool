@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { getCategoryColor } from "@/lib/categoryColors";
+import { getCategoryColor } from "@/lib/format/categoryColors";
 
 test("getCategoryColor expense categories", () => {
   expect(getCategoryColor("Shopping", "expense")).toBe("bg-blue-500");

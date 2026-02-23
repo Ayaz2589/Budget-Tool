@@ -4,7 +4,7 @@ import {
   formatDateInput,
   getDateInputPlaceholder,
   isoToDateInput,
-} from "@/lib/dateInput";
+} from "@/lib/format/dateInput";
 
 test("getDateInputPlaceholder returns MM/DD/YYYY", () => {
   expect(getDateInputPlaceholder("MM/DD/YYYY")).toBe("MM/DD/YYYY");

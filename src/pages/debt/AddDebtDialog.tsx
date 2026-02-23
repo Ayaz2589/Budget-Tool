@@ -19,11 +19,11 @@ import type { Owner } from "@/types/core";
 import {
   formatCurrencyInput,
   parseCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import {
   dateInputToIso,
   isoToDateInput,
-} from "@/lib/dateInput";
+} from "@/lib/format/dateInput";
 import type { AddDebtPayload, AddDebtDialogProps } from "@/types/debt";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 

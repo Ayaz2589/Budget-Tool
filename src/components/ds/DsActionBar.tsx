@@ -1,6 +1,6 @@
 import type * as React from "react";
 import { cn } from "@/lib/utils";
-import { triggerHaptic } from "@/lib/haptics";
+import { triggerHaptic } from "@/lib/platform/haptics";
 
 interface DsActionBarProps {
   className?: string;

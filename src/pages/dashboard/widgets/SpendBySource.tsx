@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@/lib/format";
-import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
+import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/format/sourceLabels";
 import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { Expense } from "@/types/core";
 import type { WidgetSize } from "@/lib/widgets/widget";

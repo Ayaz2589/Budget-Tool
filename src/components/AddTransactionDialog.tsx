@@ -5,14 +5,14 @@ import type { ExpenseSource, TransactionRow, AddTransactionDialogProps } from "@
 import {
   formatCurrencyFromNumber,
   parseCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import {
   dateInputToIso,
   isoToDateInput,
-} from "@/lib/dateInput";
+} from "@/lib/format/dateInput";
 import {
   EXPENSE_SOURCE_LOCALE_KEYS,
-} from "@/lib/sourceLabels";
+} from "@/lib/format/sourceLabels";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,

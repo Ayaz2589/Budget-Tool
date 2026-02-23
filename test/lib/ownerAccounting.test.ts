@@ -4,7 +4,7 @@ import {
   isSharedExpenseByAllocation,
   normalizeExpenseAllocation,
   resolveExpensePaidByOwner,
-} from "@/lib/ownerAccounting";
+} from "@/lib/domain/ownerAccounting";
 import type { Expense, OwnerTransfer } from "@/types/core";
 
 function expense(overrides: Partial<Expense>): Expense {

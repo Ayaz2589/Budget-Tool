@@ -1,6 +1,6 @@
 import { test, expect } from "bun:test";
-import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
-import { parseExportedPdfData } from "@/lib/pdfExport";
+import { serializeToBlob, parseFromBlob } from "@/lib/export/minifiedPayload";
+import { parseExportedPdfData } from "@/lib/export/pdfExport";
 
 test("parseExportedPdfData reads V2 blob between markers", () => {
   const blob = serializeToBlob({

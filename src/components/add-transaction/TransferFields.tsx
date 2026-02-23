@@ -2,11 +2,11 @@ import { useTranslation } from "react-i18next";
 import type { TransactionRow } from "@/types";
 import {
   formatCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import {
   dateInputToIso,
   isoToDateInput,
-} from "@/lib/dateInput";
+} from "@/lib/format/dateInput";
 import {
   Select,
   SelectContent,

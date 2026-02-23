@@ -1,5 +1,5 @@
-import { isValidDate } from "@/lib/dateRepair";
-import type { UiFormatSettings } from "@/lib/format";
+import { isValidDate } from "@/lib/domain/dateRepair";
+import type { UiFormatSettings } from "./format";
 
 type UiDateFormat = UiFormatSettings["dateFormat"];
 

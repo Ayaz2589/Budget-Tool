@@ -1,6 +1,6 @@
 import { test, expect, mock } from "bun:test";
-import { buildExportString, downloadExportString } from "@/lib/exportString";
-import { parseExportedPdfData } from "@/lib/pdfExport";
+import { buildExportString, downloadExportString } from "@/lib/export/exportString";
+import { parseExportedPdfData } from "@/lib/export/pdfExport";
 
 test("buildExportString produces markers + V2 blob", () => {
   const text = buildExportString(

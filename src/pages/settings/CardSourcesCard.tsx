@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import type { ExpenseSource } from "@/lib/types";
 import { ALL_EXPENSE_SOURCES } from "@/lib/types";
-import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/sourceLabels";
-import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/sourceLabels";
+import { EXPENSE_SOURCE_LOCALE_KEYS } from "@/lib/format/sourceLabels";
+import { EXPENSE_SOURCE_BADGE_LABELS } from "@/lib/format/sourceLabels";
 import { useBudget } from "@/context";
 import { usePresetTransactions } from "@/context";
 import {

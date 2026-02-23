@@ -1,5 +1,5 @@
 import { beforeEach, expect, test } from "bun:test";
-import { runStorageCleanupMigration } from "@/lib/storageCleanup";
+import { runStorageCleanupMigration } from "@/lib/platform/storageCleanup";
 
 beforeEach(() => {
   localStorage.clear();

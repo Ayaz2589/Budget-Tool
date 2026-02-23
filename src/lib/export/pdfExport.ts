@@ -10,11 +10,11 @@ import type {
 } from "@/types/core";
 import type { CategoryWithColorPayload } from "@/types/payload";
 import type { ParsedExportedPdf } from "@/types/pdf";
-import { getMonthLabel, computeMonthTotals } from "@/lib/totals";
+import { getMonthLabel, computeMonthTotals } from "@/lib/domain/totals";
 import { formatCurrency, formatPercent } from "@/lib/format";
-import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
-import { isMortgageCategory } from "@/lib/mortgageCategory";
-import { EXPENSE_SOURCE_DISPLAY_LABELS } from "@/lib/sourceLabels";
+import { serializeToBlob, parseFromBlob } from "./minifiedPayload";
+import { isMortgageCategory } from "@/lib/domain/mortgageCategory";
+import { EXPENSE_SOURCE_DISPLAY_LABELS } from "@/lib/format/sourceLabels";
 
 const AMOUNT_RE = /\$([\d,]+\.\d{2})/;
 const INCOME_ROW_RE = /(\d{4}-\d{2}-\d{2})\s+(Paycheck|Rent)\s+\$([\d,]+\.\d{2})\s+(Paycheck|Rent)/g;

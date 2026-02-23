@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getCategoryColor } from "@/lib/categoryColors";
+import { getCategoryColor } from "@/lib/format/categoryColors";
 import { cn } from "@/lib/utils";
 import type { PresetTransaction } from "@/types/core";
 import type { WidgetSize } from "@/lib/widgets/widget";

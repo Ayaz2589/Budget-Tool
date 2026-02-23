@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { getDebtBalance } from "@/lib/debtUtils";
+import { getDebtBalance } from "@/lib/domain/debtUtils";
 import type { Debt, DebtPayment } from "@/lib/types";
 
 function debt(overrides: Partial<Debt>): Debt {

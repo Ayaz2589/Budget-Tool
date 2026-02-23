@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
-import { getUsdFxRate } from "@/lib/fx";
+import { getUsdFxRate } from "@/lib/platform/fx";
 import type { DisplayCurrency } from "@/types/currency";
 
 const originalFetch = globalThis.fetch;

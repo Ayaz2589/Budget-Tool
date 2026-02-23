@@ -7,7 +7,7 @@ import {
   EXPENSE_SOURCE_BADGE_LABELS,
   SOURCE_LABEL_KEYS,
   SOURCE_OPTIONS,
-} from "@/lib/sourceLabels";
+} from "@/lib/format/sourceLabels";
 
 // ---------------------------------------------------------------------------
 // EXPENSE_SOURCE_LOCALE_KEYS

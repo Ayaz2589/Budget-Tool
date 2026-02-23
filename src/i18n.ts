@@ -7,7 +7,7 @@ import zh from "./locales/zh.json";
 import ko from "./locales/ko.json";
 import hi from "./locales/hi.json";
 import ja from "./locales/ja.json";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 
 const SUPPORTED_LOCALES = ["en", "es", "bn", "zh", "ko", "hi", "ja"] as const;
 const savedLng = storage.getItem(STORAGE_KEYS.LOCALE);

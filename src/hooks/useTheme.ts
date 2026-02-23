@@ -5,7 +5,7 @@ import {
   onSystemThemeChange,
   persistTheme,
   type AppTheme,
-} from "@/lib/theme";
+} from "@/lib/platform/theme";
 
 export function useTheme() {
   const [theme, setThemeState] = useState<AppTheme>(getStoredTheme);

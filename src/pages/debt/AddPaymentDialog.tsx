@@ -15,11 +15,11 @@ import { Label } from "@/components/ui/label";
 import {
   formatCurrencyInput,
   parseCurrencyInput,
-} from "@/lib/currencyInput";
+} from "@/lib/format/currencyInput";
 import {
   dateInputToIso,
   isoToDateInput,
-} from "@/lib/dateInput";
+} from "@/lib/format/dateInput";
 import { useBudget } from "@/context";
 import type { AddPaymentPayload, AddPaymentDialogProps } from "@/types/debt";
 

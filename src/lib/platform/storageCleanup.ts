@@ -1,5 +1,5 @@
 import { DISPLAY_CURRENCIES } from "@/types/currency";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { storage, STORAGE_KEYS } from "./storage";
 
 const LEGACY_STORAGE_KEYS = [
   "budget-tool-dashboard-dummy",

@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { collectMissingImportMeta, normalizeImportedData } from "@/lib/importNormalize";
+import { collectMissingImportMeta, normalizeImportedData } from "@/lib/import/importNormalize";
 import type { ParsedExportedPdf } from "@/types/pdf";
 
 const parsed: ParsedExportedPdf = {

@@ -4,7 +4,7 @@ import {
   getOwnerAllocatedExpenseAmount,
   getSignedOwnerTransferAmount,
   scopeFinancialData,
-} from "@/lib/financialModel";
+} from "@/lib/domain/financialModel";
 
 test("collectFinancialOwners builds normalized owner union across domains", () => {
   const owners = collectFinancialOwners({

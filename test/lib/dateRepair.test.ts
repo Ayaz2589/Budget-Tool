@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import { isValidDate, tryRepairDate } from "@/lib/dateRepair";
+import { isValidDate, tryRepairDate } from "@/lib/domain/dateRepair";
 
 test("isValidDate accepts YYYY-MM-DD", () => {
   expect(isValidDate("2025-01-15")).toBe(true);

@@ -8,7 +8,7 @@ import {
 import type { ReactNode } from "react";
 import type { PresetTransaction } from "@/types/core";
 import type { PresetTransactionsContextValue } from "@/types/context";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 
 function generatePresetId(): string {
   return `preset-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;

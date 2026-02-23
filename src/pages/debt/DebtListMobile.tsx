@@ -1,4 +1,4 @@
-import { getDebtBalance } from "@/lib/debtUtils";
+import { getDebtBalance } from "@/lib/domain/debtUtils";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";

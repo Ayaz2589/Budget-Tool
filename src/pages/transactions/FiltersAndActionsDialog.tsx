@@ -15,10 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CategoryOption } from "@/lib/categoryColors";
+import { CategoryOption } from "@/lib/format/categoryColors";
 import type { ExpenseSource } from "@/types/core";
 import type { FiltersAndActionsDialogProps } from "@/types/transactions";
-import { EXPENSE_SOURCE_BADGE_LABELS, SOURCE_LABEL_KEYS } from "@/lib/sourceLabels";
+import { EXPENSE_SOURCE_BADGE_LABELS, SOURCE_LABEL_KEYS } from "@/lib/format/sourceLabels";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { FiltersAndActionsDialogProps };

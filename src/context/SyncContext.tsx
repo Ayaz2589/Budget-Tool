@@ -11,18 +11,18 @@ import {
 import i18n from "@/i18n";
 import { useBudget } from "./BudgetContext";
 import { usePresetTransactions } from "./PresetTransactionsContext";
-import { computeAllTotals, computeGrandTotals } from "@/lib/totals";
+import { computeAllTotals, computeGrandTotals } from "@/lib/domain/totals";
 import { readDataBlob, writeDataBlob } from "@/lib/sheets/data";
 import { writeTotalsSheet } from "@/lib/sheets/totals";
 import { createSheetsClient } from "@/lib/sheets/client";
 import { isGenjutsuError, generateId } from "genjutsu-db";
 import { validateExpenseSource } from "@/lib/sheets/models";
-import { serializeToBlob, parseFromBlob } from "@/lib/minifiedPayload";
-import { getCategoryColor } from "@/lib/categoryColors";
-import { isMortgageCategory } from "@/lib/mortgageCategory";
+import { serializeToBlob, parseFromBlob } from "@/lib/export/minifiedPayload";
+import { getCategoryColor } from "@/lib/format/categoryColors";
+import { isMortgageCategory } from "@/lib/domain/mortgageCategory";
 import { isDisplayCurrency } from "@/types/currency";
-import { isSpreadsheetActive } from "@/lib/googleDrive";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { isSpreadsheetActive } from "@/lib/google/googleDrive";
+import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 import type { SyncHealth, SyncStatus } from "@/types/auth";
 
 // ---------------------------------------------------------------------------

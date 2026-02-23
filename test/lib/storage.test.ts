@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { storage, STORAGE_KEYS, type StorageAdapter } from "@/lib/storage";
+import { storage, STORAGE_KEYS, type StorageAdapter } from "@/lib/platform/storage";
 
 beforeEach(() => {
   localStorage.clear();

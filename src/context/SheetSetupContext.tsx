@@ -14,9 +14,9 @@ import {
   findOrthoFolder,
   listSheetsInFolder,
   ORTHO_SHEET_NAME,
-} from "@/lib/googleDrive";
+} from "@/lib/google/googleDrive";
 import { extractSpreadsheetId } from "genjutsu-db";
-import { storage, STORAGE_KEYS } from "@/lib/storage";
+import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 import type { GoogleAuthContextValue } from "@/types/auth";
 
 // ---------------------------------------------------------------------------

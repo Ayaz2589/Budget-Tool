@@ -1,9 +1,9 @@
-import { getDebtBalance } from "@/lib/debtUtils";
-import { getMonthLabel, isValidDate } from "@/lib/totals";
+import { getDebtBalance } from "@/lib/domain/debtUtils";
+import { getMonthLabel, isValidDate } from "@/lib/domain/totals";
 import {
   isSharedExpenseByAllocation,
   normalizeExpenseAllocation,
-} from "@/lib/ownerAccounting";
+} from "@/lib/domain/ownerAccounting";
 import {
   computeDebtBalance,
   computeDebtProgress,
@@ -12,7 +12,7 @@ import {
   computeOwnerNetFromTransfers,
   sumAmountsBy,
 } from "@/lib/math";
-import { isMortgageCategory } from "@/lib/mortgageCategory";
+import { isMortgageCategory } from "@/lib/domain/mortgageCategory";
 import type { Debt, DebtPayment, Expense, Income, OwnerTransfer } from "@/types/core";
 import type {
   DashboardCashFlowRow,

@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency } from "@/lib/format";
-import type { AmortizationRow } from "@/lib/mortgageMath";
+import type { AmortizationRow } from "@/lib/domain/mortgageMath";
 
 interface MortgageScheduleTableProps {
   rows: AmortizationRow[];

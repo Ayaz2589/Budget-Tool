@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CategoryOption } from "@/lib/categoryColors";
+import { CategoryOption } from "@/lib/format/categoryColors";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { DsDataRow, DsSectionHeader } from "@/components/ds";
 import type { ImportPreviewCardProps } from "@/types/import";

@@ -2,23 +2,21 @@
  * Read/write operations for the Data sheet (minified V2 blob in cell A1).
  */
 
-import { getSheetValues, updateSheet, DATA_RANGES } from "./transport";
+import type { SheetsClient } from "./client";
 
 /** Write the minified V2 blob to the Data sheet (single cell A1). */
 export async function writeDataBlob(
-  accessToken: string,
-  spreadsheetId: string,
+  db: SheetsClient,
   blob: string,
 ): Promise<void> {
-  await updateSheet(accessToken, spreadsheetId, DATA_RANGES.dataWrite, [[blob]]);
+  await db.raw.writeRange("Data!A1", [[blob]]);
 }
 
 /** Read the minified V2 blob from the Data sheet (A1). Returns null if empty or missing. */
 export async function readDataBlob(
-  accessToken: string,
-  spreadsheetId: string,
+  db: SheetsClient,
 ): Promise<string | null> {
-  const rows = await getSheetValues(accessToken, spreadsheetId, DATA_RANGES.dataRead, "UNFORMATTED_VALUE");
+  const rows = await db.raw.readRange("Data!A1", "UNFORMATTED_VALUE");
   if (!rows.length || !rows[0]?.length) return null;
   const value = String(rows[0][0] ?? "").trim();
   return value || null;

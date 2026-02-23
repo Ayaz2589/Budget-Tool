@@ -107,26 +107,6 @@ function syncMachineReducer(
 }
 
 // ---------------------------------------------------------------------------
-// Error helpers
-// ---------------------------------------------------------------------------
-
-function isUnauthorizedError(err: unknown): boolean {
-  if (err instanceof Error) {
-    return err.message.includes("401") || err.message.includes(" 401 ");
-  }
-  return false;
-}
-
-function isRateLimitError(err: unknown): boolean {
-  if (!(err instanceof Error)) return false;
-  return (
-    err.message.includes("429") ||
-    err.message.includes("RATE_LIMIT_EXCEEDED") ||
-    err.message.includes("RESOURCE_EXHAUSTED")
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Context value type
 // ---------------------------------------------------------------------------
 
@@ -425,8 +405,8 @@ export function SyncProvider({
         })),
       });
       // Data blob and Totals are special cases — written separately
-      await writeDataBlob(accessToken, spreadsheetId, dataBlob);
-      await writeTotalsSheet(accessToken, spreadsheetId, months, grand);
+      await writeDataBlob(db, dataBlob);
+      await writeTotalsSheet(db, months, grand);
       await db.applyFormatting();
       lastSyncedSignatureRef.current = snapshot.signature;
       const changed =
@@ -476,33 +456,12 @@ export function SyncProvider({
             });
         }
       } else {
-        // Fallback for non-genjutsu errors (writeDataBlob/writeTotalsSheet)
-        if (isUnauthorizedError(err)) {
-          clearSession();
-        }
         const message = err instanceof Error ? err.message : String(err);
-        if (isRateLimitError(err)) {
-          syncQueuedRef.current = true;
-          nextSyncAllowedAtRef.current =
-            Date.now() + retryBackoffMsRef.current;
-          retryBackoffMsRef.current = Math.min(
-            retryBackoffMsRef.current * 2,
-            SYNC_RATE_LIMIT_MAX_DELAY_MS,
-          );
-          dispatchSync({
-            type: "SYNC_ERROR",
-            message:
-              "Rate limited by Google Sheets, retrying automatically.",
-            health: "warning",
-            status: "idle",
-          });
-        } else {
-          dispatchSync({
-            type: "SYNC_ERROR",
-            message,
-            health: "error",
-          });
-        }
+        dispatchSync({
+          type: "SYNC_ERROR",
+          message,
+          health: "error",
+        });
       }
     } finally {
       inFlightRef.current = false;
@@ -812,7 +771,7 @@ export function SyncProvider({
       let sheetOwnerTransfers: typeof budget.ownerTransfers;
       let sheetPresets: typeof presetTransactions;
 
-      const blob = await readDataBlob(accessToken, spreadsheetId);
+      const blob = await readDataBlob(db);
       if (blob && blob.startsWith("V2")) {
         try {
           const expanded = parseFromBlob(blob);
@@ -1027,9 +986,6 @@ export function SyncProvider({
             });
         }
       } else {
-        if (isUnauthorizedError(err)) {
-          clearSession();
-        }
         const message = err instanceof Error ? err.message : String(err);
         dispatchSync({
           type: "SYNC_ERROR",

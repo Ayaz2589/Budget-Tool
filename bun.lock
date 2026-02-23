@@ -17,7 +17,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "framer-motion": "^12.23.24",
-        "genjutsu-db": "^0.1.0",
+        "genjutsu-db": "0.2.0",
         "i18next": "^24.2.0",
         "jspdf": "^4.0.0",
         "jspdf-autotable": "^5.0.7",
@@ -662,7 +662,7 @@
 
     "fsevents": ["fsevents@2.3.3", "", { "os": "darwin" }, "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="],
 
-    "genjutsu-db": ["genjutsu-db@0.1.0", "", {}, "sha512-0l/X+vST8a1WRGyiTjGPVoiER14TkvfbTogLlX2WJVQPmwGZsN/0wi/kshH1u6KGerdy3iKALWXTeXpenKd7HQ=="],
+    "genjutsu-db": ["genjutsu-db@0.2.0", "", {}, "sha512-zdvmEHEVCKp1MgePdvw5B9vIL0FK1bLtajxi7f5e+5mpJur9/8WtXnnp7jrROQtTypk+5nqFmNZVY3pzfqE7Bw=="],
 
     "gensync": ["gensync@1.0.0-beta.2", "", {}, "sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg=="],
 

@@ -14,6 +14,7 @@ export type WidgetType =
   | "spend-by-source"
   | "owner-transfers"
   | "recent-activity"
+  | "owner-expense-by-owner"
   | "smart-insights";
 
 export type WidgetSize = "sm" | "md" | "lg";

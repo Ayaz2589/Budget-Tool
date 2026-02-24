@@ -804,6 +804,7 @@
     "netTrendChart": "Net Cash Flow Trend",
     "categoryChart": "Category Breakdown",
     "ownerSplitChart": "Owner Split",
+    "ownerExpenseByOwner": "Expense by Owner",
     "debtSnapshot": "Debt Snapshot",
     "spendBySource": "Spend by Source",
     "ownerTransfers": "Owner Transfers",

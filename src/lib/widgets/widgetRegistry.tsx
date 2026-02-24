@@ -8,6 +8,7 @@ import {
   Activity,
   PieChart,
   Users,
+  UserCheck,
   CreditCard,
   ArrowLeftRight,
   Clock,
@@ -26,6 +27,7 @@ import { CashFlowChart } from "@/pages/dashboard/widgets/CashFlowChart";
 import { NetTrendChart } from "@/pages/dashboard/widgets/NetTrendChart";
 import { CategoryChart } from "@/pages/dashboard/widgets/CategoryChart";
 import { OwnerSplitChart } from "@/pages/dashboard/widgets/OwnerSplitChart";
+import { OwnerExpenseByOwner } from "@/pages/dashboard/widgets/OwnerExpenseByOwner";
 import { QuickAdd } from "@/pages/dashboard/widgets/QuickAdd";
 import { SmartInsights } from "@/pages/dashboard/widgets/SmartInsights";
 import type { WidgetType, WidgetSize, WidgetRegistryEntry } from "@/lib/widgets/widget";
@@ -37,7 +39,7 @@ type AnyProps = any;
 
 const KPI_DIMS = { sm: { w: 3, h: 2 }, md: { w: 6, h: 2 }, lg: { w: 6, h: 3 } } as const;
 const CHART_WIDE_DIMS = { sm: { w: 6, h: 3 }, md: { w: 12, h: 6 }, lg: { w: 12, h: 8 } } as const;
-const LIST_DIMS = { sm: { w: 6, h: 3 }, md: { w: 6, h: 6 }, lg: { w: 12, h: 6 } } as const;
+const LIST_DIMS = { sm: { w: 3, h: 2 }, md: { w: 6, h: 6 }, lg: { w: 12, h: 6 } } as const;
 
 export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
   "net-cash-flow": createWidget({
@@ -123,7 +125,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     type: "net-trend-chart",
     label: "widget.netTrendChart",
     icon: <Activity className="size-4" />,
-    sm: { w: 6, h: 3 },
+    sm: { w: 6, h: 2 },
     md: { w: 9, h: 3 },
     lg: { w: 12, h: 6 },
     render: (props: AnyProps, size: WidgetSize) => (
@@ -141,7 +143,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     defaultSize: "lg",
     sm: { w: 6, h: 3 },
     md: { w: 9, h: 4 },
-    lg: { w: 12, h: 8 },
+    lg: { w: 12, h: 5 },
     render: (props: AnyProps, size: WidgetSize) => (
       <CategoryChart categorySlices={props.categorySlices} size={size} />
     ),
@@ -153,10 +155,21 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     defaultSize: "lg",
     sm: { w: 6, h: 3 },
     md: { w: 9, h: 4 },
-    lg: { w: 12, h: 8 },
+    lg: { w: 12, h: 5 },
     render: (props: AnyProps, size: WidgetSize) => (
       <OwnerSplitChart
         ownerSlices={props.ownerSlices}
+        size={size}
+      />
+    ),
+  }),
+  "owner-expense-by-owner": createWidget({
+    ...LIST_DIMS,
+    type: "owner-expense-by-owner",
+    label: "widget.ownerExpenseByOwner",
+    icon: <UserCheck className="size-4" />,
+    render: (props: AnyProps, size: WidgetSize) => (
+      <OwnerExpenseByOwner
         visibleOwnerNetRows={props.visibleOwnerNetRows}
         ownerExpenseItemsByOwner={props.ownerExpenseItemsByOwner}
         totalSpentForSelectedRange={props.totalSpentForSelectedRange}

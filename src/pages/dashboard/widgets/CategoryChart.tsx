@@ -82,28 +82,47 @@ export function CategoryChart({
 
   const chartConfig = { value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } };
 
-  // lg: full pie chart with legend
+  // lg: side-by-side large pie chart + legend on right
   if (effectiveSize === "lg") {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <ChartContainer config={chartConfig} heightMobile={200} heightDesktop={220}>
-          <PieChart>
-            <Pie data={categorySlices} dataKey="value" nameKey="label" outerRadius={80}>
-              {categorySlices.map((slice, index) => (
-                <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
-              ))}
-            </Pie>
-            <ChartTooltip content={tooltipContent} />
-          </PieChart>
-        </ChartContainer>
-        <DsLegendList
-          items={categorySlices.map((slice, index) => ({
-            key: slice.label,
-            label: slice.label,
-            value: formatCurrency(slice.value),
-            color: DONUT_COLORS[index % DONUT_COLORS.length]!,
-          }))}
-        />
+        <div className="flex items-center gap-8">
+          <div className="w-[280px] shrink-0">
+            <ChartContainer config={chartConfig} heightMobile={200} heightDesktop={200}>
+              <PieChart>
+                <Pie
+                  data={categorySlices.filter((s) => s.value > 0)}
+                  dataKey="value"
+                  nameKey="label"
+                  innerRadius={65}
+                  outerRadius={100}
+                  startAngle={180}
+                  endAngle={0}
+                  cx="50%"
+                  cy="80%"
+                  cornerRadius={0}
+                  paddingAngle={0}
+                  minAngle={5}
+                >
+                  {categorySlices.filter((s) => s.value > 0).map((slice, index) => (
+                    <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                  ))}
+                </Pie>
+                <ChartTooltip content={tooltipContent} />
+              </PieChart>
+            </ChartContainer>
+          </div>
+          <div className="min-w-0 flex-1">
+            <DsLegendList
+              items={categorySlices.map((slice, index) => ({
+                key: slice.label,
+                label: slice.label,
+                value: formatCurrency(slice.value),
+                color: DONUT_COLORS[index % DONUT_COLORS.length]!,
+              }))}
+            />
+          </div>
+        </div>
       </DsChartCard>
     );
   }
@@ -115,8 +134,21 @@ export function CategoryChart({
         <div className="w-[160px] shrink-0">
           <ChartContainer config={chartConfig} heightMobile={140} heightDesktop={140}>
             <PieChart>
-              <Pie data={categorySlices} dataKey="value" nameKey="label" outerRadius={60}>
-                {categorySlices.map((slice, index) => (
+              <Pie
+                data={categorySlices.filter((s) => s.value > 0)}
+                dataKey="value"
+                nameKey="label"
+                innerRadius={35}
+                outerRadius={60}
+                startAngle={180}
+                endAngle={0}
+                cx="50%"
+                cy="80%"
+                cornerRadius={0}
+                paddingAngle={0}
+                minAngle={5}
+              >
+                {categorySlices.filter((s) => s.value > 0).map((slice, index) => (
                   <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
                 ))}
               </Pie>

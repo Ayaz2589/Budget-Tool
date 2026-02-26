@@ -165,6 +165,7 @@ export function EditTransactionDialog({
     <Sheet open={expense !== null} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
+        desktopVariant="modal"
         showCloseButton={true}
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
       >

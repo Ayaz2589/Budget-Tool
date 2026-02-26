@@ -62,6 +62,7 @@ export function DebtActionsDialog({
     <Sheet open={debt !== null} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
+        desktopVariant="modal"
         showCloseButton={true}
         className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col overflow-hidden"
       >

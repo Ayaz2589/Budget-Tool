@@ -55,6 +55,7 @@ export function FiltersAndActionsDialog({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side={sheetSide}
+        desktopVariant="modal"
         showCloseButton={true}
         data-tour="transactions-filters-sheet"
        

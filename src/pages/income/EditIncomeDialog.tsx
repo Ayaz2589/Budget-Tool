@@ -74,6 +74,7 @@ export function EditIncomeDialog({
     <Sheet open={!!income} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
+        desktopVariant="modal"
         className="flex flex-col h-full w-[85vw] max-w-sm border-l p-0 gap-0 overflow-hidden rounded-l-2xl"
       >
         <DsSheetHeader

@@ -237,8 +237,9 @@ export function PresetsPage() {
             <SheetContent
               side="right"
               desktopVariant="modal"
+              desktopModalSize="standard"
               data-tour="presets-add-sheet"
-              className="flex flex-col h-full w-[85vw] max-w-sm border-l p-4 gap-3 overflow-hidden rounded-l-2xl"
+              className="flex flex-col p-4 gap-3 overflow-hidden"
             >
               <DsSheetHeader
                 className="-mx-4 -mt-4 mb-1"
@@ -550,7 +551,7 @@ export function PresetsPage() {
           side="right"
           desktopVariant="modal"
           showCloseButton={true}
-          className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-hidden flex flex-col"
+          className="flex flex-col p-0 gap-0 overflow-hidden"
         >
           {presetForActions ? (
             <>

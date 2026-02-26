@@ -45,7 +45,10 @@ function setMobileViewport() {
   });
 }
 
-function renderSheet(props: { desktopVariant?: "sheet" | "modal" } = {}) {
+function renderSheet(props: {
+  desktopVariant?: "sheet" | "modal";
+  desktopModalSize?: "compact" | "standard" | "wide";
+} = {}) {
   return render(
     <Sheet open>
       <SheetContent {...props}>
@@ -92,7 +95,7 @@ describe("SheetContent", () => {
       const dialog = screen.getByRole("dialog");
       expect(dialog).toBeInTheDocument();
       // Modal should have centered positioning classes (not slide-in from side)
-      expect(dialog.className).toMatch(/max-w-md/);
+      expect(dialog.className).toMatch(/max-w-lg/);
       expect(dialog.className).not.toMatch(/slide-in-from-right/);
     });
 
@@ -117,6 +120,59 @@ describe("SheetContent", () => {
     });
   });
 
+  describe("desktopModalSize on desktop", () => {
+    beforeEach(() => {
+      setDesktopViewport();
+    });
+
+    it("defaults to compact (max-w-lg) when desktopVariant='modal'", () => {
+      renderSheet({ desktopVariant: "modal" });
+
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).toMatch(/max-w-lg/);
+    });
+
+    it("renders standard size (max-w-2xl) when desktopModalSize='standard'", () => {
+      renderSheet({ desktopVariant: "modal", desktopModalSize: "standard" });
+
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).toMatch(/max-w-2xl/);
+      expect(dialog.className).not.toMatch(/max-w-lg/);
+    });
+
+    it("renders wide size (max-w-4xl) when desktopModalSize='wide'", () => {
+      renderSheet({ desktopVariant: "modal", desktopModalSize: "wide" });
+
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).toMatch(/max-w-4xl/);
+      expect(dialog.className).not.toMatch(/max-w-lg/);
+    });
+
+    it("ignores desktopModalSize when desktopVariant is 'sheet'", () => {
+      renderSheet({ desktopVariant: "sheet", desktopModalSize: "wide" });
+
+      const dialog = screen.getByRole("dialog");
+      // Sheet mode should not have modal width classes
+      expect(dialog.className).not.toMatch(/max-w-4xl/);
+      expect(dialog.className).toMatch(/slide-in-from/);
+    });
+  });
+
+  describe("desktopModalSize on mobile", () => {
+    beforeEach(() => {
+      setMobileViewport();
+    });
+
+    it("ignores desktopModalSize on mobile viewport", () => {
+      renderSheet({ desktopVariant: "modal", desktopModalSize: "wide" });
+
+      const dialog = screen.getByRole("dialog");
+      // On mobile, no modal width classes
+      expect(dialog.className).not.toMatch(/max-w-4xl/);
+      expect(dialog.className).not.toMatch(/max-w-2xl/);
+    });
+  });
+
   describe('desktopVariant="modal" on mobile', () => {
     beforeEach(() => {
       setMobileViewport();
@@ -128,7 +184,7 @@ describe("SheetContent", () => {
       const dialog = screen.getByRole("dialog");
       expect(dialog).toBeInTheDocument();
       // On mobile, should NOT have modal positioning — should have mobile sheet classes
-      expect(dialog.className).not.toMatch(/max-w-md/);
+      expect(dialog.className).not.toMatch(/max-w-lg/);
     });
   });
 });

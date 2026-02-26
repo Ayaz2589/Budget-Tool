@@ -75,7 +75,8 @@ export function EditIncomeDialog({
       <SheetContent
         side="right"
         desktopVariant="modal"
-        className="flex flex-col h-full w-[85vw] max-w-sm border-l p-0 gap-0 overflow-hidden rounded-l-2xl"
+        desktopModalSize="standard"
+        className="flex flex-col p-0 gap-0 overflow-hidden"
       >
         <DsSheetHeader
           title={t("income.editIncome")}
@@ -83,9 +84,9 @@ export function EditIncomeDialog({
         />
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden px-4 py-3"
+          className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden px-5 py-3"
         >
-          <div className="flex-1 min-h-0 overflow-auto space-y-4">
+          <div className="flex-1 min-h-0 overflow-auto grid grid-cols-1 md:grid-cols-2 gap-4 content-start">
             <div className="space-y-2">
               <Label>{t("income.date")}</Label>
               <DatePicker
@@ -106,15 +107,6 @@ export function EditIncomeDialog({
                 value={amount}
                 onChange={(e) => setAmount(formatCurrencyInput(e.target.value))}
                 required
-                className={fieldClass}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>{t("income.description")}</Label>
-              <Input
-                placeholder={t("income.placeholderDescription")}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
                 className={fieldClass}
               />
             </div>
@@ -149,6 +141,15 @@ export function EditIncomeDialog({
                 noneLabel={t("common.noOwner")}
                 noneValue="_none"
                 className={selectTriggerClass}
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>{t("income.description")}</Label>
+              <Input
+                placeholder={t("income.placeholderDescription")}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className={fieldClass}
               />
             </div>
           </div>

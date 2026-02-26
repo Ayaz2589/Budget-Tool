@@ -58,11 +58,12 @@ export function EditTransferDialog({
       <SheetContent
         side="right"
         desktopVariant="modal"
+        desktopModalSize="standard"
         showCloseButton={true}
-        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
+        className="p-0 gap-0 overflow-y-auto"
       >
         <DsSheetHeader title={t("common.edit")} />
-        <div className="grid gap-4 px-4 pt-4 pb-6 overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-5 pt-4 pb-6 overflow-y-auto">
           <div className="space-y-2">
             <Label>{t("common.date")}</Label>
             <DatePicker
@@ -113,12 +114,12 @@ export function EditTransferDialog({
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 md:col-span-2">
             <Label>{t("transactions.transferNote")}</Label>
             <Input value={note} onChange={(e) => setNote(e.target.value)} className="h-11" />
           </div>
           {fromOwner && toOwner && fromOwner === toOwner ? (
-            <p className="text-xs text-destructive">{t("transactions.transferValidationOwnersDifferent")}</p>
+            <p className="text-xs text-destructive md:col-span-2">{t("transactions.transferValidationOwnersDifferent")}</p>
           ) : null}
         </div>
         <DsSheetActions>

@@ -66,7 +66,7 @@ export function TransactionFormRow({
   const { t } = useTranslation();
 
   return (
-    <div className="grid grid-cols-1 gap-2 mt-2 pt-2 border-t border-border/60">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 pt-2 border-t border-border/60">
       <div className="space-y-0.5">
         <div className="text-xs text-muted-foreground">
           {t("transactions.type")}
@@ -160,12 +160,14 @@ function ExpenseFields({
     <>
       {presetTransactions.length > 0 &&
         expenseCategories.length > 0 && (
-          <PresetSelector
-            presetId={row.presetId}
-            sortedPresetTransactions={sortedPresetTransactions}
-            onPresetChange={onPresetChange}
-            selectTriggerClass={selectTriggerClass}
-          />
+          <div>
+            <PresetSelector
+              presetId={row.presetId}
+              sortedPresetTransactions={sortedPresetTransactions}
+              onPresetChange={onPresetChange}
+              selectTriggerClass={selectTriggerClass}
+            />
+          </div>
         )}
 
       <div className="space-y-0.5">
@@ -282,7 +284,7 @@ function ExpenseFields({
         )}
       </div>
 
-      <div className="space-y-0.5">
+      <div className="space-y-0.5 md:col-span-2">
         <div className="text-xs text-muted-foreground">
           {t("addTransaction.description")}
         </div>
@@ -296,69 +298,70 @@ function ExpenseFields({
         />
       </div>
 
-      <div className="space-y-0.5">
-        <div className="text-xs text-muted-foreground">
-          {t("addTransaction.paidBy")}
+      <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+        <div className="space-y-0.5">
+          <div className="text-xs text-muted-foreground">
+            {t("addTransaction.paidBy")}
+          </div>
+          {onCreateOwner ? (
+            <DsCreatableSelect
+              value={row.paidByOwner || "_none"}
+              onValueChange={(v) => {
+                const nextOwner = v === "_none" ? "" : v;
+                const nextAllocationOwners =
+                  row.allocationMode === "single" && nextOwner
+                    ? [nextOwner]
+                    : row.allocationOwners;
+                onUpdate({
+                  owner: nextOwner,
+                  paidByOwner: nextOwner,
+                  allocationOwners: nextAllocationOwners,
+                });
+              }}
+              options={ownerOptions}
+              onCreateNew={onCreateOwner}
+              noneLabel={t("common.noOwner")}
+              noneValue="_none"
+              className={selectTriggerClass}
+            />
+          ) : (
+            <Select
+              value={row.paidByOwner || "_none"}
+              onValueChange={(v) => {
+                const nextOwner = v === "_none" ? "" : v;
+                const nextAllocationOwners =
+                  row.allocationMode === "single" && nextOwner
+                    ? [nextOwner]
+                    : row.allocationOwners;
+                onUpdate({
+                  owner: nextOwner,
+                  paidByOwner: nextOwner,
+                  allocationOwners: nextAllocationOwners,
+                });
+              }}
+            >
+              <SelectTrigger className={selectTriggerClass}>
+                <SelectValue placeholder={t("common.noOwner")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
+                {ownerOptions.map((name) => (
+                  <SelectItem key={name} value={name}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
-        {onCreateOwner ? (
-          <DsCreatableSelect
-            value={row.paidByOwner || "_none"}
-            onValueChange={(v) => {
-              const nextOwner = v === "_none" ? "" : v;
-              const nextAllocationOwners =
-                row.allocationMode === "single" && nextOwner
-                  ? [nextOwner]
-                  : row.allocationOwners;
-              onUpdate({
-                owner: nextOwner,
-                paidByOwner: nextOwner,
-                allocationOwners: nextAllocationOwners,
-              });
-            }}
-            options={ownerOptions}
-            onCreateNew={onCreateOwner}
-            noneLabel={t("common.noOwner")}
-            noneValue="_none"
-            className={selectTriggerClass}
-          />
-        ) : (
-          <Select
-            value={row.paidByOwner || "_none"}
-            onValueChange={(v) => {
-              const nextOwner = v === "_none" ? "" : v;
-              const nextAllocationOwners =
-                row.allocationMode === "single" && nextOwner
-                  ? [nextOwner]
-                  : row.allocationOwners;
-              onUpdate({
-                owner: nextOwner,
-                paidByOwner: nextOwner,
-                allocationOwners: nextAllocationOwners,
-              });
-            }}
-          >
-            <SelectTrigger className={selectTriggerClass}>
-              <SelectValue placeholder={t("common.noOwner")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="_none">{t("common.noOwner")}</SelectItem>
-              {ownerOptions.map((name) => (
-                <SelectItem key={name} value={name}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+        <AllocationEditor
+          row={row}
+          ownerOptions={ownerOptions}
+          onUpdate={onUpdate}
+          selectTriggerClass={selectTriggerClass}
+          fieldClass={fieldClass}
+        />
       </div>
-
-      <AllocationEditor
-        row={row}
-        ownerOptions={ownerOptions}
-        onUpdate={onUpdate}
-        selectTriggerClass={selectTriggerClass}
-        fieldClass={fieldClass}
-      />
     </>
   );
 }

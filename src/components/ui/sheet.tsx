@@ -12,6 +12,13 @@ const SheetPortal = SheetPrimitive.Portal;
 const SheetClose = SheetPrimitive.Close;
 
 type DesktopVariant = "sheet" | "modal";
+type DesktopModalSize = "compact" | "standard" | "wide";
+
+const modalSizeClasses: Record<DesktopModalSize, string> = {
+  compact: "max-w-lg",
+  standard: "max-w-2xl",
+  wide: "max-w-4xl",
+};
 
 const modalVariants = {
   initial: { opacity: 0, scale: 0.95 },
@@ -53,6 +60,7 @@ const sheetVariants = {
 const SheetContent = ({
   side = "right",
   desktopVariant = "sheet",
+  desktopModalSize = "compact",
   className,
   children,
   showCloseButton = true,
@@ -61,6 +69,7 @@ const SheetContent = ({
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: keyof typeof sheetVariants;
   desktopVariant?: DesktopVariant;
+  desktopModalSize?: DesktopModalSize;
   showCloseButton?: boolean;
 }) => {
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -91,8 +100,10 @@ const SheetContent = ({
         >
           <motion.div
             className={cn(
-              "fixed inset-0 z-50 m-auto h-fit max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-[var(--surface-0)] shadow-lg",
-              className
+              "fixed inset-0 z-50 m-auto bg-[var(--surface-0)] shadow-lg",
+              className,
+              "h-fit max-h-[90vh] w-full overflow-y-auto rounded-xl border-0",
+              modalSizeClasses[desktopModalSize]
             )}
             variants={modalVariants}
             initial="initial"

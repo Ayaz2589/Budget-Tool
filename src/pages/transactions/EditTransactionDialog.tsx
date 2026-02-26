@@ -166,11 +166,12 @@ export function EditTransactionDialog({
       <SheetContent
         side="right"
         desktopVariant="modal"
+        desktopModalSize="wide"
         showCloseButton={true}
-        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-y-auto"
+        className="p-0 gap-0 overflow-y-auto"
       >
         <DsSheetHeader title={t("common.edit")} />
-        <div className="grid gap-4 px-4 pt-4 pb-6 overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-5 pt-4 pb-6 overflow-y-auto">
           <div className="space-y-2">
             <Label>{t("common.date")}</Label>
             <DatePicker
@@ -195,7 +196,7 @@ export function EditTransactionDialog({
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 md:col-span-2">
             <Label>{t("common.description")}</Label>
             <Input
               value={description}
@@ -250,6 +251,7 @@ export function EditTransactionDialog({
             />
           </div>
 
+          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label>{t("addTransaction.paidBy")}</Label>
             <DsCreatableSelect
@@ -327,7 +329,7 @@ export function EditTransactionDialog({
               </Select>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-2">
               <Label>{t("addTransaction.splitOwners")}</Label>
               <div className="flex flex-wrap gap-1.5">
                 {ownerOptions.map((entryOwner) => {
@@ -355,7 +357,7 @@ export function EditTransactionDialog({
           )}
 
           {allocationMode === "custom" && allocationOwners.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-3">
               <Label>{t("addTransaction.customSplitHint")}</Label>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {allocationOwners.map((entryOwner) => (
@@ -380,6 +382,7 @@ export function EditTransactionDialog({
               </div>
             </div>
           ) : null}
+          </div>
         </div>
         <DsSheetActions className="grid grid-cols-2 gap-3 pb-4">
           <Button type="button" variant="outline" onClick={onClose}>

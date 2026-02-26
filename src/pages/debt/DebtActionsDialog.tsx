@@ -64,7 +64,7 @@ export function DebtActionsDialog({
         side="right"
         desktopVariant="modal"
         showCloseButton={true}
-        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col overflow-hidden"
+        className="flex flex-col p-0 gap-0 overflow-hidden"
       >
         <DsSheetHeader className="p-4" title={debt.name} />
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pt-4 pb-4 flex flex-col gap-4">

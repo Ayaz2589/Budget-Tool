@@ -53,7 +53,7 @@ export function ExpenseActionsDialog({
         side={sheetSide}
         desktopVariant="modal"
         showCloseButton={true}
-        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-hidden flex flex-col"
+        className="flex flex-col p-0 gap-0 overflow-hidden"
       >
         <DsSheetHeader title={expense.description || t("addTransaction.transaction")} />
         <div className="flex-1 overflow-y-auto overscroll-contain px-4 pt-4 pb-6">

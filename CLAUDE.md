@@ -91,10 +91,10 @@ Bun's built-in test runner + React Testing Library + happy-dom. Tests in `test/`
 - Refactors are done incrementally — add/update tests first, then change code, run `bun test` after each change.
 
 ## Recent Changes
+- 022-half-pie-charts: Added TypeScript 5.x (strict), React 19 + recharts v2.15.4 (already installed, no upgrade needed)
 - 020-sync-genjutsu-db: Added TypeScript 5.x (strict), React 19 + genjutsu-db (new), React, Vite 7, Tailwind CSS v4, shadcn/ui
 - 018-widget-creator: Added TypeScript 5.x (strict), React 19 + None new — uses existing `WidgetRegistryEntry` type
-- 016-responsive-widget-layout: Added TypeScript 5.x (strict), React 19 + react-grid-layout v2.2.2 (`Responsive` + `WidthProvider`), Tailwind CSS v4, shadcn/ui
 
 ## Active Technologies
-- TypeScript 5.x (strict), React 19 + genjutsu-db (new), React, Vite 7, Tailwind CSS v4, shadcn/ui (020-sync-genjutsu-db)
-- localStorage (primary), Google Sheets via genjutsu-db (sync) (020-sync-genjutsu-db)
+- TypeScript 5.x (strict), React 19 + recharts v2.15.4 (already installed, no upgrade needed) (022-half-pie-charts)
+- N/A (no data changes) (022-half-pie-charts)

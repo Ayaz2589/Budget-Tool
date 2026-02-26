@@ -25,3 +25,6 @@ dist-ssr
 *.sw?
 # test coverage
 coverage/
+
+# MCP config (contains API keys)
+.mcp.json

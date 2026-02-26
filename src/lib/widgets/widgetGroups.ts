@@ -20,11 +20,6 @@ export const WIDGET_GROUPS: WidgetGroup[] = [
   {
     key: "lists",
     label: "widget.groupListsActivity",
-    widgets: ["quick-add", "debt-snapshot", "spend-by-source", "owner-transfers", "recent-activity"],
-  },
-  {
-    key: "insights",
-    label: "widget.groupInsights",
-    widgets: ["smart-insights"],
+    widgets: ["debt-snapshot", "spend-by-source", "owner-transfers", "recent-activity"],
   },
 ];

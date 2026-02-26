@@ -15,13 +15,11 @@ export const DEFAULT_LAYOUT: DashboardLayout = {
     { id: "total-income", x: 12, y: 0, w: 6, h: 2, smX: 6, smW: 3, size: "md", visible: true },
     { id: "total-debt", x: 18, y: 0, w: 6, h: 2, smX: 9, smW: 3, size: "md", visible: true },
 
-    // Row 2-3: quick-add (sm, w=6, h=3) + 4 list widgets (sm, w=3, h=2) + smart-insights (md, w=6, h=2)
-    { id: "quick-add", x: 0, y: 2, w: 6, h: 3, smX: 0, smW: 3, size: "sm", visible: true },
-    { id: "debt-snapshot", x: 6, y: 2, w: 3, h: 2, smX: 3, smW: 3, size: "sm", visible: true },
-    { id: "spend-by-source", x: 9, y: 2, w: 3, h: 2, smX: 6, smW: 3, size: "sm", visible: true },
-    { id: "recent-activity", x: 12, y: 2, w: 3, h: 2, smX: 9, smW: 3, size: "sm", visible: true },
-    { id: "owner-transfers", x: 15, y: 2, w: 3, h: 2, smX: 0, smW: 3, size: "sm", visible: true },
-    { id: "smart-insights", x: 18, y: 2, w: 6, h: 2, smX: 3, smW: 3, size: "md", visible: true },
+    // Row 2-3: 4 list widgets (sm, w=3, h=2)
+    { id: "debt-snapshot", x: 0, y: 2, w: 3, h: 2, smX: 0, smW: 3, size: "sm", visible: true },
+    { id: "spend-by-source", x: 3, y: 2, w: 3, h: 2, smX: 3, smW: 3, size: "sm", visible: true },
+    { id: "recent-activity", x: 6, y: 2, w: 3, h: 2, smX: 6, smW: 3, size: "sm", visible: true },
+    { id: "owner-transfers", x: 9, y: 2, w: 3, h: 2, smX: 9, smW: 3, size: "sm", visible: true },
 
     // Row 5-12: cash-flow-chart (lg, w=12, h=8) + net-trend-chart (md, w=9, h=3)
     { id: "cash-flow-chart", x: 0, y: 5, w: 12, h: 8, smX: 0, smW: 6, size: "lg", visible: true },
@@ -39,7 +37,6 @@ export const DEFAULT_LAYOUT: DashboardLayout = {
     "total-spent",
     "total-income",
     "total-debt",
-    "quick-add",
     "cash-flow-chart",
     "net-trend-chart",
     "category-chart",
@@ -49,7 +46,6 @@ export const DEFAULT_LAYOUT: DashboardLayout = {
     "spend-by-source",
     "owner-transfers",
     "recent-activity",
-    "smart-insights",
   ] as WidgetType[],
 };
 

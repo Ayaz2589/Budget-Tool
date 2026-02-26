@@ -5,7 +5,6 @@ export type WidgetType =
   | "total-spent"
   | "total-income"
   | "total-debt"
-  | "quick-add"
   | "cash-flow-chart"
   | "net-trend-chart"
   | "category-chart"
@@ -14,8 +13,7 @@ export type WidgetType =
   | "spend-by-source"
   | "owner-transfers"
   | "recent-activity"
-  | "owner-expense-by-owner"
-  | "smart-insights";
+  | "owner-expense-by-owner";
 
 export type WidgetSize = "sm" | "md" | "lg";
 

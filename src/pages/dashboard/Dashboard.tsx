@@ -20,7 +20,7 @@ import {
   DsWidgetCatalog,
 } from "@/components/ds";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useBudget, usePresetTransactions } from "@/context";
+import { useBudget } from "@/context";
 import {
   DashboardLayoutProvider,
   useDashboardLayout,
@@ -37,7 +37,6 @@ function DashboardContent() {
   const data = useDashboardData();
   const { t } = data;
   const { expenses, income, debts, incomeCategories, owners, addIncome, uiFormatSettings } = useBudget();
-  const { presetTransactions } = usePresetTransactions();
   const {
     layout,
     hideWidget,
@@ -48,19 +47,8 @@ function DashboardContent() {
 
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
   const [addIncomeOpen, setAddIncomeOpen] = useState(false);
-  const [selectedPresetId, setSelectedPresetId] = useState<string | undefined>();
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
-
-  const handlePresetTap = useCallback((presetId: string) => {
-    setSelectedPresetId(presetId);
-    setAddTransactionOpen(true);
-  }, []);
-
-  const handleAddTransactionOpenChange = useCallback((open: boolean) => {
-    setAddTransactionOpen(open);
-    if (!open) setSelectedPresetId(undefined);
-  }, []);
 
   const handleAddIncome = useCallback(
     (payload: Parameters<typeof addIncome>[0]) => {
@@ -85,9 +73,6 @@ function DashboardContent() {
   // Build the props object passed to widget render functions
   const dashboardData: Record<string, unknown> = {
     ...data,
-    presetTransactions,
-    onPresetTap: handlePresetTap,
-    onAddBlank: () => setAddTransactionOpen(true),
   };
 
   return (
@@ -193,8 +178,7 @@ function DashboardContent() {
 
       <AddTransactionDialog
         open={addTransactionOpen}
-        onOpenChange={handleAddTransactionOpenChange}
-        initialPresetId={selectedPresetId}
+        onOpenChange={setAddTransactionOpen}
       />
 
       <AddIncomeDialog

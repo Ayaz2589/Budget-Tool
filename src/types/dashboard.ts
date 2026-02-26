@@ -1,4 +1,4 @@
-import type { Expense, Debt, DebtPayment, Income, OwnerTransfer, PresetTransaction } from "@/types/core";
+import type { Expense, Debt, DebtPayment, Income, OwnerTransfer } from "@/types/core";
 
 export type DashboardRange = "current" | "6" | "12";
 export type DashboardExpenseScope = "all" | "exclude-mortgage";
@@ -55,19 +55,6 @@ export interface DashboardDebtRow {
 export type DashboardRecentItem = Expense;
 export type DashboardOwnerTransferItem = OwnerTransfer;
 
-export type DashboardInsightType =
-  | "spending_spike"
-  | "mortgage_confirmation"
-  | "upcoming_debt_payment"
-  | "missing_income";
-
-export interface DashboardInsight {
-  id: string;
-  type: DashboardInsightType;
-  messageKey: string;
-  messageValues?: Record<string, string | number>;
-}
-
 export interface DashboardCashFlowRow {
   monthKey: string;
   monthLabel: string;
@@ -88,13 +75,3 @@ export interface DashboardSelectorInput {
   owners: string[];
 }
 
-export interface DashboardInsightInput {
-  currentMonthKey: string;
-  previousMonthKey: string;
-  scope: DashboardExpenseScope;
-  expenses: Expense[];
-  income: Income[];
-  debts: Debt[];
-  debtPayments: DebtPayment[];
-  presetTransactions: PresetTransaction[];
-}

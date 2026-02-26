@@ -42,8 +42,9 @@ export function AddMortgagePaymentDialog({
       <SheetContent
         side="right"
         desktopVariant="modal"
+        desktopModalSize="standard"
         data-tour="mortgage-add-sheet"
-        className="flex flex-col h-full w-[85vw] max-w-sm border-l p-0 gap-0 overflow-hidden rounded-l-2xl"
+        className="flex flex-col p-0 gap-0 overflow-hidden"
       >
         <DsSheetHeader
           title={t("mortgage.addMortgagePayment")}
@@ -53,9 +54,9 @@ export function AddMortgagePaymentDialog({
         />
         <form
           onSubmit={onSubmit}
-          className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden px-4 py-3"
+          className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden px-5 py-3"
         >
-          <div className="flex-1 min-h-0 overflow-auto space-y-4">
+          <div className="flex-1 min-h-0 overflow-auto grid grid-cols-1 md:grid-cols-2 gap-4 content-start">
             <div className="space-y-2">
               <Label>{t("common.date")}</Label>
               <DatePicker

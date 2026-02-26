@@ -56,10 +56,11 @@ export function FiltersAndActionsDialog({
       <SheetContent
         side={sheetSide}
         desktopVariant="modal"
+        desktopModalSize="wide"
         showCloseButton={true}
         data-tour="transactions-filters-sheet"
        
-        className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col"
+        className="flex flex-col p-0 gap-0"
       >
         <DsSheetHeader
           title={t("transactions.filtersActionsTitle")}
@@ -67,7 +68,7 @@ export function FiltersAndActionsDialog({
           helpContent={t("transactions.help.filtersSheet")}
           helpLabel={t("common.help")}
         />
-        <div className="grid gap-6 px-4 pt-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
+        <div className="grid gap-6 px-5 pt-4 pb-8 overflow-y-auto overscroll-contain flex-1 min-h-0">
           {/* Filters */}
           <section className="space-y-4">
             <div className="flex items-center justify-between gap-2">
@@ -82,7 +83,7 @@ export function FiltersAndActionsDialog({
                 </Button>
               )}
             </div>
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label className="text-muted-foreground">
                   {t("transactions.month")}
@@ -212,7 +213,7 @@ export function FiltersAndActionsDialog({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-2">
                 <Label className="text-muted-foreground">
                   {t("transactions.totalsLabel")}
                 </Label>
@@ -229,7 +230,7 @@ export function FiltersAndActionsDialog({
                   {t("transactions.tableTotalsDefinitionHint")}
                 </p>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-2">
                 <Label className="text-muted-foreground">
                   {t("transactions.searchDescription")}
                 </Label>

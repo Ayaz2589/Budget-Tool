@@ -266,8 +266,9 @@ export function AddTransactionDialog({
       <SheetContent
         side="right"
         desktopVariant="modal"
+        desktopModalSize="wide"
         data-tour="transactions-add-sheet"
-        className="h-full !w-[85vw] !max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col overflow-hidden"
+        className="flex flex-col p-0 gap-0 overflow-hidden"
         onOpenAutoFocus={(event) => event.preventDefault()}
       >
         <DsSheetHeader

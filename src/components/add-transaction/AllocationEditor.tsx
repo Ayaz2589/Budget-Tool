@@ -95,7 +95,7 @@ export function AllocationEditor({
           </Select>
         </div>
       ) : (
-        <div className="space-y-1">
+        <div className="space-y-1 md:col-span-2">
           <div className="text-xs text-muted-foreground">
             {t("addTransaction.splitOwners")}
           </div>
@@ -126,7 +126,7 @@ export function AllocationEditor({
       )}
 
       {row.allocationMode === "custom" ? (
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-3">
           <div className="text-xs text-muted-foreground">
             {t("addTransaction.customSplitHint")}
           </div>

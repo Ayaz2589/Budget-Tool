@@ -1,11 +1,10 @@
 <!--
   Sync Impact Report
   ==================
-  Version change: 1.0.0 → 1.1.0 (MINOR — new section added)
-  Modified principles: None
+  Version change: 1.1.0 → 1.2.0 (MINOR — TDD mandate + Linear ticket tracking)
+  Modified principles: VI (added TDD mandate)
   Added sections:
-    - Dashboard Widget System (between Technology Constraints and
-      Development Workflow)
+    - Feature tracking (Linear ticket creation) in Development Workflow
   Removed sections: None
   Templates requiring updates:
     - .specify/templates/plan-template.md       ✅ No updates needed (generic)
@@ -94,11 +93,14 @@ bolted on after the fact:
 - Focus rings MUST use `focus-visible:ring-2` with the theme's
   `--focus-ring` variable.
 
-### VI. Incremental Refactoring Discipline
+### VI. Incremental Refactoring Discipline & Test-Driven Development
 
 Code changes MUST follow the incremental refactor cycle. Large rewrites
-are prohibited:
+are prohibited. All new features MUST use test-driven development (TDD):
 
+- **TDD cycle**: Write failing tests FIRST that define expected behavior,
+  verify they fail, then implement code to make them pass. Tests MUST
+  exist and fail before any implementation begins.
 - Add or update tests FIRST, then change code, then run `bun test`
   after each change.
 - New features MUST NOT break existing tests. The CI pipeline enforces
@@ -240,6 +242,10 @@ behavior is governed by four key files:
 
 **Branch strategy:** Feature branches off `main`. PRs required for merge.
 
+**Feature tracking:** When a new feature spec is created (via `/speckit.specify`),
+a corresponding Linear ticket MUST be created in the Ortho team. The ticket
+MUST be updated to Done when the feature PR is merged.
+
 **CI pipeline (GitHub Actions):**
 1. **Financial Guard** — `bun run test:financial` (11 critical files). MUST
    pass before job 2 starts.
@@ -247,7 +253,7 @@ behavior is governed by four key files:
 
 **Local development cycle:**
 1. `bun dev` — Vite dev server
-2. Make changes following incremental refactor discipline (Principle VI)
+2. Make changes following TDD and incremental refactor discipline (Principle VI)
 3. `bun test` — verify all tests pass after each change
 4. `bun run build` — verify TypeScript and production build
 5. `bun run lint` — verify no lint errors
@@ -280,4 +286,4 @@ It supersedes ad-hoc decisions and informal conventions:
 - **Runtime guidance**: see `CLAUDE.md` for AI-assisted development
   conventions that complement this constitution.
 
-**Version**: 1.1.0 | **Ratified**: 2026-02-16 | **Last Amended**: 2026-02-21
+**Version**: 1.2.0 | **Ratified**: 2026-02-16 | **Last Amended**: 2026-02-26

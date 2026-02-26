@@ -265,6 +265,7 @@ export function AddTransactionDialog({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
+        desktopVariant="modal"
         data-tour="transactions-add-sheet"
         className="h-full !w-[85vw] !max-w-sm border-l p-0 gap-0 rounded-l-2xl flex flex-col overflow-hidden"
         onOpenAutoFocus={(event) => event.preventDefault()}

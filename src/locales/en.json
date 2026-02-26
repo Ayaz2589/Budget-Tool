@@ -236,14 +236,7 @@
     "sectionFixedObligationsHint": "Includes mortgage, utilities, and debt payments.",
     "sectionRecentActivity": "Recent Activity",
     "sectionNoRecentTransactions": "No recent transactions.",
-    "sectionSmartInsightsAlerts": "Smart Insights & Alerts",
-    "sectionNoAlerts": "No alerts",
-    "dismiss": "Dismiss",
     "shared": "Shared",
-    "insightSpendingSpike": "Spending is up {{percent}} vs last month.",
-    "insightMortgagePaidOn": "Mortgage paid on {{date}}.",
-    "insightNoDebtPaymentThisMonth": "No payment logged for {{name}} this month.",
-    "insightNoIncomeThisMonth": "No income entry recorded this month.",
     "debtPaidThisMonth": "↓ {{amount}} paid this month",
     "sectionExpenseByOwner": "Expense by Owner",
     "sectionNoOwnerExpenses": "No owner expenses this month.",
@@ -265,7 +258,6 @@
     "sourceCount": "{{count}} sources",
     "transferCount": "{{count}} transfers",
     "recentItemsCount": "{{count}} recent items",
-    "quickAdd": "Quick add",
     "addExpense": "Add Expense",
     "addIncome": "Add Income",
     "help": {
@@ -820,7 +812,6 @@
     "totalSpent": "Total Spent",
     "totalIncome": "Total Income",
     "totalDebt": "Total Debt",
-    "quickAdd": "Quick Add",
     "cashFlowChart": "Income vs Expenses",
     "netTrendChart": "Net Cash Flow Trend",
     "categoryChart": "Category Breakdown",
@@ -830,8 +821,7 @@
     "spendBySource": "Spend by Source",
     "ownerTransfers": "Owner Transfers",
     "recentActivity": "Recent Activity",
-    "smartInsights": "Smart Insights",
-"manageWidgets": "Manage widgets",
+    "manageWidgets": "Manage widgets",
     "resetLayout": "Reset layout",
     "resetConfirmTitle": "Reset to default layout?",
     "resetConfirmDescription": "This will restore all widgets to their original positions, sizes, and visibility. Your current layout will be lost.",
@@ -847,7 +837,6 @@
     "groupKpiMetrics": "KPI Metrics",
     "groupCharts": "Charts",
     "groupListsActivity": "Lists & Activity",
-    "groupInsights": "Insights",
     "moveDown": "Move down"
   }
 }

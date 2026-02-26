@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import { useBudget } from "@/context";
-import { usePresetTransactions } from "@/context";
 import { computeNetCashFlow, sumAmountsBy } from "@/lib/math";
 import { isValidDate } from "@/lib/domain/totals";
 import {
@@ -23,15 +22,8 @@ import {
   buildOwnerTransfersMtd,
   buildRecentActivity,
   getCurrentMonthKey,
-  getPreviousMonthKey,
   getRangeMonthKeys,
 } from "@/pages/dashboard/dashboardSelectors";
-import {
-  buildDashboardInsights,
-  getInsightStorageKey,
-  parseDismissedInsightIds,
-  serializeDismissedInsightIds,
-} from "@/pages/dashboard/insightsBuilder";
 import type { DashboardExpenseScope, DashboardRange } from "@/types/dashboard";
 
 function formatMonthKeyNumeric(monthKey: string): string {
@@ -50,7 +42,6 @@ export function useDashboardData() {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const { expenses, income, debts, debtPayments, owners, ownerTransfers } = useBudget();
-  const { presetTransactions } = usePresetTransactions();
 
   const [range, setRange] = useState<DashboardRange>("current");
   const [selectedMonthKey, setSelectedMonthKey] = useState(getCurrentMonthKey());
@@ -59,10 +50,6 @@ export function useDashboardData() {
   const [viewMode, setViewMode] = useState<FinancialViewMode>("household");
   const [selectedOwner, setSelectedOwner] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [dismissedInsightIds, setDismissedInsightIds] = useState<string[]>(() =>
-    parseDismissedInsightIds(sessionStorage.getItem(getInsightStorageKey())),
-  );
-
   const ownerOptions = useMemo(
     () =>
       collectFinancialOwners({
@@ -131,7 +118,6 @@ export function useDashboardData() {
   }, [location.search]);
 
   const currentMonthKey = selectedMonthKey;
-  const previousMonthKey = getPreviousMonthKey(currentMonthKey);
   const monthKeys = useMemo(
     () => getRangeMonthKeys(range, currentMonthKey),
     [range, currentMonthKey],
@@ -266,21 +252,6 @@ export function useDashboardData() {
     [scopedExpenses, monthKeys, expenseScope],
   );
 
-  const insights = useMemo(
-    () =>
-      buildDashboardInsights({
-        currentMonthKey,
-        previousMonthKey,
-        scope: expenseScope,
-        expenses: scopedExpenses,
-        income: scopedIncome,
-        debts: scopedDebts,
-        debtPayments: scopedDebtPayments,
-        presetTransactions,
-      }).filter((insight) => !dismissedInsightIds.includes(insight.id)),
-    [currentMonthKey, previousMonthKey, expenseScope, scopedExpenses, scopedIncome, scopedDebts, scopedDebtPayments, presetTransactions, dismissedInsightIds],
-  );
-
   const incomeOwnerKeys = useMemo(() => {
     const keys = new Set<string>();
     for (const row of cashFlowRows) {
@@ -340,12 +311,6 @@ export function useDashboardData() {
     [sparklineMonthKeys, scopedExpenses, scopedIncome, scopedDebtPayments, expenseScope, includeDebtPayments, t, i18n.language, i18n.resolvedLanguage],
   );
 
-  const dismissInsight = (id: string) => {
-    const next = [...dismissedInsightIds, id];
-    setDismissedInsightIds(next);
-    sessionStorage.setItem(getInsightStorageKey(), serializeDismissedInsightIds(next));
-  };
-
   return {
     t,
     range,
@@ -380,7 +345,5 @@ export function useDashboardData() {
     ownerTransfersMtd,
     ownerTransfersMtdTotal,
     recentActivity,
-    insights,
-    dismissInsight,
   };
 }

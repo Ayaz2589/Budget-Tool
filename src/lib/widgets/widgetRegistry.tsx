@@ -3,7 +3,6 @@ import {
   TrendingDown,
   TrendingUp,
   Landmark,
-  Zap,
   BarChart3,
   Activity,
   PieChart,
@@ -12,7 +11,6 @@ import {
   CreditCard,
   ArrowLeftRight,
   Clock,
-  Lightbulb,
   Receipt,
 } from "lucide-react";
 import { NetCashFlow } from "@/pages/dashboard/widgets/NetCashFlow";
@@ -28,8 +26,6 @@ import { NetTrendChart } from "@/pages/dashboard/widgets/NetTrendChart";
 import { CategoryChart } from "@/pages/dashboard/widgets/CategoryChart";
 import { OwnerSplitChart } from "@/pages/dashboard/widgets/OwnerSplitChart";
 import { OwnerExpenseByOwner } from "@/pages/dashboard/widgets/OwnerExpenseByOwner";
-import { QuickAdd } from "@/pages/dashboard/widgets/QuickAdd";
-import { SmartInsights } from "@/pages/dashboard/widgets/SmartInsights";
 import type { WidgetType, WidgetSize, WidgetRegistryEntry } from "@/lib/widgets/widget";
 import { createWidget } from "@/lib/widgets/createWidget";
 
@@ -86,22 +82,6 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
         debtOutstanding={props.kpis.debtOutstanding}
         debtPaidThisMonth={props.kpis.debtPaidThisMonth}
         sparklineRows={props.kpiSparklineRows}
-        size={size}
-      />
-    ),
-  }),
-  "quick-add": createWidget({
-    type: "quick-add",
-    label: "widget.quickAdd",
-    icon: <Zap className="size-4" />,
-    sm: { w: 6, h: 3 },
-    md: { w: 12, h: 4 },
-    lg: { w: 12, h: 6 },
-    render: (props: AnyProps, size: WidgetSize) => (
-      <QuickAdd
-        presets={props.presetTransactions}
-        onPresetTap={props.onPresetTap}
-        onAddBlank={props.onAddBlank}
         size={size}
       />
     ),
@@ -216,20 +196,6 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Clock className="size-4" />,
     render: (props: AnyProps, size: WidgetSize) => (
       <RecentActivity recentActivity={props.recentActivity} size={size} />
-    ),
-  }),
-  "smart-insights": createWidget({
-    ...KPI_DIMS,
-    type: "smart-insights",
-    label: "widget.smartInsights",
-    icon: <Lightbulb className="size-4" />,
-    defaultSize: "sm",
-    render: (props: AnyProps, size: WidgetSize) => (
-      <SmartInsights
-        insights={props.insights}
-        onDismiss={props.dismissInsight}
-        size={size}
-      />
     ),
   }),
 };

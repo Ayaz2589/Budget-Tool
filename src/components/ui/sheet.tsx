@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
+import { motion } from "framer-motion";
 import { XIcon } from "lucide-react";
 
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -9,6 +10,22 @@ const Sheet = SheetPrimitive.Root;
 const SheetTrigger = SheetPrimitive.Trigger;
 const SheetPortal = SheetPrimitive.Portal;
 const SheetClose = SheetPrimitive.Close;
+
+type DesktopVariant = "sheet" | "modal";
+
+const modalVariants = {
+  initial: { opacity: 0, scale: 0.95 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.95 },
+};
+
+const backdropVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
+const modalTransition = { duration: 0.25, ease: "easeOut" as const };
 
 const SheetOverlay = ({
   className,
@@ -35,6 +52,7 @@ const sheetVariants = {
 
 const SheetContent = ({
   side = "right",
+  desktopVariant = "sheet",
   className,
   children,
   showCloseButton = true,
@@ -42,11 +60,60 @@ const SheetContent = ({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: keyof typeof sheetVariants;
+  desktopVariant?: DesktopVariant;
   showCloseButton?: boolean;
 }) => {
   const isMobile = useMediaQuery("(max-width: 767px)");
+  const useDesktopModal = !isMobile && desktopVariant === "modal";
   const useMobileTopSheet = isMobile && side === "right";
   const effectiveSide = useMobileTopSheet ? "top" : side;
+
+  if (useDesktopModal) {
+    return (
+      <SheetPortal>
+        <SheetPrimitive.Overlay asChild forceMount>
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/50"
+            variants={backdropVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={modalTransition}
+          />
+        </SheetPrimitive.Overlay>
+        <SheetPrimitive.Content
+          asChild
+          forceMount
+          onOpenAutoFocus={(event) => {
+            onOpenAutoFocus?.(event);
+          }}
+          {...props}
+        >
+          <motion.div
+            className={cn(
+              "fixed inset-0 z-50 m-auto h-fit max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-[var(--surface-0)] shadow-lg",
+              className
+            )}
+            variants={modalVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={modalTransition}
+          >
+            {children}
+            {showCloseButton && (
+              <SheetPrimitive.Close
+                className="absolute right-3 top-3 inline-flex size-11 items-center justify-center rounded-lg text-foreground/80 transition-colors hover:bg-[var(--surface-2)] hover:text-foreground focus:ring-2 focus:ring-[var(--focus-ring)]/45 focus:ring-offset-2 focus:outline-none"
+                aria-label="Close"
+              >
+                <XIcon className="size-6" />
+              </SheetPrimitive.Close>
+            )}
+          </motion.div>
+        </SheetPrimitive.Content>
+      </SheetPortal>
+    );
+  }
 
   return (
     <SheetPortal>

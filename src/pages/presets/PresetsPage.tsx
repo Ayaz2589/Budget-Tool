@@ -236,6 +236,7 @@ export function PresetsPage() {
           <Sheet open={presetOpen} onOpenChange={setPresetOpen}>
             <SheetContent
               side="right"
+              desktopVariant="modal"
               data-tour="presets-add-sheet"
               className="flex flex-col h-full w-[85vw] max-w-sm border-l p-4 gap-3 overflow-hidden rounded-l-2xl"
             >
@@ -547,6 +548,7 @@ export function PresetsPage() {
       >
         <SheetContent
           side="right"
+          desktopVariant="modal"
           showCloseButton={true}
           className="h-full w-[85vw] max-w-sm border-l p-0 gap-0 rounded-l-2xl overflow-hidden flex flex-col"
         >

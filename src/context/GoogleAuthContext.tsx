@@ -41,7 +41,10 @@ function getStoredAccessToken(): string | null {
       access_token: string;
       expires_at?: number;
     };
-    if (parsed.expires_at != null && Date.now() >= parsed.expires_at) {
+    if (
+      parsed.expires_at != null &&
+      Date.now() >= parsed.expires_at - TOKEN_EXPIRY_BUFFER_MS
+    ) {
       storage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
       return null;
     }
@@ -80,6 +83,9 @@ function clearStoredAccessToken(): void {
 }
 
 const USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
+
+/** Buffer before actual expiry to proactively clear the session. */
+const TOKEN_EXPIRY_BUFFER_MS = 60_000;
 
 // ---------------------------------------------------------------------------
 // Context
@@ -347,14 +353,18 @@ export function GoogleAuthProvider({ children }: { children: ReactNode }) {
     clearSession();
   }, [clearSession]);
 
-  // Token expiry check
+  // Token expiry check — clear session before token actually expires
+  // to prevent API calls with stale tokens
   useEffect(() => {
     if (expiresAt == null) return;
-    const interval = setInterval(() => {
-      if (Date.now() >= expiresAt) {
+    const checkExpiry = () => {
+      if (Date.now() >= expiresAt - TOKEN_EXPIRY_BUFFER_MS) {
         clearSession();
       }
-    }, 60_000);
+    };
+    // Check immediately and then every 15 seconds
+    checkExpiry();
+    const interval = setInterval(checkExpiry, 15_000);
     return () => clearInterval(interval);
   }, [expiresAt, clearSession]);
 

@@ -84,6 +84,7 @@ function renderLayout(
 afterEach(() => {
   cleanup();
   localStorage.removeItem("budget-tool-help-hint-seen");
+  localStorage.removeItem("budget-tool-ui-format");
   Object.defineProperty(window, "matchMedia", {
     writable: true,
     value: originalMatchMedia,
@@ -208,4 +209,52 @@ test("Layout shows help hint after sheet setup flow is resolved for first-time u
     expect(screen.getByText("Need help in the app?")).toBeInTheDocument();
   });
   expect(screen.getByRole("button", { name: "Got it" })).toBeInTheDocument();
+});
+
+test("Layout shows FX fallback warning when rate is 1 and fxFallback is true for non-USD currency", () => {
+  localStorage.setItem(
+    "budget-tool-ui-format",
+    JSON.stringify({
+      locale: "en-US",
+      currency: "EUR",
+      baseCurrency: "USD",
+      fxRate: 1,
+      fxFallback: true,
+      dateFormat: "YYYY/MM/DD",
+    }),
+  );
+  renderLayout();
+  expect(screen.getByText(/currency conversion unavailable/i)).toBeInTheDocument();
+});
+
+test("Layout does not show FX warning when currency is USD", () => {
+  localStorage.setItem(
+    "budget-tool-ui-format",
+    JSON.stringify({
+      locale: "en-US",
+      currency: "USD",
+      baseCurrency: "USD",
+      fxRate: 1,
+      fxFallback: false,
+      dateFormat: "YYYY/MM/DD",
+    }),
+  );
+  renderLayout();
+  expect(screen.queryByText(/currency conversion unavailable/i)).not.toBeInTheDocument();
+});
+
+test("Layout does not show FX warning when fxFallback is true but rate is not 1", () => {
+  localStorage.setItem(
+    "budget-tool-ui-format",
+    JSON.stringify({
+      locale: "en-US",
+      currency: "EUR",
+      baseCurrency: "USD",
+      fxRate: 0.92,
+      fxFallback: true,
+      dateFormat: "YYYY/MM/DD",
+    }),
+  );
+  renderLayout();
+  expect(screen.queryByText(/currency conversion unavailable/i)).not.toBeInTheDocument();
 });

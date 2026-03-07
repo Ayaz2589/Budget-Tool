@@ -119,6 +119,9 @@ export async function getUsdFxRate(currency: SupportedCurrency): Promise<{
       if (cached) {
         return { rate: cached.rate, asOf: cached.asOf, fallback: true };
       }
+      console.warn(
+        `[fx] FX rate fetch failed for ${currency} with no cache — using fallback rate 1:1`,
+      );
       return {
         rate: FALLBACK_RATE,
         asOf: new Date().toISOString(),

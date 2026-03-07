@@ -465,7 +465,8 @@
     "openMenu": "Open menu",
     "collapse": "Collapse",
     "signIn": "Sign in with Google",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "fxUnavailable": "Currency conversion unavailable — amounts shown as 1:1 with USD"
   },
   "mortgage": {
     "addMortgagePayment": "Add mortgage payment",

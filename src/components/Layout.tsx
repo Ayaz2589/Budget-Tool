@@ -2,8 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Landmark, CircleHelp } from "lucide-react";
-import { useGoogleAuth } from "@/context";
+import { Landmark, CircleHelp, AlertTriangle, X } from "lucide-react";
+import { useGoogleAuth, useBudget } from "@/context";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
@@ -37,6 +37,13 @@ export function Layout() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const { uiFormatSettings } = useBudget();
+  const [fxWarningDismissed, setFxWarningDismissed] = useState(false);
+  const showFxWarning =
+    !fxWarningDismissed &&
+    uiFormatSettings.currency !== "USD" &&
+    uiFormatSettings.fxFallback === true &&
+    uiFormatSettings.fxRate === 1;
   const {
     isSignedIn,
     userProfile,
@@ -230,6 +237,20 @@ export function Layout() {
         )}
       >
         <div className="mx-auto w-full max-w-7xl flex-1 flex flex-col min-w-0">
+          {showFxWarning && (
+            <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-3 py-2 mx-4 mt-3 md:mx-0 md:mt-0 md:mb-4 text-sm text-amber-800 dark:text-amber-200">
+              <AlertTriangle className="size-4 shrink-0" />
+              <span className="flex-1">{t("layout.fxUnavailable")}</span>
+              <button
+                type="button"
+                onClick={() => setFxWarningDismissed(true)}
+                className="shrink-0 rounded p-0.5 hover:bg-amber-200/50 dark:hover:bg-amber-800/50"
+                aria-label="Dismiss"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
+          )}
           <Outlet />
         </div>
       </main>

@@ -62,6 +62,25 @@ describe("fx", () => {
     expect(fx.fallback).toBe(false);
   });
 
+  test("logs console.warn when falling back to rate 1 with no cache", async () => {
+    const warnings: string[] = [];
+    const originalWarn = console.warn;
+    console.warn = (...args: unknown[]) => {
+      warnings.push(args.map(String).join(" "));
+    };
+
+    globalThis.fetch = mock(async () => {
+      return new Response("fail", { status: 500 }) as unknown as Response;
+    }) as typeof fetch;
+
+    const fx = await getUsdFxRate("GBP");
+    expect(fx.rate).toBe(1);
+    expect(fx.fallback).toBe(true);
+    expect(warnings.some((w) => w.includes("GBP"))).toBe(true);
+
+    console.warn = originalWarn;
+  });
+
   test("fetches rates for all newly added currencies", async () => {
     const currencies: DisplayCurrency[] = [
       "CAD",

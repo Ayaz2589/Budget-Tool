@@ -112,4 +112,7 @@ export const STORAGE_KEYS = {
 
   // Sidebar collapsed state
   SIDEBAR_COLLAPSED: "budget-tool-sidebar-collapsed",
+
+  // Sync event log
+  SYNC_LOG: "budget-tool-sync-log",
 } as const;

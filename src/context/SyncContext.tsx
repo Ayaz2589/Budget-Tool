@@ -24,89 +24,16 @@ import { isDisplayCurrency } from "@/types/currency";
 import { isSpreadsheetActive } from "@/lib/google/googleDrive";
 import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 import { withTimeout, TimeoutError } from "@/lib/platform/withTimeout";
+import {
+  syncMachineReducer,
+  AUTO_SYNC_DEBOUNCE_MS,
+  AUTO_SYNC_INTERVAL_MS,
+  SYNC_RATE_LIMIT_BASE_DELAY_MS,
+  SYNC_RATE_LIMIT_MAX_DELAY_MS,
+  SYNC_TIMEOUT_MS,
+  MAX_SYNC_RETRIES,
+} from "@/lib/sync/syncMachine";
 import type { SyncHealth, SyncStatus } from "@/types/auth";
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const AUTO_SYNC_DEBOUNCE_MS = 2_000;
-const AUTO_SYNC_INTERVAL_MS = 5 * 60_000;
-const SYNC_RATE_LIMIT_BASE_DELAY_MS = 3_000;
-const SYNC_RATE_LIMIT_MAX_DELAY_MS = 30_000;
-const SYNC_TIMEOUT_MS = 60_000;
-
-// ---------------------------------------------------------------------------
-// Sync state machine (replaces 10+ useRef declarations)
-// ---------------------------------------------------------------------------
-
-interface SyncMachineState {
-  status: SyncStatus;
-  errorMessage: string | null;
-  health: SyncHealth;
-  lastSyncAt: number | null;
-  hasUnsyncedChanges: boolean;
-  isAutoSyncEnabled: boolean;
-}
-
-type SyncMachineAction =
-  | { type: "START_SYNC" }
-  | { type: "SYNC_SUCCESS"; timestamp: number; hasUnsyncedChanges: boolean }
-  | {
-      type: "SYNC_ERROR";
-      message: string;
-      health: SyncHealth;
-      status?: SyncStatus;
-    }
-  | { type: "SET_UNSYNCED"; hasUnsyncedChanges: boolean; health: SyncHealth }
-  | { type: "SET_AUTO_SYNC"; enabled: boolean }
-  | { type: "RESET_UNSYNCED" }
-  | { type: "RESET" };
-
-function syncMachineReducer(
-  state: SyncMachineState,
-  action: SyncMachineAction,
-): SyncMachineState {
-  switch (action.type) {
-    case "START_SYNC":
-      return { ...state, status: "syncing", errorMessage: null };
-    case "SYNC_SUCCESS":
-      return {
-        ...state,
-        status: "success",
-        errorMessage: null,
-        health: "healthy",
-        lastSyncAt: action.timestamp,
-        hasUnsyncedChanges: action.hasUnsyncedChanges,
-      };
-    case "SYNC_ERROR":
-      return {
-        ...state,
-        status: action.status ?? "error",
-        errorMessage: action.message,
-        health: action.health,
-      };
-    case "SET_UNSYNCED":
-      return {
-        ...state,
-        hasUnsyncedChanges: action.hasUnsyncedChanges,
-        health: action.health,
-      };
-    case "SET_AUTO_SYNC":
-      return { ...state, isAutoSyncEnabled: action.enabled };
-    case "RESET_UNSYNCED":
-      return { ...state, hasUnsyncedChanges: false, health: "healthy" };
-    case "RESET":
-      return {
-        status: "idle",
-        errorMessage: null,
-        health: "healthy",
-        lastSyncAt: null,
-        hasUnsyncedChanges: false,
-        isAutoSyncEnabled: state.isAutoSyncEnabled,
-      };
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Context value type
@@ -166,6 +93,7 @@ export function SyncProvider({
   const syncQueuedRef = useRef(false);
   const nextSyncAllowedAtRef = useRef(0);
   const retryBackoffMsRef = useRef(SYNC_RATE_LIMIT_BASE_DELAY_MS);
+  const retryCountRef = useRef(0);
   const retryTimerRef = useRef<number | null>(null);
 
   // Sync signature (used for change detection)
@@ -269,6 +197,7 @@ export function SyncProvider({
     syncQueuedRef.current = false;
     nextSyncAllowedAtRef.current = 0;
     retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+    retryCountRef.current = 0;
     if (retryTimerRef.current != null) {
       window.clearTimeout(retryTimerRef.current);
       retryTimerRef.current = null;
@@ -419,6 +348,7 @@ export function SyncProvider({
         hasUnsyncedChanges: changed,
       });
       retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+      retryCountRef.current = 0;
       nextSyncAllowedAtRef.current = 0;
     } catch (err) {
       console.error("Sync failed:", err);
@@ -439,6 +369,21 @@ export function SyncProvider({
             });
             break;
           case "RATE_LIMIT": {
+            retryCountRef.current += 1;
+            if (retryCountRef.current >= MAX_SYNC_RETRIES) {
+              retryCountRef.current = 0;
+              retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+              nextSyncAllowedAtRef.current = 0;
+              dispatchSync({
+                type: "SYNC_ERROR",
+                message: i18n.t("auth.syncMaxRetriesExceeded", {
+                  defaultValue:
+                    "Sync failed after multiple retries. Please try again manually.",
+                }),
+                health: "error",
+              });
+              break;
+            }
             syncQueuedRef.current = true;
             const delay =
               err.retryAfterMs ?? retryBackoffMsRef.current;
@@ -519,6 +464,7 @@ export function SyncProvider({
       lastSyncedSignatureRef.current = null;
       nextSyncAllowedAtRef.current = 0;
       retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+      retryCountRef.current = 0;
       if (retryTimerRef.current != null) {
         window.clearTimeout(retryTimerRef.current);
         retryTimerRef.current = null;
@@ -823,7 +769,11 @@ export function SyncProvider({
               fxAsOf: expanded.fxAsOf ?? budget.uiFormatSettings.fxAsOf,
             });
           }
-        } catch {
+        } catch (blobErr) {
+          console.warn(
+            "V2 blob read failed, falling back to individual sheet tabs:",
+            blobErr,
+          );
           const result = await readFromSheetTabs();
           sheetExpenses = result.expenses;
           sheetMortgage = result.mortgage;

@@ -92,7 +92,8 @@ MortgageModel.formatting = [leftAlignRule(7), currencyRule(2, 3)];
 // ---------------------------------------------------------------------------
 
 export const IncomeModel = defineModel("Income", {
-  date: field.string().primaryKey(),
+  id: field.string().primaryKey(),
+  date: field.string(),
   amount: field.number(),
   description: field.string(),
   category: field.string().optional().default(""),
@@ -100,7 +101,7 @@ export const IncomeModel = defineModel("Income", {
 });
 
 IncomeModel.headerFormatting = HEADER_FORMAT;
-IncomeModel.formatting = [leftAlignRule(5), currencyRule(1, 2)];
+IncomeModel.formatting = [leftAlignRule(6), currencyRule(2, 3)];
 
 // ---------------------------------------------------------------------------
 // Debt Model → "Debts" tab

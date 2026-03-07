@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import { validateExpenseSource } from "@/lib/sheets/models";
+import { validateExpenseSource, IncomeModel } from "@/lib/sheets/models";
 import { hasIdColumn, findMissingHeaders } from "genjutsu-db";
 
 describe("validateExpenseSource", () => {
@@ -50,6 +50,21 @@ describe("validateExpenseSource", () => {
     expect(validateExpenseSource("123")).toBe("manual");
     expect(validateExpenseSource("!@#$%")).toBe("manual");
     expect(validateExpenseSource("   ")).toBe("manual");
+  });
+});
+
+describe("IncomeModel primary key", () => {
+  test("uses id as primary key, not date", () => {
+    const fields = IncomeModel.fields;
+    const fieldNames = fields.map((f: { name: string }) => f.name);
+    expect(fieldNames).toContain("id");
+    const idField = fields.find((f: { name: string }) => f.name === "id");
+    expect(idField?.isPrimaryKey).toBe(true);
+  });
+
+  test("id is the first field", () => {
+    const firstField = IncomeModel.fields[0];
+    expect(firstField.name).toBe("id");
   });
 });
 

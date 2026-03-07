@@ -170,7 +170,7 @@ PresetTransaction ┬── id: string
 
 ### Persistence
 
-All data is stored in `localStorage` under structured keys:
+All data is stored in `localStorage` under structured keys. On load, expense and income records are validated — entries with non-finite amounts or invalid dates are filtered out with console warnings.
 
 | Key | Contents |
 |-----|----------|
@@ -198,7 +198,7 @@ When synced, data maps to spreadsheet tabs via genjutsu-db models (`src/lib/shee
 |-----|-------------|
 | Expenses | id, date, amount, description, category, source, owner |
 | Mortgage | id, date, amount, description, category, source, owner |
-| Income | date, amount, description, category, owner |
+| Income | id, date, amount, description, category, owner |
 | Debts | id, name, initialAmount, startDate, owner |
 | DebtPayments | id, debtId, date, amount, note |
 | OwnerTransfers | id, date, fromOwner, toOwner, amount, note |
@@ -258,11 +258,10 @@ Dashboard sub-routes: `/dashboard` (index), `/import`, `/transactions`, `/income
 
 The dashboard uses a configurable widget grid (`src/lib/widgets/`):
 
-13 widget types across 3 categories (plus 1 ungrouped):
+13 widget types across 3 categories:
 - **KPIs:** net-cash-flow, total-spent, total-income, total-debt
-- **Charts:** cash-flow-chart, net-trend-chart, category-chart, owner-split-chart
+- **Charts:** cash-flow-chart, net-trend-chart, category-chart, owner-split-chart, owner-expense-by-owner
 - **Lists:** debt-snapshot, spend-by-source, owner-transfers, recent-activity
-- **Ungrouped:** owner-expense-by-owner
 
 Each widget is registered in `WIDGET_REGISTRY` with type, label, icon, default size, breakpoint dimensions, and render function. Layout is persisted to localStorage and supports desktop grid (react-grid-layout) and mobile single-column modes.
 
@@ -286,7 +285,7 @@ Supported display currencies: USD, EUR, JPY, CAD, MXN, GBP, BDT, INR, KRW, CNY, 
 
 ### 1. CSV Import
 
-**Data model:** CSV text -> `ParseResult { expenses: Expense[], source: ExpenseSource }`
+**Data model:** CSV text -> `ParseResult { expenses: Expense[], source: ExpenseSource, error?: string }`
 
 **Flow:**
 1. User uploads CSV file
@@ -300,6 +299,7 @@ Supported display currencies: USD, EUR, JPY, CAD, MXN, GBP, BDT, INR, KRW, CNY, 
 - Dedup uses O(1) Map lookup, not O(n^2) comparison
 - Amount tolerance of +/-0.01 handles floating-point edge cases
 - Only Amex and Apple Card parsers currently implemented
+- Unknown/unsupported CSV formats return `{ expenses: [], source: "manual", error: "unknown-format" }`
 
 ### 2. Google Sheets Sync
 
@@ -320,6 +320,7 @@ Supported display currencies: USD, EUR, JPY, CAD, MXN, GBP, BDT, INR, KRW, CNY, 
 
 **Key decisions:**
 - Exponential backoff on Google Sheets API rate limits
+- All API calls wrapped with `withTimeout` (30s for Drive API, 60s for sync operations)
 - genjutsu-db handles model validation and formatting
 - Mortgage expenses stored in separate tab
 
@@ -427,7 +428,7 @@ CSS custom properties define the design system:
 | `lib/import/` | importDedup, importNormalize, dummyData | Import pipeline |
 | `lib/parsers/` | amex, apple, csv-utils, index (detectCsvSource, parseCsv) | Bank CSV parsers |
 | `lib/format/` | format (UiFormatSettings, formatCurrency, usdToDisplayAmount), currencyInput, dateInput, categoryColors, sourceLabels | Display formatting |
-| `lib/platform/` | storage (StorageAdapter, STORAGE_KEYS), theme, fx, haptics, storageCleanup | Runtime utilities |
+| `lib/platform/` | storage (StorageAdapter, STORAGE_KEYS), theme, fx, haptics, storageCleanup, withTimeout (TimeoutError) | Runtime utilities |
 | `lib/sheets/` | client, models, data, totals | Google Sheets sync |
 | `lib/widgets/` | widget (types), widgetRegistry, widgetGroups, defaultLayout, createWidget | Dashboard widgets |
 | `lib/google/` | googleDrive | Google Drive API |
@@ -453,11 +454,11 @@ CSS custom properties define the design system:
 | Ledger | transactionsLedger | Yes |
 | Import/Export | importDedup, importNormalize, jsonExport, pdfExport, minifiedPayload, exportString, exportStringParse | No |
 | Parsers | apple, csv-utils, parsers/index | No |
-| Platform | storage, storageCleanup, theme | No |
+| Platform | storage, storageCleanup, theme, withTimeout, loadStoredBudget | No |
 | Components | AddTransactionDialog, DatePicker, MonthYearPicker, Layout, sheet | No |
 | Pages | Dashboard, Transactions, Import, Income, Debt, Mortgage, Settings, Presets, Tour, Auth, Landing + sub-components | No |
 | Context | BudgetContext | No |
 | Integration | AppFlows, importFlow, totalsComputation | No |
 | Hooks | useLongPress | No |
-| Widgets | createWidget | No |
+| Widgets | createWidget, widgetGroups | No |
 | Lib misc | categoryColors, dateInput, dateRepair, dummyData, googleDrive, googleSheets, mortgageCategory, sourceLabels, validation, utils, sheets/validate | No |

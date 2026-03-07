@@ -15,7 +15,7 @@ export const WIDGET_GROUPS: WidgetGroup[] = [
   {
     key: "charts",
     label: "widget.groupCharts",
-    widgets: ["cash-flow-chart", "net-trend-chart", "category-chart", "owner-split-chart"],
+    widgets: ["cash-flow-chart", "net-trend-chart", "category-chart", "owner-split-chart", "owner-expense-by-owner"],
   },
   {
     key: "lists",

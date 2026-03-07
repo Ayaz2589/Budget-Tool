@@ -82,7 +82,7 @@ interface StoredBudgetRaw {
   owners: string[];
 }
 
-function loadStoredBudget(): StoredBudgetRaw {
+export function loadStoredBudget(): StoredBudgetRaw {
   try {
     const raw = storage.getItem(STORAGE_KEYS.BUDGET_DATA);
     if (raw) {
@@ -110,22 +110,46 @@ function loadStoredBudget(): StoredBudgetRaw {
             return filtered;
           })()
         : [...ALL_EXPENSE_SOURCES];
+      const isoDateRe = /^\d{4}-\d{2}-\d{2}$/;
+      const isValidRecord = (r: { amount?: unknown; date?: unknown }) =>
+        Number.isFinite(r.amount) &&
+        typeof r.date === "string" &&
+        isoDateRe.test(r.date);
+
+      const rawExpenses = Array.isArray(data.expenses)
+        ? data.expenses.map((e) => ({
+            ...e,
+            owner:
+              (e as Expense & { cardMember?: string }).owner ??
+              (e as Expense & { cardMember?: string }).cardMember ??
+              undefined,
+            paidByOwner:
+              e.paidByOwner ??
+              (e as Expense & { cardMember?: string }).owner ??
+              (e as Expense & { cardMember?: string }).cardMember ??
+              undefined,
+          }))
+        : [];
+      const validExpenses = rawExpenses.filter((e) => {
+        if (!isValidRecord(e)) {
+          console.warn("[budget] Skipping invalid expense from storage:", e.id);
+          return false;
+        }
+        return true;
+      });
+
+      const rawIncome = Array.isArray(data.income) ? data.income : [];
+      const validIncome = rawIncome.filter((i) => {
+        if (!isValidRecord(i)) {
+          console.warn("[budget] Skipping invalid income from storage:", i.id);
+          return false;
+        }
+        return true;
+      });
+
       return {
-        expenses: Array.isArray(data.expenses)
-          ? data.expenses.map((e) => ({
-              ...e,
-              owner:
-                (e as Expense & { cardMember?: string }).owner ??
-                (e as Expense & { cardMember?: string }).cardMember ??
-                undefined,
-              paidByOwner:
-                e.paidByOwner ??
-                (e as Expense & { cardMember?: string }).owner ??
-                (e as Expense & { cardMember?: string }).cardMember ??
-                undefined,
-            }))
-          : [],
-        income: Array.isArray(data.income) ? data.income : [],
+        expenses: validExpenses,
+        income: validIncome,
         debts: Array.isArray(data.debts) ? data.debts : [],
         debtPayments: Array.isArray(data.debtPayments)
           ? data.debtPayments

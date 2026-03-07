@@ -95,6 +95,7 @@ export interface PresetTransaction {
 export interface ParseResult {
   expenses: Expense[];
   source: ExpenseSource;
+  error?: string;
 }
 
 export const DEFAULT_EXPENSE_CATEGORIES = [

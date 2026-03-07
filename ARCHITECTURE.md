@@ -188,7 +188,7 @@ All data is stored in `localStorage` under structured keys:
 | `budget-tool-returning-user` | Returning user flag |
 | `budget-tool-tour-completed` | Tour completion flag |
 | `budget-tool-help-hint-seen` | Help hint dismissed flag |
-| `budget-tool-sync-status` | Sync status persistence |
+| `budget-tool-sidebar-collapsed` | Sidebar collapsed state |
 
 ### Google Sheets Schema
 
@@ -232,7 +232,7 @@ App.tsx Provider Hierarchy:
           └── GoogleAuthComposer → useGoogleAuth()
 ```
 
-**Sub-context pattern:** Each domain context (Expenses, Income, Debt, OwnerTransfers) has its own reducer with actions: `ADD`, `ADD_MANY`, `UPDATE`, `REMOVE`, `REMOVE_MANY`, `SET`. The `BudgetComposer` reads all sub-contexts and provides a single `useBudget()` hook with backward-compatible methods.
+**Sub-context pattern:** Each domain context has its own reducer. Common actions include `ADD`, `UPDATE`, `REMOVE`, `SET`. ExpensesContext additionally supports `ADD_MANY` and `REMOVE_MANY`; IncomeContext supports `ADD_MANY` but not `REMOVE_MANY`; OwnerTransfersContext has only `ADD`, `UPDATE`, `REMOVE`, `SET`; DebtContext uses domain-prefixed actions (`ADD_DEBT`, `ADD_DEBTS`, `REMOVE_DEBT`, `ADD_PAYMENT`, etc.). The `BudgetComposer` reads all sub-contexts and provides a single `useBudget()` hook with backward-compatible methods.
 
 **Cross-concern cascades:** When owners change, BudgetComposer cleans invalid owner refs across all transactions. When categories change, invalid categories are blanked. When card sources change, invalid sources fall back to the first in the list.
 
@@ -258,16 +258,17 @@ Dashboard sub-routes: `/dashboard` (index), `/import`, `/transactions`, `/income
 
 The dashboard uses a configurable widget grid (`src/lib/widgets/`):
 
-13 widget types across 3 categories:
+13 widget types across 3 categories (plus 1 ungrouped):
 - **KPIs:** net-cash-flow, total-spent, total-income, total-debt
-- **Charts:** cash-flow-chart, net-trend-chart, category-chart, owner-split-chart, owner-expense-chart, spend-by-source
-- **Lists:** recent-activity, owner-transfers, debt-snapshot
+- **Charts:** cash-flow-chart, net-trend-chart, category-chart, owner-split-chart
+- **Lists:** debt-snapshot, spend-by-source, owner-transfers, recent-activity
+- **Ungrouped:** owner-expense-by-owner
 
 Each widget is registered in `WIDGET_REGISTRY` with type, label, icon, default size, breakpoint dimensions, and render function. Layout is persisted to localStorage and supports desktop grid (react-grid-layout) and mobile single-column modes.
 
 ### Currency & Formatting
 
-All amounts stored internally in USD. Display currency conversion uses live FX rates from Alpha Vantage API, cached in localStorage.
+All amounts stored internally in USD. Display currency conversion uses live FX rates from Frankfurter API (`frankfurter.app`, primary) with Open Exchange Rates (`open.er-api.com`) as fallback, cached in localStorage with 12-hour TTL.
 
 Supported display currencies: USD, EUR, JPY, CAD, MXN, GBP, BDT, INR, KRW, CNY, TWD
 
@@ -382,7 +383,6 @@ Node 20.19.0, Bun 1.3.6
 
 ### Environment Variables (`.env`)
 - `VITE_GOOGLE_CLIENT_ID` — Google OAuth client ID
-- `VITE_ALPHA_VANTAGE_API_KEY` — FX rate API key
 
 ### Theme (`src/index.css`)
 CSS custom properties define the design system:
@@ -391,9 +391,15 @@ CSS custom properties define the design system:
 - **Text:** text-primary, text-secondary, text-tertiary
 - **Interactive:** interactive-primary, interactive-danger (with hover/active states)
 - **Visualization:** viz-income, viz-expense, viz-debt, viz-series-1 through viz-series-5
-- **Radius:** base (0.625rem) with sm/md/lg/xl/2xl/3xl/4xl variants
+- **Radius:** base (0.75rem) with sm/md/lg/xl/2xl/3xl/4xl variants
 - **Shadows:** shadow-soft, shadow-strong
-- **Typography:** fluid font sizes via `clamp()`, line-height tight (1.2) and regular (1.45)
+- **Focus:** focus-ring
+- **Borders:** border-subtle, border-strong
+- **Controls:** control-surface, control-hover, control-active, control-border
+- **Fields:** field-surface, field-shadow
+- **Spacing:** space-compact-1/2/3, space-regular-1/2/3
+- **Motion:** duration-fast/normal/slow, ease-out/in/standard
+- **Typography:** fluid font sizes via `clamp()`, line-height tight (1.2) and regular (1.45), font-sans (Inter), font-mono (JetBrains Mono)
 - **Dark mode:** `.dark` class with OKLch color overrides
 - **Utility classes:** `.ds-display`, `.ds-heading-1` through `.ds-heading-4`, `.ds-body`, `.ds-body-sm`, `.ds-label`, `.ds-caption`
 
@@ -408,12 +414,13 @@ CSS custom properties define the design system:
 
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
-| `components/ui/` | button, card, dialog, sheet, input, select, popover, tabs, accordion, checkbox, switch, table, tooltip, date-picker, month-year-picker, chart, alert-dialog | shadcn/ui primitives |
+| `components/ui/` | button, card, dialog, sheet, input, select, popover, tabs, accordion, checkbox, switch, table, tooltip, label, date-picker, month-year-picker, chart, alert-dialog | shadcn/ui primitives |
 | `components/ds/` | DsMetricCard, DsChartCard, DsWidgetShell, DsWidgetCard, DsActionBar, DsEmptyState, DsSectionHeader, DsHelpTooltip, DsLegendList, DsSplitToggle, DsCreatableSelect, DsSidebarNavItem, DsSidebarBrand, DsDataRow, DsSheetActions, DsSheetHeader, DsWidgetCatalog, dsSidebarClasses | Custom design system |
-| `components/layout/` | Sidebar, MobileBottomNav, Avatar | App shell |
+| `components/layout/` | Sidebar, MobileBottomNav, Avatar, layoutConstants | App shell |
 | `components/add-transaction/` | TransactionFormRow, AllocationEditor, PresetSelector, TransferFields | Transaction form |
-| `components/` (root) | Layout, AddTransactionDialog, SheetSetupDialog, SyncStatusIndicator, ErrorBoundary | Top-level components |
+| `components/` (root) | Layout, AddTransactionDialog, add-transaction-utils, SheetSetupDialog, SyncStatusIndicator, ErrorBoundary | Top-level components |
 | `context/` | BudgetContext, ExpensesContext, IncomeContext, DebtContext, OwnerTransfersContext, SettingsContext, GoogleAuthContext, SheetSetupContext, SyncContext, PresetTransactionsContext, DashboardLayoutContext | State management |
+| `hooks/` | useMediaQuery, useLongPress, useTheme | Custom React hooks |
 | `lib/domain/` | totals, debtUtils, ownerAccounting, financialModel, mortgageMath, mortgageCategory, validation, dateRepair | Business logic |
 | `lib/math/` | core (roundTo, sumAmountsBy, safeDivide, computeNetCashFlow, computeDebtBalance, etc.) | Financial math primitives |
 | `lib/export/` | pdfExport, jsonExport, minifiedPayload, exportString, pdfText | Export pipeline |
@@ -426,10 +433,15 @@ CSS custom properties define the design system:
 | `lib/google/` | googleDrive | Google Drive API |
 | `types/` | core, budget, context, settings, transactions, transactions-ui, debt, income, mortgage, totals, dashboard, ui, auth, sheets, import, payload, category, currency, pdf | Type definitions |
 | `locales/` | en, es, bn, zh, ko, hi, ja | Translation files |
-| `pages/dashboard/` | Dashboard, dashboardSelectors, insightsBuilder, useDashboardData | Dashboard page + data utilities |
-| `pages/transactions/` | Transactions, transactionsLedger | Transactions page + ledger utility |
-| `pages/import/` | Import, useImportState | Import page + state hook |
-| `pages/` | Income, Debt, Mortgage, Presets, Settings, About, Landing, Tour, Auth | Other route pages |
+| `pages/dashboard/` | Dashboard, DashboardGrid, DashboardMobileGrid, DashboardFilters, DashboardKpiCards, DashboardDebtSnapshot, dashboardSelectors, insightsBuilder, useDashboardData | Dashboard page + data utilities |
+| `pages/dashboard/widgets/` | NetCashFlow, TotalSpent, TotalIncome, TotalDebt, CashFlowChart, NetTrendChart, CategoryChart, OwnerSplitChart, OwnerExpenseByOwner, DebtSnapshot, SpendBySource, OwnerTransfers, RecentActivity | Dashboard widget components |
+| `pages/transactions/` | TransactionsPage, transactionsLedger, TransactionsToolbar, ExpensesByMonthList, ExpensesByMonthTable, EditTransactionDialog, EditTransferDialog, DeleteTransactionDialogs, ExpenseActionsDialog, TransferActionsDialog, FiltersAndActionsDialog | Transactions page + sub-components |
+| `pages/import/` | ImportPage, useImportState, ImportPreviewCard, ImportSourceCard | Import page + sub-components |
+| `pages/income/` | IncomePage, IncomeList, IncomeTable, AddIncomeDialog, EditIncomeDialog, IncomeActionsDialog | Income page + sub-components |
+| `pages/debt/` | DebtPage, DebtList, DebtListMobile, AddDebtDialog, AddPaymentDialog, DebtActionsDialog | Debt page + sub-components |
+| `pages/mortgage/` | MortgagePage, MortgagePaymentsList, MortgagePaymentsTable, MortgageScheduleTable, MortgageScenarioCard, MortgageProfileCard, MortgageAmortizationChart, MortgageYearlySummary, AddMortgagePaymentDialog, DeleteMortgagePaymentDialog, MortgagePaymentActionsDialog | Mortgage page + sub-components |
+| `pages/settings/` | SettingsPage, OwnersCard, ExpenseCategoriesCard, IncomeCategoriesCard, CardSourcesCard, GoogleSheetsCard | Settings page + sub-components |
+| `pages/` | PresetsPage, AboutPage, LandingPage, LandingRoute, TourPage, AuthGate, LoginPage | Other route pages |
 
 ### Tests (`test/`)
 
@@ -447,3 +459,5 @@ CSS custom properties define the design system:
 | Context | BudgetContext | No |
 | Integration | AppFlows, importFlow, totalsComputation | No |
 | Hooks | useLongPress | No |
+| Widgets | createWidget | No |
+| Lib misc | categoryColors, dateInput, dateRepair, dummyData, googleDrive, googleSheets, mortgageCategory, sourceLabels, validation, utils, sheets/validate | No |

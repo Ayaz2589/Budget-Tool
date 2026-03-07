@@ -33,7 +33,7 @@ export function parseCsv(csvText: string, source?: CsvSource): ParseResult {
     case "apple":
       return parseAppleCsv(cleanText);
     default:
-      return { expenses: [], source: "amex" };
+      return { expenses: [], source: "manual", error: "unknown-format" };
   }
 }
 

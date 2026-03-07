@@ -38,9 +38,24 @@ test("parseCsv with amex source parses expenses", () => {
   expect(result.expenses[0]!.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
 });
 
-test("parseCsv unknown returns empty", () => {
+test("parseCsv unknown returns empty with error and source manual", () => {
   const result = parseCsv("a,b,c", "unknown");
   expect(result.expenses).toEqual([]);
+  expect(result.source).toBe("manual");
+  expect(result.error).toBe("unknown-format");
+});
+
+test("parseCsv chase returns empty with error (no chase parser)", () => {
+  const result = parseCsv("a,b,c", "chase");
+  expect(result.expenses).toEqual([]);
+  expect(result.source).toBe("manual");
+  expect(result.error).toBe("unknown-format");
+});
+
+test("parseCsv auto-detects unknown CSV and returns error", () => {
+  const result = parseCsv("foo,bar,baz\n1,2,3");
+  expect(result.expenses).toEqual([]);
+  expect(result.error).toBe("unknown-format");
 });
 
 test("parseAmexCsv requires date description amount columns", () => {

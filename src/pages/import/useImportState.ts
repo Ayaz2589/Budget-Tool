@@ -398,6 +398,14 @@ export function useImportState() {
           const csvSource: CsvSource =
             state.selectedSource === "amex" ? "amex" : (state.selectedSource as CsvSource);
           const result = parseCsv(text, csvSource);
+          if (result.error) {
+            dispatch({
+              type: "SET_IMPORT_ERROR",
+              payload: t("import.unknownCsvFormat"),
+            });
+            dispatch({ type: "CLEAR_PREVIEW" });
+            return;
+          }
           let toAdd = filterOutExistingExpenses(result.expenses, expenses);
           if (state.selectedSource === "amex") {
             const source =

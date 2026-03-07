@@ -390,6 +390,7 @@
     "duplicatesSkipped": "{{count}} duplicates skipped",
     "exportedPdfInvalid": "This doesn't look like an exported transactions PDF.",
     "pdfImportFailed": "PDF import failed",
+    "unknownCsvFormat": "Unrecognized CSV format. Please select the correct source or use a supported bank export.",
     "importFailed": "Import failed",
     "exportStringPasteFirst": "Paste an export string first.",
     "exportStringNotRecognized": "Export string not recognized.",

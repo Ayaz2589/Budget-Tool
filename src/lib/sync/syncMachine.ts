@@ -10,6 +10,8 @@ export const SYNC_RATE_LIMIT_BASE_DELAY_MS = 3_000;
 export const SYNC_RATE_LIMIT_MAX_DELAY_MS = 30_000;
 export const SYNC_TIMEOUT_MS = 60_000;
 export const MAX_SYNC_RETRIES = 5;
+export const ROW_COUNT_WARNING = 8_000;
+export const ROW_COUNT_LIMIT = 10_000;
 
 // ---------------------------------------------------------------------------
 // Sync state machine

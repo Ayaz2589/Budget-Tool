@@ -90,15 +90,24 @@ function DsHeaderCurrencyChip() {
         <SelectValue>
           {isCurrencyUpdating
             ? "Updating..."
-            : `${currencyMeta.flag} ${currencyMeta.symbol} ${uiFormatSettings.currency}`}
+            : `${currencyMeta.flag} ${currencyMeta.code}`}
         </SelectValue>
       </SelectTrigger>
       <SelectContent align="end">
-        {DISPLAY_CURRENCIES.map((code) => (
-          <SelectItem key={code} value={code}>
-            {CURRENCY_META[code].label}
-          </SelectItem>
-        ))}
+        {DISPLAY_CURRENCIES.map((code) => {
+          const meta = CURRENCY_META[code];
+          return (
+            <SelectItem key={code} value={code}>
+              <span className="flex items-center gap-2">
+                <span>{meta.flag}</span>
+                <span className="flex flex-col">
+                  <span className="text-sm leading-tight">{meta.name}</span>
+                  <span className="text-[11px] text-muted-foreground leading-tight">{meta.symbol} · {meta.code}</span>
+                </span>
+              </span>
+            </SelectItem>
+          );
+        })}
       </SelectContent>
     </Select>
   );

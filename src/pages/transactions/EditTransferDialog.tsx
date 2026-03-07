@@ -53,6 +53,9 @@ export function EditTransferDialog({
     onClose();
   };
 
+  const fieldClass = "h-11 w-full min-w-0";
+  const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
+
   return (
     <Sheet open={transfer !== null} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
@@ -60,10 +63,10 @@ export function EditTransferDialog({
         desktopVariant="modal"
         desktopModalSize="standard"
         showCloseButton={true}
-        className="p-0 gap-0 overflow-y-auto"
+        className="flex flex-col p-0 gap-0 overflow-hidden"
       >
         <DsSheetHeader title={t("common.edit")} />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-5 pt-4 pb-6 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 px-5 pt-4 pb-8 content-start">
           <div className="space-y-2">
             <Label>{t("common.date")}</Label>
             <DatePicker
@@ -73,7 +76,7 @@ export function EditTransferDialog({
               }
               triggerLabel={date}
               placeholder={t("common.date")}
-              triggerClassName="h-11 w-full"
+              triggerClassName={fieldClass}
             />
           </div>
           <div className="space-y-2">
@@ -83,13 +86,13 @@ export function EditTransferDialog({
               inputMode="decimal"
               value={amount}
               onChange={(e) => setAmount(formatCurrencyInput(e.target.value))}
-              className="h-11"
+              className={fieldClass}
             />
           </div>
           <div className="space-y-2">
             <Label>{t("transactions.transferFrom")}</Label>
             <Select value={fromOwner || "_none"} onValueChange={(v) => setFromOwner(v === "_none" ? "" : v)}>
-              <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
+              <SelectTrigger className={selectTriggerClass}>
                 <SelectValue placeholder={t("common.noOwner")} />
               </SelectTrigger>
               <SelectContent>
@@ -103,7 +106,7 @@ export function EditTransferDialog({
           <div className="space-y-2">
             <Label>{t("transactions.transferTo")}</Label>
             <Select value={toOwner || "_none"} onValueChange={(v) => setToOwner(v === "_none" ? "" : v)}>
-              <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
+              <SelectTrigger className={selectTriggerClass}>
                 <SelectValue placeholder={t("common.noOwner")} />
               </SelectTrigger>
               <SelectContent>
@@ -116,21 +119,19 @@ export function EditTransferDialog({
           </div>
           <div className="space-y-2 md:col-span-2">
             <Label>{t("transactions.transferNote")}</Label>
-            <Input value={note} onChange={(e) => setNote(e.target.value)} className="h-11" />
+            <Input value={note} onChange={(e) => setNote(e.target.value)} className={fieldClass} />
           </div>
           {fromOwner && toOwner && fromOwner === toOwner ? (
             <p className="text-xs text-destructive md:col-span-2">{t("transactions.transferValidationOwnersDifferent")}</p>
           ) : null}
         </div>
-        <DsSheetActions>
-          <div className="grid grid-cols-2 gap-2">
-            <Button type="button" variant="outline" density="compact" className="w-full" onClick={onClose}>
-              {t("common.cancel")}
-            </Button>
-            <Button type="button" density="compact" className="w-full" onClick={handleSave}>
-              {t("common.save")}
-            </Button>
-          </div>
+        <DsSheetActions className="flex justify-end gap-3">
+          <Button type="button" variant="ghost" onClick={onClose}>
+            {t("common.cancel")}
+          </Button>
+          <Button type="button" onClick={handleSave}>
+            {t("common.save")}
+          </Button>
         </DsSheetActions>
       </SheetContent>
     </Sheet>

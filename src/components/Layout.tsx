@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Landmark, CircleHelp } from "lucide-react";
 import { useGoogleAuth } from "@/context";
 import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,9 @@ import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { SheetSetupDialog } from "@/components/SheetSetupDialog";
 import { SidebarContent } from "@/components/layout/Sidebar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+
+const SIDEBAR_EXPANDED_W = 220;
+const SIDEBAR_COLLAPSED_W = 64;
 
 function getHelpHintSeen(): boolean {
   return storage.getItem(STORAGE_KEYS.HELP_HINT_SEEN) === "1";
@@ -163,6 +167,18 @@ export function Layout() {
     prevSheetSetupOpenRef.current = isSheetSetupDialogOpen;
   }, [isSignedIn, isSheetSetupDialogOpen]);
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
+    storage.getItem(STORAGE_KEYS.SIDEBAR_COLLAPSED) === "1",
+  );
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      storage.setItem(STORAGE_KEYS.SIDEBAR_COLLAPSED, next ? "1" : "0");
+      return next;
+    });
+  }, []);
+  const sidebarW = sidebarCollapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W;
+
   const handleLanguageChange = (locale: string) => {
     i18n.changeLanguage(locale);
     persistLocale(locale);
@@ -183,30 +199,33 @@ export function Layout() {
       </header>
 
       {/* Desktop sidebar */}
-      <nav className="hidden md:flex fixed left-0 top-0 bottom-0 border-r border-[var(--border-subtle)] bg-[var(--surface-1)]/92 p-3 flex-col gap-1 w-[220px] overflow-hidden backdrop-blur-sm shadow-[1px_0_10px_rgba(15,23,42,0.08)] dark:shadow-[1px_0_12px_rgba(0,0,0,0.24)]">
-        <SidebarContent
-          location={location}
-          t={t}
-          currentLng={currentLng}
-          handleLanguageChange={handleLanguageChange}
-          isSignedIn={isSignedIn}
-          userProfile={userProfile}
-          signIn={signIn}
-          signOut={signOut}
-        />
-      </nav>
+      <TooltipProvider>
+        <nav
+          className={cn(
+            "hidden md:flex fixed left-0 top-0 bottom-0 border-r border-[var(--border-subtle)] bg-[var(--surface-1)]/92 flex-col overflow-hidden backdrop-blur-sm shadow-[1px_0_10px_rgba(15,23,42,0.08)] dark:shadow-[1px_0_12px_rgba(0,0,0,0.24)] transition-[width] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]",
+            sidebarCollapsed ? "items-center px-2 py-3 gap-0.5" : "p-3 gap-1",
+          )}
+          style={{ width: sidebarW }}
+        >
+          <SidebarContent
+            location={location}
+            t={t}
+            currentLng={currentLng}
+            handleLanguageChange={handleLanguageChange}
+            isSignedIn={isSignedIn}
+            userProfile={userProfile}
+            signIn={signIn}
+            signOut={signOut}
+            collapsed={sidebarCollapsed}
+            onToggleCollapsed={toggleSidebar}
+          />
+        </nav>
+      </TooltipProvider>
       <main
         className={cn(
-          "flex-1 flex flex-col pb-[calc(6.25rem+env(safe-area-inset-bottom))] md:pb-6 md:ml-[220px] md:w-[calc(100%-220px)]",
-          location.pathname === "/dashboard/transactions" ||
-            location.pathname === "/dashboard/income" ||
-            location.pathname === "/dashboard/debt" ||
-            location.pathname === "/dashboard/mortgage" ||
-            location.pathname === "/dashboard/presets" ||
-            location.pathname === "/dashboard/import" ||
-            location.pathname === "/dashboard/settings"
-            ? "p-0 md:p-6"
-            : "p-0 md:p-6",
+          "flex-1 flex flex-col pb-[calc(6.25rem+env(safe-area-inset-bottom))] md:pb-6 md:transition-[margin-left] md:duration-200 md:ease-[cubic-bezier(0.4,0,0.2,1)]",
+          "p-0 md:p-6",
+          sidebarCollapsed ? "md:ml-[64px]" : "md:ml-[220px]",
           location.pathname !== "/dashboard" && "flatten-mobile-cards",
         )}
       >

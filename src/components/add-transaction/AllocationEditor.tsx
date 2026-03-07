@@ -30,7 +30,7 @@ export function AllocationEditor({
 
   return (
     <>
-      <div className="space-y-0.5">
+      <div className="space-y-1">
         <div className="text-xs text-muted-foreground">
           {t("addTransaction.splitMode")}
         </div>
@@ -69,7 +69,7 @@ export function AllocationEditor({
       </div>
 
       {row.allocationMode === "single" ? (
-        <div className="space-y-0.5">
+        <div className="space-y-1 ">
           <div className="text-xs text-muted-foreground">
             {t("addTransaction.splitOwner")}
           </div>
@@ -95,7 +95,7 @@ export function AllocationEditor({
           </Select>
         </div>
       ) : (
-        <div className="space-y-1 md:col-span-2">
+        <div className="space-y-1 ">
           <div className="text-xs text-muted-foreground">
             {t("addTransaction.splitOwners")}
           </div>
@@ -126,13 +126,13 @@ export function AllocationEditor({
       )}
 
       {row.allocationMode === "custom" ? (
-        <div className="space-y-2 md:col-span-3">
+        <div className="space-y-2 ">
           <div className="text-xs text-muted-foreground">
             {t("addTransaction.customSplitHint")}
           </div>
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {row.allocationOwners.map((name) => (
-              <div key={name} className="space-y-0.5">
+              <div key={name} className="space-y-1">
                 <div className="text-xs text-muted-foreground">{name}</div>
                 <Input
                   type="number"

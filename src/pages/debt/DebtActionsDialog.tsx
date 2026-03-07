@@ -95,7 +95,7 @@ export function DebtActionsDialog({
                 onUpdateOwner(debt.id, v === "_none" ? "" : v)
               }
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
                 <SelectValue placeholder={t("common.noOwner")} />
               </SelectTrigger>
               <SelectContent>
@@ -142,26 +142,20 @@ export function DebtActionsDialog({
             </div>
           )}
         </div>
-        <DsSheetActions className="py-3">
-          <div className="flex items-center gap-2">
-            <Button
-              density="compact"
-              className="flex-1 justify-center text-center"
-              onClick={handleAddPayment}
-              disabled={balance <= 0}
-            >
-              {t("debt.makePayment")}
-            </Button>
-            <Button
-              variant="destructive"
-              density="compact"
-              className="flex-1 justify-center text-center"
-              onClick={handleDelete}
-            >
-              <Trash2 className="size-4 text-white" />
-              {t("debt.deleteDebt")}
-            </Button>
-          </div>
+        <DsSheetActions className="flex justify-end gap-3">
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+          >
+            <Trash2 className="size-4" />
+            {t("debt.deleteDebt")}
+          </Button>
+          <Button
+            onClick={handleAddPayment}
+            disabled={balance <= 0}
+          >
+            {t("debt.makePayment")}
+          </Button>
         </DsSheetActions>
       </SheetContent>
       <Dialog

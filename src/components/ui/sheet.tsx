@@ -21,9 +21,9 @@ const modalSizeClasses: Record<DesktopModalSize, string> = {
 };
 
 const modalVariants = {
-  initial: { opacity: 0, scale: 0.95 },
-  animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.95 },
+  initial: { opacity: 1, y: "100vh" },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 1, y: "100vh" },
 };
 
 const backdropVariants = {
@@ -32,7 +32,8 @@ const backdropVariants = {
   exit: { opacity: 0 },
 };
 
-const modalTransition = { duration: 0.25, ease: "easeOut" as const };
+const modalTransition = { duration: 0.4, ease: [0.0, 0.0, 0.2, 1] as const };
+const backdropTransition = { duration: 0.3, ease: [0.4, 0.0, 1, 1] as const };
 
 const SheetOverlay = ({
   className,
@@ -87,7 +88,7 @@ const SheetContent = ({
             initial="initial"
             animate="animate"
             exit="exit"
-            transition={modalTransition}
+            transition={backdropTransition}
           />
         </SheetPrimitive.Overlay>
         <SheetPrimitive.Content
@@ -100,10 +101,10 @@ const SheetContent = ({
         >
           <motion.div
             className={cn(
-              "fixed inset-0 z-50 m-auto bg-[var(--surface-0)] shadow-lg",
-              className,
-              "h-fit max-h-[90vh] w-full overflow-y-auto rounded-xl border-0",
-              modalSizeClasses[desktopModalSize]
+              "fixed inset-0 z-50 m-auto bg-[var(--surface-1)] shadow-lg",
+              "h-fit max-h-[90vh] w-full overflow-y-auto rounded-md border border-[var(--border-subtle)]",
+              modalSizeClasses[desktopModalSize],
+              className
             )}
             variants={modalVariants}
             initial="initial"

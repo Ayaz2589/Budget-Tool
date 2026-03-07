@@ -28,7 +28,6 @@ export function MortgagePaymentActionsDialog({
   t,
 }: MortgagePaymentActionsDialogProps) {
   if (payment === null) return null;
-  const actionButtonClass = "w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
   const handleRemove = () => {
@@ -91,11 +90,9 @@ export function MortgagePaymentActionsDialog({
             </div>
           </div>
         </div>
-        <DsSheetActions>
+        <DsSheetActions className="flex justify-end gap-3">
           <Button
             variant="destructive"
-            density="compact"
-            className={actionButtonClass}
             onClick={handleRemove}
           >
             <Trash2 className="size-4" />

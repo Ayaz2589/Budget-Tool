@@ -19,7 +19,8 @@ import {
   SheetContent,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
+import { Copy, Menu, Plus, X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DsSheetActions, DsSheetHeader } from "@/components/ds";
 import {
   buildAllocationForRow,
@@ -258,8 +259,8 @@ export function AddTransactionDialog({
     }
   };
 
-  const fieldClass = "h-10 w-full min-w-0";
-  const selectTriggerClass = "h-10 w-full data-[size=default]:h-10";
+  const fieldClass = "h-11 w-full min-w-0";
+  const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -286,136 +287,201 @@ export function AddTransactionDialog({
           onSubmit={handleSubmit}
           className="flex flex-col flex-1 min-h-0 gap-0 overflow-hidden"
         >
-          <div className="flex-1 min-h-0 overflow-auto divide-y">
-            {rows.map((row, index) => (
-              <div
-                key={row.id}
-                className={cn(
-                  "px-2 py-2 md:px-3",
-                  index % 2 === 1 ? "bg-muted/20" : "bg-background",
-                )}
-              >
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setActiveRowIndex(index)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setActiveRowIndex(index);
+          {/* Tab bar */}
+          {(() => {
+            const MAX_VISIBLE = 5;
+            const visibleRows = rows.slice(0, MAX_VISIBLE);
+            const overflowRows = rows.slice(MAX_VISIBLE);
+            const activeInOverflow = activeRowIndex >= MAX_VISIBLE;
+
+            function tabLabel(row: TransactionRow, index: number) {
+              return row.description?.trim()
+                ? `${index + 1}: ${row.description.slice(0, 12)}${row.description.length > 12 ? "…" : ""}`
+                : `${t("addTransaction.transaction")} ${index + 1}`;
+            }
+
+            return (
+              <div className="shrink-0 flex items-center gap-1.5 border-b border-[var(--border-subtle)] px-4 py-2">
+                <div className="flex items-center gap-1 flex-1 min-w-0">
+                  {visibleRows.map((row, index) => {
+                    const isActive = activeRowIndex === index;
+                    return (
+                      <button
+                        key={row.id}
+                        type="button"
+                        onClick={() => setActiveRowIndex(index)}
+                        className={cn(
+                          "group relative flex items-center gap-1.5 shrink-0 h-7 px-2.5 rounded-md text-xs font-medium transition-colors outline-none",
+                          isActive
+                            ? "bg-[var(--interactive-primary)] text-[var(--interactive-primary-foreground)]"
+                            : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--control-hover)]",
+                        )}
+                      >
+                        <span className="truncate max-w-[100px]">{tabLabel(row, index)}</span>
+                        {rows.length > 1 && (
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            className={cn(
+                              "size-4 rounded-full flex items-center justify-center transition-opacity -mr-0.5",
+                              isActive
+                                ? "opacity-70 hover:opacity-100 hover:bg-white/20"
+                                : "opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-[var(--control-active)]",
+                            )}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeRow(index);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                removeRow(index);
+                              }
+                            }}
+                          >
+                            <X className="size-2.5" />
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                  {overflowRows.length > 0 && (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          className={cn(
+                            "shrink-0 h-7 px-2 rounded-md text-xs font-medium flex items-center gap-1 transition-colors",
+                            activeInOverflow
+                              ? "bg-[var(--interactive-primary)] text-[var(--interactive-primary-foreground)]"
+                              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--control-hover)]",
+                          )}
+                        >
+                          <Menu className="size-3" />
+                          <span>+{overflowRows.length}</span>
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent align="start" className="w-52 p-1 max-h-64 overflow-y-auto">
+                        {overflowRows.map((row, i) => {
+                          const globalIndex = MAX_VISIBLE + i;
+                          const isActive = activeRowIndex === globalIndex;
+                          return (
+                            <div
+                              key={row.id}
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => setActiveRowIndex(globalIndex)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  setActiveRowIndex(globalIndex);
+                                }
+                              }}
+                              className={cn(
+                                "flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-xs cursor-pointer transition-colors",
+                                isActive
+                                  ? "bg-[var(--control-active)] text-[var(--text-primary)] font-medium"
+                                  : "text-[var(--text-secondary)] hover:bg-[var(--control-hover)] hover:text-[var(--text-primary)]",
+                              )}
+                            >
+                              <span className="truncate">{tabLabel(row, globalIndex)}</span>
+                              <span
+                                role="button"
+                                tabIndex={0}
+                                className="size-4 shrink-0 rounded-full flex items-center justify-center opacity-40 hover:opacity-100 hover:bg-[var(--control-active)]"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeRow(globalIndex);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    removeRow(globalIndex);
+                                  }
+                                }}
+                              >
+                                <X className="size-2.5" />
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </div>
+                <div className="flex items-center gap-0.5 shrink-0">
+                  <button
+                    type="button"
+                    className="size-7 flex items-center justify-center rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--control-hover)] transition-colors"
+                    onClick={() => copyRow(activeRowIndex)}
+                    title={t("addTransaction.copyRow")}
+                  >
+                    <Copy className="size-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    className="size-7 flex items-center justify-center rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--control-hover)] transition-colors"
+                    onClick={addRow}
+                    title={t("addTransaction.addRow")}
+                  >
+                    <Plus className="size-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Active row form */}
+          <div className="flex-1 min-h-0 overflow-auto px-4 md:px-5 py-4">
+            {rows[activeRowIndex] && (
+              <div>
+                <TransactionFormRow
+                  row={rows[activeRowIndex]}
+                  onUpdate={(updates) => updateRow(activeRowIndex, updates)}
+                  ownerOptions={ownerOptions}
+                  cardSources={cardSources}
+                  defaultSource={defaultSource}
+                  expenseCategories={expenseCategories}
+                  presetTransactions={presetTransactions}
+                  sortedPresetTransactions={sortedPresetTransactions}
+                  onPresetChange={(v) => handlePresetChange(activeRowIndex, v)}
+                  dateFormat={uiFormatSettings.dateFormat}
+                  fieldClass={fieldClass}
+                  selectTriggerClass={selectTriggerClass}
+                  onCreateCategory={(name) => {
+                    if (!expenseCategories.includes(name)) {
+                      setExpenseCategories([...expenseCategories, name]);
                     }
                   }}
-                  className="w-full flex items-center justify-between gap-2 text-left cursor-pointer"
-                >
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold">
-                      {t("addTransaction.transaction")} {index + 1}
-                    </div>
-                    {activeRowIndex !== index && (
-                      <div className="text-xs text-muted-foreground mt-1 truncate">
-                        {row.description || t("addTransaction.placeholderDescription")}
-                        {" \u00B7 "}
-                        {row.category || t("addTransaction.uncategorized")}
-                        {" \u00B7 "}
-                        {row.amount || "0.00"}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        copyRow(index);
-                      }}
-                      title={t("addTransaction.copyRow")}
-                    >
-                      <Copy className="size-4" />
-                    </Button>
-                    {rows.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="size-8 text-destructive hover:text-destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeRow(index);
-                        }}
-                        title={t("addTransaction.removeRow")}
-                      >
-                        <Trash2 className="size-4 text-destructive" />
-                      </Button>
-                    )}
-                    <ChevronDown
-                      className={`size-4 text-muted-foreground transition-transform ${
-                        activeRowIndex === index ? "rotate-180" : ""
-                      }`}
-                    />
-                  </div>
-                </div>
-
-                {activeRowIndex === index && (
-                  <TransactionFormRow
-                    row={row}
-                    onUpdate={(updates) => updateRow(index, updates)}
-                    ownerOptions={ownerOptions}
-                    cardSources={cardSources}
-                    defaultSource={defaultSource}
-                    expenseCategories={expenseCategories}
-                    presetTransactions={presetTransactions}
-                    sortedPresetTransactions={sortedPresetTransactions}
-                    onPresetChange={(v) => handlePresetChange(index, v)}
-                    dateFormat={uiFormatSettings.dateFormat}
-                    fieldClass={fieldClass}
-                    selectTriggerClass={selectTriggerClass}
-                    onCreateCategory={(name) => {
-                      if (!expenseCategories.includes(name)) {
-                        setExpenseCategories([...expenseCategories, name]);
-                      }
-                    }}
-                    onCreateOwner={(name) => {
-                      if (!owners.includes(name)) {
-                        setOwners([...owners, name]);
-                      }
-                    }}
-                  />
-                )}
+                  onCreateOwner={(name) => {
+                    if (!owners.includes(name)) {
+                      setOwners([...owners, name]);
+                    }
+                  }}
+                />
               </div>
-            ))}
+            )}
           </div>
-          <DsSheetActions className="shrink-0 flex flex-col gap-2 pt-2 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
+
+          <DsSheetActions className="shrink-0 flex justify-end gap-3">
             <Button
               type="button"
-              variant="secondary"
-              className="w-full"
-              onClick={addRow}
+              variant="ghost"
+              onClick={() => onOpenChange(false)}
             >
-              <Plus className="size-4" />
-              {t("addTransaction.addRow")}
+              {t("common.cancel")}
             </Button>
-            <div className="flex flex-row gap-2 p-0">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={() => onOpenChange(false)}
-              >
-                {t("common.cancel")}
-              </Button>
-              <Button type="submit" className="flex-1" disabled={validCount === 0}>
-                {validCount === 0
-                  ? t("addTransaction.addTransaction")
-                  : validCount === 1
-                  ? t("addTransaction.addTransaction")
-                  : t("addTransaction.addTransactions", {
-                      count: validCount,
-                    })}
-              </Button>
-            </div>
+            <Button type="submit" disabled={validCount === 0}>
+              {validCount === 0
+                ? t("addTransaction.addTransaction")
+                : validCount === 1
+                ? t("addTransaction.addTransaction")
+                : t("addTransaction.addTransactions", {
+                    count: validCount,
+                  })}
+            </Button>
           </DsSheetActions>
         </form>
       </SheetContent>

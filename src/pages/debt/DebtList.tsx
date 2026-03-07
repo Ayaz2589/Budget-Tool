@@ -65,7 +65,7 @@ export function DebtList({
                 }
               }}
               className={cn(
-                "cursor-pointer",
+                "cursor-pointer [&>td]:py-4",
                 index % 2 === 1 ? "bg-muted/30" : undefined
               )}
             >

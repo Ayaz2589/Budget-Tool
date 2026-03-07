@@ -237,7 +237,7 @@ export function PresetsPage() {
             <SheetContent
               side="right"
               desktopVariant="modal"
-              desktopModalSize="standard"
+              desktopModalSize="compact"
               data-tour="presets-add-sheet"
               className="flex flex-col p-4 gap-3 overflow-hidden"
             >

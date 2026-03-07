@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { BudgetProvider } from "@/context";
 import { PresetTransactionsProvider } from "@/context";
@@ -26,24 +26,26 @@ function TestWrapper() {
   );
 }
 
-test("SettingsPage renders title and accordion sections", () => {
+test("SettingsPage renders title and nav sections", () => {
   render(<TestWrapper />);
   expect(
     screen.getAllByRole("heading", { name: i18n.t("settings.title") }).length,
   ).toBeGreaterThanOrEqual(1);
+  // Nav buttons for each section
   expect(
-    screen.getByText(i18n.t("settings.googleSheets")),
+    screen.getByRole("button", { name: i18n.t("settings.googleSheets") }),
   ).toBeInTheDocument();
   expect(
-    screen.getByText(i18n.t("settings.preferencesTitle")),
-  ).toBeInTheDocument();
-  expect(
-    screen.getByText(i18n.t("settings.deleteAllData")),
+    screen.getByRole("button", { name: i18n.t("settings.preferencesTitle") }),
   ).toBeInTheDocument();
 });
 
-test("SettingsPage shows expense and income category cards", () => {
+test("SettingsPage shows expense categories when navigated", () => {
   render(<TestWrapper />);
-  expect(screen.getAllByText(i18n.t("settings.expenseCategories")).length).toBeGreaterThanOrEqual(1);
-  expect(screen.getAllByText(i18n.t("settings.incomeCategories")).length).toBeGreaterThanOrEqual(1);
+  const settingsContainer = document.querySelector("[data-tour='settings-page']")!;
+  const expBtn = Array.from(settingsContainer.querySelectorAll("button")).find(
+    (btn) => btn.textContent?.trim() === i18n.t("settings.expenseCategories")
+  )!;
+  fireEvent.click(expBtn);
+  expect(screen.getByText(i18n.t("settings.expenseCategoriesDesc"))).toBeInTheDocument();
 });

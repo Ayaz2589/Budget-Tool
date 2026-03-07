@@ -15,6 +15,7 @@ export type BaseCurrency = "USD";
 
 export interface CurrencyMeta {
   code: DisplayCurrency;
+  name: string;
   label: string;
   flag: string;
   symbol: string;
@@ -40,6 +41,7 @@ export const DISPLAY_CURRENCIES: DisplayCurrency[] = [
 export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   USD: {
     code: "USD",
+    name: "US Dollar",
     label: "🇺🇸 $ USD",
     flag: "🇺🇸",
     symbol: "$",
@@ -48,6 +50,7 @@ export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   },
   EUR: {
     code: "EUR",
+    name: "Euro",
     label: "🇪🇺 € EUR",
     flag: "🇪🇺",
     symbol: "€",
@@ -56,6 +59,7 @@ export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   },
   JPY: {
     code: "JPY",
+    name: "Japanese Yen",
     label: "🇯🇵 ¥ JPY",
     flag: "🇯🇵",
     symbol: "¥",
@@ -64,6 +68,7 @@ export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   },
   CAD: {
     code: "CAD",
+    name: "Canadian Dollar",
     label: "🇨🇦 C$ CAD",
     flag: "🇨🇦",
     symbol: "C$",
@@ -72,6 +77,7 @@ export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   },
   MXN: {
     code: "MXN",
+    name: "Mexican Peso",
     label: "🇲🇽 MX$ MXN",
     flag: "🇲🇽",
     symbol: "MX$",
@@ -80,6 +86,7 @@ export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   },
   GBP: {
     code: "GBP",
+    name: "British Pound",
     label: "🇬🇧 £ GBP",
     flag: "🇬🇧",
     symbol: "£",
@@ -88,6 +95,7 @@ export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   },
   BDT: {
     code: "BDT",
+    name: "Bangladeshi Taka",
     label: "🇧🇩 ৳ BDT",
     flag: "🇧🇩",
     symbol: "৳",
@@ -96,6 +104,7 @@ export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   },
   INR: {
     code: "INR",
+    name: "Indian Rupee",
     label: "🇮🇳 ₹ INR",
     flag: "🇮🇳",
     symbol: "₹",
@@ -104,6 +113,7 @@ export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   },
   KRW: {
     code: "KRW",
+    name: "South Korean Won",
     label: "🇰🇷 ₩ KRW",
     flag: "🇰🇷",
     symbol: "₩",
@@ -112,6 +122,7 @@ export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   },
   CNY: {
     code: "CNY",
+    name: "Chinese Yuan",
     label: "🇨🇳 ¥ CNY",
     flag: "🇨🇳",
     symbol: "¥",
@@ -121,6 +132,7 @@ export const CURRENCY_META: Record<DisplayCurrency, CurrencyMeta> = {
   },
   TWD: {
     code: "TWD",
+    name: "Taiwan Dollar",
     label: "🇹🇼 NT$ TWD",
     flag: "🇹🇼",
     symbol: "NT$",

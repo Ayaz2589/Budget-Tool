@@ -9,18 +9,44 @@ import {
   Settings,
   CircleHelp,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-export const nav = [
-  { to: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard },
-  { to: "/dashboard/transactions", labelKey: "nav.transactions", icon: List },
-  { to: "/dashboard/income", labelKey: "nav.income", icon: Wallet },
-  { to: "/dashboard/debt", labelKey: "nav.debt", icon: CreditCard },
-  { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
-  { to: "/dashboard/presets", labelKey: "nav.presets", icon: ListOrdered },
-  { to: "/dashboard/import", labelKey: "nav.import", icon: Database },
-  { to: "/dashboard/about", labelKey: "nav.about", icon: CircleHelp },
-  { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
-] as const;
+export interface NavItem {
+  to: string;
+  labelKey: string;
+  icon: LucideIcon;
+}
+
+export interface NavGroup {
+  items: NavItem[];
+}
+
+export const navGroups: NavGroup[] = [
+  {
+    items: [
+      { to: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard },
+      { to: "/dashboard/transactions", labelKey: "nav.transactions", icon: List },
+      { to: "/dashboard/income", labelKey: "nav.income", icon: Wallet },
+      { to: "/dashboard/debt", labelKey: "nav.debt", icon: CreditCard },
+      { to: "/dashboard/mortgage", labelKey: "nav.mortgage", icon: Home },
+    ],
+  },
+  {
+    items: [
+      { to: "/dashboard/presets", labelKey: "nav.presets", icon: ListOrdered },
+      { to: "/dashboard/import", labelKey: "nav.import", icon: Database },
+    ],
+  },
+  {
+    items: [
+      { to: "/dashboard/about", labelKey: "nav.about", icon: CircleHelp },
+      { to: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
+    ],
+  },
+];
+
+/** Flat list for backward compat (mobile nav, etc.) */
+export const nav = navGroups.flatMap((g) => g.items);
 
 /** Primary tabs shown in mobile bottom nav */
 export const bottomNavItems = [

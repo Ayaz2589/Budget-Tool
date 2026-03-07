@@ -49,7 +49,7 @@ export function AddIncomeDialog({
       <SheetContent
         side="right"
         desktopVariant="modal"
-        desktopModalSize="standard"
+        desktopModalSize="compact"
         data-tour="income-add-sheet"
         className="flex flex-col p-0 gap-0 overflow-hidden"
       >
@@ -128,9 +128,9 @@ function AddIncomeForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col flex-1 min-h-0 gap-4 overflow-hidden px-5 py-3"
+      className="flex flex-col flex-1 min-h-0 overflow-hidden"
     >
-      <div className="flex-1 min-h-0 overflow-auto grid grid-cols-1 md:grid-cols-2 gap-4 content-start">
+      <div className="flex-1 min-h-0 overflow-auto grid grid-cols-1 gap-4 content-start px-5 pt-3 pb-8">
         <div className="space-y-2">
           <Label>{t("income.date")}</Label>
           <DatePicker
@@ -217,7 +217,7 @@ function AddIncomeForm({
             </Select>
           )}
         </div>
-        <div className="space-y-2 md:col-span-2">
+        <div className="space-y-2">
           <Label>{t("income.description")}</Label>
           <Input
             placeholder={t("income.placeholderDescription")}
@@ -227,16 +227,15 @@ function AddIncomeForm({
           />
         </div>
       </div>
-      <DsSheetActions className="grid grid-cols-2 gap-2 pt-2">
+      <DsSheetActions className="flex justify-end gap-3">
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           onClick={onCancel}
-          className="w-full"
         >
           {t("common.cancel")}
         </Button>
-        <Button type="submit" className="w-full">
+        <Button type="submit">
           {t("common.add")}
         </Button>
       </DsSheetActions>

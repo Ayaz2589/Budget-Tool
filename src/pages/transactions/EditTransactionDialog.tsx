@@ -161,17 +161,20 @@ export function EditTransactionDialog({
     onClose();
   };
 
+  const fieldClass = "h-11 w-full min-w-0";
+  const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
+
   return (
     <Sheet open={expense !== null} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
         desktopVariant="modal"
-        desktopModalSize="wide"
+        desktopModalSize="standard"
         showCloseButton={true}
-        className="p-0 gap-0 overflow-y-auto"
+        className="flex flex-col p-0 gap-0 overflow-hidden"
       >
         <DsSheetHeader title={t("common.edit")} />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-5 pt-4 pb-6 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 px-5 pt-4 pb-8 content-start">
           <div className="space-y-2">
             <Label>{t("common.date")}</Label>
             <DatePicker
@@ -181,7 +184,7 @@ export function EditTransactionDialog({
               }
               triggerLabel={date}
               placeholder={t("common.date")}
-              triggerClassName="h-11 w-full"
+              triggerClassName={fieldClass}
             />
           </div>
 
@@ -192,7 +195,7 @@ export function EditTransactionDialog({
               inputMode="decimal"
               value={amount}
               onChange={(e) => setAmount(formatCurrencyInput(e.target.value))}
-              className="h-11"
+              className={fieldClass}
             />
           </div>
 
@@ -201,7 +204,7 @@ export function EditTransactionDialog({
             <Input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="h-11"
+              className={fieldClass}
             />
           </div>
 
@@ -211,7 +214,7 @@ export function EditTransactionDialog({
               value={effectiveSource}
               onValueChange={(v) => setSource(v as ExpenseSource)}
             >
-              <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
+              <SelectTrigger className={selectTriggerClass}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -247,7 +250,7 @@ export function EditTransactionDialog({
               noneLabel={t("common.uncategorized")}
               noneValue="_"
               renderOption={(name) => <CategoryOption name={name} type="expense" />}
-              className="h-11 w-full"
+              className={selectTriggerClass}
             />
           </div>
 
@@ -272,7 +275,7 @@ export function EditTransactionDialog({
               }}
               noneLabel={t("common.noOwner")}
               noneValue="_none"
-              className="h-11 w-full"
+              className={selectTriggerClass}
             />
           </div>
 
@@ -295,7 +298,7 @@ export function EditTransactionDialog({
                 }
               }}
             >
-              <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
+              <SelectTrigger className={selectTriggerClass}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -315,7 +318,7 @@ export function EditTransactionDialog({
                   setAllocationOwners(value === "_none" ? [] : [value])
                 }
               >
-                <SelectTrigger className="h-11 w-full data-[size=default]:h-11">
+                <SelectTrigger className={selectTriggerClass}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -368,7 +371,7 @@ export function EditTransactionDialog({
                       min="0"
                       step="0.01"
                       placeholder="0"
-                      className="h-11"
+                      className={fieldClass}
                       value={allocationPercents[entryOwner] ?? ""}
                       onChange={(event) =>
                         setAllocationPercents((prev) => ({
@@ -384,8 +387,8 @@ export function EditTransactionDialog({
           ) : null}
           </div>
         </div>
-        <DsSheetActions className="grid grid-cols-2 gap-3 pb-4">
-          <Button type="button" variant="outline" onClick={onClose}>
+        <DsSheetActions className="flex justify-end gap-3">
+          <Button type="button" variant="ghost" onClick={onClose}>
             {t("common.cancel")}
           </Button>
           <Button type="button" onClick={handleSave}>

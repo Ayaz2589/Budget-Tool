@@ -40,7 +40,6 @@ export function IncomeActionsDialog({
   t,
 }: IncomeActionsDialogProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const actionButtonClass = "w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
 
   if (income === null) return null;
@@ -144,26 +143,20 @@ export function IncomeActionsDialog({
               </div>
             </div>
           </div>
-          <DsSheetActions>
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                variant="outline"
-                density="compact"
-                className={actionButtonClass}
-                onClick={handleEdit}
-              >
-                {t("common.edit")}
-              </Button>
-              <Button
-                variant="destructive"
-                density="compact"
-                className={actionButtonClass}
-                onClick={handleDeleteClick}
-              >
-                <Trash2 className="size-4" />
-                {t("common.delete")}
-              </Button>
-            </div>
+          <DsSheetActions className="flex justify-end gap-3">
+            <Button
+              variant="ghost"
+              onClick={handleEdit}
+            >
+              {t("common.edit")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteClick}
+            >
+              <Trash2 className="size-4" />
+              {t("common.delete")}
+            </Button>
           </DsSheetActions>
         </SheetContent>
       </Sheet>

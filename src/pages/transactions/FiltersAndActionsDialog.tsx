@@ -56,7 +56,7 @@ export function FiltersAndActionsDialog({
       <SheetContent
         side={sheetSide}
         desktopVariant="modal"
-        desktopModalSize="wide"
+        desktopModalSize="standard"
         showCloseButton={true}
         data-tour="transactions-filters-sheet"
        
@@ -130,7 +130,7 @@ export function FiltersAndActionsDialog({
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className={`${selectTriggerClass} flex items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs`}
+                      className={`${selectTriggerClass} flex items-center justify-between rounded-[var(--radius-control)] border border-[var(--control-border)] bg-[var(--field-surface)] px-3 py-2 text-sm shadow-[var(--field-shadow)] transition-[background-color,border-color,box-shadow,color] outline-none hover:bg-[var(--control-hover)] hover:border-[var(--border-strong)] focus-visible:border-[var(--focus-ring)] focus-visible:ring-[var(--focus-ring)]/45 focus-visible:ring-[3px]`}
                     >
                       <span className="truncate text-left">
                         {categoryFilter.length === 0
@@ -245,13 +245,11 @@ export function FiltersAndActionsDialog({
           </section>
 
         </div>
-        <DsSheetActions className="py-3">
+        <DsSheetActions className="flex justify-end gap-3">
           <Button
             type="button"
-            variant="outline"
-            density="compact"
+            variant="ghost"
             onClick={handleCancel}
-            className="w-full"
           >
             {t("common.cancel")}
           </Button>

@@ -43,7 +43,6 @@ export function ExpenseActionsDialog({
         ? t("addTransaction.splitCustom")
         : t("addTransaction.splitSingle");
 
-  const actionButtonClass = "w-full";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   const sheetSide = "right";
 
@@ -139,27 +138,21 @@ export function ExpenseActionsDialog({
             </div>
           </div>
         </div>
-        <DsSheetActions>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              variant="outline"
-              density="compact"
-              className={actionButtonClass}
-              onClick={() => onEdit(expense)}
-            >
-              <Pencil className="size-4" />
-              {t("common.edit")}
-            </Button>
-            <Button
-              variant="destructive"
-              density="compact"
-              className={actionButtonClass}
-              onClick={handleDelete}
-            >
-              <Trash2 className="size-4" />
-              {t("common.delete")}
-            </Button>
-          </div>
+        <DsSheetActions className="flex justify-end gap-3">
+          <Button
+            variant="ghost"
+            onClick={() => onEdit(expense)}
+          >
+            <Pencil className="size-4" />
+            {t("common.edit")}
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+          >
+            <Trash2 className="size-4" />
+            {t("common.delete")}
+          </Button>
         </DsSheetActions>
       </SheetContent>
     </Sheet>

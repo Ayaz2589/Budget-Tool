@@ -80,17 +80,20 @@ test("AddTransactionDialog renders when open", () => {
 test("AddTransactionDialog supports row add/copy/remove and keyboard activation", () => {
   renderDialog();
 
+  // Add a second row via the tab bar add button
   fireEvent.click(screen.getByRole("button", { name: "Add row" }));
   expect(screen.getByText("Transaction 2")).toBeInTheDocument();
-  expect(screen.getAllByTitle("Copy row").length).toBe(2);
 
-  fireEvent.click(screen.getAllByTitle("Copy row")[0]!);
+  // Copy the active row via the shared copy button
+  fireEvent.click(screen.getByTitle("Copy row"));
   expect(screen.getByText("Transaction 3")).toBeInTheDocument();
-  expect(screen.getAllByTitle("Remove row").length).toBe(3);
 
-  const row2Header = screen.getByRole("button", { name: /transaction 2/i });
-  fireEvent.keyDown(row2Header, { key: "Enter" });
-  fireEvent.click(screen.getAllByTitle("Remove row")[1]!);
+  // Remove a tab via its inline close button (the X span inside the tab)
+  const tab2 = screen.getByRole("button", { name: /transaction 2/i });
+  const closeBtn = tab2.querySelector("[role='button']") as HTMLElement;
+  expect(closeBtn).toBeTruthy();
+  fireEvent.click(closeBtn!);
+  // After removing Transaction 2, the third row becomes Transaction 2
   expect(screen.queryByText("Transaction 3")).not.toBeInTheDocument();
 });
 

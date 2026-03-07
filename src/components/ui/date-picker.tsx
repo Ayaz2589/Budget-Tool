@@ -80,13 +80,15 @@ export function DatePicker({
       }}
     >
       <PopoverTrigger asChild>
-        <Button
+        <button
           type="button"
-          variant="outline"
-          className={cn("justify-start px-3 font-normal", triggerClassName)}
+          className={cn(
+            "inline-flex items-center justify-start gap-2 rounded-[var(--radius-control)] border border-[var(--control-border)] bg-[var(--field-surface)] px-3 text-sm text-[var(--text-primary)] shadow-[var(--field-shadow)] transition-[background-color,border-color,box-shadow,color] outline-none hover:bg-[var(--control-hover)] hover:border-[var(--border-strong)] focus-visible:border-[var(--focus-ring)] focus-visible:ring-[var(--focus-ring)]/45 focus-visible:ring-[3px]",
+            triggerClassName,
+          )}
         >
           {triggerLabel || placeholder || "Select date"}
-        </Button>
+        </button>
       </PopoverTrigger>
       <PopoverContent
         align="start"

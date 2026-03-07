@@ -56,27 +56,21 @@ export function TransferActionsDialog({
             ) : null}
           </div>
         </div>
-        <DsSheetActions>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              variant="outline"
-              density="compact"
-              className="w-full"
-              onClick={() => onEdit(transfer)}
-            >
-              <Pencil className="size-4" />
-              {t("common.edit")}
-            </Button>
-            <Button
-              variant="destructive"
-              density="compact"
-              className="w-full"
-              onClick={() => onDelete(transfer)}
-            >
-              <Trash2 className="size-4" />
-              {t("common.delete")}
-            </Button>
-          </div>
+        <DsSheetActions className="flex justify-end gap-3">
+          <Button
+            variant="ghost"
+            onClick={() => onEdit(transfer)}
+          >
+            <Pencil className="size-4" />
+            {t("common.edit")}
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => onDelete(transfer)}
+          >
+            <Trash2 className="size-4" />
+            {t("common.delete")}
+          </Button>
         </DsSheetActions>
       </SheetContent>
     </Sheet>

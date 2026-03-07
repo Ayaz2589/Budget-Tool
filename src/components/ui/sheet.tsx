@@ -100,10 +100,10 @@ const SheetContent = ({
         >
           <motion.div
             className={cn(
-              "fixed inset-0 z-50 m-auto bg-[var(--surface-0)] shadow-lg",
-              className,
-              "h-fit max-h-[90vh] w-full overflow-y-auto rounded-xl border-0",
-              modalSizeClasses[desktopModalSize]
+              "fixed inset-0 z-50 m-auto bg-[var(--surface-1)] shadow-lg",
+              "h-fit max-h-[90vh] w-full overflow-y-auto rounded-md border border-[var(--border-subtle)]",
+              modalSizeClasses[desktopModalSize],
+              className
             )}
             variants={modalVariants}
             initial="initial"

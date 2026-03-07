@@ -1,5 +1,8 @@
+import { withTimeout } from "@/lib/platform/withTimeout";
+
 const DRIVE_API = "https://www.googleapis.com/drive/v3/files";
 const SHEETS_API = "https://sheets.googleapis.com/v4/spreadsheets";
+const API_TIMEOUT_MS = 30_000;
 
 export const ORTHO_FOLDER_NAME = "Ortho";
 export const ORTHO_SHEET_NAME = "Ortho Budget";
@@ -12,14 +15,17 @@ async function driveRequest<T>(
   url: string,
   init?: RequestInit,
 ): Promise<T> {
-  const res = await fetch(url, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
-  });
+  const res = await withTimeout(
+    fetch(url, {
+      ...init,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        ...(init?.headers ?? {}),
+      },
+    }),
+    API_TIMEOUT_MS,
+  );
   if (!res.ok) {
     const body = await res.text();
     throw new Error(`Drive API failed: ${res.status} ${body}`);
@@ -133,16 +139,19 @@ export async function createSheetInFolder(
   folderId: string,
   sheetName: string,
 ): Promise<{ id: string; name: string }> {
-  const createRes = await fetch(SHEETS_API, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      properties: { title: sheetName },
+  const createRes = await withTimeout(
+    fetch(SHEETS_API, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        properties: { title: sheetName },
+      }),
     }),
-  });
+    API_TIMEOUT_MS,
+  );
   if (!createRes.ok) {
     const body = await createRes.text();
     throw new Error(`Sheets API failed: ${createRes.status} ${body}`);

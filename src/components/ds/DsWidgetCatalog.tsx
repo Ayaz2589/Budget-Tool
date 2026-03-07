@@ -31,7 +31,7 @@ export function DsWidgetCatalog({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="flex flex-col p-0 gap-0 w-80 sm:w-96">
+      <SheetContent side="right" desktopVariant="modal" desktopModalSize="compact" className="flex flex-col p-0 gap-0 w-80 sm:w-96 md:w-auto">
         <DsSheetHeader
           title={t("widget.manageWidgets")}
           description={t("widget.catalogDescription")}

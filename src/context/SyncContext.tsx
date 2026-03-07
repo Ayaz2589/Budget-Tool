@@ -12,7 +12,7 @@ import i18n from "@/i18n";
 import { useBudget } from "./BudgetContext";
 import { usePresetTransactions } from "./PresetTransactionsContext";
 import { computeAllTotals, computeGrandTotals } from "@/lib/domain/totals";
-import { readDataBlob, writeDataBlob } from "@/lib/sheets/data";
+import { readDataBlob, writeDataBlob, readSyncTimestamp, writeSyncTimestamp } from "@/lib/sheets/data";
 import { writeTotalsSheet } from "@/lib/sheets/totals";
 import { createSheetsClient } from "@/lib/sheets/client";
 import { isGenjutsuError, generateId } from "genjutsu-db";
@@ -24,89 +24,19 @@ import { isDisplayCurrency } from "@/types/currency";
 import { isSpreadsheetActive } from "@/lib/google/googleDrive";
 import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 import { withTimeout, TimeoutError } from "@/lib/platform/withTimeout";
+import {
+  syncMachineReducer,
+  AUTO_SYNC_DEBOUNCE_MS,
+  AUTO_SYNC_INTERVAL_MS,
+  SYNC_RATE_LIMIT_BASE_DELAY_MS,
+  SYNC_RATE_LIMIT_MAX_DELAY_MS,
+  SYNC_TIMEOUT_MS,
+  MAX_SYNC_RETRIES,
+  ROW_COUNT_WARNING,
+  ROW_COUNT_LIMIT,
+} from "@/lib/sync/syncMachine";
+import { createDirtyTracker, type SyncModelName } from "@/lib/sync/dirtyTracking";
 import type { SyncHealth, SyncStatus } from "@/types/auth";
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const AUTO_SYNC_DEBOUNCE_MS = 2_000;
-const AUTO_SYNC_INTERVAL_MS = 5 * 60_000;
-const SYNC_RATE_LIMIT_BASE_DELAY_MS = 3_000;
-const SYNC_RATE_LIMIT_MAX_DELAY_MS = 30_000;
-const SYNC_TIMEOUT_MS = 60_000;
-
-// ---------------------------------------------------------------------------
-// Sync state machine (replaces 10+ useRef declarations)
-// ---------------------------------------------------------------------------
-
-interface SyncMachineState {
-  status: SyncStatus;
-  errorMessage: string | null;
-  health: SyncHealth;
-  lastSyncAt: number | null;
-  hasUnsyncedChanges: boolean;
-  isAutoSyncEnabled: boolean;
-}
-
-type SyncMachineAction =
-  | { type: "START_SYNC" }
-  | { type: "SYNC_SUCCESS"; timestamp: number; hasUnsyncedChanges: boolean }
-  | {
-      type: "SYNC_ERROR";
-      message: string;
-      health: SyncHealth;
-      status?: SyncStatus;
-    }
-  | { type: "SET_UNSYNCED"; hasUnsyncedChanges: boolean; health: SyncHealth }
-  | { type: "SET_AUTO_SYNC"; enabled: boolean }
-  | { type: "RESET_UNSYNCED" }
-  | { type: "RESET" };
-
-function syncMachineReducer(
-  state: SyncMachineState,
-  action: SyncMachineAction,
-): SyncMachineState {
-  switch (action.type) {
-    case "START_SYNC":
-      return { ...state, status: "syncing", errorMessage: null };
-    case "SYNC_SUCCESS":
-      return {
-        ...state,
-        status: "success",
-        errorMessage: null,
-        health: "healthy",
-        lastSyncAt: action.timestamp,
-        hasUnsyncedChanges: action.hasUnsyncedChanges,
-      };
-    case "SYNC_ERROR":
-      return {
-        ...state,
-        status: action.status ?? "error",
-        errorMessage: action.message,
-        health: action.health,
-      };
-    case "SET_UNSYNCED":
-      return {
-        ...state,
-        hasUnsyncedChanges: action.hasUnsyncedChanges,
-        health: action.health,
-      };
-    case "SET_AUTO_SYNC":
-      return { ...state, isAutoSyncEnabled: action.enabled };
-    case "RESET_UNSYNCED":
-      return { ...state, hasUnsyncedChanges: false, health: "healthy" };
-    case "RESET":
-      return {
-        status: "idle",
-        errorMessage: null,
-        health: "healthy",
-        lastSyncAt: null,
-        hasUnsyncedChanges: false,
-        isAutoSyncEnabled: state.isAutoSyncEnabled,
-      };
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Context value type
@@ -166,7 +96,10 @@ export function SyncProvider({
   const syncQueuedRef = useRef(false);
   const nextSyncAllowedAtRef = useRef(0);
   const retryBackoffMsRef = useRef(SYNC_RATE_LIMIT_BASE_DELAY_MS);
+  const retryCountRef = useRef(0);
   const retryTimerRef = useRef<number | null>(null);
+  const lastPushedTimestampRef = useRef<number | null>(null);
+  const dirtyTrackerRef = useRef(createDirtyTracker());
 
   // Sync signature (used for change detection)
   const syncSignature = useMemo(
@@ -269,10 +202,13 @@ export function SyncProvider({
     syncQueuedRef.current = false;
     nextSyncAllowedAtRef.current = 0;
     retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+    retryCountRef.current = 0;
+    lastPushedTimestampRef.current = null;
     if (retryTimerRef.current != null) {
       window.clearTimeout(retryTimerRef.current);
       retryTimerRef.current = null;
     }
+    dirtyTrackerRef.current.reset();
   }, []);
 
   // Reset sync state when spreadsheet or access token changes
@@ -322,12 +258,78 @@ export function SyncProvider({
       const snapshot = getSyncSnapshot();
       const db = createSheetsClient(spreadsheetId, async () => accessToken);
       await withTimeout(db.ensureSchema(), SYNC_TIMEOUT_MS);
+
+      // Conflict detection: check if another device pushed since our last sync
+      const remoteTimestamp = await withTimeout(readSyncTimestamp(db), SYNC_TIMEOUT_MS);
+      if (lastPushedTimestampRef.current !== null && remoteTimestamp !== null &&
+          remoteTimestamp > lastPushedTimestampRef.current) {
+        dispatchSync({
+          type: "SYNC_ERROR",
+          message: i18n.t("auth.syncConflictDetected", {
+            defaultValue: "Data was modified on another device. Pull latest data first.",
+          }),
+          health: "warning",
+        });
+        return; // Don't overwrite — let user pull first
+      }
+
       const nonMortgageExpenses = snapshot.expenses.filter(
         (e) => !isMortgageCategory(e.category),
       );
       const mortgageExpenses = snapshot.expenses.filter((e) =>
         isMortgageCategory(e.category),
       );
+
+      // Row count validation (#97)
+      const modelCounts: Record<string, number> = {
+        expenses: nonMortgageExpenses.length,
+        mortgage: mortgageExpenses.length,
+        income: snapshot.income.length,
+        debts: snapshot.debts.length,
+        debtPayments: snapshot.debtPayments.length,
+        ownerTransfers: (snapshot.ownerTransfers ?? []).length,
+        presetTransactions: snapshot.presetTransactions.length,
+      };
+      for (const [model, count] of Object.entries(modelCounts)) {
+        if (count > ROW_COUNT_LIMIT) {
+          dispatchSync({
+            type: "SYNC_ERROR",
+            message: i18n.t("auth.syncRowLimitExceeded", {
+              defaultValue: `${model} has ${count} rows, exceeding the ${ROW_COUNT_LIMIT} row limit. Please archive old data before syncing.`,
+            }),
+            health: "error",
+          });
+          return; // abort sync — don't silently truncate
+        }
+        if (count > ROW_COUNT_WARNING) {
+          console.warn(
+            `[sync] ${model} has ${count} rows — approaching the ${ROW_COUNT_LIMIT} row limit`,
+          );
+        }
+      }
+
+      // Dirty tracking: skip sync if no model data has changed since last push
+      const tracker = dirtyTrackerRef.current;
+      const dirtyEntries: Array<[SyncModelName, unknown[]]> = [
+        ["expenses", nonMortgageExpenses],
+        ["mortgage", mortgageExpenses],
+        ["income", snapshot.income],
+        ["debts", snapshot.debts],
+        ["debtPayments", snapshot.debtPayments],
+        ["ownerTransfers", snapshot.ownerTransfers ?? []],
+        ["presetTransactions", snapshot.presetTransactions],
+      ];
+      if (!tracker.isAnyDirty(dirtyEntries)) {
+        // Nothing changed — skip the push entirely
+        lastSyncedSignatureRef.current = snapshot.signature;
+        dispatchSync({
+          type: "SYNC_SUCCESS",
+          timestamp: Date.now(),
+          hasUnsyncedChanges: false,
+        });
+        return;
+      }
+
       const dataBlob = serializeToBlob({
         expenses: snapshot.expenses,
         income: snapshot.income,
@@ -410,6 +412,13 @@ export function SyncProvider({
       await withTimeout(writeDataBlob(db, dataBlob), SYNC_TIMEOUT_MS);
       await withTimeout(writeTotalsSheet(db, months, grand), SYNC_TIMEOUT_MS);
       await withTimeout(db.applyFormatting(), SYNC_TIMEOUT_MS);
+      const pushTimestamp = Date.now();
+      await withTimeout(writeSyncTimestamp(db, pushTimestamp), SYNC_TIMEOUT_MS);
+      lastPushedTimestampRef.current = pushTimestamp;
+      // Mark all models as synced for dirty tracking
+      for (const [model, data] of dirtyEntries) {
+        tracker.markSynced(model, data);
+      }
       lastSyncedSignatureRef.current = snapshot.signature;
       const changed =
         latestSyncSignatureRef.current !== lastSyncedSignatureRef.current;
@@ -419,6 +428,7 @@ export function SyncProvider({
         hasUnsyncedChanges: changed,
       });
       retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+      retryCountRef.current = 0;
       nextSyncAllowedAtRef.current = 0;
     } catch (err) {
       console.error("Sync failed:", err);
@@ -439,6 +449,21 @@ export function SyncProvider({
             });
             break;
           case "RATE_LIMIT": {
+            retryCountRef.current += 1;
+            if (retryCountRef.current >= MAX_SYNC_RETRIES) {
+              retryCountRef.current = 0;
+              retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+              nextSyncAllowedAtRef.current = 0;
+              dispatchSync({
+                type: "SYNC_ERROR",
+                message: i18n.t("auth.syncMaxRetriesExceeded", {
+                  defaultValue:
+                    "Sync failed after multiple retries. Please try again manually.",
+                }),
+                health: "error",
+              });
+              break;
+            }
             syncQueuedRef.current = true;
             const delay =
               err.retryAfterMs ?? retryBackoffMsRef.current;
@@ -519,6 +544,7 @@ export function SyncProvider({
       lastSyncedSignatureRef.current = null;
       nextSyncAllowedAtRef.current = 0;
       retryBackoffMsRef.current = SYNC_RATE_LIMIT_BASE_DELAY_MS;
+      retryCountRef.current = 0;
       if (retryTimerRef.current != null) {
         window.clearTimeout(retryTimerRef.current);
         retryTimerRef.current = null;
@@ -823,7 +849,11 @@ export function SyncProvider({
               fxAsOf: expanded.fxAsOf ?? budget.uiFormatSettings.fxAsOf,
             });
           }
-        } catch {
+        } catch (blobErr) {
+          console.warn(
+            "V2 blob read failed, falling back to individual sheet tabs:",
+            blobErr,
+          );
           const result = await readFromSheetTabs();
           sheetExpenses = result.expenses;
           sheetMortgage = result.mortgage;
@@ -966,6 +996,7 @@ export function SyncProvider({
         hasUnsyncedChanges: false,
       });
       lastSyncedSignatureRef.current = latestSyncSignatureRef.current;
+      lastPushedTimestampRef.current = await readSyncTimestamp(db).catch(() => null);
     } catch (err) {
       console.error("Restore from sheet failed:", err);
       if (err instanceof TimeoutError) {

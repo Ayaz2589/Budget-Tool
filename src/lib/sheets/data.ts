@@ -21,3 +21,21 @@ export async function readDataBlob(
   const value = String(rows[0][0] ?? "").trim();
   return value || null;
 }
+
+/** Write sync timestamp to Data!B1 */
+export async function writeSyncTimestamp(
+  db: SheetsClient,
+  timestamp: number,
+): Promise<void> {
+  await db.raw.writeRange("Data!B1", [[timestamp]]);
+}
+
+/** Read sync timestamp from Data!B1. Returns null if empty. */
+export async function readSyncTimestamp(
+  db: SheetsClient,
+): Promise<number | null> {
+  const rows = await db.raw.readRange("Data!B1", "UNFORMATTED_VALUE");
+  if (!rows.length || !rows[0]?.length) return null;
+  const value = Number(rows[0][0]);
+  return Number.isFinite(value) ? value : null;
+}

@@ -53,6 +53,17 @@ export function buildTotalsValues(months: MonthTotals[], grandTotal: MonthTotals
   ];
 }
 
+/** Convert a 0-based column index to a spreadsheet column letter (0→A, 25→Z, 26→AA). */
+function colLetter(index: number): string {
+  let result = "";
+  let n = index;
+  while (n >= 0) {
+    result = String.fromCharCode((n % 26) + 65) + result;
+    n = Math.floor(n / 26) - 1;
+  }
+  return result;
+}
+
 /** Clear and rewrite the Totals sheet with monthly summaries and a grand total row. */
 export async function writeTotalsSheet(
   db: SheetsClient,
@@ -60,7 +71,10 @@ export async function writeTotalsSheet(
   grandTotal: MonthTotals,
 ): Promise<void> {
   const rows = buildTotalsValues(months, grandTotal);
-  const range = "Totals!A1:Z100";
+  const numCols = rows[0]?.length ?? 1;
+  const numRows = rows.length;
+  const endCol = colLetter(numCols - 1);
+  const range = `Totals!A1:${endCol}${numRows}`;
   await db.raw.clearRange(range);
   await db.raw.writeRange(range, rows);
 }

@@ -1,6 +1,6 @@
-import { test, expect } from "bun:test";
+import { test, expect, describe } from "bun:test";
 import pako from "pako";
-import { serializeToBlob, parseFromBlob } from "@/lib/export/minifiedPayload";
+import { serializeToBlob, parseFromBlob, BlobChecksumError } from "@/lib/export/minifiedPayload";
 
 test("serializeToBlob and parseFromBlob round-trip", () => {
   const input = {
@@ -103,7 +103,10 @@ test("serializeToBlob always includes ec and ic in encoded payload (empty arrays
     debtPayments: [],
     presetTransactions: [],
   });
-  const base64Part = blob.slice(2);
+  // New format: V2<8-char-checksum>.<base64>
+  const afterPrefix = blob.slice(2);
+  const dotIndex = afterPrefix.indexOf(".");
+  const base64Part = dotIndex >= 0 ? afterPrefix.slice(dotIndex + 1) : afterPrefix;
   const binary = atob(base64Part);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
@@ -115,4 +118,47 @@ test("serializeToBlob always includes ec and ic in encoded payload (empty arrays
   expect(Array.isArray(raw.ic)).toBe(true);
   expect(raw.ec).toEqual([]);
   expect(raw.ic).toEqual([]);
+});
+
+describe("V2 blob checksum", () => {
+  test("blob format includes checksum prefix", () => {
+    const blob = serializeToBlob({
+      expenses: [],
+      income: [],
+      debts: [],
+      debtPayments: [],
+      presetTransactions: [],
+    });
+    // Format: V2<8-hex-chars>.<base64>
+    expect(blob.startsWith("V2")).toBe(true);
+    const afterV2 = blob.slice(2);
+    expect(afterV2[8]).toBe(".");
+    expect(/^[0-9a-f]{8}$/.test(afterV2.slice(0, 8))).toBe(true);
+  });
+
+  test("parseFromBlob detects corrupted checksum", () => {
+    const blob = serializeToBlob({
+      expenses: [],
+      income: [],
+      debts: [],
+      debtPayments: [],
+      presetTransactions: [],
+    });
+    // Corrupt the checksum by replacing first char
+    const corrupted = "V2" + "00000000" + blob.slice(10);
+    expect(() => parseFromBlob(corrupted)).toThrow(BlobChecksumError);
+  });
+
+  test("parseFromBlob reads legacy blobs without checksum", () => {
+    // Create a legacy-format blob (V2 + base64 directly, no checksum)
+    const payload = JSON.stringify({ e: [], i: [], d: [], dp: [], ot: [], pt: [], ec: [], ic: [] });
+    const compressed = pako.gzip(new TextEncoder().encode(payload));
+    let binary = "";
+    for (let i = 0; i < compressed.length; i++) {
+      binary += String.fromCharCode(compressed[i]!);
+    }
+    const legacyBlob = "V2" + btoa(binary);
+    const expanded = parseFromBlob(legacyBlob);
+    expect(expanded.expenses).toEqual([]);
+  });
 });

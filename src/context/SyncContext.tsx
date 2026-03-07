@@ -23,6 +23,7 @@ import { isMortgageCategory } from "@/lib/domain/mortgageCategory";
 import { isDisplayCurrency } from "@/types/currency";
 import { isSpreadsheetActive } from "@/lib/google/googleDrive";
 import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
+import { withTimeout, TimeoutError } from "@/lib/platform/withTimeout";
 import type { SyncHealth, SyncStatus } from "@/types/auth";
 
 // ---------------------------------------------------------------------------
@@ -33,6 +34,7 @@ const AUTO_SYNC_DEBOUNCE_MS = 2_000;
 const AUTO_SYNC_INTERVAL_MS = 5 * 60_000;
 const SYNC_RATE_LIMIT_BASE_DELAY_MS = 3_000;
 const SYNC_RATE_LIMIT_MAX_DELAY_MS = 30_000;
+const SYNC_TIMEOUT_MS = 60_000;
 
 // ---------------------------------------------------------------------------
 // Sync state machine (replaces 10+ useRef declarations)
@@ -319,7 +321,7 @@ export function SyncProvider({
     try {
       const snapshot = getSyncSnapshot();
       const db = createSheetsClient(spreadsheetId, async () => accessToken);
-      await db.ensureSchema();
+      await withTimeout(db.ensureSchema(), SYNC_TIMEOUT_MS);
       const nonMortgageExpenses = snapshot.expenses.filter(
         (e) => !isMortgageCategory(e.category),
       );
@@ -348,7 +350,7 @@ export function SyncProvider({
         owners: snapshot.owners,
       });
       const grand = computeGrandTotals(months);
-      await db.batchSync({
+      await withTimeout(db.batchSync({
         expenses: nonMortgageExpenses.map((e) => ({
           id: e.id,
           date: e.date,
@@ -403,11 +405,11 @@ export function SyncProvider({
           category: p.category || "Uncategorized",
           owner: p.owner,
         })),
-      });
+      }), SYNC_TIMEOUT_MS);
       // Data blob and Totals are special cases — written separately
-      await writeDataBlob(db, dataBlob);
-      await writeTotalsSheet(db, months, grand);
-      await db.applyFormatting();
+      await withTimeout(writeDataBlob(db, dataBlob), SYNC_TIMEOUT_MS);
+      await withTimeout(writeTotalsSheet(db, months, grand), SYNC_TIMEOUT_MS);
+      await withTimeout(db.applyFormatting(), SYNC_TIMEOUT_MS);
       lastSyncedSignatureRef.current = snapshot.signature;
       const changed =
         latestSyncSignatureRef.current !== lastSyncedSignatureRef.current;
@@ -420,7 +422,13 @@ export function SyncProvider({
       nextSyncAllowedAtRef.current = 0;
     } catch (err) {
       console.error("Sync failed:", err);
-      if (isGenjutsuError(err)) {
+      if (err instanceof TimeoutError) {
+        dispatchSync({
+          type: "SYNC_ERROR",
+          message: i18n.t("auth.syncTimedOut"),
+          health: "warning",
+        });
+      } else if (isGenjutsuError(err)) {
         switch (err.kind) {
           case "AUTH_ERROR":
             clearSession();
@@ -611,7 +619,7 @@ export function SyncProvider({
     dispatchSync({ type: "START_SYNC" });
     try {
       const db = createSheetsClient(spreadsheetId, async () => accessToken);
-      await db.ensureSchema();
+      await withTimeout(db.ensureSchema(), SYNC_TIMEOUT_MS);
 
       // Helper: read all 7 domain sheets via genjutsu-db and convert to app types
       const readFromSheetTabs = async () => {
@@ -771,7 +779,7 @@ export function SyncProvider({
       let sheetOwnerTransfers: typeof budget.ownerTransfers;
       let sheetPresets: typeof presetTransactions;
 
-      const blob = await readDataBlob(db);
+      const blob = await withTimeout(readDataBlob(db), SYNC_TIMEOUT_MS);
       if (blob && blob.startsWith("V2")) {
         try {
           const expanded = parseFromBlob(blob);
@@ -960,7 +968,13 @@ export function SyncProvider({
       lastSyncedSignatureRef.current = latestSyncSignatureRef.current;
     } catch (err) {
       console.error("Restore from sheet failed:", err);
-      if (isGenjutsuError(err)) {
+      if (err instanceof TimeoutError) {
+        dispatchSync({
+          type: "SYNC_ERROR",
+          message: i18n.t("auth.syncTimedOut"),
+          health: "warning",
+        });
+      } else if (isGenjutsuError(err)) {
         switch (err.kind) {
           case "AUTH_ERROR":
             clearSession();

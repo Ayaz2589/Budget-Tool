@@ -52,7 +52,8 @@
     "signInWithGoogle": "Google",
     "valuePropSubtitle": "Sync with Google Sheets. No credit card needed.",
     "valuePropTitle": "Track expenses, income, and budgets.",
-    "dummyDataSyncBlocked": "Dummy data sync and restore are disabled. Turn off dummy data in Settings to use Google Sheets."
+    "dummyDataSyncBlocked": "Dummy data sync and restore are disabled. Turn off dummy data in Settings to use Google Sheets.",
+    "syncTimedOut": "Sync timed out — please check your connection and try again."
   },
   "common": {
     "actions": "Actions",

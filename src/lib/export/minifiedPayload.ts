@@ -289,7 +289,19 @@ export function expandPayload(raw: Record<string, unknown>): ExpandedPayload {
   };
 }
 
-/** Serialize payload to V2 blob string (gzip + Base64). */
+/** Simple CRC32 for integrity checking. */
+function crc32(data: string): string {
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < data.length; i++) {
+    crc ^= data.charCodeAt(i);
+    for (let j = 0; j < 8; j++) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+    }
+  }
+  return ((crc ^ 0xFFFFFFFF) >>> 0).toString(16).padStart(8, "0");
+}
+
+/** Serialize payload to V2 blob string (gzip + Base64 + CRC32 checksum). */
 export function serializeToBlob(input: MinifiedPayloadInput): string {
   const payload = buildMinifiedPayload(
     input.expenses,
@@ -313,16 +325,43 @@ export function serializeToBlob(input: MinifiedPayloadInput): string {
     binary += String.fromCharCode(compressed[i]!);
   }
   const base64Str = btoa(binary);
-  return "V2" + base64Str;
+  const checksum = crc32(base64Str);
+  return `V2${checksum}.${base64Str}`;
 }
 
-/** Parse V2 blob string to expanded payload. Throws if invalid. */
+export class BlobChecksumError extends Error {
+  constructor() {
+    super("V2 blob checksum mismatch — data may be corrupted");
+    this.name = "BlobChecksumError";
+  }
+}
+
+/**
+ * Parse V2 blob string to expanded payload. Throws if invalid.
+ * Supports both legacy format (V2<base64>) and checksummed format (V2<crc32>.<base64>).
+ */
 export function parseFromBlob(blob: string): ExpandedPayload {
   const trimmed = blob.replace(/\s/g, "").trim();
   if (!trimmed.startsWith("V2")) {
     throw new Error("Invalid blob: missing V2 prefix");
   }
-  const base64Part = trimmed.slice(2);
+  const afterPrefix = trimmed.slice(2);
+  let base64Part: string;
+
+  // New format: V2<8-char-hex>.<base64>
+  const dotIndex = afterPrefix.indexOf(".");
+  if (dotIndex === 8 && /^[0-9a-f]{8}$/i.test(afterPrefix.slice(0, 8))) {
+    const expectedChecksum = afterPrefix.slice(0, 8).toLowerCase();
+    base64Part = afterPrefix.slice(9);
+    const actualChecksum = crc32(base64Part);
+    if (actualChecksum !== expectedChecksum) {
+      throw new BlobChecksumError();
+    }
+  } else {
+    // Legacy format: V2<base64> (no checksum)
+    base64Part = afterPrefix;
+  }
+
   const binary = atob(base64Part);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) {

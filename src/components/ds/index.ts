@@ -13,6 +13,7 @@ export { DsActionBar } from "./DsActionBar";
 export { DsWidgetCard } from "./DsWidgetCard";
 export { DsWidgetShell } from "./DsWidgetShell";
 export { DsWidgetCatalog } from "./DsWidgetCatalog";
+export { DsLanguagePicker } from "./DsLanguagePicker";
 export { DsSidebarBrand } from "./DsSidebarBrand";
 export { DsSidebarNavItem } from "./DsSidebarNavItem";
 export {

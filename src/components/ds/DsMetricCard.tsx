@@ -6,8 +6,6 @@ interface DsMetricCardProps {
   value: React.ReactNode;
   subtitle?: React.ReactNode;
   sparkline?: React.ReactNode;
-  /** When true, pushes sparkline to the bottom of the card (use for larger sizes). */
-  sparklineBottom?: boolean;
   tone?: "neutral" | "positive" | "negative";
   className?: string;
 }
@@ -17,7 +15,6 @@ export function DsMetricCard({
   value,
   subtitle,
   sparkline,
-  sparklineBottom,
   tone = "neutral",
   className,
 }: DsMetricCardProps) {
@@ -40,7 +37,7 @@ export function DsMetricCard({
           <p className="text-sm text-muted-foreground ds-caption">{subtitle}</p>
         ) : null}
       </div>
-      {sparkline ? <div className={cn("-mb-3", sparklineBottom ? "mt-4" : "mt-2")}>{sparkline}</div> : null}
+      {sparkline ? <div className={cn("-mb-3 mt-auto")}>{sparkline}</div> : null}
     </div>
   );
 }

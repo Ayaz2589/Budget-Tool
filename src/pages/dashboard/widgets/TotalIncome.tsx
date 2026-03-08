@@ -42,7 +42,6 @@ export function TotalIncome({ totalIncome, sparklineRows, size = "sm" }: TotalIn
         </span>
       }
       value={formatCurrency(totalIncome)}
-      sparklineBottom={size === "lg"}
       sparkline={
         sparklineRows && sparklineRows.length > 1 ? (
           <ResponsiveContainer width={size === "lg" ? "100%" : "75%"} height={20}>

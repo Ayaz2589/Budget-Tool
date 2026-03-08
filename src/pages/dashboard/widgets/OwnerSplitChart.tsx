@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Cell, Pie, PieChart } from "recharts";
+import { Users } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { DsChartCard, DsEmptyState, DsLegendList } from "@/components/ds";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -42,7 +43,7 @@ export function OwnerSplitChart({
   if (ownerSlices.length === 0) {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <DsEmptyState title={t("dashboard.chartNoOwnerSplitData")} className="py-4" />
+        <DsEmptyState icon={<Users className="size-5" />} title={t("dashboard.chartNoOwnerSplitData")} className="py-4" />
       </DsChartCard>
     );
   }
@@ -71,7 +72,7 @@ export function OwnerSplitChart({
     );
   }
 
-  // Single-owner: skip pie chart, show direct summary at md/lg
+  // Single-owner: skip chart, show direct summary at md/lg
   if (ownerSlices.length === 1) {
     const single = ownerSlices[0];
     return (
@@ -143,38 +144,35 @@ export function OwnerSplitChart({
     );
   }
 
-  // lg: side-by-side large pie chart + legend on right
+  // lg: horizontal bar rows — each owner gets a labeled bar
+  const total = ownerSlices.reduce((sum, s) => sum + s.value, 0);
+  const maxValue = Math.max(...ownerSlices.map((s) => s.value));
+
   return (
     <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-      <div className="flex items-center gap-8">
-        <div className="w-[280px] shrink-0">
-          <ChartContainer config={chartConfig} heightMobile={200} heightDesktop={200}>
-            <PieChart>
-              <Pie
-                data={ownerSlices.filter((s) => s.value > 0)}
-                dataKey="value"
-                nameKey="label"
-                innerRadius={65}
-                outerRadius={100}
-                startAngle={180}
-                endAngle={0}
-                cx="50%"
-                cy="80%"
-                cornerRadius={0}
-                paddingAngle={0}
-                minAngle={5}
-              >
-                {ownerSlices.filter((s) => s.value > 0).map((slice, index) => (
-                  <Cell key={slice.key} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
-                ))}
-              </Pie>
-              <ChartTooltip content={tooltipContent} />
-            </PieChart>
-          </ChartContainer>
-        </div>
-        <div className="min-w-0 flex-1">
-          {legend}
-        </div>
+      <div className="space-y-4">
+        {ownerSlices.map((slice, index) => {
+          const pct = total > 0 ? Math.round((slice.value / total) * 100) : 0;
+          const barWidth = maxValue > 0 ? (slice.value / maxValue) * 100 : 0;
+          const color = DONUT_COLORS[index % DONUT_COLORS.length];
+          return (
+            <div key={slice.key} className="space-y-1.5">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-sm font-medium truncate">{slice.label}</span>
+                <span className="shrink-0 text-sm font-semibold">{formatCurrency(slice.value)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 flex-1 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${barWidth}%`, backgroundColor: color }}
+                  />
+                </div>
+                <span className="w-10 shrink-0 text-right text-xs text-muted-foreground">{pct}%</span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </DsChartCard>
   );

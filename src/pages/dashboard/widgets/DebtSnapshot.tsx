@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@/lib/format";
 import { clamp } from "@/lib/math";
+import { Landmark } from "lucide-react";
 import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { DashboardDebtRow } from "@/types/dashboard";
 import type { WidgetSize } from "@/lib/widgets/widget";
@@ -32,9 +33,9 @@ export function DebtSnapshot({ debtRows, size = "md" }: DebtSnapshotProps) {
 
   return (
     <div>
-      <h3 className="px-4 py-3 text-base font-semibold">{t("dashboard.sectionDebtSnapshot")}</h3>
+      <h3 className="py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground/80">{t("dashboard.sectionDebtSnapshot")}</h3>
       {debtRows.length === 0 ? (
-        <DsEmptyState title={t("dashboard.sectionNoActiveDebts")} className="py-4" />
+        <DsEmptyState icon={<Landmark className="size-5" />} title={t("dashboard.sectionNoActiveDebts")} className="py-4" />
       ) : (
         <>
           {displayRows.map((row) => (

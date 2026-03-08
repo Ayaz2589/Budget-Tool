@@ -7,6 +7,7 @@ import {
   YAxis,
 } from "recharts";
 import { formatCurrency } from "@/lib/format";
+import { BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DsChartCard, DsEmptyState, DsHelpTooltip } from "@/components/ds";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -72,10 +73,13 @@ export function CashFlowChart({
     </span>
   ) : t("dashboard.chartIncomeVsExpenses");
 
-  if (cashFlowDisplayRows.length === 0) {
+  const hasData = cashFlowDisplayRows.length > 0 &&
+    cashFlowDisplayRows.some((r) => r.incomeTotal > 0 || r.expensesTotal > 0 || r.debtPaymentsTotal > 0);
+
+  if (!hasData) {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <DsEmptyState title={t("dashboard.chartNoDataRange")} className="py-4" />
+        <DsEmptyState icon={<BarChart3 className="size-5" />} title={t("dashboard.chartNoDataRange")} className="py-4" />
       </DsChartCard>
     );
   }
@@ -119,7 +123,100 @@ export function CashFlowChart({
     />
   );
 
-  // lg (~588×664px): full chart with per-owner stacked bars, legend, axis labels
+  // lg: single-month layout — chart on left, summary on right
+  if (effectiveSize === "lg" && cashFlowDisplayRows.length === 1) {
+    const row = cashFlowDisplayRows[0];
+    const totalIncome = row.incomeTotal;
+    const totalExpenses = row.expensesTotal + (includeDebtPayments ? row.debtPaymentsTotal : 0);
+    const delta = totalIncome - totalExpenses;
+
+    return (
+      <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
+        <div className="flex items-start gap-8">
+          <div className="w-1/2 shrink-0">
+            <ChartContainer
+              config={{
+                expenses: { label: t("dashboard.chartExpenses"), color: "var(--viz-expense)" },
+                ...(includeDebtPayments
+                  ? { debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" } }
+                  : {}),
+              }}
+              heightMobile={200}
+              heightDesktop={240}
+            >
+              <BarChart data={cashFlowDisplayRows} barCategoryGap="30%">
+                <CartesianGrid vertical={false} />
+                <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} />
+                <YAxis />
+                <ChartTooltip content={tooltipContent} />
+                {incomeOwnerKeys.map((owner, index) => (
+                  <Bar
+                    key={owner}
+                    dataKey={`incomeByOwner.${owner}`}
+                    name={t("dashboard.chartIncomeOwner", { owner })}
+                    fill={INCOME_OWNER_COLORS[index % INCOME_OWNER_COLORS.length]}
+                    stackId="income"
+                    radius={index === incomeOwnerKeys.length - 1 ? [4, 4, 0, 0] : 0}
+                  />
+                ))}
+                <Bar dataKey="expensesTotal" name={t("dashboard.chartExpenses")} fill="var(--viz-expense)" stackId="outflow" />
+                {includeDebtPayments ? (
+                  <Bar dataKey="debtPaymentsTotal" name={t("dashboard.chartDebtPayments")} fill="var(--viz-debt)" stackId="outflow" />
+                ) : null}
+              </BarChart>
+            </ChartContainer>
+          </div>
+          <div className="flex-1 space-y-4 pt-2">
+            <div className="space-y-3">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm text-muted-foreground">{t("dashboard.chartIncome")}</span>
+                <span className="text-lg font-semibold text-emerald-500">{formatCurrency(totalIncome)}</span>
+              </div>
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm text-muted-foreground">{t("dashboard.chartExpenses")}</span>
+                <span className="text-lg font-semibold text-destructive">{formatCurrency(row.expensesTotal)}</span>
+              </div>
+              {includeDebtPayments && row.debtPaymentsTotal > 0 && (
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm text-muted-foreground">{t("dashboard.chartDebtPayments")}</span>
+                  <span className="text-lg font-semibold text-destructive">{formatCurrency(row.debtPaymentsTotal)}</span>
+                </div>
+              )}
+            </div>
+            <hr className="border-border/40" />
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm font-medium text-muted-foreground">{t("dashboard.netCashflow")}</span>
+              <span className={cn("text-xl font-bold", delta >= 0 ? "text-emerald-500" : "text-destructive")}>
+                {formatCurrency(delta)}
+              </span>
+            </div>
+            {incomeOwnerKeys.length > 1 && (
+              <div className="space-y-2 pt-2">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground/70">{t("dashboard.chartIncome")}</p>
+                {incomeOwnerKeys.map((owner, index) => {
+                  const ownerIncome = row.incomeByOwner[owner] ?? 0;
+                  return (
+                    <div key={owner} className="flex items-center justify-between">
+                      <span className="flex items-center gap-2 text-sm">
+                        <span
+                          className="inline-block size-2.5 rounded-full"
+                          style={{ backgroundColor: INCOME_OWNER_COLORS[index % INCOME_OWNER_COLORS.length] }}
+                        />
+                        {owner}
+                      </span>
+                      <span className="text-sm font-medium">{formatCurrency(ownerIncome)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </DsChartCard>
+    );
+  }
+
+  // lg: multi-month full chart with per-owner stacked bars, legend, axis labels
   if (effectiveSize === "lg") {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
@@ -130,8 +227,8 @@ export function CashFlowChart({
               ? { debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" } }
               : {}),
           }}
-          heightMobile={220}
-          heightDesktop={380}
+          heightMobile={200}
+          heightDesktop={300}
         >
           <BarChart data={cashFlowDisplayRows}>
             <CartesianGrid vertical={false} />

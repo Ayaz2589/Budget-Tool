@@ -83,27 +83,29 @@ test("Dashboard renders PRD sections", () => {
   expect(screen.getByText("Recent Activity")).toBeInTheDocument();
 });
 
-test("Dashboard shows helper text when mortgage is excluded", () => {
+test("Dashboard settings modal toggles mortgage exclusion", () => {
   localStorage.clear();
   render(<TestWrapper />);
   fireEvent.click(screen.getByRole("button", { name: "Settings" }));
-  fireEvent.click(screen.getByRole("button", { name: "Exclude Mortgage" }));
+  const switches = screen.getAllByRole("switch");
+  // Second switch: Exclude Mortgage (unchecked by default)
+  expect(switches[1]).toHaveAttribute("data-state", "unchecked");
+  fireEvent.click(switches[1]);
   return waitFor(() => {
-    expect(
-      screen.getByText("Mortgage excluded from expense totals"),
-    ).toBeInTheDocument();
+    expect(switches[1]).toHaveAttribute("data-state", "checked");
   });
 });
 
-test("Dashboard shows helper text when debt payments are excluded", () => {
+test("Dashboard settings modal toggles debt payment inclusion", () => {
   localStorage.clear();
   render(<TestWrapper />);
   fireEvent.click(screen.getByRole("button", { name: "Settings" }));
-  fireEvent.click(screen.getByRole("button", { name: "Exclude Debt" }));
+  const switches = screen.getAllByRole("switch");
+  // Third switch: Include Debt Payments (checked by default)
+  expect(switches[2]).toHaveAttribute("data-state", "checked");
+  fireEvent.click(switches[2]);
   return waitFor(() => {
-    expect(
-      screen.getByText("Debt payments excluded from dashboard totals and cash flow charts."),
-    ).toBeInTheDocument();
+    expect(switches[2]).toHaveAttribute("data-state", "unchecked");
   });
 });
 
@@ -131,7 +133,7 @@ test("Dashboard debt row is read-only", () => {
     }),
   );
   render(<TestWrapper />);
-  expect(screen.getByText("1 active debts")).toBeInTheDocument();
+  expect(screen.getByText("Car loan")).toBeInTheDocument();
   expect(screen.queryByText("/dashboard/debt?debtId=d1")).toBeNull();
 });
 

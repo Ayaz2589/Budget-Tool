@@ -117,7 +117,7 @@ export function DashboardGrid({ dashboardData }: DashboardGridProps) {
   const { t } = useTranslation();
 
   if (visibleItems.length === 0) {
-    return <DsEmptyState title={t("widget.noWidgetsVisible")} className="py-12" />;
+    return <DsEmptyState variant="hero" title={t("widget.noWidgetsVisible")} className="py-12" />;
   }
 
   return (

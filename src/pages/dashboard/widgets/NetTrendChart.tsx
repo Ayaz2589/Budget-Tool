@@ -7,6 +7,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { DsChartCard, DsEmptyState, DsHelpTooltip } from "@/components/ds";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -62,7 +63,7 @@ export function NetTrendChart({
   if (netCashFlowRows.length === 0) {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <DsEmptyState title={t("dashboard.chartNoNetCashFlowData")} className="py-4" />
+        <DsEmptyState icon={<TrendingUp className="size-5" />} title={t("dashboard.chartNoNetCashFlowData")} className="py-4" />
       </DsChartCard>
     );
   }
@@ -205,7 +206,7 @@ export function NetTrendChart({
           </p>
         </div>
       )}
-      <ChartContainer config={chartConfig} heightMobile={140} heightDesktop={effectiveSize === "lg" ? 220 : 160}>
+      <ChartContainer config={chartConfig} heightMobile={140} heightDesktop={effectiveSize === "lg" ? 180 : 160}>
         <AreaChart data={netCashFlowRows}>
           <defs>
             <linearGradient id="netCashFlowAreaMd" x1="0" y1="0" x2="0" y2="1">

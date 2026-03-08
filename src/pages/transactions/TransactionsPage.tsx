@@ -263,6 +263,7 @@ export function TransactionsPage() {
             <div className="flex flex-1 flex-col">
               {filtered.length === 0 ? (
                 <DsEmptyState
+                  variant="hero"
                   title={t("transactions.noTransactions")}
                   description={t("transactions.emptyStateHint")}
                   actions={

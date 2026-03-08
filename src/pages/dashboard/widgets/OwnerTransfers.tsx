@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { ArrowLeftRight } from "lucide-react";
 import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { DashboardOwnerTransferItem } from "@/types/dashboard";
 import type { WidgetSize } from "@/lib/widgets/widget";
@@ -35,9 +36,9 @@ export function OwnerTransfers({
 
   return (
     <div>
-      <h3 className="px-4 py-3 text-base font-semibold">{t("dashboard.ownerTransfersMtd")}</h3>
+      <h3 className="py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground/80">{t("dashboard.ownerTransfersMtd")}</h3>
       {ownerTransfersMtd.length === 0 ? (
-        <DsEmptyState title={t("dashboard.noOwnerTransfersMtd")} className="py-4" />
+        <DsEmptyState icon={<ArrowLeftRight className="size-5" />} title={t("dashboard.noOwnerTransfersMtd")} className="py-4" />
       ) : (
         <>
           <div className="px-0 py-2">

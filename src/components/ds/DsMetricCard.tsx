@@ -40,7 +40,7 @@ export function DsMetricCard({
           <p className="text-sm text-muted-foreground ds-caption">{subtitle}</p>
         ) : null}
       </div>
-      {sparkline ? <div className={cn("-mb-3", sparklineBottom ? "mt-4" : "mt-2")}>{sparkline}</div> : null}
+      {sparkline ? <div className={cn("-mb-3 flex justify-end", sparklineBottom ? "mt-4" : "mt-2")}>{sparkline}</div> : null}
     </div>
   );
 }

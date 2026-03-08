@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Cell, Pie, PieChart } from "recharts";
+import { PieChart as PieChartIcon } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { DsChartCard, DsEmptyState, DsLegendList } from "@/components/ds";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -42,7 +43,7 @@ export function CategoryChart({
   if (categorySlices.length === 0) {
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <DsEmptyState title={t("dashboard.chartNoSpendingCategories")} className="py-4" />
+        <DsEmptyState icon={<PieChartIcon className="size-5" />} title={t("dashboard.chartNoSpendingCategories")} className="py-4" />
       </DsChartCard>
     );
   }
@@ -82,46 +83,34 @@ export function CategoryChart({
 
   const chartConfig = { value: { label: t("dashboard.chartAmount"), color: DONUT_COLORS[0]! } };
 
-  // lg: side-by-side large pie chart + legend on right
+  // lg: horizontal stacked bar + legend list (no half-donut dead space)
   if (effectiveSize === "lg") {
+    const total = categorySlices.reduce((sum, s) => sum + s.value, 0);
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <div className="flex items-center gap-8">
-          <div className="w-[280px] shrink-0">
-            <ChartContainer config={chartConfig} heightMobile={200} heightDesktop={200}>
-              <PieChart>
-                <Pie
-                  data={categorySlices.filter((s) => s.value > 0)}
-                  dataKey="value"
-                  nameKey="label"
-                  innerRadius={65}
-                  outerRadius={100}
-                  startAngle={180}
-                  endAngle={0}
-                  cx="50%"
-                  cy="80%"
-                  cornerRadius={0}
-                  paddingAngle={0}
-                  minAngle={5}
-                >
-                  {categorySlices.filter((s) => s.value > 0).map((slice, index) => (
-                    <Cell key={slice.label} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
-                  ))}
-                </Pie>
-                <ChartTooltip content={tooltipContent} />
-              </PieChart>
-            </ChartContainer>
-          </div>
-          <div className="min-w-0 flex-1">
-            <DsLegendList
-              items={categorySlices.map((slice, index) => ({
-                key: slice.label,
-                label: slice.label,
-                value: formatCurrency(slice.value),
-                color: DONUT_COLORS[index % DONUT_COLORS.length]!,
-              }))}
-            />
-          </div>
+        <div className="space-y-3">
+          {total > 0 && (
+            <div className="flex h-3 w-full overflow-hidden rounded-full">
+              {categorySlices.filter((s) => s.value > 0).map((slice, index) => (
+                <div
+                  key={slice.label}
+                  className="h-full transition-all"
+                  style={{
+                    width: `${(slice.value / total) * 100}%`,
+                    backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length],
+                  }}
+                />
+              ))}
+            </div>
+          )}
+          <DsLegendList
+            items={categorySlices.map((slice, index) => ({
+              key: slice.label,
+              label: slice.label,
+              value: formatCurrency(slice.value),
+              color: DONUT_COLORS[index % DONUT_COLORS.length]!,
+            }))}
+          />
         </div>
       </DsChartCard>
     );

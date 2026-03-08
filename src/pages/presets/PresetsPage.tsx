@@ -352,6 +352,7 @@ export function PresetsPage() {
 
           {presetTransactions.length === 0 ? (
             <DsEmptyState
+              variant="hero"
               title={
                 expenseCategories.length === 0
                   ? t("presetTransactions.emptyNoCategories")

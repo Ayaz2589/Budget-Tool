@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { Clock } from "lucide-react";
 import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { Expense } from "@/types/core";
 import type { WidgetSize } from "@/lib/widgets/widget";
@@ -31,9 +32,9 @@ export function RecentActivity({ recentActivity, size = "md" }: RecentActivityPr
 
   return (
     <div>
-      <h3 className="px-4 py-3 text-base font-semibold">{t("dashboard.sectionRecentActivity")}</h3>
+      <h3 className="py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground/80">{t("dashboard.sectionRecentActivity")}</h3>
       {recentActivity.length === 0 ? (
-        <DsEmptyState title={t("dashboard.sectionNoRecentTransactions")} className="py-4" />
+        <DsEmptyState icon={<Clock className="size-5" />} title={t("dashboard.sectionNoRecentTransactions")} className="py-4" />
       ) : (
         <>
           {displayItems.map((item) => (

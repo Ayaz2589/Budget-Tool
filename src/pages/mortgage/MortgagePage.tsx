@@ -116,6 +116,7 @@ export function MortgagePage() {
           <div className="flex flex-1 flex-col">
             {mortgagePayments.length === 0 ? (
               <DsEmptyState
+                variant="hero"
                 title={t("mortgage.noPaymentsYet")}
                 description={t("mortgage.emptyStateHint")}
                 actions={

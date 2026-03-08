@@ -190,7 +190,7 @@ export function DashboardMobileGrid({ dashboardData }: DashboardMobileGridProps)
   );
 
   if (visibleIds.length === 0) {
-    return <DsEmptyState title={t("widget.noWidgetsVisible")} className="py-12" />;
+    return <DsEmptyState variant="hero" title={t("widget.noWidgetsVisible")} className="py-12" />;
   }
 
   return (

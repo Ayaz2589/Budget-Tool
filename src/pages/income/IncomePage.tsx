@@ -94,6 +94,7 @@ export function IncomePage() {
         <CardContent data-tour="income-table" className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           {sortedIncome.length === 0 ? (
             <DsEmptyState
+              variant="hero"
               title={t("income.noIncomeEntries")}
               description={t("income.emptyStateHint")}
               actions={

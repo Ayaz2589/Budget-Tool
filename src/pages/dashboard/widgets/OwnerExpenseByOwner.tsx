@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { percentOfTotal } from "@/lib/math";
+import { UserCircle } from "lucide-react";
 import { DsDataRow, DsEmptyState } from "@/components/ds";
 import type { DashboardOwnerNetRow } from "@/types/dashboard";
 import type { buildOwnerExpenseItems } from "@/pages/dashboard/dashboardSelectors";
@@ -46,11 +47,11 @@ export function OwnerExpenseByOwner({
   if (size === "md") {
     return (
       <div>
-        <h3 className="px-4 py-3 text-base font-semibold">
+        <h3 className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground/80">
           {t("dashboard.sectionExpenseByOwner")}
         </h3>
         {visibleOwnerNetRows.length === 0 ? (
-          <DsEmptyState title={t("dashboard.sectionNoOwnerExpenses")} className="py-4" />
+          <DsEmptyState icon={<UserCircle className="size-5" />} title={t("dashboard.sectionNoOwnerExpenses")} className="py-4" />
         ) : (
           visibleOwnerNetRows.map((row) => {
             const ownerShareOfTotal = percentOfTotal(row.gross, totalSpentForSelectedRange);
@@ -82,11 +83,11 @@ export function OwnerExpenseByOwner({
   // lg: full expandable list (original behavior)
   return (
     <section data-tour="dashboard-expense-by-owner" className="space-y-2">
-      <h2 className="px-4 pt-3 inline-flex items-center gap-1.5 text-base font-semibold">
+      <h2 className="py-2 inline-flex items-center gap-1.5 text-base font-semibold">
         {t("dashboard.sectionExpenseByOwner")}
       </h2>
       {visibleOwnerNetRows.length === 0 ? (
-        <DsEmptyState title={t("dashboard.sectionNoOwnerExpenses")} className="py-4" />
+        <DsEmptyState icon={<UserCircle className="size-5" />} title={t("dashboard.sectionNoOwnerExpenses")} className="py-4" />
       ) : (
         <div className="rounded-2xl border border-border/60 bg-card">
           <div className="grid grid-cols-2 gap-2 border-b border-[var(--border-subtle)] px-3 py-2 text-[11px] uppercase tracking-wide text-muted-foreground">

@@ -1,54 +1,27 @@
-import { useState, useCallback, useMemo } from "react";
-import { useTranslation } from "react-i18next";
-import { Plus, SlidersHorizontal, Wallet, Grid2X2 } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Plus, SlidersHorizontal, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import {
   DsActionBar,
   DsEmptyState,
   DsHelpTooltip,
   DsSectionHeader,
-  DsWidgetCatalog,
 } from "@/components/ds";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useBudget } from "@/context";
-import {
-  DashboardLayoutProvider,
-  useDashboardLayout,
-} from "@/context/DashboardLayoutContext";
 import { AddTransactionDialog } from "@/components/AddTransactionDialog";
 import { AddIncomeDialog } from "@/pages/income/AddIncomeDialog";
 import { useDashboardData } from "./useDashboardData";
-import { DashboardGrid } from "./DashboardGrid";
-import { DashboardMobileGrid } from "./DashboardMobileGrid";
+import { DashboardFixedLayout } from "./DashboardFixedLayout";
 import { DashboardFilters } from "./DashboardFilters";
 
-function DashboardContent() {
-  const isMobile = useMediaQuery("(max-width: 767px)");
+export function Dashboard() {
   const data = useDashboardData();
   const { t } = data;
   const { expenses, income, debts, incomeCategories, owners, addIncome, uiFormatSettings } = useBudget();
-  const {
-    layout,
-    hideWidget,
-    showWidget,
-    resetToDefault,
-  } = useDashboardLayout();
   const isEmpty = expenses.length === 0 && income.length === 0 && debts.length === 0;
 
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
   const [addIncomeOpen, setAddIncomeOpen] = useState(false);
-  const [catalogOpen, setCatalogOpen] = useState(false);
-  const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   const handleAddIncome = useCallback(
     (payload: Parameters<typeof addIncome>[0]) => {
@@ -57,23 +30,6 @@ function DashboardContent() {
     },
     [addIncome],
   );
-
-  const handleReset = useCallback(() => {
-    resetToDefault();
-    setResetDialogOpen(false);
-  }, [resetToDefault]);
-
-  const visibleWidgetIds = useMemo(
-    () => new Set(layout.desktopGrid.filter((item) => item.visible).map((item) => item.id)),
-    [layout.desktopGrid],
-  );
-
-  const { t: tWidget } = useTranslation();
-
-  // Build the props object passed to widget render functions
-  const dashboardData: Record<string, unknown> = {
-    ...data,
-  };
 
   return (
     <div data-tour-page="dashboard" className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
@@ -91,24 +47,12 @@ function DashboardContent() {
             }
             subtitle={t("dashboard.healthQuestion")}
             showCurrencyChip
-            actions={
-              !isMobile ? (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-10 w-10"
-                  onClick={() => setCatalogOpen(true)}
-                  aria-label={tWidget("widget.manageWidgets")}
-                >
-                  <Grid2X2 className="size-5" />
-                </Button>
-              ) : undefined
-            }
           />
         </div>
 
         {isEmpty ? (
           <DsEmptyState
+            variant="hero"
             title={t("dashboard.emptyTitle")}
             description={t("dashboard.emptyHint")}
             actions={
@@ -125,25 +69,11 @@ function DashboardContent() {
             }
           />
         ) : (
-          isMobile ? (
-            <DashboardMobileGrid dashboardData={dashboardData} />
-          ) : (
-            <DashboardGrid dashboardData={dashboardData} />
-          )
+          <DashboardFixedLayout data={data} />
         )}
       </div>
 
       <DsActionBar mobileOnly={false}>
-        <Button
-          variant="secondary"
-          density="compact"
-          onClick={() => setCatalogOpen(true)}
-          className="rounded-full p-0"
-          size="icon"
-          aria-label={tWidget("widget.manageWidgets")}
-        >
-          <Grid2X2 className="size-4" />
-        </Button>
         <Button
           variant="secondary"
           density="compact"
@@ -208,40 +138,6 @@ function DashboardContent() {
         includeDebtPayments={data.includeDebtPayments}
         setIncludeDebtPayments={data.setIncludeDebtPayments}
       />
-
-      <DsWidgetCatalog
-        open={catalogOpen}
-        onOpenChange={setCatalogOpen}
-        visibleWidgetIds={visibleWidgetIds}
-        onShow={showWidget}
-        onHide={hideWidget}
-        onReset={() => setResetDialogOpen(true)}
-      />
-
-      <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{tWidget("widget.resetConfirmTitle")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {tWidget("widget.resetConfirmDescription")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleReset}>
-              {tWidget("widget.resetConfirmAction")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
-  );
-}
-
-export function Dashboard() {
-  return (
-    <DashboardLayoutProvider>
-      <DashboardContent />
-    </DashboardLayoutProvider>
   );
 }

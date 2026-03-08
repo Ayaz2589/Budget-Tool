@@ -108,6 +108,7 @@ export function DebtPage() {
         <div className="flex-1 min-h-0 flex flex-col overflow-hidden gap-0 px-0 pb-24 md:px-0 md:pb-0 md:gap-4 transactions-card-content">
           {debts.length === 0 ? (
             <DsEmptyState
+              variant="hero"
               title={t("debt.noDebtsYet")}
               description={t("debt.emptyStateHint")}
               actions={

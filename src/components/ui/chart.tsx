@@ -28,6 +28,7 @@ function ChartContainer({
   config,
   heightMobile = 220,
   heightDesktop = 280,
+  fillHeight = false,
   legendMode = "below",
   style,
   ...props
@@ -38,6 +39,7 @@ function ChartContainer({
   >["children"];
   heightMobile?: number;
   heightDesktop?: number;
+  fillHeight?: boolean;
   legendMode?: "inline" | "below";
 }) {
   const uniqueId = React.useId();
@@ -50,15 +52,20 @@ function ChartContainer({
         data-chart={chartId}
         data-legend-mode={legendMode}
         className={cn(
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex h-[var(--chart-h-mobile)] md:h-[var(--chart-h-desktop)] justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          fillHeight
+            ? "h-full w-full"
+            : "h-[var(--chart-h-mobile)] md:h-[var(--chart-h-desktop)]",
           className
         )}
         style={
-          {
-            "--chart-h-mobile": `${heightMobile}px`,
-            "--chart-h-desktop": `${heightDesktop}px`,
-            ...(style ?? {}),
-          } as React.CSSProperties
+          fillHeight
+            ? style
+            : {
+                "--chart-h-mobile": `${heightMobile}px`,
+                "--chart-h-desktop": `${heightDesktop}px`,
+                ...(style ?? {}),
+              } as React.CSSProperties
         }
         {...props}
       >

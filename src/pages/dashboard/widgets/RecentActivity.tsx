@@ -30,12 +30,12 @@ export function RecentActivity({ recentActivity, size = "md" }: RecentActivityPr
   const displayItems = recentActivity.slice(0, limit);
 
   return (
-    <div>
-      <h3 className="px-4 py-3 text-base font-semibold">{t("dashboard.sectionRecentActivity")}</h3>
+    <div className="flex h-full flex-col">
+      <h3 className="shrink-0 px-4 py-3 text-base font-semibold">{t("dashboard.sectionRecentActivity")}</h3>
       {recentActivity.length === 0 ? (
         <DsEmptyState title={t("dashboard.sectionNoRecentTransactions")} className="py-4" />
       ) : (
-        <>
+        <div className="flex-1 overflow-y-auto">
           {displayItems.map((item) => (
             <DsDataRow
               key={item.id}
@@ -54,7 +54,7 @@ export function RecentActivity({ recentActivity, size = "md" }: RecentActivityPr
               {t("dashboard.moreItemsCount", { count: recentActivity.length - 4 })}
             </p>
           )}
-        </>
+        </div>
       )}
     </div>
   );

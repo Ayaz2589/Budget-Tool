@@ -45,8 +45,8 @@ export function OwnerExpenseByOwner({
   // md: compact list without expandable details
   if (size === "md") {
     return (
-      <div>
-        <h3 className="px-4 py-3 text-base font-semibold">
+      <div className="flex h-full flex-col">
+        <h3 className="shrink-0 px-4 py-3 text-base font-semibold">
           {t("dashboard.sectionExpenseByOwner")}
         </h3>
         {visibleOwnerNetRows.length === 0 ? (

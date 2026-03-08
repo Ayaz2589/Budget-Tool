@@ -38,7 +38,6 @@ export function TotalDebt({ debtOutstanding, debtPaidThisMonth, sparklineRows, s
       title={t("dashboard.kpiTotalDebtOutstanding")}
       value={formatCurrency(debtOutstanding)}
       subtitle={!hasSparkline ? formatDebtPaidSubtitle(debtPaidThisMonth, t) : undefined}
-      sparklineBottom={size === "lg"}
       sparkline={
         sparklineRows && sparklineRows.length > 1 ? (
           <ResponsiveContainer width={size === "lg" ? "100%" : "75%"} height={20}>

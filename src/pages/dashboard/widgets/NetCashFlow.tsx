@@ -53,7 +53,6 @@ export function NetCashFlow({ netCashFlow, sparklineRows, size = "sm" }: NetCash
         </span>
       }
       tone={tone}
-      sparklineBottom={size === "lg"}
       sparkline={
         sparklineRows && sparklineRows.length > 1 ? (
           <ResponsiveContainer width={size === "lg" ? "100%" : "75%"} height={20}>

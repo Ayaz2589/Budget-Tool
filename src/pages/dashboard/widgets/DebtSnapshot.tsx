@@ -31,12 +31,12 @@ export function DebtSnapshot({ debtRows, size = "md" }: DebtSnapshotProps) {
   const displayRows = debtRows.slice(0, limit);
 
   return (
-    <div>
-      <h3 className="px-4 py-3 text-base font-semibold">{t("dashboard.sectionDebtSnapshot")}</h3>
+    <div className="flex h-full flex-col">
+      <h3 className="shrink-0 px-4 py-3 text-base font-semibold">{t("dashboard.sectionDebtSnapshot")}</h3>
       {debtRows.length === 0 ? (
         <DsEmptyState title={t("dashboard.sectionNoActiveDebts")} className="py-4" />
       ) : (
-        <>
+        <div className="flex-1 overflow-y-auto">
           {displayRows.map((row) => (
             <DsDataRow
               key={row.id}
@@ -66,7 +66,7 @@ export function DebtSnapshot({ debtRows, size = "md" }: DebtSnapshotProps) {
               {t("dashboard.moreItemsCount", { count: debtRows.length - 4 })}
             </p>
           )}
-        </>
+        </div>
       )}
     </div>
   );

@@ -36,12 +36,12 @@ export function SpendBySource({ spendBySourceRows, size = "md" }: SpendBySourceP
   const displayRows = spendBySourceRows.slice(0, limit);
 
   return (
-    <div>
-      <h3 className="px-4 py-3 text-base font-semibold">{t("dashboard.sectionSpendByCardSource")}</h3>
+    <div className="flex h-full flex-col">
+      <h3 className="shrink-0 px-4 py-3 text-base font-semibold">{t("dashboard.sectionSpendByCardSource")}</h3>
       {spendBySourceRows.length === 0 ? (
         <DsEmptyState title={t("dashboard.sectionNoSpendByCardSource")} className="py-4" />
       ) : (
-        <>
+        <div className="flex-1 overflow-y-auto">
           {displayRows.map((row) => (
             <DsDataRow
               key={row.source}
@@ -58,7 +58,7 @@ export function SpendBySource({ spendBySourceRows, size = "md" }: SpendBySourceP
               {t("dashboard.moreItemsCount", { count: spendBySourceRows.length - 4 })}
             </p>
           )}
-        </>
+        </div>
       )}
     </div>
   );

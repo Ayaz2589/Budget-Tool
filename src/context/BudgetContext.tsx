@@ -884,6 +884,180 @@ function BudgetComposer({
     [useDummyData, setDummyState, settings],
   );
 
+  // ---------------------------------------------------------------------------
+  // Rename helpers — atomically rename across settings + all transactions
+  // ---------------------------------------------------------------------------
+
+  const renameOwner = useCallback(
+    (oldName: string, newName: string) => {
+      const trimmed = newName.trim();
+      if (!trimmed || trimmed === oldName) return;
+
+      const renameInOwnersList = (list: string[]) =>
+        list.map((o) => (o === oldName ? trimmed : o));
+
+      const renameExpenseOwner = (e: Expense): Expense => {
+        const changed =
+          e.owner === oldName ||
+          e.paidByOwner === oldName ||
+          e.allocation?.some((a) => a.owner === oldName);
+        if (!changed) return e;
+        return {
+          ...e,
+          owner: e.owner === oldName ? trimmed : e.owner,
+          paidByOwner: e.paidByOwner === oldName ? trimmed : e.paidByOwner,
+          allocation: e.allocation?.map((a) =>
+            a.owner === oldName ? { ...a, owner: trimmed } : a,
+          ),
+        };
+      };
+
+      const renameIncomeOwner = (i: Income): Income =>
+        i.owner === oldName ? { ...i, owner: trimmed } : i;
+
+      const renameDebtOwner = (d: Debt): Debt =>
+        d.owner === oldName ? { ...d, owner: trimmed } : d;
+
+      const renameTransferOwner = (t: OwnerTransfer): OwnerTransfer => {
+        const changed = t.fromOwner === oldName || t.toOwner === oldName;
+        if (!changed) return t;
+        return {
+          ...t,
+          fromOwner: t.fromOwner === oldName ? trimmed : t.fromOwner,
+          toOwner: t.toOwner === oldName ? trimmed : t.toOwner,
+        };
+      };
+
+      const renameBalanceOwner = (
+        balances: Record<string, Record<string, number>>,
+      ): Record<string, Record<string, number>> => {
+        const result: Record<string, Record<string, number>> = {};
+        for (const [month, ownerMap] of Object.entries(balances)) {
+          const newMap: Record<string, number> = {};
+          for (const [owner, amount] of Object.entries(ownerMap)) {
+            newMap[owner === oldName ? trimmed : owner] = amount;
+          }
+          result[month] = newMap;
+        }
+        return result;
+      };
+
+      if (useDummyData) {
+        setDummyState((prev) => ({
+          ...prev,
+          owners: renameInOwnersList(prev.owners),
+          expenses: prev.expenses.map(renameExpenseOwner),
+          income: prev.income.map(renameIncomeOwner),
+          debts: prev.debts.map(renameDebtOwner),
+          ownerTransfers: prev.ownerTransfers.map(renameTransferOwner),
+          ownerBalances: renameBalanceOwner(prev.ownerBalances),
+        }));
+      } else {
+        dispatchExpenses({
+          type: "SET",
+          expenses: realExpenses.map(renameExpenseOwner),
+        });
+        dispatchIncome({
+          type: "SET",
+          income: realIncome.map(renameIncomeOwner),
+        });
+        dispatchDebt({
+          type: "SET",
+          debts: realDebts.map(renameDebtOwner),
+          debtPayments: realDebtPayments,
+        });
+        dispatchTransfers({
+          type: "SET",
+          transfers: realOwnerTransfers.map(renameTransferOwner),
+        });
+        settings.setOwners(renameInOwnersList(settings.owners));
+        // Rename owner in balances
+        const newBalances = renameBalanceOwner(settings.ownerBalances);
+        for (const [month, ownerMap] of Object.entries(newBalances)) {
+          for (const [owner, amount] of Object.entries(ownerMap)) {
+            settings.setOwnerBalance(month, owner, amount);
+          }
+        }
+      }
+    },
+    [
+      useDummyData,
+      setDummyState,
+      dispatchExpenses,
+      dispatchIncome,
+      dispatchDebt,
+      dispatchTransfers,
+      realExpenses,
+      realIncome,
+      realDebts,
+      realDebtPayments,
+      realOwnerTransfers,
+      settings,
+    ],
+  );
+
+  const renameExpenseCategory = useCallback(
+    (oldName: string, newName: string) => {
+      const trimmed = newName.trim();
+      if (!trimmed || trimmed === oldName) return;
+
+      const renameInList = (list: string[]) =>
+        list.map((c) => (c === oldName ? trimmed : c));
+
+      if (useDummyData) {
+        setDummyState((prev) => ({
+          ...prev,
+          expenseCategories: renameInList(prev.expenseCategories),
+          expenses: prev.expenses.map((e) =>
+            e.category === oldName ? { ...e, category: trimmed } : e,
+          ),
+        }));
+      } else {
+        dispatchExpenses({
+          type: "SET",
+          expenses: realExpenses.map((e) =>
+            e.category === oldName ? { ...e, category: trimmed } : e,
+          ),
+        });
+        settings.setExpenseCategories(
+          renameInList(settings.expenseCategories),
+        );
+      }
+    },
+    [useDummyData, setDummyState, dispatchExpenses, realExpenses, settings],
+  );
+
+  const renameIncomeCategory = useCallback(
+    (oldName: string, newName: string) => {
+      const trimmed = newName.trim();
+      if (!trimmed || trimmed === oldName) return;
+
+      const renameInList = (list: string[]) =>
+        list.map((c) => (c === oldName ? trimmed : c));
+
+      if (useDummyData) {
+        setDummyState((prev) => ({
+          ...prev,
+          incomeCategories: renameInList(prev.incomeCategories),
+          income: prev.income.map((i) =>
+            i.category === oldName ? { ...i, category: trimmed } : i,
+          ),
+        }));
+      } else {
+        dispatchIncome({
+          type: "SET",
+          income: realIncome.map((i) =>
+            i.category === oldName ? { ...i, category: trimmed } : i,
+          ),
+        });
+        settings.setIncomeCategories(
+          renameInList(settings.incomeCategories),
+        );
+      }
+    },
+    [useDummyData, setDummyState, dispatchIncome, realIncome, settings],
+  );
+
   const repairCorruptedDates = useCallback(() => {
     let fixedExpenses = 0;
     let fixedIncome = 0;
@@ -960,6 +1134,9 @@ function BudgetComposer({
       setExpenseCategories,
       setIncomeCategories,
       setOwners,
+      renameOwner,
+      renameExpenseCategory,
+      renameIncomeCategory,
       setCardSources,
       setOwnerBalance,
       ownerBalances,
@@ -1004,6 +1181,9 @@ function BudgetComposer({
       setExpenseCategories,
       setIncomeCategories,
       setOwners,
+      renameOwner,
+      renameExpenseCategory,
+      renameIncomeCategory,
       setCardSources,
       setOwnerBalance,
       repairCorruptedDates,

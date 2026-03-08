@@ -111,7 +111,7 @@ export function OwnerSplitChart({
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
         <div className="flex items-center gap-6">
           <div className="w-[160px] shrink-0">
-            <ChartContainer config={chartConfig} heightMobile={140} heightDesktop={140}>
+            <ChartContainer config={chartConfig} fillHeight>
               <PieChart>
                 <Pie
                   data={ownerSlices.filter((s) => s.value > 0)}
@@ -148,7 +148,7 @@ export function OwnerSplitChart({
     <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
       <div className="flex items-center gap-8">
         <div className="w-[280px] shrink-0">
-          <ChartContainer config={chartConfig} heightMobile={200} heightDesktop={200}>
+          <ChartContainer config={chartConfig} fillHeight>
             <PieChart>
               <Pie
                 data={ownerSlices.filter((s) => s.value > 0)}

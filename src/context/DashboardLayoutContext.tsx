@@ -47,7 +47,7 @@ function migrateId(id: string): WidgetType {
 function validateLayout(raw: unknown): DashboardLayout | null {
   if (!raw || typeof raw !== "object") return null;
   const obj = raw as Record<string, unknown>;
-  if (obj.version !== 3 && obj.version !== 4 && obj.version !== 5 && obj.version !== 6 && obj.version !== 7) return null;
+  if (obj.version !== 3 && obj.version !== 4 && obj.version !== 5 && obj.version !== 6 && obj.version !== 7 && obj.version !== 8) return null;
   if (!Array.isArray(obj.desktopGrid)) return null;
   if (!Array.isArray(obj.mobileOrder)) return null;
 
@@ -121,7 +121,7 @@ function validateLayout(raw: unknown): DashboardLayout | null {
     }
   }
 
-  return { version: 7, desktopGrid, mobileOrder };
+  return { version: 8, desktopGrid, mobileOrder };
 }
 
 function loadLayout(): DashboardLayout {

@@ -33,9 +33,9 @@ import { createWidget } from "@/lib/widgets/createWidget";
 type AnyProps = any;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-const KPI_DIMS = { sm: { w: 3, h: 2 }, md: { w: 6, h: 2 }, lg: { w: 6, h: 3 } } as const;
+const KPI_DIMS = { sm: { w: 6, h: 2 }, md: { w: 6, h: 2 }, lg: { w: 6, h: 3 } } as const;
 const CHART_WIDE_DIMS = { sm: { w: 6, h: 3 }, md: { w: 12, h: 6 }, lg: { w: 12, h: 8 } } as const;
-const LIST_DIMS = { sm: { w: 3, h: 2 }, md: { w: 6, h: 6 }, lg: { w: 12, h: 6 } } as const;
+const LIST_DIMS = { sm: { w: 6, h: 2 }, md: { w: 6, h: 6 }, lg: { w: 12, h: 6 } } as const;
 
 export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
   "net-cash-flow": createWidget({

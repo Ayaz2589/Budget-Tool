@@ -4,7 +4,7 @@ import type { WidgetSize } from "@/lib/widgets/widget";
 import { createWidget } from "@/lib/widgets/createWidget";
 
 const TEST_DIMS = {
-  sm: { w: 3, h: 2 },
+  sm: { w: 6, h: 2 },
   md: { w: 6, h: 2 },
   lg: { w: 6, h: 3 },
 };
@@ -54,7 +54,7 @@ describe("createWidget", () => {
     test("sizeDims assembled from flat sm/md/lg params", () => {
       const entry = createWidget(makeOpts());
       expect(entry.sizeDims).toEqual({
-        sm: { w: 3, h: 2 },
+        sm: { w: 6, h: 2 },
         md: { w: 6, h: 2 },
         lg: { w: 6, h: 3 },
       });

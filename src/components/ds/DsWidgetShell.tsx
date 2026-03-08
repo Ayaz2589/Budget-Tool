@@ -41,23 +41,19 @@ export function DsWidgetShell({
       tabIndex={0}
       className="group relative h-full w-full overflow-hidden rounded-2xl"
     >
-      {/* Drag handle — top-left, hover-visible on desktop, always visible on mobile */}
-      {!isMobile && (
-        <div
-          className="react-grid-dragHandleExample absolute left-1.5 top-1.5 z-10 flex size-6 cursor-grab items-center justify-center rounded-md bg-background/80 opacity-0 shadow-sm backdrop-blur-sm transition-opacity group-hover:opacity-100"
-          aria-hidden
-        >
-          <GripVertical className="size-3.5 text-muted-foreground" />
-        </div>
-      )}
-
-      {/* Overflow popover trigger — top-right, hover-visible on desktop, always visible on mobile */}
-      <div
-        className={cn(
-          "absolute right-1.5 top-1.5 z-10 transition-opacity",
-          isMobile ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+      {/* Controls — bottom-right, always visible on desktop */}
+      <div className="absolute bottom-2 right-2 z-10 flex items-center gap-1">
+        {/* Drag handle — hidden on mobile */}
+        {!isMobile && (
+          <div
+            className="react-grid-dragHandleExample flex size-6 cursor-grab items-center justify-center rounded-md bg-background/80 shadow-sm backdrop-blur-sm"
+            aria-hidden
+          >
+            <GripVertical className="size-3.5 text-muted-foreground" />
+          </div>
         )}
-      >
+
+        {/* Overflow popover trigger */}
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
             <Button

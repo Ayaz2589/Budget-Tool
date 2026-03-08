@@ -121,7 +121,7 @@ export function NetTrendChart({
           </p>
         </div>
         {effectiveSize === "lg" && (
-          <ChartContainer config={miniChartConfig} heightMobile={120} heightDesktop={160}>
+          <ChartContainer config={miniChartConfig} fillHeight>
             <AreaChart data={miniData}>
               <defs>
                 <linearGradient id="netCashFlowMini" x1="0" y1="0" x2="0" y2="1">
@@ -205,7 +205,7 @@ export function NetTrendChart({
           </p>
         </div>
       )}
-      <ChartContainer config={chartConfig} heightMobile={140} heightDesktop={effectiveSize === "lg" ? 220 : 160}>
+      <ChartContainer config={chartConfig} fillHeight>
         <AreaChart data={netCashFlowRows}>
           <defs>
             <linearGradient id="netCashFlowAreaMd" x1="0" y1="0" x2="0" y2="1">

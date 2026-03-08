@@ -34,12 +34,12 @@ export function OwnerTransfers({
   const displayRows = ownerTransfersMtd.slice(0, limit);
 
   return (
-    <div>
-      <h3 className="px-4 py-3 text-base font-semibold">{t("dashboard.ownerTransfersMtd")}</h3>
+    <div className="flex h-full flex-col">
+      <h3 className="shrink-0 px-4 py-3 text-base font-semibold">{t("dashboard.ownerTransfersMtd")}</h3>
       {ownerTransfersMtd.length === 0 ? (
         <DsEmptyState title={t("dashboard.noOwnerTransfersMtd")} className="py-4" />
       ) : (
-        <>
+        <div className="flex-1 overflow-y-auto">
           <div className="px-0 py-2">
             <p className="text-xl font-semibold">{formatCurrency(ownerTransfersMtdTotal)}</p>
           </div>
@@ -57,7 +57,7 @@ export function OwnerTransfers({
               {t("dashboard.moreItemsCount", { count: ownerTransfersMtd.length - 4 })}
             </p>
           )}
-        </>
+        </div>
       )}
     </div>
   );

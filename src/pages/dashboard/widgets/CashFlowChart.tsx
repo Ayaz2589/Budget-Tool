@@ -130,8 +130,7 @@ export function CashFlowChart({
               ? { debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" } }
               : {}),
           }}
-          heightMobile={220}
-          heightDesktop={380}
+          fillHeight
         >
           <BarChart data={cashFlowDisplayRows}>
             <CartesianGrid vertical={false} />
@@ -169,8 +168,7 @@ export function CashFlowChart({
             ? { debtPayments: { label: t("dashboard.chartDebtPayments"), color: "var(--viz-debt)" } }
             : {}),
         }}
-        heightMobile={200}
-        heightDesktop={280}
+        fillHeight
       >
         <BarChart
           data={cashFlowDisplayRows}

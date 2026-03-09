@@ -2,6 +2,7 @@ export interface ExpenseCategoriesCardProps {
   categories: string[];
   onRemove: (category: string) => void;
   onAdd: (name: string) => void;
+  onRename?: (oldName: string, newName: string) => void;
   bare?: boolean;
 }
 
@@ -9,6 +10,7 @@ export interface IncomeCategoriesCardProps {
   categories: string[];
   onRemove: (category: string) => void;
   onAdd: (name: string) => void;
+  onRename?: (oldName: string, newName: string) => void;
   bare?: boolean;
 }
 
@@ -16,6 +18,7 @@ export interface OwnersCardProps {
   owners: string[];
   onRemove: (owner: string) => void;
   onAdd: (name: string) => void;
+  onRename?: (oldName: string, newName: string) => void;
   bare?: boolean;
 }
 

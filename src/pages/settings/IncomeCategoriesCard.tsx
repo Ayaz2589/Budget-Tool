@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil, Check, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,11 +21,15 @@ export function IncomeCategoriesCard({
   categories,
   onRemove,
   onAdd,
+  onRename,
   bare = false,
 }: IncomeCategoriesCardProps) {
   const { t } = useTranslation();
   const [newCategory, setNewCategory] = useState("");
   const [categoryToRemove, setCategoryToRemove] = useState<string | null>(null);
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   const handleAdd = () => {
     const trimmed = newCategory.trim();
@@ -42,6 +46,30 @@ export function IncomeCategoriesCard({
     }
   };
 
+  const handleStartEdit = (category: string) => {
+    setEditingCategory(category);
+    setEditValue(category);
+    setTimeout(() => editInputRef.current?.select(), 0);
+  };
+
+  const handleSaveEdit = () => {
+    const trimmed = editValue.trim();
+    if (
+      editingCategory &&
+      trimmed &&
+      trimmed !== editingCategory &&
+      !categories.includes(trimmed) &&
+      onRename
+    ) {
+      onRename(editingCategory, trimmed);
+    }
+    setEditingCategory(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCategory(null);
+  };
+
   const content = (
     <div className="space-y-3">
       <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -50,19 +78,72 @@ export function IncomeCategoriesCard({
             key={category}
             className="flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-background/60 px-3 py-2.5"
           >
-            <span className="text-sm font-medium truncate min-w-0">
-              {category}
-            </span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="size-8 shrink-0 text-destructive hover:text-destructive"
-              onClick={() => setCategoryToRemove(category)}
-              aria-label={t("settings.removeCategory", { category })}
-            >
-              <Trash2 className="size-4 text-destructive" />
-            </Button>
+            {editingCategory === category ? (
+              <div className="flex flex-1 items-center gap-1.5 min-w-0">
+                <Input
+                  ref={editInputRef}
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") { e.preventDefault(); handleSaveEdit(); }
+                    if (e.key === "Escape") handleCancelEdit();
+                  }}
+                  className="h-7 min-w-0 flex-1 text-sm"
+                  autoFocus
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-7 shrink-0 text-emerald-600 hover:text-emerald-700"
+                  onClick={handleSaveEdit}
+                  disabled={!editValue.trim() || editValue.trim() === editingCategory || categories.includes(editValue.trim())}
+                  aria-label={t("common.save")}
+                >
+                  <Check className="size-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-7 shrink-0"
+                  onClick={handleCancelEdit}
+                  aria-label={t("common.cancel")}
+                >
+                  <X className="size-3.5" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <span className="text-sm font-medium truncate min-w-0">
+                  {category}
+                </span>
+                <div className="flex items-center gap-0.5 shrink-0">
+                  {onRename && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-muted-foreground hover:text-foreground"
+                      onClick={() => handleStartEdit(category)}
+                      aria-label={t("settings.renameCategory", { category })}
+                    >
+                      <Pencil className="size-3.5" />
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 shrink-0 text-destructive hover:text-destructive"
+                    onClick={() => setCategoryToRemove(category)}
+                    aria-label={t("settings.removeCategory", { category })}
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                </div>
+              </>
+            )}
           </li>
         ))}
       </ul>

@@ -81,6 +81,9 @@ export function SettingsPage() {
     setUiFormatSettings,
     useDummyData,
     setUseDummyData,
+    renameOwner,
+    renameExpenseCategory,
+    renameIncomeCategory,
   } = useBudget();
   const {
     isSignedIn,
@@ -117,6 +120,36 @@ export function SettingsPage() {
         : t("settings.repairResultNone"),
     );
     setTimeout(() => setRepairResult(null), 5000);
+  };
+
+  const handleRenameOwner = (oldName: string, newName: string) => {
+    renameOwner(oldName, newName);
+    // Also rename in preset transactions
+    const changed = presetTransactions.some((p) => p.owner === oldName);
+    if (changed) {
+      setPresets(
+        presetTransactions.map((p) =>
+          p.owner === oldName ? { ...p, owner: newName } : p,
+        ),
+      );
+    }
+  };
+
+  const handleRenameExpenseCategory = (oldName: string, newName: string) => {
+    renameExpenseCategory(oldName, newName);
+    // Also rename in preset transactions
+    const changed = presetTransactions.some((p) => p.category === oldName);
+    if (changed) {
+      setPresets(
+        presetTransactions.map((p) =>
+          p.category === oldName ? { ...p, category: newName } : p,
+        ),
+      );
+    }
+  };
+
+  const handleRenameIncomeCategory = (oldName: string, newName: string) => {
+    renameIncomeCategory(oldName, newName);
   };
 
   const handleRemoveExpenseCategory = (category: string) => {
@@ -297,6 +330,7 @@ export function SettingsPage() {
                 categories={expenseCategories}
                 onRemove={handleRemoveExpenseCategory}
                 onAdd={handleAddExpenseCategory}
+                onRename={handleRenameExpenseCategory}
               />
             </div>
           )}
@@ -309,6 +343,7 @@ export function SettingsPage() {
                 categories={incomeCategories}
                 onRemove={handleRemoveIncomeCategory}
                 onAdd={handleAddIncomeCategory}
+                onRename={handleRenameIncomeCategory}
               />
             </div>
           )}
@@ -321,6 +356,7 @@ export function SettingsPage() {
                 owners={owners}
                 onRemove={handleRemoveOwner}
                 onAdd={handleAddOwner}
+                onRename={handleRenameOwner}
               />
             </div>
           )}

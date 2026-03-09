@@ -550,6 +550,8 @@
     "removeExpenseCategoryConfirmTitle": "Remove expense category?",
     "removeIncomeCategoryConfirmDesc": "Removing \"{{category}}\" will set affected income entries to uncategorized.",
     "removeIncomeCategoryConfirmTitle": "Remove income category?",
+    "renameCategory": "Rename {{category}}",
+    "renameOwner": "Rename {{owner}}",
     "removeOwner": "Remove {{owner}}",
     "removeOwnerConfirmDesc": "This will set any entries owned by {{owner}} to No Owner.",
     "removeOwnerConfirmTitle": "Remove owner?",

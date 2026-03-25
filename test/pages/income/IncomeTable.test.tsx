@@ -4,6 +4,22 @@ import { IncomeTable } from "@/pages/income/IncomeTable";
 
 afterEach(() => cleanup());
 
+const sampleByMonth: [string, { id: string; date: string; amount: number; description: string; category: string; owner: string }[]][] = [
+  [
+    "2026-02",
+    [
+      {
+        id: "i1",
+        date: "2026-02-01",
+        amount: 1200,
+        description: "Salary",
+        category: "Paycheck",
+        owner: "Ayaz",
+      },
+    ],
+  ],
+];
+
 test("IncomeTable shows empty state when no income", () => {
   render(
     <IncomeTable
@@ -22,21 +38,7 @@ test("IncomeTable shows month header and row tap action", () => {
   const onIncomeTap = mock(() => {});
   render(
     <IncomeTable
-      byMonth={[
-        [
-          "2026-02",
-          [
-            {
-              id: "i1",
-              date: "2026-02-01",
-              amount: 1200,
-              description: "Salary",
-              category: "Paycheck",
-              owner: "Ayaz",
-            },
-          ],
-        ],
-      ]}
+      byMonth={sampleByMonth}
       defaultOpenMonth="2026-02"
       onIncomeTap={onIncomeTap}
     />,
@@ -47,4 +49,20 @@ test("IncomeTable shows month header and row tap action", () => {
   expect(onIncomeTap).toHaveBeenCalledWith(
     expect.objectContaining({ id: "i1" }),
   );
+});
+
+test("IncomeTable renders copy button and calls onCopy", () => {
+  const onCopy = mock(() => {});
+  render(
+    <IncomeTable
+      byMonth={sampleByMonth}
+      defaultOpenMonth="2026-02"
+      onIncomeTap={() => {}}
+      onCopy={onCopy}
+    />,
+  );
+  const copyBtn = screen.getByRole("button", { name: /copy/i });
+  expect(copyBtn).toBeInTheDocument();
+  fireEvent.click(copyBtn);
+  expect(onCopy).toHaveBeenCalledWith(expect.objectContaining({ id: "i1" }));
 });

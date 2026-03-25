@@ -17,6 +17,11 @@ const inFlight = new Map<
   Promise<{ rate: number; asOf: string; fallback: boolean }>
 >();
 
+/** @internal test-only: clear inflight dedup map between tests */
+export function _resetInFlight(): void {
+  inFlight.clear();
+}
+
 function getCacheKey(currency: SupportedCurrency): string {
   return `${STORAGE_KEYS.FX_CACHE_PREFIX}${currency.toLowerCase()}`;
 }

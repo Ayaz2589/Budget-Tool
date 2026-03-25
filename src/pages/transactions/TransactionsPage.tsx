@@ -64,6 +64,7 @@ export function TransactionsPage() {
   const [editTransfer, setEditTransfer] = useState<OwnerTransfer | null>(null);
   const [filtersPopupOpen, setFiltersPopupOpen] = useState(false);
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
+  const [copyExpense, setCopyExpense] = useState<Expense | null>(null);
   const pendingHighlightIdRef = useRef<string | null>(null);
   const pendingOpenEditIdRef = useRef<string | null>(null);
 
@@ -292,6 +293,12 @@ export function TransactionsPage() {
                           setExpenseForActions(row.expense);
                         }
                       }}
+                      onCopy={(row) => {
+                        if (row.expense) {
+                          setCopyExpense(row.expense);
+                          setAddTransactionOpen(true);
+                        }
+                      }}
                       sourceLabelKeys={SOURCE_LABEL_KEYS}
                       t={t}
                       onUpdateCategory={(id, category) => updateExpense(id, { category })}
@@ -317,6 +324,12 @@ export function TransactionsPage() {
                           setTransferForActions(row.transfer);
                         } else if (row.expense) {
                           setExpenseForActions(row.expense);
+                        }
+                      }}
+                      onCopy={(row) => {
+                        if (row.expense) {
+                          setCopyExpense(row.expense);
+                          setAddTransactionOpen(true);
                         }
                       }}
                       t={t}
@@ -359,7 +372,11 @@ export function TransactionsPage() {
 
       <AddTransactionDialog
         open={addTransactionOpen}
-        onOpenChange={setAddTransactionOpen}
+        onOpenChange={(open) => {
+          setAddTransactionOpen(open);
+          if (!open) setCopyExpense(null);
+        }}
+        initialExpense={copyExpense ?? undefined}
       />
 
       <ExpenseActionsDialog

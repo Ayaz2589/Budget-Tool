@@ -3,7 +3,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { sumAmountsBy } from "@/lib/math";
 import { getMonthLabel } from "@/lib/domain/totals";
 import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Copy } from "lucide-react";
 import type { ExpensesByMonthListProps } from "@/types/transactions";
 import type { ExpenseSource } from "@/types/core";
 import { DsDataRow } from "@/components/ds";
@@ -15,6 +15,7 @@ export function ExpensesByMonthList({
   defaultOpenMonth,
   includeOwnerTransfersInTotals = false,
   onRowTap,
+  onCopy,
   t,
 }: ExpensesByMonthListProps) {
   const [openMonth, setOpenMonth] = useState<string>(defaultOpenMonth);
@@ -121,6 +122,27 @@ export function ExpensesByMonthList({
                       }
                       trailing={
                         <div className="flex items-center gap-2 shrink-0">
+                          {onCopy && row.kind === "expense" && (
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              aria-label={t("common.copy")}
+                              className="inline-flex items-center justify-center size-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onCopy(row);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  onCopy(row);
+                                }
+                              }}
+                            >
+                              <Copy className="size-3.5" />
+                            </span>
+                          )}
                           <span className="inline-flex items-center justify-center rounded-md bg-[var(--surface-2)] text-[10px] px-2 py-0.5 text-muted-foreground">
                             {getSourceBadge(row.source)}
                           </span>

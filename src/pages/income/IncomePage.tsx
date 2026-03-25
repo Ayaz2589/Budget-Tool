@@ -27,6 +27,7 @@ export function IncomePage() {
   const [addOpen, setAddOpen] = useState(false);
   const [editIncome, setEditIncome] = useState<Income | null>(null);
   const [incomeForActions, setIncomeForActions] = useState<Income | null>(null);
+  const [copyIncome, setCopyIncome] = useState<Income | null>(null);
 
   const { t } = useTranslation();
   const sortedIncome = [...income].sort((a, b) => b.date.localeCompare(a.date));
@@ -83,11 +84,15 @@ export function IncomePage() {
 
       <AddIncomeDialog
         open={addOpen}
-        onOpenChange={setAddOpen}
+        onOpenChange={(open) => {
+          setAddOpen(open);
+          if (!open) setCopyIncome(null);
+        }}
         incomeCategories={incomeCategories}
         owners={owners}
         dateFormat={uiFormatSettings.dateFormat}
         onSubmit={handleAdd}
+        initialIncome={copyIncome ?? undefined}
       />
 
       <Card className="flex-1 min-h-0 flex flex-col overflow-hidden md:border-0 md:shadow-none md:rounded-none md:bg-transparent md:py-0">
@@ -111,6 +116,10 @@ export function IncomePage() {
                   byMonth={byMonth}
                   defaultOpenMonth={defaultOpenMonth}
                   onIncomeTap={setIncomeForActions}
+                  onCopy={(i) => {
+                    setCopyIncome(i);
+                    setAddOpen(true);
+                  }}
                   onUpdateCategory={(id, category) => updateIncome(id, { category })}
                   onUpdateOwner={(id, owner) => updateIncome(id, { owner: owner || undefined })}
                   incomeCategories={incomeCategories}
@@ -122,6 +131,10 @@ export function IncomePage() {
                   byMonth={byMonth}
                   defaultOpenMonth={defaultOpenMonth}
                   onIncomeTap={setIncomeForActions}
+                  onCopy={(i) => {
+                    setCopyIncome(i);
+                    setAddOpen(true);
+                  }}
                 />
               </div>
             </>

@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Copy } from "lucide-react";
 import { DsHelpTooltip } from "@/components/ds";
 import { CategoryOption } from "@/lib/format/categoryColors";
 import type { IncomeTableProps } from "@/types/income";
@@ -97,6 +98,7 @@ export function IncomeTable({
   byMonth,
   defaultOpenMonth,
   onIncomeTap,
+  onCopy,
   onUpdateCategory,
   onUpdateOwner,
   incomeCategories,
@@ -161,6 +163,7 @@ export function IncomeTable({
                     </TableHead>
                     <TableHead>{t("common.owner")}</TableHead>
                     <TableHead>{t("common.category")}</TableHead>
+                    {onCopy && <TableHead className="w-10" />}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -234,6 +237,21 @@ export function IncomeTable({
                           i.category || t("common.uncategorized")
                         )}
                       </TableCell>
+                      {onCopy && (
+                        <TableCell className="w-10 text-center">
+                          <button
+                            type="button"
+                            aria-label={t("common.copy")}
+                            className="inline-flex items-center justify-center size-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onCopy(i);
+                            }}
+                          >
+                            <Copy className="size-3.5" />
+                          </button>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>

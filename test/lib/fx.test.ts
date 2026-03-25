@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
-import { getUsdFxRate } from "@/lib/platform/fx";
+import { getUsdFxRate, _resetInFlight } from "@/lib/platform/fx";
 import type { DisplayCurrency } from "@/types/currency";
 
 const originalFetch = globalThis.fetch;
@@ -9,6 +9,7 @@ describe("fx", () => {
     localStorage.clear();
     mock.restore();
     globalThis.fetch = originalFetch;
+    _resetInFlight();
   });
 
   test("returns fresh value and caches it", async () => {

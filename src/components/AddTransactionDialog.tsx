@@ -33,6 +33,7 @@ export function AddTransactionDialog({
   open,
   onOpenChange,
   initialPresetId,
+  initialExpense,
 }: AddTransactionDialogProps) {
   const { t } = useTranslation();
   const {
@@ -62,14 +63,32 @@ export function AddTransactionDialog({
   useEffect(() => {
     if (open) {
       const fallback = (cardSources[0] as ExpenseSource) ?? "manual";
+      const todayInput = isoToDateInput(
+        new Date().toISOString().slice(0, 10),
+        uiFormatSettings.dateFormat,
+      );
       const defaultRow = createDefaultTransactionRow({
         defaultSource: fallback,
-        dateValue: isoToDateInput(
-          new Date().toISOString().slice(0, 10),
-          uiFormatSettings.dateFormat,
-        ),
+        dateValue: todayInput,
       });
-      if (initialPresetId) {
+      if (initialExpense) {
+        defaultRow.entryType = "expense";
+        defaultRow.source = initialExpense.source;
+        defaultRow.description = initialExpense.description;
+        defaultRow.amount = formatCurrencyFromNumber(initialExpense.amount);
+        defaultRow.category = initialExpense.category;
+        defaultRow.owner = initialExpense.paidByOwner || initialExpense.owner || "";
+        defaultRow.paidByOwner = initialExpense.paidByOwner || initialExpense.owner || "";
+        defaultRow.allocationMode = initialExpense.allocationMode || "single";
+        if (initialExpense.allocation?.length) {
+          defaultRow.allocationOwners = initialExpense.allocation.map((a) => a.owner);
+          defaultRow.allocationPercents = Object.fromEntries(
+            initialExpense.allocation
+              .filter((a) => a.percent != null)
+              .map((a) => [a.owner, String(a.percent)]),
+          );
+        }
+      } else if (initialPresetId) {
         const preset = presetTransactions.find((p) => p.id === initialPresetId);
         if (preset) {
           defaultRow.entryType = "expense";
@@ -88,7 +107,7 @@ export function AddTransactionDialog({
       setRows([defaultRow]);
       setActiveRowIndex(0);
     }
-  }, [open, cardSources, uiFormatSettings.dateFormat, initialPresetId, presetTransactions]);
+  }, [open, cardSources, uiFormatSettings.dateFormat, initialExpense, initialPresetId, presetTransactions]);
 
   const ownerOptions = useMemo(() => {
     if (owners.length > 0) return owners;

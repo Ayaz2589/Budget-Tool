@@ -3,7 +3,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { sumAmountsBy } from "@/lib/math";
 import { getMonthLabel } from "@/lib/domain/totals";
 import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Copy } from "lucide-react";
 import type { IncomeListProps } from "@/types/income";
 import { DsDataRow } from "@/components/ds";
 
@@ -13,6 +13,7 @@ export function IncomeList({
   byMonth,
   defaultOpenMonth,
   onIncomeTap,
+  onCopy,
 }: IncomeListProps) {
   const [openMonth, setOpenMonth] = useState<string>(defaultOpenMonth);
 
@@ -70,8 +71,31 @@ export function IncomeList({
                       title={i.description || "—"}
                       subtitle={`${formatDate(i.date)} · ${i.category || "Uncategorized"}`}
                       trailing={
-                        <div className="text-base font-semibold shrink-0">
-                          {formatCurrency(i.amount)}
+                        <div className="flex items-center gap-2 shrink-0">
+                          {onCopy && (
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              aria-label="Copy"
+                              className="inline-flex items-center justify-center size-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onCopy(i);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  onCopy(i);
+                                }
+                              }}
+                            >
+                              <Copy className="size-3.5" />
+                            </span>
+                          )}
+                          <div className="text-base font-semibold">
+                            {formatCurrency(i.amount)}
+                          </div>
                         </div>
                       }
                     />

@@ -10,6 +10,7 @@ export interface AddTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialPresetId?: string;
+  initialExpense?: Expense;
 }
 
 export interface ExpensesByMonthTableProps {
@@ -20,6 +21,7 @@ export interface ExpensesByMonthTableProps {
   sortDir: "asc" | "desc";
   onSort: (col: SortColumn) => void;
   onRowTap: (row: TransactionLedgerRow) => void;
+  onCopy?: (row: TransactionLedgerRow) => void;
   sourceLabelKeys: Record<string, string>;
   t: (key: string, opts?: { count?: number }) => string;
   onUpdateCategory?: (id: string, category: string) => void;
@@ -33,6 +35,7 @@ export interface ExpensesByMonthListProps {
   defaultOpenMonth: string;
   includeOwnerTransfersInTotals?: boolean;
   onRowTap: (row: TransactionLedgerRow) => void;
+  onCopy?: (row: TransactionLedgerRow) => void;
   t: (key: string, opts?: { count?: number }) => string;
 }
 

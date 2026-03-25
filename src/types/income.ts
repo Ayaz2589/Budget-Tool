@@ -16,6 +16,7 @@ export interface AddIncomeDialogProps {
   owners: string[];
   dateFormat?: UiFormatSettings["dateFormat"];
   onSubmit: (payload: AddIncomeFormPayload) => void;
+  initialIncome?: Income;
 }
 
 export interface EditIncomeFormPayload {
@@ -38,12 +39,14 @@ export interface IncomeListProps {
   byMonth: [string, Income[]][];
   defaultOpenMonth: string;
   onIncomeTap: (income: Income) => void;
+  onCopy?: (income: Income) => void;
 }
 
 export interface IncomeTableProps {
   byMonth: [string, Income[]][];
   defaultOpenMonth: string;
   onIncomeTap: (income: Income) => void;
+  onCopy?: (income: Income) => void;
   onUpdateCategory?: (id: string, category: string) => void;
   onUpdateOwner?: (id: string, owner: string) => void;
   incomeCategories?: string[];

@@ -41,6 +41,7 @@ export function AddIncomeDialog({
   owners = [],
   dateFormat = "YYYY/MM/DD",
   onSubmit,
+  initialIncome,
 }: AddIncomeDialogProps) {
   const { t } = useTranslation();
   const { setIncomeCategories, setOwners } = useBudget();
@@ -60,11 +61,13 @@ export function AddIncomeDialog({
           helpLabel={t("common.help")}
         />
         <AddIncomeForm
+          key={initialIncome?.id ?? "new"}
           incomeCategories={incomeCategories}
           owners={owners}
           dateFormat={dateFormat}
           onSubmit={onSubmit}
           onCancel={() => onOpenChange(false)}
+          initialIncome={initialIncome}
           onCreateCategory={(name) => {
             if (!incomeCategories.includes(name)) {
               setIncomeCategories([...incomeCategories, name]);
@@ -90,6 +93,7 @@ function AddIncomeForm({
   onCancel,
   onCreateCategory,
   onCreateOwner,
+  initialIncome,
   t,
 }: {
   incomeCategories: string[];
@@ -99,15 +103,18 @@ function AddIncomeForm({
   onCancel: () => void;
   onCreateCategory?: (name: string) => void;
   onCreateOwner?: (name: string) => void;
+  initialIncome?: import("@/types/core").Income;
   t: (key: string) => string;
 }) {
   const [date, setDate] = useState(() =>
     isoToDateInput(new Date().toISOString().slice(0, 10), dateFormat)
   );
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState(""); // default: Uncategorized
-  const [owner, setOwner] = useState<Owner>(owners[0] ?? "");
+  const [amount, setAmount] = useState(() =>
+    initialIncome ? formatCurrencyInput(String(initialIncome.amount)) : ""
+  );
+  const [description, setDescription] = useState(initialIncome?.description ?? "");
+  const [category, setCategory] = useState(initialIncome?.category ?? "");
+  const [owner, setOwner] = useState<Owner>(initialIncome?.owner ?? owners[0] ?? "");
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   const handleSubmit = (e: React.FormEvent) => {

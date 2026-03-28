@@ -101,7 +101,6 @@ export interface EditTransactionDialogProps {
       allocation?: ExpenseAllocation[];
     },
   ) => void;
-  expenseCategories: string[];
   ownerOptions: string[];
   cardSources: string[];
 }

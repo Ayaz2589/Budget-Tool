@@ -12,7 +12,6 @@ export interface AddIncomeFormPayload {
 export interface AddIncomeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  incomeCategories: string[];
   owners: string[];
   dateFormat?: UiFormatSettings["dateFormat"];
   onSubmit: (payload: AddIncomeFormPayload) => void;
@@ -30,7 +29,6 @@ export interface EditIncomeFormPayload {
 export interface EditIncomeDialogProps {
   income: Income | null;
   onClose: () => void;
-  incomeCategories: string[];
   owners: string[];
   onSubmit: (id: string, payload: EditIncomeFormPayload) => void;
 }

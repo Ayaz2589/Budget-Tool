@@ -50,105 +50,21 @@ function seedData() {
     STORAGE_KEYS.BUDGET_DATA,
     JSON.stringify({
       expenses: [
-        { id: "e1", date: "2026-01-15", amount: 50, description: "Lunch", category: "Dining", source: "manual", owner: "Alice", paidByOwner: "Alice" },
-        { id: "e2", date: "2026-01-16", amount: 30, description: "Gas", category: "Transport", source: "manual" },
+        { id: "e1", date: "2026-01-15", amount: 50, description: "Lunch", category: "Food > Dining Out", source: "manual", owner: "Alice", paidByOwner: "Alice" },
+        { id: "e2", date: "2026-01-16", amount: 30, description: "Gas", category: "Transport > Gas/Fuel", source: "manual" },
       ],
       income: [
-        { id: "i1", date: "2026-01-01", amount: 5000, description: "Salary", category: "Paycheck", owner: "Alice" },
+        { id: "i1", date: "2026-01-01", amount: 5000, description: "Salary", category: "Income > Salary", owner: "Alice" },
       ],
       debts: [],
       debtPayments: [],
       ownerTransfers: [],
       ownerBalances: {},
       cardSources: ["manual"],
-      expenseCategories: ["Dining", "Transport", "Shopping"],
-      incomeCategories: ["Paycheck", "Bonus"],
       owners: ["Alice", "Bob"],
     }),
   );
 }
-
-test("Expense categories section shows pencil (rename) buttons for each category", async () => {
-  seedData();
-  render(<TestWrapper />);
-  navigateToSection("settings.expenseCategories");
-
-  await waitFor(() => {
-    const renameButtons = screen.getAllByLabelText(/Rename/i);
-    expect(renameButtons.length).toBe(3); // Dining, Transport, Shopping
-  });
-});
-
-test("Clicking pencil icon enters inline edit mode with pre-filled input", async () => {
-  seedData();
-  render(<TestWrapper />);
-  navigateToSection("settings.expenseCategories");
-
-  await waitFor(() => {
-    expect(screen.getAllByLabelText(/Rename/i).length).toBeGreaterThan(0);
-  });
-
-  // Click rename on "Dining"
-  const renameBtn = screen.getByLabelText("Rename Dining");
-  fireEvent.click(renameBtn);
-
-  // Should show an input pre-filled with "Dining"
-  await waitFor(() => {
-    const inputs = screen.getAllByRole("textbox");
-    const editInput = inputs.find((input) => (input as HTMLInputElement).value === "Dining");
-    expect(editInput).toBeTruthy();
-  });
-});
-
-test("Pressing Enter on edited category renames it", async () => {
-  seedData();
-  render(<TestWrapper />);
-  navigateToSection("settings.expenseCategories");
-
-  await waitFor(() => {
-    expect(screen.getByLabelText("Rename Dining")).toBeInTheDocument();
-  });
-
-  fireEvent.click(screen.getByLabelText("Rename Dining"));
-
-  const editInput = await waitFor(() => {
-    const inputs = screen.getAllByRole("textbox");
-    return inputs.find((input) => (input as HTMLInputElement).value === "Dining")!;
-  });
-
-  fireEvent.change(editInput, { target: { value: "Eating Out" } });
-  fireEvent.keyDown(editInput, { key: "Enter" });
-
-  // "Dining" should be gone, "Eating Out" should appear
-  await waitFor(() => {
-    expect(screen.getByText("Eating Out")).toBeInTheDocument();
-  });
-});
-
-test("Pressing Escape cancels inline edit without changes", async () => {
-  seedData();
-  render(<TestWrapper />);
-  navigateToSection("settings.expenseCategories");
-
-  await waitFor(() => {
-    expect(screen.getByLabelText("Rename Dining")).toBeInTheDocument();
-  });
-
-  fireEvent.click(screen.getByLabelText("Rename Dining"));
-
-  const editInput = await waitFor(() => {
-    const inputs = screen.getAllByRole("textbox");
-    return inputs.find((input) => (input as HTMLInputElement).value === "Dining")!;
-  });
-
-  fireEvent.change(editInput, { target: { value: "Changed" } });
-  fireEvent.keyDown(editInput, { key: "Escape" });
-
-  // Should still show "Dining" unchanged
-  await waitFor(() => {
-    expect(screen.getByText("Dining")).toBeInTheDocument();
-  });
-});
 
 test("Owners section shows rename buttons for each owner", async () => {
   seedData();
@@ -158,16 +74,5 @@ test("Owners section shows rename buttons for each owner", async () => {
   await waitFor(() => {
     expect(screen.getByLabelText("Rename Alice")).toBeInTheDocument();
     expect(screen.getByLabelText("Rename Bob")).toBeInTheDocument();
-  });
-});
-
-test("Income categories section shows rename buttons", async () => {
-  seedData();
-  render(<TestWrapper />);
-  navigateToSection("settings.incomeCategories");
-
-  await waitFor(() => {
-    expect(screen.getByLabelText("Rename Paycheck")).toBeInTheDocument();
-    expect(screen.getByLabelText("Rename Bonus")).toBeInTheDocument();
   });
 });

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Trash2, Settings2, CloudCog, CreditCard, Tags, Wallet, Users, AlertTriangle } from "lucide-react";
+import { Trash2, Settings2, CloudCog, CreditCard, Users, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useBudget } from "@/context";
 import { useGoogleAuth } from "@/context";
@@ -34,8 +34,6 @@ import {
 import { DsSectionHeader } from "@/components/ds";
 import { GoogleSheetsCard } from "./GoogleSheetsCard";
 import { CardSourcesCard } from "./CardSourcesCard";
-import { ExpenseCategoriesCard } from "./ExpenseCategoriesCard";
-import { IncomeCategoriesCard } from "./IncomeCategoriesCard";
 import { OwnersCard } from "./OwnersCard";
 import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
 import { cn } from "@/lib/utils";
@@ -48,14 +46,12 @@ const DATE_FORMAT_OPTIONS = [
 ] as const;
 const CURRENCY_OPTIONS = DISPLAY_CURRENCIES.map((code) => CURRENCY_META[code]);
 
-type SettingsSection = "general" | "sync" | "card-sources" | "expense-categories" | "income-categories" | "owners" | "danger";
+type SettingsSection = "general" | "sync" | "card-sources" | "owners" | "danger";
 
 const SECTIONS: { id: SettingsSection; icon: typeof Settings2 }[] = [
   { id: "general", icon: Settings2 },
   { id: "sync", icon: CloudCog },
   { id: "card-sources", icon: CreditCard },
-  { id: "expense-categories", icon: Tags },
-  { id: "income-categories", icon: Wallet },
   { id: "owners", icon: Users },
   { id: "danger", icon: AlertTriangle },
 ];
@@ -70,11 +66,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 
 export function SettingsPage() {
   const {
-    expenseCategories,
-    incomeCategories,
     owners,
-    setExpenseCategories,
-    setIncomeCategories,
     setOwners,
     repairCorruptedDates,
     uiFormatSettings,
@@ -82,8 +74,6 @@ export function SettingsPage() {
     useDummyData,
     setUseDummyData,
     renameOwner,
-    renameExpenseCategory,
-    renameIncomeCategory,
   } = useBudget();
   const {
     isSignedIn,
@@ -135,51 +125,6 @@ export function SettingsPage() {
     }
   };
 
-  const handleRenameExpenseCategory = (oldName: string, newName: string) => {
-    renameExpenseCategory(oldName, newName);
-    // Also rename in preset transactions
-    const changed = presetTransactions.some((p) => p.category === oldName);
-    if (changed) {
-      setPresets(
-        presetTransactions.map((p) =>
-          p.category === oldName ? { ...p, category: newName } : p,
-        ),
-      );
-    }
-  };
-
-  const handleRenameIncomeCategory = (oldName: string, newName: string) => {
-    renameIncomeCategory(oldName, newName);
-  };
-
-  const handleRemoveExpenseCategory = (category: string) => {
-    setExpenseCategories(expenseCategories.filter((c) => c !== category));
-    const presetsWithoutCategory = presetTransactions.filter(
-      (p) => p.category !== category,
-    );
-    if (presetsWithoutCategory.length !== presetTransactions.length) {
-      setPresets(presetsWithoutCategory);
-    }
-  };
-
-  const handleAddExpenseCategory = (name: string) => {
-    const trimmed = name.trim();
-    if (trimmed && !expenseCategories.includes(trimmed)) {
-      setExpenseCategories([...expenseCategories, trimmed]);
-    }
-  };
-
-  const handleRemoveIncomeCategory = (category: string) => {
-    setIncomeCategories(incomeCategories.filter((c) => c !== category));
-  };
-
-  const handleAddIncomeCategory = (name: string) => {
-    const trimmed = name.trim();
-    if (trimmed && !incomeCategories.includes(trimmed)) {
-      setIncomeCategories([...incomeCategories, trimmed]);
-    }
-  };
-
   const handleRemoveOwner = (owner: string) => {
     setOwners(owners.filter((o) => o !== owner));
     const changed = presetTransactions.some((p) => p.owner === owner);
@@ -223,8 +168,6 @@ export function SettingsPage() {
     general: t("settings.preferencesTitle"),
     sync: t("settings.googleSheets"),
     "card-sources": t("settings.cardSources"),
-    "expense-categories": t("settings.expenseCategories"),
-    "income-categories": t("settings.incomeCategories"),
     owners: t("settings.owners"),
     danger: t("settings.deleteAllData"),
   };
@@ -319,32 +262,6 @@ export function SettingsPage() {
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">{t("settings.cardSourcesDesc")}</p>
               <CardSourcesCard bare />
-            </div>
-          )}
-
-          {activeSection === "expense-categories" && (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">{t("settings.expenseCategoriesDesc")}</p>
-              <ExpenseCategoriesCard
-                bare
-                categories={expenseCategories}
-                onRemove={handleRemoveExpenseCategory}
-                onAdd={handleAddExpenseCategory}
-                onRename={handleRenameExpenseCategory}
-              />
-            </div>
-          )}
-
-          {activeSection === "income-categories" && (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">{t("settings.incomeCategoriesDesc")}</p>
-              <IncomeCategoriesCard
-                bare
-                categories={incomeCategories}
-                onRemove={handleRemoveIncomeCategory}
-                onAdd={handleAddIncomeCategory}
-                onRename={handleRenameIncomeCategory}
-              />
             </div>
           )}
 

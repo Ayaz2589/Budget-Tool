@@ -422,7 +422,6 @@ export function TransactionsPage() {
         expense={editExpense}
         onClose={() => setEditExpense(null)}
         onSubmit={(id, updates) => updateExpense(id, updates)}
-        expenseCategories={expenseCategories}
         ownerOptions={ownerOptions}
         cardSources={cardSources}
       />

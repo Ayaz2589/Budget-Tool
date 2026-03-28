@@ -14,7 +14,6 @@ import {
   dateInputToIso,
   isoToDateInput,
 } from "@/lib/format/dateInput";
-import { CategoryOption } from "@/lib/format/categoryColors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -32,6 +31,7 @@ import {
 } from "@/components/ui/sheet";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "@/context";
+import { DsCategoryPicker } from "@/components/ds/DsCategoryPicker";
 import { DsCreatableSelect, DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 function parsePercentValue(raw: string): number | null {
@@ -48,12 +48,11 @@ export function EditTransactionDialog({
   expense,
   onClose,
   onSubmit,
-  expenseCategories,
   ownerOptions,
   cardSources,
 }: EditTransactionDialogProps) {
   const { t } = useTranslation();
-  const { uiFormatSettings, setExpenseCategories, owners: allOwners, setOwners } = useBudget();
+  const { uiFormatSettings, owners: allOwners, setOwners } = useBudget();
   const [date, setDate] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -238,18 +237,10 @@ export function EditTransactionDialog({
 
           <div className="space-y-2">
             <Label>{t("common.category")}</Label>
-            <DsCreatableSelect
-              value={category || "_"}
-              onValueChange={(v) => setCategory(v === "_" ? "" : v)}
-              options={expenseCategories}
-              onCreateNew={(name) => {
-                if (!expenseCategories.includes(name)) {
-                  setExpenseCategories([...expenseCategories, name]);
-                }
-              }}
-              noneLabel={t("common.uncategorized")}
-              noneValue="_"
-              renderOption={(name) => <CategoryOption name={name} type="expense" />}
+            <DsCategoryPicker
+              value={category}
+              onValueChange={setCategory}
+              type="expense"
               className={selectTriggerClass}
             />
           </div>

@@ -106,26 +106,8 @@ test("PresetsPage shows empty state when no presets exist", () => {
   ).toBeInTheDocument();
 });
 
-test("PresetsPage shows special empty state when no categories exist", () => {
-  localStorage.setItem(
-    BUDGET_STORAGE_KEY,
-    JSON.stringify({
-      expenses: [],
-      income: [],
-      debts: [],
-      debtPayments: [],
-      ownerBalances: {},
-      cardSources: ["manual"],
-      expenseCategories: [],
-      incomeCategories: [],
-      owners: [],
-    }),
-  );
-  render(<TestWrapper />);
-  expect(
-    screen.getByText(i18n.t("presetTransactions.emptyNoCategories")),
-  ).toBeInTheDocument();
-});
+// Categories are now preset from the registry and can never be empty,
+// so the "no categories" empty state is no longer reachable.
 
 // ---------------------------------------------------------------------------
 // Rendering with seeded presets

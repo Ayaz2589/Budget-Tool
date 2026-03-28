@@ -15,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CategoryOption } from "@/lib/format/categoryColors";
 import {
   formatCurrencyInput,
   parseCurrencyInput,
@@ -30,6 +29,7 @@ import type {
   AddIncomeDialogProps,
 } from "@/types/income";
 import { useBudget } from "@/context";
+import { DsCategoryPicker } from "@/components/ds/DsCategoryPicker";
 import { DsCreatableSelect, DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { AddIncomeFormPayload, AddIncomeDialogProps };
@@ -37,14 +37,13 @@ export type { AddIncomeFormPayload, AddIncomeDialogProps };
 export function AddIncomeDialog({
   open,
   onOpenChange,
-  incomeCategories,
   owners = [],
   dateFormat = "YYYY/MM/DD",
   onSubmit,
   initialIncome,
 }: AddIncomeDialogProps) {
   const { t } = useTranslation();
-  const { setIncomeCategories, setOwners } = useBudget();
+  const { setOwners } = useBudget();
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -62,17 +61,11 @@ export function AddIncomeDialog({
         />
         <AddIncomeForm
           key={initialIncome?.id ?? "new"}
-          incomeCategories={incomeCategories}
           owners={owners}
           dateFormat={dateFormat}
           onSubmit={onSubmit}
           onCancel={() => onOpenChange(false)}
           initialIncome={initialIncome}
-          onCreateCategory={(name) => {
-            if (!incomeCategories.includes(name)) {
-              setIncomeCategories([...incomeCategories, name]);
-            }
-          }}
           onCreateOwner={(name) => {
             if (!owners.includes(name)) {
               setOwners([...owners, name]);
@@ -86,22 +79,18 @@ export function AddIncomeDialog({
 }
 
 function AddIncomeForm({
-  incomeCategories,
   owners = [],
   dateFormat = "YYYY/MM/DD",
   onSubmit,
   onCancel,
-  onCreateCategory,
   onCreateOwner,
   initialIncome,
   t,
 }: {
-  incomeCategories: string[];
   owners?: string[];
   dateFormat?: "YYYY/MM/DD" | "MM/DD/YYYY";
   onSubmit: (payload: AddIncomeFormPayload) => void;
   onCancel: () => void;
-  onCreateCategory?: (name: string) => void;
   onCreateOwner?: (name: string) => void;
   initialIncome?: import("@/types/core").Income;
   t: (key: string) => string;
@@ -161,37 +150,12 @@ function AddIncomeForm({
         </div>
         <div className="space-y-2">
           <Label>{t("income.category")}</Label>
-          {onCreateCategory ? (
-            <DsCreatableSelect
-              value={category || "_"}
-              onValueChange={(v) => setCategory(v === "_" ? "" : v)}
-              options={incomeCategories}
-              onCreateNew={onCreateCategory}
-              noneLabel={t("common.uncategorized")}
-              noneValue="_"
-              renderOption={(name) => <CategoryOption name={name} type="income" />}
-              className={selectTriggerClass}
-            />
-          ) : (
-            <Select
-              value={category || "_"}
-              onValueChange={(v) => setCategory(v === "_" ? "" : v)}
-            >
-              <SelectTrigger className={selectTriggerClass}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="_">
-                  <CategoryOption name={t("common.uncategorized")} type="income" />
-                </SelectItem>
-                {incomeCategories.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    <CategoryOption name={c} type="income" />
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          <DsCategoryPicker
+            value={category}
+            onValueChange={setCategory}
+            type="income"
+            className={selectTriggerClass}
+          />
         </div>
         <div className="space-y-2">
           <Label>{t("income.owner")}</Label>

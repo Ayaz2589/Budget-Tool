@@ -9,8 +9,8 @@ import {
 // ---------------------------------------------------------------------------
 
 describe("MORTGAGE_CATEGORY_LABEL", () => {
-  test("is the string 'Mortgage'", () => {
-    expect(MORTGAGE_CATEGORY_LABEL).toBe("Mortgage");
+  test("is the composite key 'Home > Rent/Mortgage'", () => {
+    expect(MORTGAGE_CATEGORY_LABEL).toBe("Home > Rent/Mortgage");
   });
 });
 
@@ -51,6 +51,24 @@ describe("isMortgageCategory whitespace handling", () => {
 
   test("returns true for '\\tMortgage\\n' (tab and newline)", () => {
     expect(isMortgageCategory("\tMortgage\n")).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// isMortgageCategory — composite key matches
+// ---------------------------------------------------------------------------
+
+describe("isMortgageCategory composite key matches", () => {
+  test("returns true for 'Home > Rent/Mortgage'", () => {
+    expect(isMortgageCategory("Home > Rent/Mortgage")).toBe(true);
+  });
+
+  test("returns true for 'home > rent/mortgage' (lowercase)", () => {
+    expect(isMortgageCategory("home > rent/mortgage")).toBe(true);
+  });
+
+  test("returns true for ' Home > Rent/Mortgage ' (whitespace)", () => {
+    expect(isMortgageCategory(" Home > Rent/Mortgage ")).toBe(true);
   });
 });
 

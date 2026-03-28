@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
-import { CategoryOption } from "@/lib/format/categoryColors";
 import {
   formatCurrencyFromNumber,
   formatCurrencyInput,
@@ -24,6 +23,7 @@ import type {
   EditIncomeFormPayload,
   EditIncomeDialogProps,
 } from "@/types/income";
+import { DsCategoryPicker } from "@/components/ds/DsCategoryPicker";
 import { DsCreatableSelect, DsSheetActions, DsSheetHeader } from "@/components/ds";
 
 export type { EditIncomeFormPayload, EditIncomeDialogProps };
@@ -31,7 +31,6 @@ export type { EditIncomeFormPayload, EditIncomeDialogProps };
 export function EditIncomeDialog({
   income,
   onClose,
-  incomeCategories,
   owners = [],
   onSubmit,
 }: EditIncomeDialogProps) {
@@ -41,7 +40,7 @@ export function EditIncomeDialog({
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [owner, setOwner] = useState<Owner>("");
-  const { uiFormatSettings, setIncomeCategories, setOwners: setAllOwners } = useBudget();
+  const { uiFormatSettings, setOwners: setAllOwners } = useBudget();
   const fieldClass = "h-11 w-full min-w-0";
   const selectTriggerClass = "h-11 w-full data-[size=default]:h-11";
   useEffect(() => {
@@ -52,7 +51,7 @@ export function EditIncomeDialog({
       setCategory(income.category ?? ""); // default: Uncategorized
       setOwner(income.owner ?? "");
     }
-  }, [income, incomeCategories, owners, uiFormatSettings.dateFormat]);
+  }, [income, owners, uiFormatSettings.dateFormat]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,18 +111,10 @@ export function EditIncomeDialog({
             </div>
             <div className="space-y-2">
               <Label>{t("income.category")}</Label>
-              <DsCreatableSelect
-                value={category || "_"}
-                onValueChange={(v) => setCategory(v === "_" ? "" : v)}
-                options={incomeCategories}
-                onCreateNew={(name) => {
-                  if (!incomeCategories.includes(name)) {
-                    setIncomeCategories([...incomeCategories, name]);
-                  }
-                }}
-                noneLabel={t("common.uncategorized")}
-                noneValue="_"
-                renderOption={(name) => <CategoryOption name={name} type="income" />}
+              <DsCategoryPicker
+                value={category}
+                onValueChange={setCategory}
+                type="income"
                 className={selectTriggerClass}
               />
             </div>

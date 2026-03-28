@@ -9,6 +9,8 @@ export { DsHelpTooltip } from "./DsHelpTooltip";
 export { DsLegendList } from "./DsLegendList";
 export { DsEmptyState } from "./DsEmptyState";
 export { DsCreatableSelect } from "./DsCreatableSelect";
+export { DsCategoryIcon, DsCategoryBadge } from "./DsCategoryIcon";
+export { DsCategoryPicker } from "./DsCategoryPicker";
 export { DsActionBar } from "./DsActionBar";
 export { DsWidgetCard } from "./DsWidgetCard";
 export { DsWidgetShell } from "./DsWidgetShell";

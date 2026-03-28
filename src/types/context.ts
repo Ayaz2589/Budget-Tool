@@ -30,12 +30,8 @@ export interface BudgetContextValue extends BudgetState {
   addOwnerTransfer: (entry: Omit<OwnerTransfer, "id"> | OwnerTransfer) => void;
   updateOwnerTransfer: (id: string, updates: Partial<OwnerTransfer>) => void;
   removeOwnerTransfer: (id: string) => void;
-  setExpenseCategories: (categories: string[]) => void;
-  setIncomeCategories: (categories: string[]) => void;
   setOwners: (owners: string[]) => void;
   renameOwner: (oldName: string, newName: string) => void;
-  renameExpenseCategory: (oldName: string, newName: string) => void;
-  renameIncomeCategory: (oldName: string, newName: string) => void;
   setCardSources: (sources: string[]) => void;
   setOwnerBalance: (monthKey: string, owner: string, amount: number) => void;
   ownerBalances: Record<string, Record<string, number>>;

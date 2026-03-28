@@ -55,12 +55,13 @@ import {
   DsSheetActions,
   DsSheetHeader,
 } from "@/components/ds";
+import { DsCategoryPicker } from "@/components/ds/DsCategoryPicker";
 
 export function PresetsPage() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const { expenseCategories, setExpenseCategories, cardSources, owners, setOwners } = useBudget();
+  const { expenseCategories, cardSources, owners, setOwners } = useBudget();
   const { presetTransactions, addPreset, removePreset, setPresets } =
     usePresetTransactions();
 
@@ -301,15 +302,10 @@ export function PresetsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>{t("presetTransactions.category")}</Label>
-                    <DsCreatableSelect
+                    <DsCategoryPicker
                       value={presetCategory}
                       onValueChange={setPresetCategory}
-                      options={expenseCategories}
-                      onCreateNew={(name) => {
-                        if (!expenseCategories.includes(name)) {
-                          setExpenseCategories([...expenseCategories, name]);
-                        }
-                      }}
+                      type="expense"
                       className={selectTriggerClass}
                     />
                   </div>

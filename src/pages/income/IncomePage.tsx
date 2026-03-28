@@ -88,7 +88,6 @@ export function IncomePage() {
           setAddOpen(open);
           if (!open) setCopyIncome(null);
         }}
-        incomeCategories={incomeCategories}
         owners={owners}
         dateFormat={uiFormatSettings.dateFormat}
         onSubmit={handleAdd}
@@ -175,7 +174,6 @@ export function IncomePage() {
       <EditIncomeDialog
         income={editIncome}
         onClose={() => setEditIncome(null)}
-        incomeCategories={incomeCategories}
         owners={owners}
         onSubmit={handleEdit}
       />

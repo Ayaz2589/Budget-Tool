@@ -190,8 +190,6 @@ export function useImportState() {
     incomeCategories,
     cardSources,
     setCardSources,
-    setExpenseCategories,
-    setIncomeCategories,
     setOwners,
     owners,
     ownerTransfers,
@@ -313,22 +311,7 @@ export function useImportState() {
     if (Array.isArray(parsed.cardSources) && parsed.cardSources.length > 0) {
       setCardSources(parsed.cardSources);
     }
-    if (
-      Array.isArray(parsed.expenseCategoriesWithColors) &&
-      parsed.expenseCategoriesWithColors.length > 0
-    ) {
-      setExpenseCategories(
-        parsed.expenseCategoriesWithColors.map((x) => x.name),
-      );
-    }
-    if (
-      Array.isArray(parsed.incomeCategoriesWithColors) &&
-      parsed.incomeCategoriesWithColors.length > 0
-    ) {
-      setIncomeCategories(
-        parsed.incomeCategoriesWithColors.map((x) => x.name),
-      );
-    }
+    // Categories are now preset from the registry — no need to import them
     if (Array.isArray(parsed.owners) && parsed.owners.length > 0) {
       setOwners(parsed.owners);
     }
@@ -624,12 +607,7 @@ export function useImportState() {
     const addIncCats = selected?.incomeCategories ?? state.missingIncomeCategories;
     const addOwnersList = selected?.owners ?? state.missingOwners;
 
-    if (addExpCats.length > 0) {
-      setExpenseCategories([...expenseCategories, ...addExpCats]);
-    }
-    if (addIncCats.length > 0) {
-      setIncomeCategories([...incomeCategories, ...addIncCats]);
-    }
+    // Categories are now preset from the registry — skip category imports
     if (addOwnersList.length > 0) {
       setOwners([...owners, ...addOwnersList]);
     }

@@ -827,16 +827,7 @@ export function SyncProvider({
           ) {
             budget.setCardSources(expanded.cardSources);
           }
-          if (Array.isArray(expanded.expenseCategoriesWithColors)) {
-            budget.setExpenseCategories(
-              expanded.expenseCategoriesWithColors.map((x) => x.name),
-            );
-          }
-          if (Array.isArray(expanded.incomeCategoriesWithColors)) {
-            budget.setIncomeCategories(
-              expanded.incomeCategoriesWithColors.map((x) => x.name),
-            );
-          }
+          // Categories are now preset from the registry — no need to sync them from sheets
           if (Array.isArray(expanded.owners)) {
             budget.setOwners(expanded.owners);
           }
@@ -895,42 +886,7 @@ export function SyncProvider({
         (i) => !appIncomeKeys.has(incomeKey(i)),
       );
 
-      const additionalExpenseCategories = [
-        ...new Set(
-          sheetExpenses
-            .map((e) => (e.category || "").trim())
-            .filter(
-              (category) =>
-                category.length > 0 &&
-                !isMortgageCategory(category) &&
-                !budget.expenseCategories.includes(category),
-            ),
-        ),
-      ];
-      if (additionalExpenseCategories.length > 0) {
-        budget.setExpenseCategories([
-          ...budget.expenseCategories,
-          ...additionalExpenseCategories,
-        ]);
-      }
-
-      const additionalIncomeCategories = [
-        ...new Set(
-          sheetIncome
-            .map((i) => (i.category || "").trim())
-            .filter(
-              (category) =>
-                category.length > 0 &&
-                !budget.incomeCategories.includes(category),
-            ),
-        ),
-      ];
-      if (additionalIncomeCategories.length > 0) {
-        budget.setIncomeCategories([
-          ...budget.incomeCategories,
-          ...additionalIncomeCategories,
-        ]);
-      }
+      // Categories are now preset from the registry — no need to derive from sheet data
 
       const normalizedNewExpenses = newExpenses.map((e) => ({
         ...e,
@@ -1059,8 +1015,6 @@ export function SyncProvider({
     budget.setCardSources,
     budget.expenseCategories,
     budget.incomeCategories,
-    budget.setExpenseCategories,
-    budget.setIncomeCategories,
     ensureLinkedSheetActive,
   ]);
 

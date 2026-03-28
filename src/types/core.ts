@@ -98,20 +98,19 @@ export interface ParseResult {
   error?: string;
 }
 
-export const DEFAULT_EXPENSE_CATEGORIES = [
-  "Groceries",
-  "Dining",
-  "Transport",
-  "Shopping",
-  "Amazon",
-] as const;
+/**
+ * @deprecated Use `getAllCompositeKeys("expense")` from `@/lib/categories` instead.
+ * Kept temporarily for backward compatibility during migration.
+ */
+export const DEFAULT_EXPENSE_CATEGORIES = [] as const;
 
-export const DEFAULT_INCOME_CATEGORIES = [
-  "Rent",
-  "Paycheck",
-  "Bonus",
-  "Other",
-] as const;
+/**
+ * @deprecated Use `getAllCompositeKeys("income")` from `@/lib/categories` instead.
+ * Kept temporarily for backward compatibility during migration.
+ */
+export const DEFAULT_INCOME_CATEGORIES = [] as const;
 
-export type ExpenseCategory = (typeof DEFAULT_EXPENSE_CATEGORIES)[number];
-export type IncomeCategory = (typeof DEFAULT_INCOME_CATEGORIES)[number];
+/** @deprecated Categories are now preset composite keys from the registry. */
+export type ExpenseCategory = string;
+/** @deprecated Categories are now preset composite keys from the registry. */
+export type IncomeCategory = string;

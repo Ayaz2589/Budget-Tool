@@ -8,11 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { ExpenseSource } from "@/types/core";
-import {
-  ALL_EXPENSE_SOURCES,
-  DEFAULT_EXPENSE_CATEGORIES,
-  DEFAULT_INCOME_CATEGORIES,
-} from "@/lib/types";
+import { ALL_EXPENSE_SOURCES } from "@/lib/types";
 import {
   getDefaultUiFormatSettings,
   setUiFormatSettings as applyUiFormatSettings,
@@ -69,6 +65,7 @@ export function loadStoredCardSources(raw?: string[] | null): string[] {
   return [...ALL_EXPENSE_SOURCES];
 }
 
+/** @deprecated Categories are now preset; this loader is kept only for legacy data compat. */
 export function loadStoredCategories(
   raw: string[] | undefined,
   defaults: readonly string[],
@@ -89,8 +86,6 @@ export function loadStoredCategories(
 export interface StoredSettingsData {
   ownerBalances: Record<string, Record<string, number>>;
   cardSources: string[];
-  expenseCategories: string[];
-  incomeCategories: string[];
   owners: string[];
 }
 
@@ -101,8 +96,6 @@ export function loadStoredSettings(): StoredSettingsData {
       const data = JSON.parse(raw) as Partial<{
         ownerBalances: Record<string, Record<string, number>>;
         cardSources: string[];
-        expenseCategories: string[];
-        incomeCategories: string[];
         owners: string[];
       }>;
       return {
@@ -111,14 +104,6 @@ export function loadStoredSettings(): StoredSettingsData {
             ? data.ownerBalances
             : {},
         cardSources: loadStoredCardSources(data.cardSources),
-        expenseCategories: loadStoredCategories(
-          data.expenseCategories,
-          DEFAULT_EXPENSE_CATEGORIES,
-        ),
-        incomeCategories: loadStoredCategories(
-          data.incomeCategories,
-          DEFAULT_INCOME_CATEGORIES,
-        ),
         owners:
           Array.isArray(data.owners) &&
           data.owners.every((o) => typeof o === "string")
@@ -132,8 +117,6 @@ export function loadStoredSettings(): StoredSettingsData {
   return {
     ownerBalances: {},
     cardSources: [...ALL_EXPENSE_SOURCES],
-    expenseCategories: [],
-    incomeCategories: [],
     owners: [],
   };
 }
@@ -143,15 +126,11 @@ export function loadStoredSettings(): StoredSettingsData {
 // ---------------------------------------------------------------------------
 
 export interface SettingsContextValue {
-  expenseCategories: string[];
-  incomeCategories: string[];
   owners: string[];
   cardSources: string[];
   ownerBalances: Record<string, Record<string, number>>;
   uiFormatSettings: UiFormatSettings;
   isCurrencyUpdating: boolean;
-  setExpenseCategories: (categories: string[]) => void;
-  setIncomeCategories: (categories: string[]) => void;
   setOwners: (owners: string[]) => void;
   setCardSources: (sources: string[]) => void;
   setOwnerBalance: (monthKey: string, owner: string, amount: number) => void;
@@ -171,12 +150,6 @@ export function SettingsProvider({
   children: ReactNode;
   initialSettings: StoredSettingsData;
 }) {
-  const [expenseCategories, setExpenseCategoriesState] = useState<string[]>(
-    initialSettings.expenseCategories,
-  );
-  const [incomeCategories, setIncomeCategoriesState] = useState<string[]>(
-    initialSettings.incomeCategories,
-  );
   const [owners, setOwnersState] = useState<string[]>(
     initialSettings.owners,
   );
@@ -239,14 +212,6 @@ export function SettingsProvider({
   }, [uiFormatSettings.currency]);
 
   // --- Simple setters (no cross-concern side effects) ---
-  const setExpenseCategories = useCallback(
-    (categories: string[]) => setExpenseCategoriesState(categories),
-    [],
-  );
-  const setIncomeCategories = useCallback(
-    (categories: string[]) => setIncomeCategoriesState(categories),
-    [],
-  );
   const setOwners = useCallback(
     (nextOwners: string[]) => setOwnersState(nextOwners),
     [],
@@ -317,30 +282,22 @@ export function SettingsProvider({
 
   const value = useMemo<SettingsContextValue>(
     () => ({
-      expenseCategories,
-      incomeCategories,
       owners,
       cardSources,
       ownerBalances,
       uiFormatSettings,
       isCurrencyUpdating,
-      setExpenseCategories,
-      setIncomeCategories,
       setOwners,
       setCardSources,
       setOwnerBalance,
       setUiFormatSettings,
     }),
     [
-      expenseCategories,
-      incomeCategories,
       owners,
       cardSources,
       ownerBalances,
       uiFormatSettings,
       isCurrencyUpdating,
-      setExpenseCategories,
-      setIncomeCategories,
       setOwners,
       setCardSources,
       setOwnerBalance,

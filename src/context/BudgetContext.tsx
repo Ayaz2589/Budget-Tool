@@ -16,7 +16,12 @@ import type {
   OwnerTransfer,
 } from "@/types/core";
 import { ALL_EXPENSE_SOURCES } from "@/lib/types";
-import { isMortgageCategory } from "@/lib/domain/mortgageCategory";
+import { getAllCompositeKeys } from "@/lib/categories/registry";
+import {
+  migrateCategories,
+  isMigrationNeeded,
+  setCategoryMigrationVersion,
+} from "@/lib/categories/migration";
 import { isValidDate, tryRepairDate } from "@/lib/domain/dateRepair";
 import { buildDummyBudget, type DummyBudgetData } from "@/lib/import/dummyData";
 import { storage, STORAGE_KEYS } from "@/lib/platform/storage";
@@ -77,8 +82,6 @@ interface StoredBudgetRaw {
   ownerTransfers: OwnerTransfer[];
   ownerBalances: Record<string, Record<string, number>>;
   cardSources: string[];
-  expenseCategories: string[];
-  incomeCategories: string[];
   owners: string[];
 }
 
@@ -94,8 +97,6 @@ export function loadStoredBudget(): StoredBudgetRaw {
         ownerTransfers: OwnerTransfer[];
         ownerBalances: Record<string, Record<string, number>>;
         cardSources: string[];
-        expenseCategories: string[];
-        incomeCategories: string[];
         owners: string[];
       }>;
       const cardSources = Array.isArray(data.cardSources)
@@ -163,16 +164,6 @@ export function loadStoredBudget(): StoredBudgetRaw {
             : {},
         cardSources:
           cardSources.length > 0 ? cardSources : [...ALL_EXPENSE_SOURCES],
-        expenseCategories:
-          Array.isArray(data.expenseCategories) &&
-          data.expenseCategories.every((c) => typeof c === "string")
-            ? data.expenseCategories
-            : [],
-        incomeCategories:
-          Array.isArray(data.incomeCategories) &&
-          data.incomeCategories.every((c) => typeof c === "string")
-            ? data.incomeCategories
-            : [],
         owners:
           Array.isArray(data.owners) &&
           data.owners.every((o) => typeof o === "string")
@@ -191,8 +182,6 @@ export function loadStoredBudget(): StoredBudgetRaw {
     ownerTransfers: [],
     ownerBalances: {},
     cardSources: [...ALL_EXPENSE_SOURCES],
-    expenseCategories: [],
-    incomeCategories: [],
     owners: [],
   };
 }
@@ -235,12 +224,15 @@ function BudgetComposer({
   const ownerTransfers = useDummyData
     ? dummyState.ownerTransfers
     : realOwnerTransfers;
-  const expenseCategories = useDummyData
-    ? dummyState.expenseCategories
-    : settings.expenseCategories;
-  const incomeCategories = useDummyData
-    ? dummyState.incomeCategories
-    : settings.incomeCategories;
+  // Categories are now preset from the registry, not user-managed
+  const expenseCategories = useMemo(
+    () => getAllCompositeKeys("expense"),
+    [],
+  );
+  const incomeCategories = useMemo(
+    () => getAllCompositeKeys("income"),
+    [],
+  );
   const owners = useDummyData ? dummyState.owners : settings.owners;
   const cardSources = useDummyData
     ? dummyState.cardSources
@@ -262,8 +254,6 @@ function BudgetComposer({
         ownerTransfers: realOwnerTransfers,
         ownerBalances: settings.ownerBalances,
         cardSources: settings.cardSources,
-        expenseCategories: settings.expenseCategories,
-        incomeCategories: settings.incomeCategories,
         owners: settings.owners,
       }),
     );
@@ -276,8 +266,6 @@ function BudgetComposer({
     realOwnerTransfers,
     settings.ownerBalances,
     settings.cardSources,
-    settings.expenseCategories,
-    settings.incomeCategories,
     settings.owners,
   ]);
 
@@ -671,65 +659,6 @@ function BudgetComposer({
 
   // --- Cross-concern setters that touch both settings and transactions ---
 
-  const setExpenseCategories = useCallback(
-    (categories: string[]) => {
-      if (useDummyData) {
-        setDummyState((prev) => ({
-          ...prev,
-          expenses: prev.expenses.map((e) =>
-            e.category &&
-            !isMortgageCategory(e.category) &&
-            !categories.includes(e.category)
-              ? { ...e, category: "" }
-              : e,
-          ),
-          expenseCategories: categories,
-        }));
-      } else {
-        // Clear categories from expenses that no longer exist
-        dispatchExpenses({
-          type: "SET",
-          expenses: realExpenses.map((e) =>
-            e.category &&
-            !isMortgageCategory(e.category) &&
-            !categories.includes(e.category)
-              ? { ...e, category: "" }
-              : e,
-          ),
-        });
-        settings.setExpenseCategories(categories);
-      }
-    },
-    [useDummyData, setDummyState, dispatchExpenses, realExpenses, settings],
-  );
-
-  const setIncomeCategories = useCallback(
-    (categories: string[]) => {
-      if (useDummyData) {
-        setDummyState((prev) => ({
-          ...prev,
-          income: prev.income.map((i) =>
-            i.category && !categories.includes(i.category)
-              ? { ...i, category: "" }
-              : i,
-          ),
-          incomeCategories: categories,
-        }));
-      } else {
-        dispatchIncome({
-          type: "SET",
-          income: realIncome.map((i) =>
-            i.category && !categories.includes(i.category)
-              ? { ...i, category: "" }
-              : i,
-          ),
-        });
-        settings.setIncomeCategories(categories);
-      }
-    },
-    [useDummyData, setDummyState, dispatchIncome, realIncome, settings],
-  );
-
   const setOwners = useCallback(
     (nextOwners: string[]) => {
       const normalized = nextOwners.map((o) => o.trim()).filter(Boolean);
@@ -996,68 +925,6 @@ function BudgetComposer({
     ],
   );
 
-  const renameExpenseCategory = useCallback(
-    (oldName: string, newName: string) => {
-      const trimmed = newName.trim();
-      if (!trimmed || trimmed === oldName) return;
-
-      const renameInList = (list: string[]) =>
-        list.map((c) => (c === oldName ? trimmed : c));
-
-      if (useDummyData) {
-        setDummyState((prev) => ({
-          ...prev,
-          expenseCategories: renameInList(prev.expenseCategories),
-          expenses: prev.expenses.map((e) =>
-            e.category === oldName ? { ...e, category: trimmed } : e,
-          ),
-        }));
-      } else {
-        dispatchExpenses({
-          type: "SET",
-          expenses: realExpenses.map((e) =>
-            e.category === oldName ? { ...e, category: trimmed } : e,
-          ),
-        });
-        settings.setExpenseCategories(
-          renameInList(settings.expenseCategories),
-        );
-      }
-    },
-    [useDummyData, setDummyState, dispatchExpenses, realExpenses, settings],
-  );
-
-  const renameIncomeCategory = useCallback(
-    (oldName: string, newName: string) => {
-      const trimmed = newName.trim();
-      if (!trimmed || trimmed === oldName) return;
-
-      const renameInList = (list: string[]) =>
-        list.map((c) => (c === oldName ? trimmed : c));
-
-      if (useDummyData) {
-        setDummyState((prev) => ({
-          ...prev,
-          incomeCategories: renameInList(prev.incomeCategories),
-          income: prev.income.map((i) =>
-            i.category === oldName ? { ...i, category: trimmed } : i,
-          ),
-        }));
-      } else {
-        dispatchIncome({
-          type: "SET",
-          income: realIncome.map((i) =>
-            i.category === oldName ? { ...i, category: trimmed } : i,
-          ),
-        });
-        settings.setIncomeCategories(
-          renameInList(settings.incomeCategories),
-        );
-      }
-    },
-    [useDummyData, setDummyState, dispatchIncome, realIncome, settings],
-  );
-
   const repairCorruptedDates = useCallback(() => {
     let fixedExpenses = 0;
     let fixedIncome = 0;
@@ -1131,12 +998,8 @@ function BudgetComposer({
       addOwnerTransfer,
       updateOwnerTransfer,
       removeOwnerTransfer,
-      setExpenseCategories,
-      setIncomeCategories,
       setOwners,
       renameOwner,
-      renameExpenseCategory,
-      renameIncomeCategory,
       setCardSources,
       setOwnerBalance,
       ownerBalances,
@@ -1178,12 +1041,8 @@ function BudgetComposer({
       addOwnerTransfer,
       updateOwnerTransfer,
       removeOwnerTransfer,
-      setExpenseCategories,
-      setIncomeCategories,
       setOwners,
       renameOwner,
-      renameExpenseCategory,
-      renameIncomeCategory,
       setCardSources,
       setOwnerBalance,
       repairCorruptedDates,
@@ -1208,9 +1067,19 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const isDev = import.meta.env.DEV;
   const stored = loadStoredBudget();
 
+  // Migrate flat category strings to composite keys on first load
+  let loadedExpenses = stored.expenses;
+  let loadedIncome = stored.income;
+  if (isMigrationNeeded()) {
+    const migrated = migrateCategories(stored.expenses, stored.income);
+    loadedExpenses = migrated.expenses;
+    loadedIncome = migrated.income;
+    setCategoryMigrationVersion(1);
+  }
+
   const transactionData: StoredTransactionData = {
-    expenses: stored.expenses,
-    income: stored.income,
+    expenses: loadedExpenses,
+    income: loadedIncome,
     debts: stored.debts,
     debtPayments: stored.debtPayments,
     ownerTransfers: stored.ownerTransfers,
@@ -1219,8 +1088,6 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
   const settingsData: StoredSettingsData = {
     ownerBalances: stored.ownerBalances,
     cardSources: stored.cardSources,
-    expenseCategories: stored.expenseCategories,
-    incomeCategories: stored.incomeCategories,
     owners: stored.owners,
   };
 

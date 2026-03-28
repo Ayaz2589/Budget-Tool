@@ -11,7 +11,6 @@ import {
   EXPENSE_SOURCE_BADGE_LABELS,
   EXPENSE_SOURCE_LOCALE_KEYS,
 } from "@/lib/format/sourceLabels";
-import { CategoryOption } from "@/lib/format/categoryColors";
 import {
   Select,
   SelectContent,
@@ -20,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DsCreatableSelect } from "@/components/ds";
+import { DsCategoryPicker } from "@/components/ds/DsCategoryPicker";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { PresetSelector } from "./PresetSelector";
@@ -43,7 +43,6 @@ interface TransactionFormRowProps {
   dateFormat: DateFormat;
   fieldClass: string;
   selectTriggerClass: string;
-  onCreateCategory?: (name: string) => void;
   onCreateOwner?: (name: string) => void;
 }
 
@@ -60,7 +59,6 @@ export function TransactionFormRow({
   dateFormat,
   fieldClass,
   selectTriggerClass,
-  onCreateCategory,
   onCreateOwner,
 }: TransactionFormRowProps) {
   const { t } = useTranslation();
@@ -123,11 +121,9 @@ export function TransactionFormRow({
           ownerOptions={ownerOptions}
           cardSources={cardSources}
           defaultSource={defaultSource}
-          expenseCategories={expenseCategories}
           dateFormat={dateFormat}
           fieldClass={fieldClass}
           selectTriggerClass={selectTriggerClass}
-          onCreateCategory={onCreateCategory}
           onCreateOwner={onCreateOwner}
           hasOwners={ownerOptions.length > 0}
         />
@@ -153,11 +149,9 @@ function ExpenseFields({
   ownerOptions,
   cardSources,
   defaultSource,
-  expenseCategories,
   dateFormat,
   fieldClass,
   selectTriggerClass,
-  onCreateCategory,
   onCreateOwner,
   hasOwners,
 }: {
@@ -166,11 +160,9 @@ function ExpenseFields({
   ownerOptions: string[];
   cardSources: string[];
   defaultSource: ExpenseSource;
-  expenseCategories: string[];
   dateFormat: DateFormat;
   fieldClass: string;
   selectTriggerClass: string;
-  onCreateCategory?: (name: string) => void;
   onCreateOwner?: (name: string) => void;
   hasOwners: boolean;
 }) {
@@ -218,42 +210,12 @@ function ExpenseFields({
           <div className="text-xs text-muted-foreground">
             {t("addTransaction.category")}
           </div>
-          {onCreateCategory ? (
-            <DsCreatableSelect
-              value={row.category || "_"}
-              onValueChange={(v) => onUpdate({ category: v === "_" ? "" : v })}
-              options={expenseCategories}
-              onCreateNew={onCreateCategory}
-              noneLabel={t("addTransaction.uncategorized")}
-              noneValue="_"
-              renderOption={(name) => <CategoryOption name={name} type="expense" />}
-              className={selectTriggerClass}
-            />
-          ) : (
-            <Select
-              value={row.category || "_"}
-              onValueChange={(v) =>
-                onUpdate({ category: v === "_" ? "" : v })
-              }
-            >
-              <SelectTrigger className={selectTriggerClass}>
-                <SelectValue placeholder="\u2014" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="_">
-                  <CategoryOption
-                    name={t("addTransaction.uncategorized")}
-                    type="expense"
-                  />
-                </SelectItem>
-                {expenseCategories.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    <CategoryOption name={c} type="expense" />
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          <DsCategoryPicker
+            value={row.category}
+            onValueChange={(v) => onUpdate({ category: v })}
+            type="expense"
+            className={selectTriggerClass}
+          />
         </div>
         <div className="space-y-1">
           <div className="text-xs text-muted-foreground">

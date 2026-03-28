@@ -17,7 +17,7 @@ import { DashboardFilters } from "./DashboardFilters";
 export function Dashboard() {
   const data = useDashboardData();
   const { t } = data;
-  const { expenses, income, debts, incomeCategories, owners, addIncome, uiFormatSettings } = useBudget();
+  const { expenses, income, debts, owners, addIncome, uiFormatSettings } = useBudget();
   const isEmpty = expenses.length === 0 && income.length === 0 && debts.length === 0;
 
   const [addTransactionOpen, setAddTransactionOpen] = useState(false);
@@ -114,7 +114,6 @@ export function Dashboard() {
       <AddIncomeDialog
         open={addIncomeOpen}
         onOpenChange={setAddIncomeOpen}
-        incomeCategories={incomeCategories}
         owners={owners}
         dateFormat={uiFormatSettings.dateFormat}
         onSubmit={handleAddIncome}

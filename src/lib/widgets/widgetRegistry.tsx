@@ -12,6 +12,8 @@ import {
   ArrowLeftRight,
   Clock,
   Receipt,
+  ListOrdered,
+  CalendarDays,
 } from "lucide-react";
 import { NetCashFlow } from "@/pages/dashboard/widgets/NetCashFlow";
 import { TotalSpent } from "@/pages/dashboard/widgets/TotalSpent";
@@ -26,6 +28,10 @@ import { NetTrendChart } from "@/pages/dashboard/widgets/NetTrendChart";
 import { CategoryChart } from "@/pages/dashboard/widgets/CategoryChart";
 import { OwnerSplitChart } from "@/pages/dashboard/widgets/OwnerSplitChart";
 import { OwnerExpenseByOwner } from "@/pages/dashboard/widgets/OwnerExpenseByOwner";
+import { SpendByCategoryChart } from "@/pages/dashboard/widgets/SpendByCategoryChart";
+import { CategoryTrendsChart } from "@/pages/dashboard/widgets/CategoryTrendsChart";
+import { TopCategories } from "@/pages/dashboard/widgets/TopCategories";
+import { DailySpendingHeatmap } from "@/pages/dashboard/widgets/DailySpendingHeatmap";
 import type { WidgetType, WidgetSize, WidgetRegistryEntry } from "@/lib/widgets/widget";
 import { createWidget } from "@/lib/widgets/createWidget";
 
@@ -196,6 +202,52 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetRegistryEntry> = {
     icon: <Clock className="size-4" />,
     render: (props: AnyProps, size: WidgetSize) => (
       <RecentActivity recentActivity={props.recentActivity} size={size} />
+    ),
+  }),
+  "spend-by-category": createWidget({
+    type: "spend-by-category",
+    label: "widget.spendByCategory",
+    icon: <BarChart3 className="size-4" />,
+    defaultSize: "lg",
+    sm: { w: 6, h: 3 },
+    md: { w: 6, h: 6 },
+    lg: { w: 6, h: 6 },
+    render: (props: AnyProps, size: WidgetSize) => (
+      <SpendByCategoryChart parentCategorySlices={props.parentCategorySlices} size={size} />
+    ),
+  }),
+  "category-trends": createWidget({
+    ...CHART_WIDE_DIMS,
+    type: "category-trends",
+    label: "widget.categoryTrends",
+    icon: <Activity className="size-4" />,
+    defaultSize: "lg",
+    render: (props: AnyProps, size: WidgetSize) => (
+      <CategoryTrendsChart categoryTrends={props.categoryTrends} size={size} />
+    ),
+  }),
+  "top-categories": createWidget({
+    type: "top-categories",
+    label: "widget.topCategories",
+    icon: <ListOrdered className="size-4" />,
+    defaultSize: "lg",
+    sm: { w: 6, h: 3 },
+    md: { w: 6, h: 6 },
+    lg: { w: 6, h: 6 },
+    render: (props: AnyProps, size: WidgetSize) => (
+      <TopCategories categorySlices={props.categorySlices} size={size} />
+    ),
+  }),
+  "daily-spending-heatmap": createWidget({
+    type: "daily-spending-heatmap",
+    label: "widget.dailySpendingHeatmap",
+    icon: <CalendarDays className="size-4" />,
+    defaultSize: "lg",
+    sm: { w: 6, h: 3 },
+    md: { w: 6, h: 6 },
+    lg: { w: 6, h: 6 },
+    render: (props: AnyProps, size: WidgetSize) => (
+      <DailySpendingHeatmap dailySpending={props.dailySpending} size={size} />
     ),
   }),
 };

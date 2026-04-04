@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import {
   Bar,
   BarChart,
-  CartesianGrid,
   XAxis,
   YAxis,
 } from "recharts";
@@ -132,8 +131,8 @@ export function CashFlowChart({
 
     return (
       <DsChartCard title={chartTitle} className="min-w-0" size={effectiveSize}>
-        <div className="flex items-start gap-8">
-          <div className="w-1/2 shrink-0">
+        <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-8">
+          <div className="shrink-0 md:w-1/2">
             <ChartContainer
               config={{
                 expenses: { label: t("dashboard.chartExpenses"), color: "var(--viz-expense)" },
@@ -145,9 +144,8 @@ export function CashFlowChart({
               heightDesktop={240}
             >
               <BarChart data={cashFlowDisplayRows} barCategoryGap="30%">
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} />
-                <YAxis />
+                <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} axisLine={false} tickLine={false} />
+                <YAxis hide />
                 <ChartTooltip content={tooltipContent} />
                 {incomeOwnerKeys.map((owner, index) => (
                   <Bar
@@ -166,7 +164,7 @@ export function CashFlowChart({
               </BarChart>
             </ChartContainer>
           </div>
-          <div className="flex-1 space-y-4 pt-2">
+          <div className="flex-1 space-y-4 md:pt-2">
             <div className="space-y-3">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm text-muted-foreground">{t("dashboard.chartIncome")}</span>
@@ -231,9 +229,8 @@ export function CashFlowChart({
           heightDesktop={300}
         >
           <BarChart data={cashFlowDisplayRows}>
-            <CartesianGrid vertical={false} />
-            <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} />
-            <YAxis />
+              <XAxis dataKey="monthAxisLabel" interval={0} tickMargin={8} minTickGap={0} axisLine={false} tickLine={false} />
+            <YAxis hide />
             <ChartTooltip content={tooltipContent} />
             {incomeOwnerKeys.map((owner, index) => (
               <Bar
@@ -273,7 +270,6 @@ export function CashFlowChart({
           data={cashFlowDisplayRows}
           margin={{ top: 4, right: 24, left: -4, bottom: 2 }}
         >
-          <CartesianGrid vertical={false} />
           <XAxis
             dataKey="monthAxisLabel"
             tick={{ fontSize: 11 }}
@@ -281,16 +277,10 @@ export function CashFlowChart({
             minTickGap={18}
             interval="preserveStartEnd"
             padding={{ left: 0, right: 8 }}
+            axisLine={false}
+            tickLine={false}
           />
-          <YAxis
-            tick={{ fontSize: 11 }}
-            width={34}
-            tickFormatter={(value) => {
-              const abs = Math.abs(Number(value));
-              if (abs >= 1000) return `${Math.round(Number(value) / 1000)}k`;
-              return String(Math.round(Number(value)));
-            }}
-          />
+          <YAxis hide />
           <ChartTooltip content={tooltipContent} />
           <Bar dataKey="incomeTotal" name={t("dashboard.chartIncome")} fill="var(--viz-income)" radius={[4, 4, 0, 0]} />
           <Bar

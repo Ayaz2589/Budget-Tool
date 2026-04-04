@@ -64,6 +64,49 @@ export interface DashboardCashFlowRow {
   incomeByOwner: Record<string, number>;
 }
 
+export interface DashboardParentCategorySlice {
+  label: string;
+  value: number;
+}
+
+export interface DashboardCategoryComparisonRow {
+  label: string;
+  currentValue: number;
+  previousValue: number;
+  changePct: number | null;
+  direction: "up" | "down" | "flat";
+}
+
+export interface DashboardCategoryTrendSeries {
+  category: string;
+  values: number[];
+}
+
+export interface DashboardCategoryTrends {
+  monthKeys: string[];
+  categories: string[];
+  series: DashboardCategoryTrendSeries[];
+}
+
+export interface DashboardDailyExpenseItem {
+  id: string;
+  description: string;
+  category: string;
+  amount: number;
+}
+
+export interface DashboardDailySpendingDay {
+  date: string;
+  amount: number;
+  items: DashboardDailyExpenseItem[];
+}
+
+export interface DashboardDailySpending {
+  monthKey: string;
+  days: DashboardDailySpendingDay[];
+  maxAmount: number;
+}
+
 export interface DashboardSelectorInput {
   currentMonthKey: string;
   range: DashboardRange;

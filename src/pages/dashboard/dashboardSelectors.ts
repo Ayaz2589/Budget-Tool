@@ -14,15 +14,20 @@ import {
 } from "@/lib/math";
 import { isMortgageCategory } from "@/lib/domain/mortgageCategory";
 import type { Debt, DebtPayment, Expense, Income, OwnerTransfer } from "@/types/core";
+import { COMPOSITE_KEY_SEPARATOR } from "@/lib/categories/registry";
 import type {
   DashboardCashFlowRow,
   DashboardCategorySlice,
+  DashboardCategoryComparisonRow,
+  DashboardCategoryTrends,
+  DashboardDailySpending,
   DashboardDebtRow,
   DashboardExpenseScope,
   DashboardKpis,
   DashboardOwnerNetRow,
   DashboardOwnerSlice,
   DashboardOwnerExpenseItem,
+  DashboardParentCategorySlice,
   DashboardRange,
   DashboardRecentItem,
 } from "@/types/dashboard";
@@ -184,17 +189,22 @@ export function buildCashFlowRows({
 export function buildCategoryBreakdown({
   expenses,
   currentMonthKey,
+  monthKeys,
   scope,
   uncategorizedLabel = "Uncategorized",
 }: {
   expenses: Expense[];
-  currentMonthKey: string;
+  currentMonthKey?: string;
+  monthKeys?: string[];
   scope: DashboardExpenseScope;
   uncategorizedLabel?: string;
 }): DashboardCategorySlice[] {
+  const allowedMonths = monthKeys ? new Set(monthKeys) : null;
   const byCategory = new Map<string, number>();
   for (const expense of expenses) {
-    if (!isValidDate(expense.date) || monthFromDate(expense.date) !== currentMonthKey) continue;
+    if (!isValidDate(expense.date)) continue;
+    const mk = monthFromDate(expense.date);
+    if (allowedMonths ? !allowedMonths.has(mk) : mk !== currentMonthKey) continue;
     if (!shouldIncludeExpense(expense, scope)) continue;
     const category = (expense.category || "").trim() || uncategorizedLabel;
     byCategory.set(category, (byCategory.get(category) ?? 0) + expense.amount);
@@ -463,4 +473,186 @@ export function buildOwnerNetRows({
 export function getOwnerDrilldownParam(slice: DashboardOwnerSlice): string {
   if (slice.owner) return slice.owner;
   return slice.key === SHARED_BUCKET_KEY ? "_shared" : "_none";
+}
+
+function getParentLabel(category: string, uncategorizedLabel: string): string {
+  const trimmed = (category || "").trim();
+  if (!trimmed) return uncategorizedLabel;
+  const sepIdx = trimmed.indexOf(COMPOSITE_KEY_SEPARATOR);
+  return sepIdx >= 0 ? trimmed.slice(0, sepIdx) : trimmed;
+}
+
+export function buildParentCategoryBreakdown({
+  expenses,
+  currentMonthKey,
+  monthKeys,
+  scope,
+  uncategorizedLabel = "Uncategorized",
+}: {
+  expenses: Expense[];
+  currentMonthKey?: string;
+  monthKeys?: string[];
+  scope: DashboardExpenseScope;
+  uncategorizedLabel?: string;
+}): DashboardParentCategorySlice[] {
+  const allowedMonths = monthKeys ? new Set(monthKeys) : null;
+  const byParent = new Map<string, number>();
+  for (const expense of expenses) {
+    if (!isValidDate(expense.date)) continue;
+    const mk = monthFromDate(expense.date);
+    if (allowedMonths ? !allowedMonths.has(mk) : mk !== currentMonthKey) continue;
+    if (!shouldIncludeExpense(expense, scope)) continue;
+    const parent = getParentLabel(expense.category, uncategorizedLabel);
+    byParent.set(parent, (byParent.get(parent) ?? 0) + expense.amount);
+  }
+
+  return Array.from(byParent.entries())
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value);
+}
+
+export function buildCategoryTrends({
+  expenses,
+  monthKeys,
+  scope,
+  uncategorizedLabel = "Uncategorized",
+}: {
+  expenses: Expense[];
+  monthKeys: string[];
+  scope: DashboardExpenseScope;
+  uncategorizedLabel?: string;
+}): DashboardCategoryTrends {
+  const monthKeySet = new Set(monthKeys);
+  const monthIndexMap = new Map(monthKeys.map((k, i) => [k, i]));
+
+  // category → monthIndex → total
+  const categoryMonthTotals = new Map<string, number[]>();
+  const categoryTotals = new Map<string, number>();
+
+  for (const expense of expenses) {
+    if (!isValidDate(expense.date)) continue;
+    const mk = monthFromDate(expense.date);
+    if (!monthKeySet.has(mk)) continue;
+    if (!shouldIncludeExpense(expense, scope)) continue;
+
+    const parent = getParentLabel(expense.category, uncategorizedLabel);
+    const monthIdx = monthIndexMap.get(mk)!;
+
+    if (!categoryMonthTotals.has(parent)) {
+      categoryMonthTotals.set(parent, new Array(monthKeys.length).fill(0));
+    }
+    categoryMonthTotals.get(parent)![monthIdx] += expense.amount;
+    categoryTotals.set(parent, (categoryTotals.get(parent) ?? 0) + expense.amount);
+  }
+
+  // Sort categories by total spend descending
+  const sortedCategories = Array.from(categoryTotals.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([cat]) => cat);
+
+  return {
+    monthKeys,
+    categories: sortedCategories,
+    series: sortedCategories.map((category) => ({
+      category,
+      values: categoryMonthTotals.get(category)!,
+    })),
+  };
+}
+
+export function buildCategoryComparison({
+  expenses,
+  currentMonthKey,
+  scope,
+  uncategorizedLabel = "Uncategorized",
+}: {
+  expenses: Expense[];
+  currentMonthKey: string;
+  scope: DashboardExpenseScope;
+  uncategorizedLabel?: string;
+}): DashboardCategoryComparisonRow[] {
+  const previousMonthKey = getPreviousMonthKey(currentMonthKey);
+  const currentTotals = new Map<string, number>();
+  const previousTotals = new Map<string, number>();
+
+  for (const expense of expenses) {
+    if (!isValidDate(expense.date)) continue;
+    if (!shouldIncludeExpense(expense, scope)) continue;
+    const mk = monthFromDate(expense.date);
+    if (mk !== currentMonthKey && mk !== previousMonthKey) continue;
+
+    const parent = getParentLabel(expense.category, uncategorizedLabel);
+    const target = mk === currentMonthKey ? currentTotals : previousTotals;
+    target.set(parent, (target.get(parent) ?? 0) + expense.amount);
+  }
+
+  const allCategories = new Set([...currentTotals.keys(), ...previousTotals.keys()]);
+  const rows: DashboardCategoryComparisonRow[] = [];
+
+  for (const label of allCategories) {
+    const currentValue = currentTotals.get(label) ?? 0;
+    const previousValue = previousTotals.get(label) ?? 0;
+    const changePct = computeMonthOverMonthPct(currentValue, previousValue);
+
+    let direction: "up" | "down" | "flat";
+    if (changePct === null) {
+      direction = currentValue > 0 ? "up" : "flat";
+    } else if (changePct > 0) {
+      direction = "up";
+    } else if (changePct < 0) {
+      direction = "down";
+    } else {
+      direction = "flat";
+    }
+
+    rows.push({ label, currentValue, previousValue, changePct, direction });
+  }
+
+  return rows.sort((a, b) => b.currentValue - a.currentValue);
+}
+
+export function buildDailySpending({
+  expenses,
+  monthKey,
+  scope,
+}: {
+  expenses: Expense[];
+  monthKey: string;
+  scope: DashboardExpenseScope;
+}): DashboardDailySpending {
+  const [y, m] = monthKey.split("-").map(Number);
+  const daysInMonth = new Date(y!, m!, 0).getDate();
+
+  type DayBucket = { total: number; items: { id: string; description: string; category: string; amount: number }[] };
+  const dayMap = new Map<string, DayBucket>();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = `${monthKey}-${String(d).padStart(2, "0")}`;
+    dayMap.set(date, { total: 0, items: [] });
+  }
+
+  for (const expense of expenses) {
+    if (!isValidDate(expense.date)) continue;
+    if (monthFromDate(expense.date) !== monthKey) continue;
+    if (!shouldIncludeExpense(expense, scope)) continue;
+    const bucket = dayMap.get(expense.date);
+    if (bucket) {
+      bucket.total += expense.amount;
+      bucket.items.push({
+        id: expense.id,
+        description: expense.description,
+        category: expense.category,
+        amount: expense.amount,
+      });
+    }
+  }
+
+  let maxAmount = 0;
+  const days = Array.from(dayMap.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, bucket]) => {
+      if (bucket.total > maxAmount) maxAmount = bucket.total;
+      return { date, amount: bucket.total, items: bucket.items };
+    });
+
+  return { monthKey, days, maxAmount };
 }

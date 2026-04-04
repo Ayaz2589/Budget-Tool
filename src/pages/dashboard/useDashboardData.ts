@@ -21,6 +21,10 @@ import {
   buildSpendBySource,
   buildOwnerTransfersMtd,
   buildRecentActivity,
+  buildParentCategoryBreakdown,
+  buildCategoryTrends,
+  buildCategoryComparison,
+  buildDailySpending,
   getCurrentMonthKey,
   getRangeMonthKeys,
 } from "@/pages/dashboard/dashboardSelectors";
@@ -156,11 +160,54 @@ export function useDashboardData() {
     () =>
       buildCategoryBreakdown({
         expenses: scopedExpenses,
+        monthKeys,
+        scope: expenseScope,
+        uncategorizedLabel: t("common.uncategorized"),
+      }),
+    [scopedExpenses, monthKeys, expenseScope, t],
+  );
+
+  const parentCategorySlices = useMemo(
+    () =>
+      buildParentCategoryBreakdown({
+        expenses: scopedExpenses,
+        monthKeys,
+        scope: expenseScope,
+        uncategorizedLabel: t("common.uncategorized"),
+      }),
+    [scopedExpenses, monthKeys, expenseScope, t],
+  );
+
+  const categoryTrends = useMemo(
+    () =>
+      buildCategoryTrends({
+        expenses: scopedExpenses,
+        monthKeys,
+        scope: expenseScope,
+        uncategorizedLabel: t("common.uncategorized"),
+      }),
+    [scopedExpenses, monthKeys, expenseScope, t],
+  );
+
+  const categoryComparison = useMemo(
+    () =>
+      buildCategoryComparison({
+        expenses: scopedExpenses,
         currentMonthKey,
         scope: expenseScope,
         uncategorizedLabel: t("common.uncategorized"),
       }),
     [scopedExpenses, currentMonthKey, expenseScope, t],
+  );
+
+  const dailySpending = useMemo(
+    () =>
+      buildDailySpending({
+        expenses: scopedExpenses,
+        monthKey: currentMonthKey,
+        scope: expenseScope,
+      }),
+    [scopedExpenses, currentMonthKey, expenseScope],
   );
 
   const ownerSlices = useMemo(
@@ -335,6 +382,10 @@ export function useDashboardData() {
     incomeOwnerKeys,
     netCashFlowRows,
     categorySlices,
+    parentCategorySlices,
+    categoryTrends,
+    categoryComparison,
+    dailySpending,
     ownerSlices,
     visibleOwnerNetRows,
     ownerExpenseItemsByOwner,

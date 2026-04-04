@@ -13,7 +13,11 @@ export type WidgetType =
   | "spend-by-source"
   | "owner-transfers"
   | "recent-activity"
-  | "owner-expense-by-owner";
+  | "owner-expense-by-owner"
+  | "spend-by-category"
+  | "category-trends"
+  | "top-categories"
+  | "daily-spending-heatmap";
 
 export type WidgetSize = "sm" | "md" | "lg";
 

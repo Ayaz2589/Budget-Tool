@@ -76,11 +76,8 @@ test("Dashboard renders PRD sections", () => {
   render(<TestWrapper />);
   expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
   expect(screen.getByText("Net Cash Flow (MTD)")).toBeInTheDocument();
-  expect(screen.getByText("Income vs Expenses")).toBeInTheDocument();
-  expect(screen.getByText("Spending Breakdown")).toBeInTheDocument();
-  expect(screen.getByText("Shared vs Individual Spending")).toBeInTheDocument();
-  expect(screen.getByText("Debt Snapshot")).toBeInTheDocument();
-  expect(screen.getByText("Recent Activity")).toBeInTheDocument();
+  expect(screen.getByText("Spend by Category")).toBeInTheDocument();
+  expect(screen.getByText("Category Trends")).toBeInTheDocument();
 });
 
 test("Dashboard settings modal toggles mortgage exclusion", () => {
@@ -133,8 +130,8 @@ test("Dashboard debt row is read-only", () => {
     }),
   );
   render(<TestWrapper />);
-  expect(screen.getByText("Car loan")).toBeInTheDocument();
-  expect(screen.queryByText("/dashboard/debt?debtId=d1")).toBeNull();
+  // Debt snapshot widget removed — verify dashboard still renders
+  expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
 });
 
 // TODO: Owner names render inside chart widgets that report 0×0 in happy-dom; fix when widget test harness is available

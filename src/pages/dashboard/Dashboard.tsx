@@ -33,7 +33,7 @@ export function Dashboard() {
 
   return (
     <div data-tour-page="dashboard" className="flex flex-col min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
-      <div className={`min-w-0 px-2 md:px-0 pt-4 md:pt-0 space-y-4${isEmpty ? " flex flex-1 flex-col" : ""}`}>
+      <div className={`min-w-0 px-4 md:px-0 pt-4 md:pt-0 space-y-4${isEmpty ? " flex flex-1 flex-col" : ""}`}>
         <div className="space-y-3" data-tour="dashboard-header">
           <DsSectionHeader
             title={

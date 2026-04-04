@@ -27,8 +27,8 @@ describe("WIDGET_REGISTRY", () => {
     }
   });
 
-  test("has exactly 13 registered widgets", () => {
-    expect(Object.keys(WIDGET_REGISTRY).length).toBe(13);
+  test("has exactly 17 registered widgets", () => {
+    expect(Object.keys(WIDGET_REGISTRY).length).toBe(17);
   });
 
   test("each entry has required fields", () => {

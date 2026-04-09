@@ -3,19 +3,12 @@ import type { Location } from "react-router-dom";
 import {
   LogIn,
   LogOut,
-  Globe,
   ChevronDown,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { DsLanguagePicker } from "@/components/ds";
 import {
   Popover,
   PopoverContent,
@@ -29,11 +22,10 @@ import {
 import {
   DsSidebarBrand,
   DsSidebarNavItem,
-  DS_SIDEBAR_LANGUAGE_TRIGGER_CLASS,
 } from "@/components/ds";
 import { cn } from "@/lib/utils";
 import { Avatar } from "./Avatar";
-import { LANGUAGE_OPTIONS, navGroups } from "./layoutConstants";
+import { navGroups } from "./layoutConstants";
 
 interface SidebarContentProps {
   location: Location;
@@ -108,34 +100,11 @@ export function SidebarContent({
         {/* Language */}
         {collapsed ? (
           <div className="flex justify-center">
-            <Select value={currentLng} onValueChange={handleLanguageChange}>
-              <SelectTrigger className="size-10 justify-center rounded-[var(--radius-control)] border-0 bg-transparent px-0 text-[var(--text-secondary)] hover:bg-[var(--control-hover)] hover:text-[var(--text-primary)] [&>svg:last-child]:hidden">
-                <Globe className="size-4" />
-              </SelectTrigger>
-              <SelectContent side="right" align="end" className="max-h-[280px]!">
-                {LANGUAGE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <DsLanguagePicker value={currentLng} onChange={handleLanguageChange} compact />
           </div>
         ) : (
           <div className="px-1">
-            <Select value={currentLng} onValueChange={handleLanguageChange}>
-              <SelectTrigger className={DS_SIDEBAR_LANGUAGE_TRIGGER_CLASS}>
-                <Globe className="size-3.5" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="max-h-[280px]!">
-                {LANGUAGE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <DsLanguagePicker value={currentLng} onChange={handleLanguageChange} />
           </div>
         )}
 

@@ -4,18 +4,11 @@ import { useTranslation } from "react-i18next";
 import {
   LogIn,
   LogOut,
-  Globe,
   MoreHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { DsLanguagePicker } from "@/components/ds";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar } from "./Avatar";
-import { bottomNavItems, moreNavItems, LANGUAGE_OPTIONS } from "./layoutConstants";
+import { bottomNavItems, moreNavItems } from "./layoutConstants";
 
 interface MobileBottomNavProps {
   isActivePath: (to: string) => boolean;
@@ -113,19 +106,7 @@ export function MobileBottomNav({
               <div className="px-2 text-xs font-medium text-muted-foreground">
                 {t("layout.language")}
               </div>
-              <Select value={currentLng} onValueChange={handleLanguageChange}>
-                <SelectTrigger className="h-9 w-full">
-                  <Globe className="size-4 shrink-0" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="max-h-[280px]!">
-                  {LANGUAGE_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <DsLanguagePicker value={currentLng} onChange={handleLanguageChange} />
             </div>
             <div className="pt-2">
               {isSignedIn ? (

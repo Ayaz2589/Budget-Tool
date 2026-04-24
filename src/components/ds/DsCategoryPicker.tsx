@@ -78,33 +78,33 @@ export function DsCategoryPicker({
         </button>
       </PopoverTrigger>
       <PopoverContent
+        portal={false}
         align="start"
-        className="w-[var(--radix-popover-trigger-width)] min-w-[14rem] p-0 flex flex-col max-h-[var(--radix-popover-content-available-height)]"
+        className="w-[var(--radix-popover-trigger-width)] min-w-[14rem] p-1 max-h-[var(--radix-popover-content-available-height,24rem)] overflow-y-auto overscroll-contain"
         collisionPadding={8}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-1">
-          {/* Uncategorized option */}
-          <button
-            type="button"
-            className={cn(
-              "relative flex w-full cursor-default items-center gap-2 rounded-md py-2 pr-8 pl-2.5 text-sm outline-none select-none hover:bg-[var(--control-hover)]",
-              !value && "font-medium",
-            )}
-            onClick={() => handleSelect("")}
-          >
-            {!value ? (
-              <span className="absolute right-2 flex size-3.5 items-center justify-center">
-                <CheckIcon className="size-4" />
-              </span>
-            ) : null}
-            <CircleDashed className="size-4 text-muted-foreground" />
-            <span className="text-muted-foreground">
-              {t("addTransaction.uncategorized", "Uncategorized")}
+        {/* Uncategorized option */}
+        <button
+          type="button"
+          className={cn(
+            "relative flex w-full cursor-default items-center gap-2 rounded-md py-2 pr-8 pl-2.5 text-sm outline-none select-none hover:bg-[var(--control-hover)]",
+            !value && "font-medium",
+          )}
+          onClick={() => handleSelect("")}
+        >
+          {!value ? (
+            <span className="absolute right-2 flex size-3.5 items-center justify-center">
+              <CheckIcon className="size-4" />
             </span>
-          </button>
+          ) : null}
+          <CircleDashed className="size-4 text-muted-foreground" />
+          <span className="text-muted-foreground">
+            {t("addTransaction.uncategorized", "Uncategorized")}
+          </span>
+        </button>
 
-          {isIncome
+        {isIncome
             ? /* Income: flat list of subcategories (no parent header) */
               parents[0]?.subcategories.map((sub) => {
                 const compositeKey = buildCompositeKey(
@@ -189,7 +189,6 @@ export function DsCategoryPicker({
                   </div>
                 );
               })}
-        </div>
       </PopoverContent>
     </Popover>
   );

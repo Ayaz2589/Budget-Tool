@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { CheckIcon, ChevronDownIcon, CircleDashed } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import type { CategoryType } from "@/types/category";
 import {
@@ -14,6 +10,10 @@ import {
   buildCompositeKey,
 } from "@/lib/categories/registry";
 import { DsCategoryIcon } from "./DsCategoryIcon";
+
+const Popover = PopoverPrimitive.Root;
+const PopoverTrigger = PopoverPrimitive.Trigger;
+const PopoverContent = PopoverPrimitive.Content;
 
 interface DsCategoryPickerProps {
   value: string;
@@ -78,9 +78,9 @@ export function DsCategoryPicker({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        portal={false}
         align="start"
-        className="w-[var(--radix-popover-trigger-width)] min-w-[14rem] p-1 max-h-[var(--radix-popover-content-available-height,24rem)] overflow-y-auto overscroll-contain"
+        sideOffset={8}
+        className="z-50 rounded-md border bg-popover text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 w-[var(--radix-popover-trigger-width)] min-w-[14rem] p-1 max-h-[var(--radix-popover-content-available-height,24rem)] overflow-y-auto overscroll-contain"
         collisionPadding={8}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >

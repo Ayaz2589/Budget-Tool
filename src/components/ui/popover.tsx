@@ -6,25 +6,13 @@ import { cn } from "@/lib/utils";
 const Popover = PopoverPrimitive.Root;
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
-type PopoverContentProps = React.ComponentProps<
-  typeof PopoverPrimitive.Content
-> & {
-  /**
-   * When false, the content is rendered in place instead of in a portal.
-   * Useful inside a Radix Dialog/Sheet, whose `react-remove-scroll` blocks
-   * wheel/touch events on portaled siblings of the dialog content.
-   */
-  portal?: boolean;
-};
-
 const PopoverContent = ({
   className,
   align = "center",
   sideOffset = 8,
-  portal = true,
   ...props
-}: PopoverContentProps) => {
-  const content = (
+}: React.ComponentProps<typeof PopoverPrimitive.Content>) => (
+  <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content
       align={align}
       sideOffset={sideOffset}
@@ -34,8 +22,7 @@ const PopoverContent = ({
       )}
       {...props}
     />
-  );
-  return portal ? <PopoverPrimitive.Portal>{content}</PopoverPrimitive.Portal> : content;
-};
+  </PopoverPrimitive.Portal>
+);
 
 export { Popover, PopoverTrigger, PopoverContent };

@@ -233,9 +233,11 @@ test("TransactionsPage shows empty state when no valid non-mortgage expenses", (
     },
   ]);
 
-  render(<TestWrapper />);
+  const { container } = render(<TestWrapper />);
   expect(
-    screen.getByText("No transactions yet. Import a CSV or add one manually."),
+    within(container).getByText(
+      "No transactions yet. Import a CSV or add one manually.",
+    ),
   ).toBeInTheDocument();
 });
 
